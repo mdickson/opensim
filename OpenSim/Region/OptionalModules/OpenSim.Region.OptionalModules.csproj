@@ -1,0 +1,234 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>14.0.23107.0</ProductVersion>
+    <ApplicationIcon />
+    <AssemblyKeyContainerName />
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <TargetFramework>net46</TargetFramework>
+    <AppDesignerFolder />
+    <StartupObject />
+    <StartArguments />
+    <FileUpgradeFlags />
+    <AssemblyTitle>OpenSim.Region.OptionalModules</AssemblyTitle>
+    <Product>OpenSim.Region.OptionalModules.Properties</Product>
+    <Description>Optional modules for OpenSim</Description>
+    <Copyright>Copyright ©  2012</Copyright>
+    <AssemblyVersion>OpenSim.VersionInfo.AssemblyVersionNumber</AssemblyVersion>
+    <FileVersion>OpenSim.VersionInfo.AssemblyVersionNumber</FileVersion>
+    <OutputPath>../../../bin/</OutputPath>
+    <NoWarn />
+    <ConfigurationOverrideFile />
+    <FileAlignment>4096</FileAlignment>
+    <DocumentationFile />
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoStdLib>False</NoStdLib>
+    <BaseAddress>285212672</BaseAddress>
+    <RemoveIntegerChecks>False</RemoveIntegerChecks>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DotNetOpenMail">
+      <HintPath>../../../bin/DotNetOpenMail.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Ionic.Zip">
+      <HintPath>../../../bin/Ionic.Zip.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>../../../bin/log4net.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.Addins">
+      <HintPath>../../../bin/Mono.Addins.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.Data.SqliteClient">
+      <HintPath>../../../bin/Mono.Data.SqliteClient.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NDesk.Options">
+      <HintPath>../../../bin/NDesk.Options.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="netcd">
+      <HintPath>../../../bin/netcd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Nini">
+      <HintPath>../../../bin/Nini.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverse">
+      <HintPath>../../../bin/OpenMetaverse.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverse.StructuredData">
+      <HintPath>../../../bin/OpenMetaverse.StructuredData.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverseTypes">
+      <HintPath>../../../bin/OpenMetaverseTypes.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Web">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="XMLRPC">
+      <HintPath>../../../bin/XMLRPC.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Capabilities/OpenSim.Capabilities.csproj" />
+    <ProjectReference Include="../../Data/OpenSim.Data.csproj" />
+    <ProjectReference Include="../../Framework/OpenSim.Framework.csproj" />
+    <ProjectReference Include="../../Framework/Console/OpenSim.Framework.Console.csproj" />
+    <ProjectReference Include="../../Framework/Monitoring/OpenSim.Framework.Monitoring.csproj" />
+    <ProjectReference Include="../../Framework/Servers/OpenSim.Framework.Servers.csproj" />
+    <ProjectReference Include="../../Framework/Servers/HttpServer/OpenSim.Framework.Servers.HttpServer.csproj" />
+    <ProjectReference Include="../ClientStack/Linden/UDP/OpenSim.Region.ClientStack.LindenUDP.csproj" />
+    <ProjectReference Include="../CoreModules/OpenSim.Region.CoreModules.csproj" />
+    <ProjectReference Include="../Framework/OpenSim.Region.Framework.csproj" />
+    <ProjectReference Include="../PhysicsModules/SharedBase/OpenSim.Region.PhysicsModules.SharedBase.csproj" />
+    <ProjectReference Include="../../Server/Base/OpenSim.Server.Base.csproj" />
+    <ProjectReference Include="../../Server/Handlers/OpenSim.Server.Handlers.csproj" />
+    <ProjectReference Include="../../Services/Base/OpenSim.Services.Base.csproj" />
+    <ProjectReference Include="../../Services/Connectors/OpenSim.Services.Connectors.csproj" />
+    <ProjectReference Include="../../Services/Interfaces/OpenSim.Services.Interfaces.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Asset/AssetInfoModule.cs" />
+    <Compile Remove="DataSnapshot/DataRequestHandler.cs" />
+    <Compile Remove="DataSnapshot/DataSnapshotManager.cs" />
+    <Compile Remove="DataSnapshot/EstateSnapshot.cs" />
+    <Compile Remove="DataSnapshot/LandSnapshot.cs" />
+    <Compile Remove="DataSnapshot/LLSDDiscovery.cs" />
+    <Compile Remove="DataSnapshot/ObjectSnapshot.cs" />
+    <Compile Remove="DataSnapshot/SnapshotStore.cs" />
+    <Compile Remove="Materials/MaterialsModule.cs" />
+    <Compile Remove="PhysicsParameters/PhysicsParameters.cs" />
+    <Compile Remove="PrimLimitsModule/PrimLimitsModule.cs" />
+    <Compile Remove="Properties/AssemblyInfo.cs" />
+    <Compile Remove="UserStatistics/ActiveConnectionsAJAX.cs" />
+    <Compile Remove="UserStatistics/Clients_report.cs" />
+    <Compile Remove="UserStatistics/Default_Report.cs" />
+    <Compile Remove="UserStatistics/HTMLUtil.cs" />
+    <Compile Remove="UserStatistics/IStatsReport.cs" />
+    <Compile Remove="UserStatistics/LogLinesAJAX.cs" />
+    <Compile Remove="UserStatistics/Prototype_distributor.cs" />
+    <Compile Remove="UserStatistics/Sessions_Report.cs" />
+    <Compile Remove="UserStatistics/SimStatsAJAX.cs" />
+    <Compile Remove="UserStatistics/Updater_distributor.cs" />
+    <Compile Remove="UserStatistics/WebStatsModule.cs" />
+    <Compile Remove="ViewerSupport/CameraOnlyModeModule.cs" />
+    <Compile Remove="ViewerSupport/DynamicFloaterModule.cs" />
+    <Compile Remove="ViewerSupport/DynamicMenuModule.cs" />
+    <Compile Remove="ViewerSupport/GodNamesModule.cs" />
+    <Compile Remove="ViewerSupport/SimulatorFeaturesHelper.cs" />
+    <Compile Remove="ViewerSupport/SpecialUIModule.cs" />
+    <Compile Remove="Agent/InternetRelayClientView/IRCStackModule.cs" />
+    <Compile Remove="Agent/TextureSender/J2KDecoderCommandModule.cs" />
+    <Compile Remove="Avatar/Animations/AnimationsCommandModule.cs" />
+    <Compile Remove="Avatar/Appearance/AppearanceInfoModule.cs" />
+    <Compile Remove="Avatar/Attachments/AttachmentsCommandModule.cs" />
+    <Compile Remove="Avatar/Attachments/TempAttachmentsModule.cs" />
+    <Compile Remove="Avatar/Chat/ChannelState.cs" />
+    <Compile Remove="Avatar/Chat/IRCBridgeModule.cs" />
+    <Compile Remove="Avatar/Chat/IRCConnector.cs" />
+    <Compile Remove="Avatar/Chat/RegionState.cs" />
+    <Compile Remove="Avatar/Concierge/ConciergeModule.cs" />
+    <Compile Remove="Avatar/Friends/FriendsCommandsModule.cs" />
+    <Compile Remove="Avatar/SitStand/SitStandCommandsModule.cs" />
+    <Compile Remove="Avatar/XmlRpcGroups/GroupsMessagingModule.cs" />
+    <Compile Remove="Avatar/XmlRpcGroups/GroupsModule.cs" />
+    <Compile Remove="Avatar/XmlRpcGroups/IGroupsServicesConnector.cs" />
+    <Compile Remove="Avatar/XmlRpcGroups/SimianGroupsServicesConnectorModule.cs" />
+    <Compile Remove="Avatar/XmlRpcGroups/XmlRpcGroupsServicesConnectorModule.cs" />
+    <Compile Remove="DataSnapshot/Interfaces/IDataSnapshot.cs" />
+    <Compile Remove="DataSnapshot/Interfaces/IDataSnapshotProvider.cs" />
+    <Compile Remove="Example/BareBonesNonShared/BareBonesNonSharedModule.cs" />
+    <Compile Remove="Example/BareBonesShared/BareBonesSharedModule.cs" />
+    <Compile Remove="Example/WebSocketEchoTest/WebSocketEchoModule.cs" />
+    <Compile Remove="Framework/Monitoring/EtcdMonitoringModule.cs" />
+    <Compile Remove="Framework/Monitoring/MonitorServicesModule.cs" />
+    <Compile Remove="Scripting/JsonStore/JsonStore.cs" />
+    <Compile Remove="Scripting/JsonStore/JsonStoreCommands.cs" />
+    <Compile Remove="Scripting/JsonStore/JsonStoreModule.cs" />
+    <Compile Remove="Scripting/JsonStore/JsonStoreScriptModule.cs" />
+    <Compile Remove="Scripting/Minimodule/ExtensionHandler.cs" />
+    <Compile Remove="Scripting/Minimodule/Graphics.cs" />
+    <Compile Remove="Scripting/Minimodule/Heightmap.cs" />
+    <Compile Remove="Scripting/Minimodule/Host.cs" />
+    <Compile Remove="Scripting/Minimodule/IMRMModule.cs" />
+    <Compile Remove="Scripting/Minimodule/InventoryItem.cs" />
+    <Compile Remove="Scripting/Minimodule/ISecurityCredential.cs" />
+    <Compile Remove="Scripting/Minimodule/LOParcel.cs" />
+    <Compile Remove="Scripting/Minimodule/MicroScheduler.cs" />
+    <Compile Remove="Scripting/Minimodule/MRMBase.cs" />
+    <Compile Remove="Scripting/Minimodule/MRMModule.cs" />
+    <Compile Remove="Scripting/Minimodule/ObjectAccessor.cs" />
+    <Compile Remove="Scripting/Minimodule/SecurityCredential.cs" />
+    <Compile Remove="Scripting/Minimodule/SEUser.cs" />
+    <Compile Remove="Scripting/Minimodule/SOPObject.cs" />
+    <Compile Remove="Scripting/Minimodule/SOPObjectInventory.cs" />
+    <Compile Remove="Scripting/Minimodule/SOPObjectMaterial.cs" />
+    <Compile Remove="Scripting/Minimodule/SPAvatar.cs" />
+    <Compile Remove="Scripting/Minimodule/SPAvatarAttachment.cs" />
+    <Compile Remove="Scripting/Minimodule/World.cs" />
+    <Compile Remove="Scripting/ObjectModules/IObjectModule.cs" />
+    <Compile Remove="Scripting/RegionReadyModule/RegionReadyModule.cs" />
+    <Compile Remove="Scripting/XmlRpcRouterModule/XmlRpcGridRouterModule.cs" />
+    <Compile Remove="Scripting/XmlRpcRouterModule/XmlRpcRouterModule.cs" />
+    <Compile Remove="ServiceConnectorsIn/Freeswitch/FreeswitchServiceInConnectorModule.cs" />
+    <Compile Remove="World/AutoBackup/AutoBackupModule.cs" />
+    <Compile Remove="World/AutoBackup/AutoBackupModuleState.cs" />
+    <Compile Remove="World/MoneyModule/SampleMoneyModule.cs" />
+    <Compile Remove="World/NPC/NPCAvatar.cs" />
+    <Compile Remove="World/NPC/NPCModule.cs" />
+    <Compile Remove="World/SceneCommands/SceneCommandsModule.cs" />
+    <Compile Remove="World/TreePopulator/TreePopulatorModule.cs" />
+    <Compile Remove="World/WorldView/WorldViewModule.cs" />
+    <Compile Remove="World/WorldView/WorldViewRequestHandler.cs" />
+    <Compile Remove="Agent/InternetRelayClientView/Server/IRCClientView.cs" />
+    <Compile Remove="Agent/InternetRelayClientView/Server/IRCServer.cs" />
+    <Compile Remove="Agent/UDP/Linden/LindenUDPInfoModule.cs" />
+    <Compile Remove="Avatar/Voice/FreeSwitchVoice/FreeSwitchVoiceModule.cs" />
+    <Compile Remove="Avatar/Voice/VivoxVoice/VivoxVoiceModule.cs" />
+    <Compile Remove="Avatar/XmlRpcGroups/Tests/GroupsModuleTests.cs" />
+    <Compile Remove="Scripting/JsonStore/Tests/JsonStoreScriptModuleTests.cs" />
+    <Compile Remove="Scripting/Minimodule/Interfaces/IAvatar.cs" />
+    <Compile Remove="Scripting/Minimodule/Interfaces/IAvatarAttachment.cs" />
+    <Compile Remove="Scripting/Minimodule/Interfaces/IEntity.cs" />
+    <Compile Remove="Scripting/Minimodule/Interfaces/IExtension.cs" />
+    <Compile Remove="Scripting/Minimodule/Interfaces/IGraphics.cs" />
+    <Compile Remove="Scripting/Minimodule/Interfaces/IHeightmap.cs" />
+    <Compile Remove="Scripting/Minimodule/Interfaces/IHost.cs" />
+    <Compile Remove="Scripting/Minimodule/Interfaces/IInventoryItem.cs" />
+    <Compile Remove="Scripting/Minimodule/Interfaces/IMicrothreader.cs" />
+    <Compile Remove="Scripting/Minimodule/Interfaces/IObject.cs" />
+    <Compile Remove="Scripting/Minimodule/Interfaces/IObjectAccessor.cs" />
+    <Compile Remove="Scripting/Minimodule/Interfaces/IParcel.cs" />
+    <Compile Remove="Scripting/Minimodule/Interfaces/IPersistence.cs" />
+    <Compile Remove="Scripting/Minimodule/Interfaces/IScheduler.cs" />
+    <Compile Remove="Scripting/Minimodule/Interfaces/ISocialEntity.cs" />
+    <Compile Remove="Scripting/Minimodule/Interfaces/IWorld.cs" />
+    <Compile Remove="Scripting/Minimodule/Object/IObjectInventory.cs" />
+    <Compile Remove="Scripting/Minimodule/Object/IObjectPhysics.cs" />
+    <Compile Remove="Scripting/Minimodule/Object/IObjectShape.cs" />
+    <Compile Remove="Scripting/Minimodule/Object/IObjectSound.cs" />
+    <Compile Remove="Scripting/Minimodule/Test/DrunkenTextAppreciationModule.cs" />
+    <Compile Remove="Scripting/Minimodule/Test/TestModule.cs" />
+    <Compile Remove="Scripting/Minimodule/WorldX/IWorldAudio.cs" />
+    <Compile Remove="World/NPC/Tests/NPCModuleTests.cs" />
+  </ItemGroup>
+</Project>

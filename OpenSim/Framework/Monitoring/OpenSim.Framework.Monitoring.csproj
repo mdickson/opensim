@@ -1,0 +1,73 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>14.0.23107.0</ProductVersion>
+    <ApplicationIcon />
+    <AssemblyKeyContainerName />
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <TargetFramework>net46</TargetFramework>
+    <AppDesignerFolder />
+    <StartupObject />
+    <StartArguments />
+    <FileUpgradeFlags />
+    <AssemblyTitle>OpenSim.Framework.Monitoring</AssemblyTitle>
+    <Company>http://opensimulator.org</Company>
+    <Product>OpenSim</Product>
+    <Copyright>OpenSimulator developers</Copyright>
+    <AssemblyVersion>OpenSim.VersionInfo.AssemblyVersionNumber</AssemblyVersion>
+    <FileVersion>OpenSim.VersionInfo.AssemblyVersionNumber</FileVersion>
+    <OutputPath>../../../bin/</OutputPath>
+    <NoWarn />
+    <ConfigurationOverrideFile />
+    <FileAlignment>4096</FileAlignment>
+    <DocumentationFile />
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoStdLib>False</NoStdLib>
+    <BaseAddress>285212672</BaseAddress>
+    <RemoveIntegerChecks>False</RemoveIntegerChecks>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>../../../bin/log4net.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Nini">
+      <HintPath>../../../bin/Nini.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverse">
+      <HintPath>../../../bin/OpenMetaverse.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverse.StructuredData">
+      <HintPath>../../../bin/OpenMetaverse.StructuredData.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverseTypes">
+      <HintPath>../../../bin/OpenMetaverseTypes.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../OpenSim.Framework.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Checks/Check.cs" />
+    <Compile Remove="Interfaces/IPullStatsProvider.cs" />
+    <Compile Remove="Interfaces/IStatsCollector.cs" />
+    <Compile Remove="Properties/AssemblyInfo.cs" />
+    <Compile Remove="Stats/CounterStat.cs" />
+    <Compile Remove="Stats/EventHistogram.cs" />
+    <Compile Remove="Stats/PercentageStat.cs" />
+    <Compile Remove="Stats/Stat.cs" />
+  </ItemGroup>
+</Project>

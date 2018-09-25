@@ -1,0 +1,112 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>14.0.23107.0</ProductVersion>
+    <ApplicationIcon />
+    <AssemblyKeyContainerName />
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <TargetFramework>net46</TargetFramework>
+    <AppDesignerFolder />
+    <StartupObject />
+    <StartArguments />
+    <FileUpgradeFlags />
+    <OutputPath>../../../bin/</OutputPath>
+    <NoWarn />
+    <ConfigurationOverrideFile />
+    <FileAlignment>4096</FileAlignment>
+    <DocumentationFile />
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoStdLib>False</NoStdLib>
+    <BaseAddress>285212672</BaseAddress>
+    <RemoveIntegerChecks>False</RemoveIntegerChecks>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="HttpServer_OpenSim">
+      <HintPath>../../../bin/HttpServer_OpenSim.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>../../../bin/log4net.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Nini">
+      <HintPath>../../../bin/Nini.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverse.StructuredData">
+      <HintPath>../../../bin/OpenMetaverse.StructuredData.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverseTypes">
+      <HintPath>../../../bin/OpenMetaverseTypes.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="XMLRPC">
+      <HintPath>../../../bin/XMLRPC.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Data/OpenSim.Data.csproj" />
+    <ProjectReference Include="../OpenSim.Framework.csproj" />
+    <ProjectReference Include="../Console/OpenSim.Framework.Console.csproj" />
+    <ProjectReference Include="../Monitoring/OpenSim.Framework.Monitoring.csproj" />
+    <ProjectReference Include="../Servers/HttpServer/OpenSim.Framework.Servers.HttpServer.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="HttpServer/BaseHTTPHandler.cs" />
+    <Compile Remove="HttpServer/BaseHttpServer.cs" />
+    <Compile Remove="HttpServer/BaseOutputStreamHandler.cs" />
+    <Compile Remove="HttpServer/BaseRequestHandler.cs" />
+    <Compile Remove="HttpServer/BaseStreamHandler.cs" />
+    <Compile Remove="HttpServer/BaseStreamHandlerBasicDOSProtector.cs" />
+    <Compile Remove="HttpServer/BinaryStreamHandler.cs" />
+    <Compile Remove="HttpServer/GenericHTTPBasicDOSProtector.cs" />
+    <Compile Remove="HttpServer/GenericHTTPMethod.cs" />
+    <Compile Remove="HttpServer/JsonRPCMethod.cs" />
+    <Compile Remove="HttpServer/JsonRpcRequestManager.cs" />
+    <Compile Remove="HttpServer/JsonRpcResponse.cs" />
+    <Compile Remove="HttpServer/LLSDMethod.cs" />
+    <Compile Remove="HttpServer/LLSDMethodString.cs" />
+    <Compile Remove="HttpServer/OSHttpHandler.cs" />
+    <Compile Remove="HttpServer/OSHttpHttpHandler.cs" />
+    <Compile Remove="HttpServer/OSHttpRequest.cs" />
+    <Compile Remove="HttpServer/OSHttpRequestPump.cs" />
+    <Compile Remove="HttpServer/OSHttpRequestQueue.cs" />
+    <Compile Remove="HttpServer/OSHttpResponse.cs" />
+    <Compile Remove="HttpServer/OSHttpServer.cs" />
+    <Compile Remove="HttpServer/OSHttpStatusCodes.cs" />
+    <Compile Remove="HttpServer/OSHttpXmlRpcHandler.cs" />
+    <Compile Remove="HttpServer/PollServiceEventArgs.cs" />
+    <Compile Remove="HttpServer/PollServiceHttpRequest.cs" />
+    <Compile Remove="HttpServer/PollServiceRequestManager.cs" />
+    <Compile Remove="HttpServer/RestDeserialiseHandler.cs" />
+    <Compile Remove="HttpServer/RestHTTPHandler.cs" />
+    <Compile Remove="HttpServer/RestMethod.cs" />
+    <Compile Remove="HttpServer/RestObjectPoster.cs" />
+    <Compile Remove="HttpServer/RestObjectPosterResponse.cs" />
+    <Compile Remove="HttpServer/RestSessionService.cs" />
+    <Compile Remove="HttpServer/RestStreamHandler.cs" />
+    <Compile Remove="HttpServer/WebsocketServerHandler.cs" />
+    <Compile Remove="HttpServer/XmlRpcBasicDOSProtector.cs" />
+    <Compile Remove="HttpServer/XmlRpcMethod.cs" />
+    <Compile Remove="Properties/AssemblyInfo.cs" />
+    <Compile Remove="Tests/OSHttpTests.cs" />
+    <Compile Remove="Tests/VersionInfoTests.cs" />
+    <Compile Remove="HttpServer/Interfaces/IHttpAgentHandler.cs" />
+    <Compile Remove="HttpServer/Interfaces/IHttpServer.cs" />
+    <Compile Remove="HttpServer/Interfaces/IOSHttpRequest.cs" />
+    <Compile Remove="HttpServer/Interfaces/IOSHttpResponse.cs" />
+    <Compile Remove="HttpServer/Interfaces/IStreamHandler.cs" />
+    <Compile Remove="HttpServer/Properties/AssemblyInfo.cs" />
+  </ItemGroup>
+</Project>

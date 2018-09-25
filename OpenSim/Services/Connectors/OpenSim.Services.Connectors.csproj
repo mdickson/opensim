@@ -1,0 +1,124 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>14.0.23107.0</ProductVersion>
+    <ApplicationIcon />
+    <AssemblyKeyContainerName />
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <TargetFramework>net46</TargetFramework>
+    <AppDesignerFolder />
+    <StartupObject />
+    <StartArguments />
+    <FileUpgradeFlags />
+    <AssemblyTitle>OpenSim.Services.Connectors</AssemblyTitle>
+    <Company>http://opensimulator.org</Company>
+    <Product>OpenSim</Product>
+    <Copyright>OpenSimulator developers</Copyright>
+    <AssemblyVersion>OpenSim.VersionInfo.AssemblyVersionNumber</AssemblyVersion>
+    <FileVersion>OpenSim.VersionInfo.AssemblyVersionNumber</FileVersion>
+    <OutputPath>../../../bin/</OutputPath>
+    <NoWarn />
+    <ConfigurationOverrideFile />
+    <FileAlignment>4096</FileAlignment>
+    <DocumentationFile />
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoStdLib>False</NoStdLib>
+    <BaseAddress>285212672</BaseAddress>
+    <RemoveIntegerChecks>False</RemoveIntegerChecks>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>../../../bin/log4net.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.Addins">
+      <HintPath>../../../bin/Mono.Addins.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Nini">
+      <HintPath>../../../bin/Nini.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverse">
+      <HintPath>../../../bin/OpenMetaverse.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverse.StructuredData">
+      <HintPath>../../../bin/OpenMetaverse.StructuredData.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverseTypes">
+      <HintPath>../../../bin/OpenMetaverseTypes.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Web">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="XMLRPC">
+      <HintPath>../../../bin/XMLRPC.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Capabilities/OpenSim.Capabilities.csproj" />
+    <ProjectReference Include="../../Data/OpenSim.Data.csproj" />
+    <ProjectReference Include="../../Framework/OpenSim.Framework.csproj" />
+    <ProjectReference Include="../../Framework/Console/OpenSim.Framework.Console.csproj" />
+    <ProjectReference Include="../../Framework/Monitoring/OpenSim.Framework.Monitoring.csproj" />
+    <ProjectReference Include="../../Framework/Servers/HttpServer/OpenSim.Framework.Servers.HttpServer.csproj" />
+    <ProjectReference Include="../../Region/Framework/OpenSim.Region.Framework.csproj" />
+    <ProjectReference Include="../../Server/Base/OpenSim.Server.Base.csproj" />
+    <ProjectReference Include="../Base/OpenSim.Services.Base.csproj" />
+    <ProjectReference Include="../Interfaces/OpenSim.Services.Interfaces.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="AgentPreferences/AgentPreferencesConnector.cs" />
+    <Compile Remove="Asset/AssetServicesConnector.cs" />
+    <Compile Remove="Asset/HGAssetServiceConnector.cs" />
+    <Compile Remove="Authentication/AuthenticationServicesConnector.cs" />
+    <Compile Remove="Authorization/AuthorizationServicesConnector.cs" />
+    <Compile Remove="Avatar/AvatarServicesConnector.cs" />
+    <Compile Remove="Estate/EstateDataConnector.cs" />
+    <Compile Remove="Freeswitch/RemoteFreeswitchConnector.cs" />
+    <Compile Remove="Friends/FriendsServicesConnector.cs" />
+    <Compile Remove="Friends/FriendsSimConnector.cs" />
+    <Compile Remove="Grid/GridServicesConnector.cs" />
+    <Compile Remove="GridUser/GridUserServicesConnector.cs" />
+    <Compile Remove="Hypergrid/GatekeeperServiceConnector.cs" />
+    <Compile Remove="Hypergrid/HeloServicesConnector.cs" />
+    <Compile Remove="Hypergrid/HGFriendsServicesConnector.cs" />
+    <Compile Remove="Hypergrid/UserAgentServiceConnector.cs" />
+    <Compile Remove="InstantMessage/InstantMessageServiceConnector.cs" />
+    <Compile Remove="Inventory/XInventoryServicesConnector.cs" />
+    <Compile Remove="Land/LandServicesConnector.cs" />
+    <Compile Remove="MapImage/MapImageServicesConnector.cs" />
+    <Compile Remove="MuteList/MuteListServicesConnector.cs" />
+    <Compile Remove="Neighbour/NeighbourServicesConnector.cs" />
+    <Compile Remove="Presence/PresenceServicesConnector.cs" />
+    <Compile Remove="Properties/AssemblyInfo.cs" />
+    <Compile Remove="SimianGrid/SimianActivityDetector.cs" />
+    <Compile Remove="SimianGrid/SimianAssetServiceConnector.cs" />
+    <Compile Remove="SimianGrid/SimianAuthenticationServiceConnector.cs" />
+    <Compile Remove="SimianGrid/SimianAvatarServiceConnector.cs" />
+    <Compile Remove="SimianGrid/SimianExternalCapsModule.cs" />
+    <Compile Remove="SimianGrid/SimianFriendsServiceConnector.cs" />
+    <Compile Remove="SimianGrid/SimianGrid.cs" />
+    <Compile Remove="SimianGrid/SimianGridMaptileModule.cs" />
+    <Compile Remove="SimianGrid/SimianGridServiceConnector.cs" />
+    <Compile Remove="SimianGrid/SimianInventoryServiceConnector.cs" />
+    <Compile Remove="SimianGrid/SimianPresenceServiceConnector.cs" />
+    <Compile Remove="SimianGrid/SimianProfiles.cs" />
+    <Compile Remove="SimianGrid/SimianUserAccountServiceConnector.cs" />
+    <Compile Remove="Simulation/SimulationServiceConnector.cs" />
+    <Compile Remove="UserAccounts/UserAccountServicesConnector.cs" />
+  </ItemGroup>
+</Project>

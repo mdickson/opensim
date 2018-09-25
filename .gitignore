@@ -1,8 +1,6 @@
 .project
 .settings
 .gitignore
-*.csproj
-*.csproj.user
 *.build
 *.mdb
 *.mdp
@@ -81,7 +79,6 @@ bin/*.manifest
 bin/crashes/
 Examples/*.dll
 OpenSim.build
-OpenSim.sln
 OpenSim.userprefs
 Prebuild/Prebuild.build
 Prebuild/Prebuild.sln

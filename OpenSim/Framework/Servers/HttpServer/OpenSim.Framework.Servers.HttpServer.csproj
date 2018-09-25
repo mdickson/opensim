@@ -1,0 +1,82 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>14.0.23107.0</ProductVersion>
+    <ApplicationIcon />
+    <AssemblyKeyContainerName />
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <TargetFramework>net46</TargetFramework>
+    <AppDesignerFolder />
+    <StartupObject />
+    <StartArguments />
+    <FileUpgradeFlags />
+    <AssemblyTitle>OpenSim.Framework.Servers.HttpServer</AssemblyTitle>
+    <Company>http://opensimulator.org</Company>
+    <Product>OpenSim</Product>
+    <Copyright>OpenSimulator developers</Copyright>
+    <AssemblyVersion>OpenSim.VersionInfo.AssemblyVersionNumber</AssemblyVersion>
+    <FileVersion>OpenSim.VersionInfo.AssemblyVersionNumber</FileVersion>
+    <OutputPath>../../../../bin/</OutputPath>
+    <NoWarn />
+    <ConfigurationOverrideFile />
+    <FileAlignment>4096</FileAlignment>
+    <DocumentationFile />
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoStdLib>False</NoStdLib>
+    <BaseAddress>285212672</BaseAddress>
+    <RemoveIntegerChecks>False</RemoveIntegerChecks>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="HttpServer_OpenSim">
+      <HintPath>../../../../bin/HttpServer_OpenSim.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>../../../../bin/log4net.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverse.StructuredData">
+      <HintPath>../../../../bin/OpenMetaverse.StructuredData.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverseTypes">
+      <HintPath>../../../../bin/OpenMetaverseTypes.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Web">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="XMLRPC">
+      <HintPath>../../../../bin/XMLRPC.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../OpenSim.Framework.csproj" />
+    <ProjectReference Include="../../Monitoring/OpenSim.Framework.Monitoring.csproj" />
+    <ProjectReference Include="../../../../ThirdParty/SmartThreadPool/SmartThreadPool.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="OSHttpHandler.cs" />
+    <Compile Remove="OSHttpHttpHandler.cs" />
+    <Compile Remove="OSHttpRequestPump.cs" />
+    <Compile Remove="OSHttpRequestQueue.cs" />
+    <Compile Remove="OSHttpServer.cs" />
+    <Compile Remove="OSHttpXmlRpcHandler.cs" />
+    <Compile Remove="Interfaces/IHttpAgentHandler.cs" />
+    <Compile Remove="Interfaces/IHttpServer.cs" />
+    <Compile Remove="Interfaces/IOSHttpRequest.cs" />
+    <Compile Remove="Interfaces/IOSHttpResponse.cs" />
+    <Compile Remove="Interfaces/IStreamHandler.cs" />
+    <Compile Remove="Properties/AssemblyInfo.cs" />
+  </ItemGroup>
+</Project>

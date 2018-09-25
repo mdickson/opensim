@@ -1,0 +1,81 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>14.0.23107.0</ProductVersion>
+    <ApplicationIcon />
+    <AssemblyKeyContainerName />
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <TargetFramework>net46</TargetFramework>
+    <AppDesignerFolder />
+    <StartupObject />
+    <StartArguments />
+    <FileUpgradeFlags />
+    <OutputPath>../../bin/</OutputPath>
+    <NoWarn />
+    <ConfigurationOverrideFile />
+    <FileAlignment>4096</FileAlignment>
+    <DocumentationFile />
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoStdLib>False</NoStdLib>
+    <BaseAddress>285212672</BaseAddress>
+    <RemoveIntegerChecks>False</RemoveIntegerChecks>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>../../bin/log4net.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Nini">
+      <HintPath>../../bin/Nini.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverse">
+      <HintPath>../../bin/OpenMetaverse.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverseTypes">
+      <HintPath>../../bin/OpenMetaverseTypes.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Web">
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Framework/OpenSim.Framework.csproj" />
+    <ProjectReference Include="../Framework/Monitoring/OpenSim.Framework.Monitoring.csproj" />
+    <ProjectReference Include="../Framework/Servers/OpenSim.Framework.Servers.csproj" />
+    <ProjectReference Include="../Framework/Servers/HttpServer/OpenSim.Framework.Servers.HttpServer.csproj" />
+    <ProjectReference Include="../Services/Interfaces/OpenSim.Services.Interfaces.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Properties/AssemblyInfo.cs" />
+    <Compile Remove="Handlers/AvatarPickerSearch/AvatarPickerSearchHandler.cs" />
+    <Compile Remove="Handlers/FetchInventory/FetchInvDescHandler.cs" />
+    <Compile Remove="Handlers/FetchInventory/FetchInvDescServerConnector.cs" />
+    <Compile Remove="Handlers/FetchInventory/FetchInventory2Handler.cs" />
+    <Compile Remove="Handlers/FetchInventory/FetchInventory2ServerConnector.cs" />
+    <Compile Remove="Handlers/GetDisplayNames/GetDisplayNamesHandler.cs" />
+    <Compile Remove="Handlers/GetDisplayNames/GetDisplayNamesServerConnector.cs" />
+    <Compile Remove="Handlers/GetMesh/GetMeshHandler.cs" />
+    <Compile Remove="Handlers/GetMesh/GetMeshServerConnector.cs" />
+    <Compile Remove="Handlers/GetTexture/GetTextureHandler.cs" />
+    <Compile Remove="Handlers/GetTexture/GetTextureRobustHandler.cs" />
+    <Compile Remove="Handlers/GetTexture/GetTextureServerConnector.cs" />
+    <Compile Remove="Handlers/Properties/AssemblyInfo.cs" />
+    <Compile Remove="Handlers/UploadBakedTexture/UploadBakedTextureHandler.cs" />
+    <Compile Remove="Handlers/UploadBakedTexture/UploadBakedTextureServerConnector.cs" />
+    <Compile Remove="Handlers/FetchInventory/Tests/FetchInventory2HandlerTests.cs" />
+    <Compile Remove="Handlers/FetchInventory/Tests/FetchInventoryDescendents2HandlerTests.cs" />
+    <Compile Remove="Handlers/GetTexture/Tests/GetTextureHandlerTests.cs" />
+  </ItemGroup>
+</Project>

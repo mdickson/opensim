@@ -1,0 +1,115 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>14.0.23107.0</ProductVersion>
+    <ApplicationIcon />
+    <AssemblyKeyContainerName />
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <TargetFramework>net46</TargetFramework>
+    <AppDesignerFolder />
+    <StartupObject />
+    <StartArguments />
+    <FileUpgradeFlags />
+    <OutputPath>../../../bin/</OutputPath>
+    <NoWarn />
+    <ConfigurationOverrideFile />
+    <FileAlignment>4096</FileAlignment>
+    <DocumentationFile />
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoStdLib>False</NoStdLib>
+    <BaseAddress>285212672</BaseAddress>
+    <RemoveIntegerChecks>False</RemoveIntegerChecks>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="HttpServer_OpenSim">
+      <HintPath>../../../bin/HttpServer_OpenSim.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>../../../bin/log4net.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.Addins">
+      <HintPath>../../../bin/Mono.Addins.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Nini">
+      <HintPath>../../../bin/Nini.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>../../../bin/nunit.framework.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverse">
+      <HintPath>../../../bin/OpenMetaverse.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverse.StructuredData">
+      <HintPath>../../../bin/OpenMetaverse.StructuredData.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverseTypes">
+      <HintPath>../../../bin/OpenMetaverseTypes.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Web">
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Data/OpenSim.Data.csproj" />
+    <ProjectReference Include="../../Data/Null/OpenSim.Data.Null.csproj" />
+    <ProjectReference Include="../../Framework/OpenSim.Framework.csproj" />
+    <ProjectReference Include="../../Framework/Console/OpenSim.Framework.Console.csproj" />
+    <ProjectReference Include="../../Framework/Servers/OpenSim.Framework.Servers.csproj" />
+    <ProjectReference Include="../../Framework/Servers/HttpServer/OpenSim.Framework.Servers.HttpServer.csproj" />
+    <ProjectReference Include="../../Region/ClientStack/Linden/Caps/OpenSim.Region.ClientStack.LindenCaps.csproj" />
+    <ProjectReference Include="../../Region/ClientStack/Linden/UDP/OpenSim.Region.ClientStack.LindenUDP.csproj" />
+    <ProjectReference Include="../../Region/CoreModules/OpenSim.Region.CoreModules.csproj" />
+    <ProjectReference Include="../../Region/Framework/OpenSim.Region.Framework.csproj" />
+    <ProjectReference Include="../../Region/OptionalModules/OpenSim.Region.OptionalModules.csproj" />
+    <ProjectReference Include="../../Region/PhysicsModules/BasicPhysics/OpenSim.Region.PhysicsModule.BasicPhysics.csproj" />
+    <ProjectReference Include="../../Region/PhysicsModules/SharedBase/OpenSim.Region.PhysicsModules.SharedBase.csproj" />
+    <ProjectReference Include="../../Region/ScriptEngine/Shared/OpenSim.Region.ScriptEngine.Shared.csproj" />
+    <ProjectReference Include="../../Server/Base/OpenSim.Server.Base.csproj" />
+    <ProjectReference Include="../../Services/Interfaces/OpenSim.Services.Interfaces.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Helpers/AssetHelpers.cs" />
+    <Compile Remove="Helpers/BaseRequestHandlerHelpers.cs" />
+    <Compile Remove="Helpers/ClientStackHelpers.cs" />
+    <Compile Remove="Helpers/EntityTransferHelpers.cs" />
+    <Compile Remove="Helpers/SceneHelpers.cs" />
+    <Compile Remove="Helpers/TaskInventoryHelpers.cs" />
+    <Compile Remove="Helpers/UserAccountHelpers.cs" />
+    <Compile Remove="Helpers/UserInventoryHelpers.cs" />
+    <Compile Remove="Mock/BaseAssetRepository.cs" />
+    <Compile Remove="Mock/MockAssetDataPlugin.cs" />
+    <Compile Remove="Mock/MockGroupsServicesConnector.cs" />
+    <Compile Remove="Mock/MockRegionDataPlugin.cs" />
+    <Compile Remove="Mock/MockScriptEngine.cs" />
+    <Compile Remove="Mock/TestClient.cs" />
+    <Compile Remove="Mock/TestEventQueueGetModule.cs" />
+    <Compile Remove="Mock/TestGroupsDataPlugin.cs" />
+    <Compile Remove="Mock/TestHttpClientContext.cs" />
+    <Compile Remove="Mock/TestHttpRequest.cs" />
+    <Compile Remove="Mock/TestHttpResponse.cs" />
+    <Compile Remove="Mock/TestInventoryDataPlugin.cs" />
+    <Compile Remove="Mock/TestLandChannel.cs" />
+    <Compile Remove="Mock/TestLLUDPServer.cs" />
+    <Compile Remove="Mock/TestOSHttpRequest.cs" />
+    <Compile Remove="Mock/TestOSHttpResponse.cs" />
+    <Compile Remove="Mock/TestScene.cs" />
+    <Compile Remove="Mock/TestXInventoryDataPlugin.cs" />
+  </ItemGroup>
+</Project>
