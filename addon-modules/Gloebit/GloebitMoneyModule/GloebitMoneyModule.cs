@@ -2288,20 +2288,22 @@ namespace Gloebit.GloebitMoneyModule
         /// If this is a new session, if not authed, requests auth.  If authed, sends purchase url.
         /// </summary>
         private void OnCompleteMovementToRegion(IClientAPI client, bool blah) {
-            // TODO: may now be albe to remove client from these funcs (since we moved this out of OnNewClient, but this still might be simpler.
-            m_log.DebugFormat("[GLOEBITMONEYMODULE] OnCompleteMovementToRegion for {0} with bool {1}", client.AgentId, blah);
-            m_log.DebugFormat("[GLOEBITMONEYMODULE] OnCompleteMovementToRegion SessionId:{0} SecureSessionId:{1}", client.SessionId, client.SecureSessionId);
+            System.Threading.ThreadPool.QueueUserWorkItem(delegate {
+                // TODO: may now be albe to remove client from these funcs (since we moved this out of OnNewClient, but this still might be simpler.
+                m_log.DebugFormat("[GLOEBITMONEYMODULE] OnCompleteMovementToRegion for {0} with bool {1}", client.AgentId, blah);
+                m_log.DebugFormat("[GLOEBITMONEYMODULE] OnCompleteMovementToRegion SessionId:{0} SecureSessionId:{1}", client.SessionId, client.SecureSessionId);
 
-            GloebitUser user = GloebitUser.Get(m_key, client.AgentId);
-            // If authed, update balance immediately
-            if (user.IsAuthed()) {
-                // Don't send Buy Gloebits messaging so that we don't spam
-                UpdateBalance(client.AgentId, client, 0);
-            }
-            if (user.IsNewSession(client.SessionId)) {
-                // Send welcome messaging and buy gloebits messaging or auth messaging
-                SendNewSessionMessaging(client, user);
-            }
+                GloebitUser user = GloebitUser.Get(m_key, client.AgentId);
+                // If authed, update balance immediately
+                if (user.IsAuthed()) {
+                    // Don't send Buy Gloebits messaging so that we don't spam
+                    UpdateBalance(client.AgentId, client, 0);
+                }
+                if (user.IsNewSession(client.SessionId)) {
+                    // Send welcome messaging and buy gloebits messaging or auth messaging
+                    SendNewSessionMessaging(client, user);
+                }
+            }, null);
         }
 
         /// <summary>
