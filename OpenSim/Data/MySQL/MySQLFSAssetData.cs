@@ -225,8 +225,8 @@ namespace OpenSim.Data.MySQL
                 using (MySqlCommand cmd = new MySqlCommand())
                 {
                     cmd.Parameters.AddWithValue("?id", meta.ID);
-                    cmd.Parameters.AddWithValue("?name", meta.Name);
-                    cmd.Parameters.AddWithValue("?description", meta.Description);
+                    cmd.Parameters.AddWithValue("?name", meta.Name.Substring(0, Math.Min(meta.Name.Length, 64)));
+                    cmd.Parameters.AddWithValue("?description", meta.Description.Substring(0, Math.Min(meta.Description.Length, 128)));
 //                    cmd.Parameters.AddWithValue("?type", meta.Type.ToString());
                     cmd.Parameters.AddWithValue("?type", meta.Type);
                     cmd.Parameters.AddWithValue("?hash", hash);

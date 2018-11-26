@@ -191,6 +191,11 @@ namespace OpenSim.Server
 
             int res = m_Server.Run();
 
+            if (res != 0)
+            {
+                m_log.ErrorFormat("[SERVER]: Non-Zero exit code from Server.Run() = {0}", res);
+            }
+
             if(m_Server != null)
                 m_Server.Shutdown();
 

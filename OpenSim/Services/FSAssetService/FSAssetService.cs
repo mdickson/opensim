@@ -517,8 +517,6 @@ namespace OpenSim.Services.FSAssetService
             catch (Exception exception)
             {
                 m_log.Error(exception.ToString());
-                Thread.Sleep(5000);
-                Environment.Exit(1);
                 return null;
             }
         }
