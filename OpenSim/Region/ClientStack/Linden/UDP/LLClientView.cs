@@ -6341,7 +6341,8 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
             m_thisAgentUpdateArgs.lastpacketSequence = seq;
 
-            OnPreAgentUpdate?.Invoke(this, m_thisAgentUpdateArgs);
+            if (OnPreAgentUpdate != null)
+                OnPreAgentUpdate(this, m_thisAgentUpdateArgs);
 
             bool movement;
             bool camera;
@@ -6370,7 +6371,8 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
                 m_thisAgentUpdateArgs.NeedsCameraCollision = !camera;
 
-                OnAgentUpdate?.Invoke(this, m_thisAgentUpdateArgs);
+                if (OnAgentUpdate != null)
+                    OnAgentUpdate(this, m_thisAgentUpdateArgs);
             }
 
             // Was there a significant camera(s) change?
@@ -6383,7 +6385,8 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
                 m_thisAgentUpdateArgs.NeedsCameraCollision = true;
 
-                OnAgentCameraUpdate?.Invoke(this, m_thisAgentUpdateArgs);
+                if (OnAgentCameraUpdate != null)
+                    OnAgentCameraUpdate(this, m_thisAgentUpdateArgs);
             }
 
             if(movement && camera)
@@ -6923,8 +6926,12 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             return true;
         }
 
-        uint m_DeRezObjectLasSeq = 0;
-        Dictionary<UUID, List<uint>> m_DeRezObjectDelayed = new Dictionary<UUID, List<uint>>();
+        private class DeRezObjectInfo
+        {
+            public int count;
+            public List<uint> objectids;
+        }
+        private Dictionary<UUID, DeRezObjectInfo> m_DeRezObjectDelayed = new Dictionary<UUID, DeRezObjectInfo>();
 
         private bool HandlerDeRezObject(IClientAPI sender, Packet Pack)
         {
@@ -6940,23 +6947,26 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 return true;
             #endregion
 
-            uint seq = DeRezPacket.Header.Sequence;
-            if(seq <= m_DeRezObjectLasSeq)
-                return true;
-            m_DeRezObjectLasSeq = seq;
-
             List<uint> deRezIDs;
             DeRezAction action = (DeRezAction)DeRezPacket.AgentBlock.Destination;
             int numberPackets = DeRezPacket.AgentBlock.PacketCount;
             int curPacket = DeRezPacket.AgentBlock.PacketNumber;
             UUID id = DeRezPacket.AgentBlock.TransactionID;
 
-            if (numberPackets > 1) 
+            if (numberPackets > 1)
             {
-                if(!m_DeRezObjectDelayed.TryGetValue(id, out deRezIDs))
+                DeRezObjectInfo info;
+                if (!m_DeRezObjectDelayed.TryGetValue(id, out info))
                 {
                     deRezIDs = new List<uint>();
-                    m_DeRezObjectDelayed[id] = deRezIDs;
+                    info = new DeRezObjectInfo();
+                    info.count = 0;
+                    info.objectids = deRezIDs;
+                    m_DeRezObjectDelayed[id] = info;
+                }
+                else
+                {
+                    deRezIDs = info.objectids;
                 }
 
                 foreach (DeRezObjectPacket.ObjectDataBlock data in DeRezPacket.ObjectData)
@@ -6964,10 +6974,12 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                     deRezIDs.Add(data.ObjectLocalID);
                 }
 
-                if (curPacket < numberPackets - 1)
+                info.count++;
+                if (info.count < numberPackets)
                     return true;
 
                 m_DeRezObjectDelayed.Remove(id);
+                info.objectids = null;
             }
             else
             {

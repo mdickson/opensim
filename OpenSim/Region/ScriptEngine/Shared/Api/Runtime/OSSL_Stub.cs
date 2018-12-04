@@ -289,12 +289,12 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 
         // Animation Functions
 
-        public void osAvatarPlayAnimation(string avatar, string animation)
+        public void osAvatarPlayAnimation(LSL_Key avatar, string animation)
         {
             m_OSSL_Functions.osAvatarPlayAnimation(avatar, animation);
         }
 
-        public void osAvatarStopAnimation(string avatar, string animation)
+        public void osAvatarStopAnimation(LSL_Key avatar, string animation)
         {
             m_OSSL_Functions.osAvatarStopAnimation(avatar, animation);
         }
@@ -474,16 +474,6 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
         public string osGetSimulatorVersion()
         {
            return m_OSSL_Functions.osGetSimulatorVersion();
-        }
-
-        public Hashtable osParseJSON(string JSON)
-        {
-            return m_OSSL_Functions.osParseJSON(JSON);
-        }
-
-        public Object osParseJSONNew(string JSON)
-        {
-            return m_OSSL_Functions.osParseJSONNew(JSON);
         }
 
         public void osMessageObject(key objectUUID,string message)

@@ -158,8 +158,8 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         void osTeleportOwner(LSL_Types.Vector3 position, LSL_Types.Vector3 lookat);
 
         // Animation commands
-        void osAvatarPlayAnimation(string avatar, string animation);
-        void osAvatarStopAnimation(string avatar, string animation);
+        void osAvatarPlayAnimation(LSL_Key avatarId, string animation);
+        void osAvatarStopAnimation(LSL_Key avatarId, string animation);
 
         #region Attachment commands
 
@@ -269,8 +269,6 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         LSL_Integer osCheckODE();
         string osGetPhysicsEngineType();
         string osGetPhysicsEngineName();
-        Object osParseJSONNew(string JSON);
-        Hashtable osParseJSON(string JSON);
 
         void osMessageObject(key objectUUID,string message);
 

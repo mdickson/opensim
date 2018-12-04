@@ -27,6 +27,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Reflection;
 using System.IO;
@@ -43,27 +44,46 @@ using Caps = OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Capabilities.Handlers
 {
-    public class GetMeshHandler
+    public class GetAssetsHandler
     {
         private static readonly ILog m_log =
                    LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        private static readonly Dictionary<string, AssetType> queryTypes = new Dictionary<string, AssetType>()
+        {
+            {"texture_id", AssetType.Texture},
+            {"sound_id", AssetType.Sound},
+            {"callcard_id", AssetType.CallingCard},
+            {"landmark_id", AssetType.Landmark},
+            {"script_id", AssetType.LSLText},
+            {"clothing_id", AssetType.Clothing},
+            {"object_id", AssetType.Object},
+            {"notecard_id", AssetType.Notecard},
+            {"lsltext_id", AssetType.LSLText},
+            {"lslbyte_id", AssetType.LSLBytecode},
+            {"txtr_tga_id", AssetType.TextureTGA},
+            {"bodypart_id", AssetType.Bodypart},
+            {"snd_wav_id", AssetType.SoundWAV},
+            {"img_tga_id", AssetType.ImageTGA},
+            {"jpeg_id", AssetType.ImageJPEG},
+            {"animatn_id", AssetType.Animation},
+            {"gesture_id", AssetType.Gesture},
+            {"mesh_id", AssetType.Mesh}
+        };
+
         private IAssetService m_assetService;
 
-        public const string DefaultFormat = "vnd.ll.mesh";
-
-        public GetMeshHandler(IAssetService assService)
+        public GetAssetsHandler(IAssetService assService)
         {
             m_assetService = assService;
         }
+
         public Hashtable Handle(Hashtable request)
         {
-            return ProcessGetMesh(request, UUID.Zero, null); ;
-        }
-
-        public Hashtable ProcessGetMesh(Hashtable request, UUID AgentId, Caps cap)
-        {
             Hashtable responsedata = new Hashtable();
+            responsedata["content_type"] = "text/plain";
+            responsedata["int_bytes"] = 0;
+
             if (m_assetService == null)
             {
                 responsedata["int_response_code"] = (int)System.Net.HttpStatusCode.ServiceUnavailable;
@@ -73,49 +93,67 @@ namespace OpenSim.Capabilities.Handlers
             }
 
             responsedata["int_response_code"] = (int)System.Net.HttpStatusCode.BadRequest;
-            responsedata["content_type"] = "text/plain";
-            responsedata["int_bytes"] = 0;
 
-            string meshStr = string.Empty;
-            if (request.ContainsKey("mesh_id"))
-                meshStr = request["mesh_id"].ToString();
-
-            if (String.IsNullOrEmpty(meshStr))
+            string[] queries = null;
+            if(request.Contains("querystringkeys"))
+                queries = (string[])request["querystringkeys"];
+            
+            if(queries == null || queries.Length == 0)
                 return responsedata;
 
-            UUID meshID = UUID.Zero;
-            if(!UUID.TryParse(meshStr, out meshID))
-                return responsedata;
-
-            AssetBase mesh = m_assetService.Get(meshID.ToString());
-            if(mesh == null)
+            string query = queries[0];
+            if(!queryTypes.ContainsKey(query))
             {
+                m_log.Warn("[GETASSET]: Unknown type: " + query);
+                return responsedata;
+            }
+
+            AssetType type = queryTypes[query];
+
+            string assetStr = string.Empty;
+            if (request.ContainsKey(query))
+                assetStr = request[query].ToString();
+
+            if (String.IsNullOrEmpty(assetStr))
+                return responsedata;
+
+            UUID assetID = UUID.Zero;
+            if(!UUID.TryParse(assetStr, out assetID))
+                return responsedata;
+
+            AssetBase asset = m_assetService.Get(assetID.ToString());
+            if(asset == null)
+            {
+                // m_log.Warn("[GETASSET]: not found: " + query + " " + assetStr);
                 responsedata["int_response_code"] = (int)System.Net.HttpStatusCode.NotFound;
-                responsedata["str_response_string"] = "Mesh not found.";
+                responsedata["str_response_string"] = "Asset not found.";
                 return responsedata;
             }
 
-            if (mesh.Type != (SByte)AssetType.Mesh)
+            if (asset.Type != (sbyte)type)
             {
-                responsedata["str_response_string"] = "Asset isn't a mesh.";
+                responsedata["str_response_string"] = "Got wrong asset type";
                 return responsedata;
             }
+
+            // if(type != AssetType.Mesh && type != AssetType.Texture)
+            //    m_log.Warn("[GETASSETS]: type: " + query);
+
+            responsedata["content_type"] = asset.Metadata.ContentType;
+            responsedata["bin_response_data"] = asset.Data;
+            responsedata["int_bytes"] = asset.Data.Length;
+            responsedata["int_response_code"] = (int)System.Net.HttpStatusCode.OK;
 
             string range = String.Empty;
-
             if (((Hashtable)request["headers"])["range"] != null)
                range = (string)((Hashtable)request["headers"])["range"];
             else if (((Hashtable)request["headers"])["Range"] != null)
                 range = (string)((Hashtable)request["headers"])["Range"];
+            else
+                return responsedata; // full asset
 
-            responsedata["content_type"] = "application/vnd.ll.mesh";
             if (String.IsNullOrEmpty(range))
-            {
-                // full mesh
-                responsedata["str_response_string"] = Convert.ToBase64String(mesh.Data);
-                responsedata["int_response_code"] = (int)System.Net.HttpStatusCode.OK;
-                return responsedata;
-            }
+                return responsedata; // full asset
 
             // range request
             int start, end;
@@ -123,32 +161,31 @@ namespace OpenSim.Capabilities.Handlers
             {
                 // Before clamping start make sure we can satisfy it in order to avoid
                 // sending back the last byte instead of an error status
-                if (start >= mesh.Data.Length)
+                if (start >= asset.Data.Length)
                 {
                     responsedata["str_response_string"] = "This range doesnt exist.";
                     return responsedata;
                 }
 
-                end = Utils.Clamp(end, 0, mesh.Data.Length - 1);
+                if (end == -1)
+                    end = asset.Data.Length - 1;
+                else
+                    end = Utils.Clamp(end, 0, asset.Data.Length - 1);
+
                 start = Utils.Clamp(start, 0, end);
                 int len = end - start + 1;
 
                 //m_log.Debug("Serving " + start + " to " + end + " of " + texture.Data.Length + " bytes for texture " + texture.ID);
                 Hashtable headers = new Hashtable();
-                headers["Content-Range"] = String.Format("bytes {0}-{1}/{2}", start, end, mesh.Data.Length);
+                headers["Content-Range"] = String.Format("bytes {0}-{1}/{2}", start, end, asset.Data.Length);
                 responsedata["headers"] = headers;
                 responsedata["int_response_code"] = (int)System.Net.HttpStatusCode.PartialContent;
-
-                byte[] d = new byte[len];
-                Array.Copy(mesh.Data, start, d, 0, len);
-                responsedata["bin_response_data"] = d;
+                responsedata["bin_start"] = start;
                 responsedata["int_bytes"] = len;
                 return responsedata;
             }
 
-            m_log.Warn("[GETMESH]: Failed to parse a range from GetMesh request, sending full asset: " + (string)request["uri"]);
-            responsedata["str_response_string"] = Convert.ToBase64String(mesh.Data);
-            responsedata["int_response_code"] = (int)System.Net.HttpStatusCode.OK;
+            m_log.Warn("[GETASSETS]: Failed to parse a range, sending full asset: " + assetStr);
             return responsedata;
         }
     }
