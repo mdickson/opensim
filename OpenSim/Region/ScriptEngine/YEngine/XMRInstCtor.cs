@@ -378,18 +378,37 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
             else
             {
-                string xml;
-                using (FileStream fs = File.Open(m_StateFileName,
+                try
+                {
+                    string xml;
+                    using (FileStream fs = File.Open(m_StateFileName,
                                           FileMode.Open,
                                           FileAccess.Read))
-                {
-                    using(StreamReader ss = new StreamReader(fs))
-                        xml = ss.ReadToEnd();
-                }
+                    {
+                        using(StreamReader ss = new StreamReader(fs))
+                            xml = ss.ReadToEnd();
+                    }
 
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(xml);
-                LoadScriptState(doc);
+                    XmlDocument doc = new XmlDocument();
+                    doc.LoadXml(xml);
+                    LoadScriptState(doc);
+                }
+                catch
+                {
+                    File.Delete(m_StateFileName);
+
+                    m_Running = true;                  // event processing is enabled
+                    eventCode = ScriptEventCode.None;  // not processing any event
+
+                    // default state_entry() must initialize global variables
+                    glblVars.AllocVarArrays(m_ObjCode.glblSizes); // reset globals
+                    doGblInit = true;
+                    stateCode = 0;
+
+                    PostEvent(new EventParams("state_entry",
+                                              zeroObjectArray,
+                                              zeroDetectParams));
+                }
             }
 
              // Post event(s) saying what caused the script to start.
@@ -508,11 +527,6 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             XmlElement doGblInitN = (XmlElement)scriptStateN.SelectSingleNode("DoGblInit");
             doGblInit = bool.Parse(doGblInitN.InnerText);
 
-            XmlElement permissionsN = (XmlElement)scriptStateN.SelectSingleNode("Permissions");
-            m_Item.PermsGranter = new UUID(permissionsN.GetAttribute("granter"));
-            m_Item.PermsMask = Convert.ToInt32(permissionsN.GetAttribute("mask"));
-            m_Part.Inventory.UpdateInventoryItem(m_Item, false, false);
-
             // get values used by stuff like llDetectedGrab, etc.
             DetectParams[] detParams = RestoreDetectParams(scriptStateN.SelectSingleNode("DetectArray"));
 
@@ -527,15 +541,21 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             XmlElement snapshotN = (XmlElement)scriptStateN.SelectSingleNode("Snapshot");
 
             Byte[] data = Convert.FromBase64String(snapshotN.InnerText);
-            MemoryStream ms = new MemoryStream();
-            ms.Write(data, 0, data.Length);
-            ms.Seek(0, SeekOrigin.Begin);
-            MigrateInEventHandler(ms);
-            ms.Close();
+            using(MemoryStream ms = new MemoryStream())
+            {
+                ms.Write(data, 0, data.Length);
+                ms.Seek(0, SeekOrigin.Begin);
+                MigrateInEventHandler(ms);
+            }
+
+            XmlElement permissionsN = (XmlElement)scriptStateN.SelectSingleNode("Permissions");
+            m_Item.PermsGranter = new UUID(permissionsN.GetAttribute("granter"));
+            m_Item.PermsMask = Convert.ToInt32(permissionsN.GetAttribute("mask"));
+            m_Part.Inventory.UpdateInventoryItem(m_Item, false, false);
 
             // Restore event queues, preserving any events that queued
             // whilst we were restoring the state
-            lock(m_QueueLock)
+            lock (m_QueueLock)
             {
                 m_DetectParams = detParams;
                 foreach(EventParams evt in m_EventQueue)
