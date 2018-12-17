@@ -352,6 +352,82 @@ namespace OpenSim.Region.CoreModules.Scripting.EmailModules
             }
         }
 
+
+        /// <summary>
+        /// Send an external Email via SMTP.
+        /// </summary>
+        /// <param name="sender">The sender of the email</param>
+        /// <param name="recipient">Email recipient</param>
+        /// <param name="subject">Email Subject</param>
+        /// <param name="body">Text Body of the Email</param>
+        public void SendEmailSMTP(string sender, string recipient, string subject, string body)
+        {
+            //Check if addresses are empty
+            if ((sender == string.Empty) || (recipient == string.Empty))
+                return;
+
+            // We wont send an empty message
+            if (body == string.Empty)
+                return;
+
+            // Check the email is correct form in REGEX
+            string EMailpatternStrict = @"^(([^<>()[\]\\.,;:\s@\""]+"
+                + @"(\.[^<>()[\]\\.,;:\s@\""]+)*)|(\"".+\""))@"
+                + @"((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
+                + @"\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+"
+                + @"[a-zA-Z]{2,}))$";
+
+            Regex EMailreStrict = new Regex(EMailpatternStrict);
+
+            // Check addresses
+            if (!EMailreStrict.IsMatch(sender))
+            {
+                m_log.Error("[EMAIL]: REGEX Problem with Sender address: " + sender);
+                return;
+            }
+            if (!EMailreStrict.IsMatch(recipient))
+            {
+                m_log.Error("[EMAIL]: REGEX Problem with Recipient address: " + sender);
+                return;
+            }
+
+            if ((subject.Length + body.Length) > m_MaxEmailSize)
+            {
+                m_log.Error("[EMAIL]: subject + body larger than limit of " + m_MaxEmailSize + " bytes");
+                return;
+            }
+
+            // regular email, send it out
+            try
+            {
+                //Creation EmailMessage
+                EmailMessage emailMessage = new EmailMessage();
+                emailMessage.FromAddress = new EmailAddress(sender + "@" + m_HostName);
+                emailMessage.AddToAddress(new EmailAddress(recipient));
+                emailMessage.Subject = subject;
+                emailMessage.BodyText =  body;
+
+                //Config SMTP Server
+                //Set SMTP SERVER config
+                SmtpServer smtpServer = new SmtpServer(SMTP_SERVER_HOSTNAME, SMTP_SERVER_PORT);
+
+                // Add authentication only when requested
+                if (SMTP_SERVER_LOGIN != String.Empty && SMTP_SERVER_PASSWORD != String.Empty)
+                    smtpServer.SmtpAuthToken = new SmtpAuthToken(SMTP_SERVER_LOGIN, SMTP_SERVER_PASSWORD);
+
+                //Send Email Message
+                emailMessage.Send(smtpServer);
+
+                //Log
+                m_log.Info("[EMAIL]: EMail sent to: " + recipient + " from sender: " + sender + "@" + m_HostName);
+            }
+            catch (Exception e)
+            {
+                m_log.Error("[EMAIL]: DefaultEmailModule Exception: " + e.Message);
+            }
+        }
+
+
         /// <summary>
         ///
         /// </summary>
