@@ -211,8 +211,13 @@ namespace OpenSim.OfflineIM
             }
 
             string reason = string.Empty;
-            bool success = m_OfflineIMService.StoreMessage(im, out reason);
+            bool success = false;
+            success = m_OfflineIMService.StoreMessage(im, out reason);
+ 
+            // Check if we should send emails?
+            // success = m_OfflineIMService.EmailMessage(im, out reason);
 
+            // Notify the Sender
             if (im.dialog == (byte)InstantMessageDialog.MessageFromAgent)
             {
                 IClientAPI client = FindClient(new UUID(im.fromAgentID));
@@ -241,10 +246,16 @@ namespace OpenSim.OfflineIM
             return m_OfflineIMService.StoreMessage(im, out reason);
         }
 
+        public bool EmailMessage(GridInstantMessage im, out string reason)
+        {
+            return m_OfflineIMService.EmailMessage(im, out reason);
+        }
+
         public void DeleteMessages(UUID userID)
         {
             m_OfflineIMService.DeleteMessages(userID);
         }
+
 
         #endregion
     }

@@ -125,6 +125,11 @@ namespace OpenSim.OfflineIM
 
         }
 
+        public bool EmailMessage(GridInstantMessage im, out string reason)
+        {
+            throw new NotImplementedException();
+        }
+
         public void DeleteMessages(UUID userID)
         {
             m_Database.Delete("PrincipalID", userID.ToString());

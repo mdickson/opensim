@@ -38,6 +38,8 @@ namespace OpenSim.Services.Interfaces
 
         bool StoreMessage(GridInstantMessage im, out string reason);
 
+        bool EmailMessage(GridInstantMessage im, out string reason);
+
         /// <summary>
         /// Delete messages to or from this user (or group).
         /// </summary>
