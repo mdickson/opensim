@@ -26,12 +26,13 @@
   <Reference name="OpenSim.Data.MySQL"/>
   <Reference name="OpenSim.Data.PGSQL"/>
   <Reference name="OpenSim.Data.SQLite"/>
+  <Reference name="OpenSim.Framework"/>
   <Reference name="OpenSim.Framework.Servers"/>
   <Reference name="OpenSim.Framework.Servers.HttpServer"/>
   <Reference name="OpenSim.Region.Framework"/>
   <Reference name="OpenSim.Region.CoreModules"/>
   <Reference name="OpenSim.Region.OptionalModules"/>
-  <Reference name="OpenSim.Framework"/>
+  <Reference name="OpenSim.Framework.Communications"/>
   <Reference name="OpenSim.Server.Base"/>
   <Reference name="OpenSim.Services.Interfaces"/>
   <Reference name="OpenSim.Region.ScriptEngine.Shared"/>
