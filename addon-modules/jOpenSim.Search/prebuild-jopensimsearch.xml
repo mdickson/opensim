@@ -1,4 +1,4 @@
-<Project frameworkVersion="v4_6" name="jOpenSim.Search" path="addon-modules/jOpenSim.Search/jOpenSimSearch" type="Library">
+<Project frameworkVersion="v4_6_1" name="jOpenSim.Search" path="addon-modules/jOpenSim.Search/jOpenSimSearch" type="Library">
   <Configuration name="Debug">
     <Options>
       <OutputPath>../../../bin</OutputPath>
