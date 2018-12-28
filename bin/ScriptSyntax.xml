@@ -1,4 +1,4 @@
-fe7d5416-2379-feca-3b16-6b9854799c50
+a0b4b514-3c14-6b98-ca98-e18a79e9792f
 <llsd><map><key>llsd-lsl-syntax-version</key><integer>2</integer>
 <key>controls</key>
 <map>
@@ -2567,6 +2567,14 @@ fe7d5416-2379-feca-3b16-6b9854799c50
   <key>type</key><string>integer</string>
   <key>value</key><string>1</string>
  </map>
+ <key>RC_REJECT_HOST</key><map>
+  <key>type</key><string>integer</string>
+  <key>value</key><string>0x20000000</string>
+ </map>
+ <key>RC_REJECT_HOSTGROUP</key><map>
+  <key>type</key><string>integer</string>
+  <key>value</key><string>0x40000000</string>
+ </map>
  <key>RC_REJECT_LAND</key><map>
   <key>type</key><string>integer</string>
   <key>value</key><string>8</string>
@@ -4053,6 +4061,11 @@ fe7d5416-2379-feca-3b16-6b9854799c50
  <key>llGetNumberOfSides</key>
  <map>
   <key>return</key><string>integer</string>
+  <key>arguments</key><undef/>
+ </map>
+ <key>llGetObjectAnimationNames</key>
+ <map>
+  <key>return</key><string>list</string>
   <key>arguments</key><undef/>
  </map>
  <key>llGetObjectDesc</key>
@@ -5789,6 +5802,12 @@ fe7d5416-2379-feca-3b16-6b9854799c50
    <map><key>anim</key><map><key>type</key><string>string</string></map></map>
   </array>
  </map>
+ <key>llStartObjectAnimation</key>
+ <map>
+  <key>arguments</key><array>
+   <map><key>anim</key><map><key>type</key><string>string</string></map></map>
+  </array>
+ </map>
  <key>llStopAnimation</key>
  <map>
   <key>arguments</key><array>
@@ -5806,6 +5825,12 @@ fe7d5416-2379-feca-3b16-6b9854799c50
  <key>llStopMoveToTarget</key>
  <map>
   <key>arguments</key><undef/>
+ </map>
+ <key>llStopObjectAnimation</key>
+ <map>
+  <key>arguments</key><array>
+   <map><key>anim</key><map><key>type</key><string>string</string></map></map>
+  </array>
  </map>
  <key>llStopPointAt</key>
  <map>
@@ -6091,23 +6116,7 @@ fe7d5416-2379-feca-3b16-6b9854799c50
   <key>arguments</key><array>
    <map><key>va</key><map><key>type</key><string>vector</string></map></map>
    <map><key>vb</key><map><key>type</key><string>vector</string></map></map>
-  </array>
- </map>
- <key>osApproxEquals</key>
- <map>
-  <key>return</key><string>integer</string>
-  <key>arguments</key><array>
-   <map><key>a</key><map><key>type</key><string>float</string></map></map>
-   <map><key>b</key><map><key>type</key><string>float</string></map></map>
    <map><key>margin</key><map><key>type</key><string>float</string></map></map>
-  </array>
- </map>
- <key>osApproxEquals</key>
- <map>
-  <key>return</key><string>integer</string>
-  <key>arguments</key><array>
-   <map><key>a</key><map><key>type</key><string>float</string></map></map>
-   <map><key>b</key><map><key>type</key><string>float</string></map></map>
   </array>
  </map>
  <key>osApproxEquals</key>
@@ -6116,7 +6125,23 @@ fe7d5416-2379-feca-3b16-6b9854799c50
   <key>arguments</key><array>
    <map><key>va</key><map><key>type</key><string>vector</string></map></map>
    <map><key>vb</key><map><key>type</key><string>vector</string></map></map>
+  </array>
+ </map>
+ <key>osApproxEquals</key>
+ <map>
+  <key>return</key><string>integer</string>
+  <key>arguments</key><array>
+   <map><key>a</key><map><key>type</key><string>float</string></map></map>
+   <map><key>b</key><map><key>type</key><string>float</string></map></map>
    <map><key>margin</key><map><key>type</key><string>float</string></map></map>
+  </array>
+ </map>
+ <key>osApproxEquals</key>
+ <map>
+  <key>return</key><string>integer</string>
+  <key>arguments</key><array>
+   <map><key>a</key><map><key>type</key><string>float</string></map></map>
+   <map><key>b</key><map><key>type</key><string>float</string></map></map>
   </array>
  </map>
  <key>osApproxEquals</key>
@@ -6259,6 +6284,8 @@ fe7d5416-2379-feca-3b16-6b9854799c50
   <key>return</key><string>string</string>
   <key>arguments</key><array>
    <map><key>drawList</key><map><key>type</key><string>string</string></map></map>
+   <map><key>startX</key><map><key>type</key><string>integer</string></map></map>
+   <map><key>startY</key><map><key>type</key><string>integer</string></map></map>
    <map><key>endX</key><map><key>type</key><string>integer</string></map></map>
    <map><key>endY</key><map><key>type</key><string>integer</string></map></map>
   </array>
@@ -6268,8 +6295,6 @@ fe7d5416-2379-feca-3b16-6b9854799c50
   <key>return</key><string>string</string>
   <key>arguments</key><array>
    <map><key>drawList</key><map><key>type</key><string>string</string></map></map>
-   <map><key>startX</key><map><key>type</key><string>integer</string></map></map>
-   <map><key>startY</key><map><key>type</key><string>integer</string></map></map>
    <map><key>endX</key><map><key>type</key><string>integer</string></map></map>
    <map><key>endY</key><map><key>type</key><string>integer</string></map></map>
   </array>
@@ -6408,13 +6433,13 @@ fe7d5416-2379-feca-3b16-6b9854799c50
  <map>
   <key>arguments</key><array>
    <map><key>avatar</key><map><key>type</key><string>string</string></map></map>
+   <map><key>target</key><map><key>type</key><string>string</string></map></map>
   </array>
  </map>
  <key>osForceOtherSit</key>
  <map>
   <key>arguments</key><array>
    <map><key>avatar</key><map><key>type</key><string>string</string></map></map>
-   <map><key>target</key><map><key>type</key><string>string</string></map></map>
   </array>
  </map>
  <key>osFormatString</key>
@@ -6814,6 +6839,7 @@ fe7d5416-2379-feca-3b16-6b9854799c50
    <map><key>name</key><map><key>type</key><string>string</string></map></map>
    <map><key>position</key><map><key>type</key><string>vector</string></map></map>
    <map><key>notecard</key><map><key>type</key><string>string</string></map></map>
+   <map><key>options</key><map><key>type</key><string>integer</string></map></map>
   </array>
  </map>
  <key>osNpcCreate</key>
@@ -6824,7 +6850,6 @@ fe7d5416-2379-feca-3b16-6b9854799c50
    <map><key>name</key><map><key>type</key><string>string</string></map></map>
    <map><key>position</key><map><key>type</key><string>vector</string></map></map>
    <map><key>notecard</key><map><key>type</key><string>string</string></map></map>
-   <map><key>options</key><map><key>type</key><string>integer</string></map></map>
   </array>
  </map>
  <key>osNpcGetOwner</key>
@@ -7407,8 +7432,6 @@ fe7d5416-2379-feca-3b16-6b9854799c50
   <key>arguments</key><array>
    <map><key>src</key><map><key>type</key><string>string</string></map></map>
    <map><key>value</key><map><key>type</key><string>string</string></map></map>
-   <map><key>start</key><map><key>type</key><string>integer</string></map></map>
-   <map><key>count</key><map><key>type</key><string>integer</string></map></map>
    <map><key>ignorecase</key><map><key>type</key><string>integer</string></map></map>
   </array>
  </map>
@@ -7418,6 +7441,8 @@ fe7d5416-2379-feca-3b16-6b9854799c50
   <key>arguments</key><array>
    <map><key>src</key><map><key>type</key><string>string</string></map></map>
    <map><key>value</key><map><key>type</key><string>string</string></map></map>
+   <map><key>start</key><map><key>type</key><string>integer</string></map></map>
+   <map><key>count</key><map><key>type</key><string>integer</string></map></map>
    <map><key>ignorecase</key><map><key>type</key><string>integer</string></map></map>
   </array>
  </map>
@@ -7512,6 +7537,8 @@ fe7d5416-2379-feca-3b16-6b9854799c50
  <map>
   <key>arguments</key><array>
    <map><key>agent</key><map><key>type</key><string>string</string></map></map>
+   <map><key>regionX</key><map><key>type</key><string>integer</string></map></map>
+   <map><key>regionY</key><map><key>type</key><string>integer</string></map></map>
    <map><key>position</key><map><key>type</key><string>vector</string></map></map>
    <map><key>lookat</key><map><key>type</key><string>vector</string></map></map>
   </array>
@@ -7520,8 +7547,6 @@ fe7d5416-2379-feca-3b16-6b9854799c50
  <map>
   <key>arguments</key><array>
    <map><key>agent</key><map><key>type</key><string>string</string></map></map>
-   <map><key>regionX</key><map><key>type</key><string>integer</string></map></map>
-   <map><key>regionY</key><map><key>type</key><string>integer</string></map></map>
    <map><key>position</key><map><key>type</key><string>vector</string></map></map>
    <map><key>lookat</key><map><key>type</key><string>vector</string></map></map>
   </array>
@@ -7539,7 +7564,8 @@ fe7d5416-2379-feca-3b16-6b9854799c50
  <key>osTeleportOwner</key>
  <map>
   <key>arguments</key><array>
-   <map><key>regionName</key><map><key>type</key><string>string</string></map></map>
+   <map><key>regionX</key><map><key>type</key><string>integer</string></map></map>
+   <map><key>regionY</key><map><key>type</key><string>integer</string></map></map>
    <map><key>position</key><map><key>type</key><string>vector</string></map></map>
    <map><key>lookat</key><map><key>type</key><string>vector</string></map></map>
   </array>
@@ -7547,8 +7573,7 @@ fe7d5416-2379-feca-3b16-6b9854799c50
  <key>osTeleportOwner</key>
  <map>
   <key>arguments</key><array>
-   <map><key>regionX</key><map><key>type</key><string>integer</string></map></map>
-   <map><key>regionY</key><map><key>type</key><string>integer</string></map></map>
+   <map><key>regionName</key><map><key>type</key><string>string</string></map></map>
    <map><key>position</key><map><key>type</key><string>vector</string></map></map>
    <map><key>lookat</key><map><key>type</key><string>vector</string></map></map>
   </array>
