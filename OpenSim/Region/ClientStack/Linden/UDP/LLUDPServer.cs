@@ -46,6 +46,7 @@ using OpenMetaverse;
 using Mono.Addins;
 using TokenBucket = OpenSim.Region.ClientStack.LindenUDP.TokenBucket;
 
+
 namespace OpenSim.Region.ClientStack.LindenUDP
 {
     /// <summary>
@@ -855,12 +856,8 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             LLUDPClient udpClient, Packet packet, ThrottleOutPacketType category, bool allowSplitting, UnackedPacketMethod method)
         {
             // CoarseLocationUpdate packets cannot be split in an automated way
-            if (allowSplitting && packet.Type == PacketType.CoarseLocationUpdate)
-                allowSplitting = false;
-
-//            bool packetQueued = false;
-
-            if (allowSplitting && packet.HasVariableBlocks)
+            if (allowSplitting && packet.HasVariableBlocks && packet.Type != PacketType.CoarseLocationUpdate &&
+                    packet.Length + 20 > MTU)
             {
                 byte[][] datas = packet.ToBytesMultiple();
                 int packetCount = datas.Length;
@@ -887,6 +884,46 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             PacketPool.Instance.ReturnPacket(packet);
         }
 
+        public static int ZeroEncode(byte[] src, int srclen, byte[] dest)
+        {
+            Buffer.BlockCopy(src, 0, dest, 0, 6);
+ 
+            int zerolen = 6;
+            byte zerocount = 0;
+
+            for (int i = zerolen; i < srclen; i++)
+            {
+                if (src[i] == 0x00)
+                {
+                    zerocount++;
+                    if (zerocount == 0)
+                    {
+                        dest[zerolen++] = 0x00;
+                        dest[zerolen++] = 0xff;
+                        zerocount++;
+                    }
+                }
+                else
+                {
+                    if (zerocount != 0)
+                    {
+                        dest[zerolen++] = 0x00;
+                        dest[zerolen++] = (byte)zerocount;
+                        zerocount = 0;
+                    }
+
+                    dest[zerolen++] = src[i];
+                }
+            }
+
+            if (zerocount != 0)
+            {
+                dest[zerolen++] = 0x00;
+                dest[zerolen++] = (byte)zerocount;
+            }
+
+            return (int)zerolen;
+        }
         /// <summary>
         /// Start the process of sending a packet to the client.
         /// </summary>
@@ -919,8 +956,14 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             {
                 try
                 {
-                    dataLength = Helpers.ZeroEncode(data, dataLength, buffer.Data);
-                    doCopy = false;
+                    int testlen = ZeroEncode(data, dataLength, buffer.Data);
+                    if(testlen <= dataLength)
+                    {
+                        dataLength = testlen;
+                        doCopy = false;
+                    }
+                    else
+                        data[0] = (byte)(data[0] & ~Helpers.MSG_ZEROCODED);
                 }
                 catch (IndexOutOfRangeException)
                 {
@@ -942,15 +985,13 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 }
                 else
                 {
-                    bufferSize = dataLength;
-                    buffer = new UDPPacketBuffer(udpClient.RemoteEndPoint, bufferSize);
-
                     m_log.Error("[LLUDPSERVER]: Packet exceeded buffer size! This could be an indication of packet assembly not obeying the MTU. Type=" +
                         type + ", DataLength=" + dataLength + ", BufferLength=" + buffer.Data.Length);
+                    buffer = new UDPPacketBuffer(udpClient.RemoteEndPoint, dataLength);
                     Buffer.BlockCopy(data, 0, buffer.Data, 0, dataLength);
                 }
             }
-
+            data = null;
             buffer.DataLength = dataLength;
 
             #region Queue or Send
@@ -972,7 +1013,6 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             // If a Linden Lab 1.23.5 client receives an update packet after a kill packet for an object, it will
             // continue to display the deleted object until relog.  Therefore, we need to always queue a kill object
             // packet so that it isn't sent before a queued update packet.
-
             bool requestQueue = type == PacketType.KillObject;
             if (!outgoingPacket.Client.EnqueueOutgoing(outgoingPacket, requestQueue, highPriority))
             {
@@ -1113,8 +1153,6 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             if (!udpClient.IsConnected)
                 return;
 
-            #region ACK Appending
-
             int dataLength = buffer.DataLength;
 
             // NOTE: I'm seeing problems with some viewers when ACKs are appended to zerocoded packets so I've disabled that here
@@ -1122,9 +1160,9 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             {
                 // Keep appending ACKs until there is no room left in the buffer or there are
                 // no more ACKs to append
-                uint ackCount = 0;
+                int ackCount = 0;
                 uint ack;
-                while (dataLength + 5 < buffer.Data.Length && udpClient.PendingAcks.Dequeue(out ack))
+                while (dataLength + 5 < buffer.Data.Length && ackCount < 256 && udpClient.PendingAcks.Dequeue(out ack))
                 {
                     Utils.UIntToBytesBig(ack, buffer.Data, dataLength);
                     dataLength += 4;
@@ -1142,10 +1180,6 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
             buffer.DataLength = dataLength;
 
-            #endregion ACK Appending
-
-            #region Sequence Number Assignment
-
             if (!isResend)
             {
                 // Not a resend, assign a new sequence number
@@ -1162,32 +1196,21 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             else
             {
                 Interlocked.Increment(ref udpClient.PacketsResent);
-
-                // We're not going to worry about interlock yet since its not currently critical that this total count
-                // is 100% correct
                 PacketsResentCount++;
             }
 
-            #endregion Sequence Number Assignment
-
             // Stats tracking
             Interlocked.Increment(ref udpClient.PacketsSent);
-
-            // We're not going to worry about interlock yet since its not currently critical that this total count
-            // is 100% correct
             PacketsSentCount++;
+
+            SyncSend(buffer);
+            // Keep track of when this packet was sent out (right now)
+            outgoingPacket.TickCount = Environment.TickCount & Int32.MaxValue;
 
             if (udpClient.DebugDataOutLevel > 0)
                 m_log.DebugFormat(
                     "[LLUDPSERVER]: Sending packet #{0} (rel: {1}, res: {2}) to {3} from {4}",
                     outgoingPacket.SequenceNumber, isReliable, isResend, udpClient.AgentID, Scene.Name);
-
-            // Put the UDP payload on the wire
-//            AsyncBeginSend(buffer);
-            SyncSend(buffer);
-
-            // Keep track of when this packet was sent out (right now)
-            outgoingPacket.TickCount = Environment.TickCount & Int32.MaxValue;
         }
 
         protected void RecordMalformedInboundPacket(IPEndPoint endPoint)
@@ -1675,8 +1698,9 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         m_pendingCache.Remove(endPoint);
                     }
 
-                    m_log.DebugFormat("[LLUDPSERVER]: Client created, processing pending queue, {0} entries", queue.Count);
+                    client.CheckViewerCaps();
 
+                    m_log.DebugFormat("[LLUDPSERVER]: Client created, processing pending queue, {0} entries", queue.Count);
                     // Reinject queued packets
                     while (queue.Count > 0)
                     {
@@ -1897,38 +1921,28 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             uint circuitCode, UUID agentID, UUID sessionID, IPEndPoint remoteEndPoint, AuthenticateResponse sessionInfo)
         {
             IClientAPI client = null;
-            bool createNew = false;
 
             // We currently synchronize this code across the whole scene to avoid issues such as
             // http://opensimulator.org/mantis/view.php?id=5365  However, once locking per agent circuit can be done
             // consistently, this lock could probably be removed.
             lock (this)
             {
-                if (!Scene.TryGetClient(agentID, out client))
+                if (Scene.TryGetClient(agentID, out client))
                 {
-                    createNew = true;
-                }
-                else
-                {
-                    if (client.SceneAgent == null)
-                    {
-                        Scene.CloseAgent(agentID, true);
-                        createNew = true;
-                    }
+                    if (client.SceneAgent != null)
+                        return client;
+                    Scene.CloseAgent(agentID, true);
                 }
 
-                if (createNew)
-                {
-                    LLUDPClient udpClient = new LLUDPClient(this, ThrottleRates, Throttle, circuitCode, agentID, remoteEndPoint, m_defaultRTO, m_maxRTO);
+                LLUDPClient udpClient = new LLUDPClient(this, ThrottleRates, Throttle, circuitCode, agentID, remoteEndPoint, m_defaultRTO, m_maxRTO);
 
-                    client = new LLClientView(Scene, this, udpClient, sessionInfo, agentID, sessionID, circuitCode);
-                    client.OnLogout += LogoutHandler;
-                    client.DebugPacketLevel = DefaultClientPacketDebugLevel;
+                client = new LLClientView(Scene, this, udpClient, sessionInfo, agentID, sessionID, circuitCode);
+                client.OnLogout += LogoutHandler;
+                client.DebugPacketLevel = DefaultClientPacketDebugLevel;
 
-                    ((LLClientView)client).DisableFacelights = m_disableFacelights;
+                ((LLClientView)client).DisableFacelights = m_disableFacelights;
 
-                    client.Start();
-                }
+                client.Start();
             }
 
             return client;

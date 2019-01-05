@@ -69,7 +69,7 @@ namespace OpenSim.Region.Framework.Scenes
 
         #region Fields
 
-        protected System.Threading.ReaderWriterLockSlim m_scenePresencesLock = new System.Threading.ReaderWriterLockSlim();
+        protected System.Threading.ReaderWriterLockSlim m_scenePresencesLock;
 
         protected ConcurrentDictionary<UUID, ScenePresence> m_scenePresenceMap = new ConcurrentDictionary<UUID, ScenePresence>();
         protected ConcurrentDictionary<uint, ScenePresence> m_scenePresenceLocalIDMap = new ConcurrentDictionary<uint, ScenePresence>();
@@ -119,6 +119,7 @@ namespace OpenSim.Region.Framework.Scenes
 
         protected internal SceneGraph(Scene parent)
         {
+            m_scenePresencesLock = new System.Threading.ReaderWriterLockSlim();
             m_parentScene = parent;
         }
 
@@ -153,6 +154,9 @@ namespace OpenSim.Region.Framework.Scenes
                 m_scenePresenceMap = new ConcurrentDictionary<UUID, ScenePresence>();
                 m_scenePresenceLocalIDMap = new ConcurrentDictionary<uint, ScenePresence>();
                 m_scenePresenceArray = new List<ScenePresence>();
+                if (_PhyScene != null)
+                    _PhyScene.OnPhysicsCrash -= physicsBasedCrash;
+                _PhyScene = null;
             }
             finally
             {
@@ -168,6 +172,7 @@ namespace OpenSim.Region.Framework.Scenes
 
             Entities.Clear();
             m_scenePresencesLock.Dispose();
+            m_scenePresencesLock = null;
         }
 
         #region Update Methods
@@ -485,7 +490,7 @@ namespace OpenSim.Region.Framework.Scenes
             }
 
             if (sendClientUpdates)
-                sceneObject.ScheduleGroupForFullUpdate();
+                sceneObject.ScheduleGroupForFullAnimUpdate();
 
             if (attachToBackup)
                 sceneObject.AttachToBackup();
@@ -626,6 +631,8 @@ namespace OpenSim.Region.Framework.Scenes
                 for (int i = 0; i < updates.Count; i++)
                 {
                     SceneObjectGroup sog = updates[i];
+                    if (sog.IsDeleted)
+                        continue;
 
                     // Don't abort the whole update if one entity happens to give us an exception.
                     try
@@ -693,10 +700,13 @@ namespace OpenSim.Region.Framework.Scenes
             ScenePresence presence = new ScenePresence(client, m_parentScene, appearance, type);
 
             Entities[presence.UUID] = presence;
+            bool entered = false;
 
-            m_scenePresencesLock.EnterWriteLock();
             try
             {
+                m_scenePresencesLock.EnterWriteLock();
+                entered = true;
+
                 m_numChildAgents++;
 
                 List<ScenePresence> newlist = new List<ScenePresence>(m_scenePresenceArray);
@@ -729,7 +739,8 @@ namespace OpenSim.Region.Framework.Scenes
             }
             finally
             {
-                m_scenePresencesLock.ExitWriteLock();
+                if(entered)
+                    m_scenePresencesLock.ExitWriteLock();
             }
 
             return presence;
@@ -747,9 +758,11 @@ namespace OpenSim.Region.Framework.Scenes
                     agentID);
             }
 
-            m_scenePresencesLock.EnterWriteLock();
+            bool entered = false;
             try
             {
+                m_scenePresencesLock.EnterWriteLock();
+                entered = true;
                 // Remove the presence reference from the dictionary
                 ScenePresence oldref;
                 if(m_scenePresenceMap.TryRemove(agentID, out oldref))
@@ -767,7 +780,8 @@ namespace OpenSim.Region.Framework.Scenes
             }
             finally
             {
-                m_scenePresencesLock.ExitWriteLock();
+                if(entered)
+                    m_scenePresencesLock.ExitWriteLock();
             }
         }
 
@@ -894,15 +908,21 @@ namespace OpenSim.Region.Framework.Scenes
         /// <returns></returns>
         protected internal List<ScenePresence> GetScenePresences()
         {
-
-            m_scenePresencesLock.EnterReadLock();
+            bool entered = false;
             try
             {
+                m_scenePresencesLock.EnterReadLock();
+                entered = true;
                 return m_scenePresenceArray;
+            }
+            catch
+            {
+                return new List<ScenePresence>();
             }
             finally
             {
-                m_scenePresencesLock.ExitReadLock();
+                if(entered)
+                    m_scenePresencesLock.ExitReadLock();
             }
         }
 
@@ -1205,8 +1225,6 @@ namespace OpenSim.Region.Framework.Scenes
                     {
                         foreach (SceneObjectPart p in ((SceneObjectGroup)entity).Parts)
                         {
-//                            m_log.DebugFormat("[SCENE GRAPH]: Part {0} has name {1}", p.UUID, p.Name);
-
                             if (p.Name == name)
                             {
                                 sop = p;
@@ -1310,23 +1328,6 @@ namespace OpenSim.Region.Framework.Scenes
         /// <param name="action"></param>
         public void ForEachScenePresence(Action<ScenePresence> action)
         {
-            // Once all callers have their delegates configured for parallelism, we can unleash this
-            /*
-            Action<ScenePresence> protectedAction = new Action<ScenePresence>(delegate(ScenePresence sp)
-                {
-                    try
-                    {
-                        action(sp);
-                    }
-                    catch (Exception e)
-                    {
-                        m_log.Info("[SCENEGRAPH]: Error in " + m_parentScene.RegionInfo.RegionName + ": " + e.ToString());
-                        m_log.Info("[SCENEGRAPH]: Stack Trace: " + e.StackTrace);
-                    }
-                });
-            Parallel.ForEach<ScenePresence>(GetScenePresences(), protectedAction);
-            */
-            // For now, perform actions serially
             List<ScenePresence> presences = GetScenePresences();
             foreach (ScenePresence sp in presences)
             {
@@ -1823,7 +1824,6 @@ namespace OpenSim.Region.Framework.Scenes
 
             try
             {
-
                 List<SceneObjectGroup> childGroups = new List<SceneObjectGroup>();
 
                 // We do this in reverse to get the link order of the prims correct
@@ -1868,8 +1868,6 @@ namespace OpenSim.Region.Framework.Scenes
                 {
                     parentGroup.RootPart.CreateSelected = true;
                     parentGroup.TriggerScriptChangedEvent(Changed.LINK);
-                    parentGroup.HasGroupChanged = true;
-                    parentGroup.ScheduleGroupForFullUpdate();
                 }
             }
             finally
@@ -1884,7 +1882,7 @@ namespace OpenSim.Region.Framework.Scenes
                 parentGroup.AdjustChildPrimPermissions(false);
                 parentGroup.HasGroupChanged = true;
                 parentGroup.ProcessBackup(m_parentScene.SimulationDataService, true);
-                parentGroup.ScheduleGroupForFullUpdate();
+                parentGroup.ScheduleGroupForFullAnimUpdate();
                 Monitor.Exit(m_updateLock);
             }
         }
@@ -1947,7 +1945,7 @@ namespace OpenSim.Region.Framework.Scenes
                         child.ParentGroup.DelinkFromGroup(child, true);
                         //child.ParentGroup is now other
                         child.ParentGroup.HasGroupChanged = true;
-                        child.ParentGroup.ScheduleGroupForFullUpdate();
+                        child.ParentGroup.ScheduleGroupForFullAnimUpdate();
                     }
                 }
 
@@ -1989,7 +1987,7 @@ namespace OpenSim.Region.Framework.Scenes
                         newRoot.TriggerScriptChangedEvent(Changed.LINK);
                         newRoot.ParentGroup.HasGroupChanged = true;
                         newRoot.ParentGroup.InvalidatePartsLinkMaps();
-                        newRoot.ParentGroup.ScheduleGroupForFullUpdate();
+                        newRoot.ParentGroup.ScheduleGroupForFullAnimUpdate();
                     }
                 }
 
@@ -2129,7 +2127,7 @@ namespace OpenSim.Region.Framework.Scenes
                     copy.ResumeScripts();
 
                     copy.HasGroupChanged = true;
-                    copy.ScheduleGroupForFullUpdate();
+                    copy.ScheduleGroupForFullAnimUpdate();
                     return copy;
                 }
             }

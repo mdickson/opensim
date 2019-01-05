@@ -1391,5 +1391,7 @@ namespace OpenSim.Region.OptionalModules.World.NPC
             return 0;
         }
 
+        public void CheckViewerCaps() { }
+
     }
 }

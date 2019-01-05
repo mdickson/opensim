@@ -1780,5 +1780,8 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
         {
             return 0;
         }
+
+        public void CheckViewerCaps() { }
+
     }
 }
