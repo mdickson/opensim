@@ -354,26 +354,23 @@ namespace OpenSim.Region.CoreModules.Scripting.VectorRender
                 // under lock.
                 lock (this)
                 {
+
+                    if (alpha == 256 && bgColor.A != 255)
+                        alpha = bgColor.A;
+
                     if (alpha == 256)
                     {
                         bitmap = new Bitmap(width, height, PixelFormat.Format32bppRgb);
                         graph = Graphics.FromImage(bitmap);
-                        using (SolidBrush bgFillBrush = new SolidBrush(bgColor))
-                        {
-                            graph.FillRectangle(bgFillBrush, 0, 0, width, height);
-                        }
+                        graph.Clear(bgColor);
                     }
                     else
                     {
+                        Color newbg = Color.FromArgb(alpha, bgColor);
                         bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
                         graph = Graphics.FromImage(bitmap);
-                        Color newbg = Color.FromArgb(alpha,bgColor);
-                        using (SolidBrush bgFillBrush = new SolidBrush(newbg))
-                        {
-                            graph.FillRectangle(bgFillBrush, 0, 0, width, height);
-                        }
+                        graph.Clear(newbg);
                     }
-
                     GDIDraw(data, graph, altDataDelim, out reuseable);
                 }
 
