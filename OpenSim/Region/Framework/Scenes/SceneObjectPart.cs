@@ -410,8 +410,7 @@ namespace OpenSim.Region.Framework.Scenes
             m_particleSystem = Utils.EmptyBytes;
             Rezzed = DateTime.UtcNow;
             Description = String.Empty;
-            DynAttrs = new DAMap();
-
+ 
             // Prims currently only contain a single folder (Contents).  From looking at the Second Life protocol,
             // this appears to have the same UUID (!) as the prim.  If this isn't the case, one can't drag items from
             // the prim into an agent inventory (Linden client reports that the "Object not found for drop" in its log
@@ -704,33 +703,6 @@ namespace OpenSim.Region.Framework.Scenes
             get { return m_scriptAccessPin; }
             set { m_scriptAccessPin = (int)value; }
         }
-        private SceneObjectPart m_PlaySoundMasterPrim = null;
-        public SceneObjectPart PlaySoundMasterPrim
-        {
-            get { return m_PlaySoundMasterPrim; }
-            set { m_PlaySoundMasterPrim = value; }
-        }
-
-        private List<SceneObjectPart> m_PlaySoundSlavePrims = new List<SceneObjectPart>();
-        public List<SceneObjectPart> PlaySoundSlavePrims
-        {
-            get { return m_PlaySoundSlavePrims; }
-            set { m_PlaySoundSlavePrims = value; }
-        }
-
-        private SceneObjectPart m_LoopSoundMasterPrim = null;
-        public SceneObjectPart LoopSoundMasterPrim
-        {
-            get { return m_LoopSoundMasterPrim; }
-            set { m_LoopSoundMasterPrim = value; }
-        }
-
-        private List<SceneObjectPart> m_LoopSoundSlavePrims = new List<SceneObjectPart>();
-        public List<SceneObjectPart> LoopSoundSlavePrims
-        {
-            get { return m_LoopSoundSlavePrims; }
-            set { m_LoopSoundSlavePrims = value; }
-        }
 
         public Byte[] TextureAnimation
         {
@@ -744,13 +716,11 @@ namespace OpenSim.Region.Framework.Scenes
             set { m_particleSystem = value; }
         }
 
-
         public DateTime Expires
         {
             get { return m_expires; }
             set { m_expires = value; }
         }
-
 
         public DateTime Rezzed
         {
@@ -1960,20 +1930,14 @@ namespace OpenSim.Region.Framework.Scenes
             else
             {
                 data = new byte[16];
-                int pos = 0;
 
-                // The flags don't like conversion from uint to byte, so we have to do
-                // it the crappy way.  See the above function :(
-
-                data[pos] = ConvertScriptUintToByte((uint)pTexAnim.Flags); pos++;
-                data[pos] = (byte)pTexAnim.Face; pos++;
-                data[pos] = (byte)pTexAnim.SizeX; pos++;
-                data[pos] = (byte)pTexAnim.SizeY; pos++;
-
-                Utils.FloatToBytes(pTexAnim.Start).CopyTo(data, pos);
-                Utils.FloatToBytes(pTexAnim.Length).CopyTo(data, pos + 4);
-                Utils.FloatToBytes(pTexAnim.Rate).CopyTo(data, pos + 8);
-
+                data[0] = (byte)pTexAnim.Flags;
+                data[1] = (byte)pTexAnim.Face;
+                data[2] = (byte)pTexAnim.SizeX;
+                data[3] = (byte)pTexAnim.SizeY;
+                Utils.FloatToBytesSafepos(pTexAnim.Start, data, 4);
+                Utils.FloatToBytesSafepos(pTexAnim.Length, data, 8);
+                Utils.FloatToBytesSafepos(pTexAnim.Rate, data, 12);
             }
             m_TextureAnimation = data;
         }
@@ -1998,23 +1962,15 @@ namespace OpenSim.Region.Framework.Scenes
         /// </summary>
         /// <param name="impulsei">Vector force</param>
         /// <param name="localGlobalTF">true for the local frame, false for the global frame</param>
-        public void ApplyImpulse(Vector3 impulsei, bool localGlobalTF)
+        public void ApplyImpulse(Vector3 impulse, bool localGlobalTF)
         {
-            Vector3 impulse = impulsei;
+            if (ParentGroup == null || ParentGroup.IsDeleted || ParentGroup.inTransit)
+                return;
 
             if (localGlobalTF)
-            {
-                Quaternion grot = GetWorldRotation();
-                Quaternion AXgrot = grot;
-                Vector3 AXimpulsei = impulsei;
-                Vector3 newimpulse = AXimpulsei * AXgrot;
-                impulse = newimpulse;
-            }
+                impulse *= GetWorldRotation();
 
-            if (ParentGroup != null)
-            {
-                ParentGroup.applyImpulse(impulse);
-            }
+            ParentGroup.applyImpulse(impulse);
         }
 
         //      SetVelocity for LSL llSetVelocity..  may need revision if having other uses in future
@@ -2037,9 +1993,7 @@ namespace OpenSim.Region.Framework.Scenes
                 return;
 
             if (localGlobalTF)
-            {
-                pVel = pVel * GetWorldRotation();
-            }
+                pVel *= GetWorldRotation();
 
             ParentGroup.Velocity = pVel;
         }
@@ -2064,9 +2018,7 @@ namespace OpenSim.Region.Framework.Scenes
                 return;
 
             if (localGlobalTF)
-            {
-                pAngVel = pAngVel * GetWorldRotation();
-            }
+                pAngVel *= GetWorldRotation();
 
             root.AngularVelocity = pAngVel;
         }
@@ -2079,23 +2031,15 @@ namespace OpenSim.Region.Framework.Scenes
         /// </summary>
         /// <param name="impulsei">Vector force</param>
         /// <param name="localGlobalTF">true for the local frame, false for the global frame</param>
-        public void ApplyAngularImpulse(Vector3 impulsei, bool localGlobalTF)
+        public void ApplyAngularImpulse(Vector3 impulse, bool localGlobalTF)
         {
            if (ParentGroup == null || ParentGroup.IsDeleted || ParentGroup.inTransit)
                 return;
 
-            Vector3 impulse = impulsei;
-
             if (localGlobalTF)
-            {
-                Quaternion grot = GetWorldRotation();
-                Quaternion AXgrot = grot;
-                Vector3 AXimpulsei = impulsei;
-                Vector3 newimpulse = AXimpulsei * AXgrot;
-                impulse = newimpulse;
-            }
-
-            ParentGroup.ApplyAngularImpulse(impulse);
+                ParentGroup.ApplyAngularImpulse(impulse * GetWorldRotation());
+            else
+                ParentGroup.ApplyAngularImpulse(impulse);
         }
 
         /// <summary>
@@ -2112,9 +2056,7 @@ namespace OpenSim.Region.Framework.Scenes
             Vector3 torque = torquei;
 
             if (localGlobalTF)
-            {
                 torque *= GetWorldRotation();
-            }
 
             Torque = torque;
         }
@@ -2161,19 +2103,6 @@ namespace OpenSim.Region.Framework.Scenes
                     RemFlag(PrimFlags.CameraDecoupled);
                 }
             }
-        }
-
-        public byte ConvertScriptUintToByte(uint indata)
-        {
-            byte outdata = (byte)TextureAnimFlags.NONE;
-            if ((indata & 1) != 0) outdata |= (byte)TextureAnimFlags.ANIM_ON;
-            if ((indata & 2) != 0) outdata |= (byte)TextureAnimFlags.LOOP;
-            if ((indata & 4) != 0) outdata |= (byte)TextureAnimFlags.REVERSE;
-            if ((indata & 8) != 0) outdata |= (byte)TextureAnimFlags.PING_PONG;
-            if ((indata & 16) != 0) outdata |= (byte)TextureAnimFlags.SMOOTH;
-            if ((indata & 32) != 0) outdata |= (byte)TextureAnimFlags.ROTATE;
-            if ((indata & 64) != 0) outdata |= (byte)TextureAnimFlags.SCALE;
-            return outdata;
         }
 
         /// <summary>
@@ -2533,14 +2462,6 @@ namespace OpenSim.Region.Framework.Scenes
             return 0;
         }
 
-        public double GetDistanceTo(Vector3 a, Vector3 b)
-        {
-            float dx = a.X - b.X;
-            float dy = a.Y - b.Y;
-            float dz = a.Z - b.Z;
-            return Math.Sqrt(dx * dx + dy * dy + dz * dz);
-        }
-
         public uint GetEffectiveObjectFlags()
         {
             // Commenting this section of code out since it doesn't actually do anything, as enums are handled by
@@ -2675,20 +2596,13 @@ namespace OpenSim.Region.Framework.Scenes
         /// <returns>A Linked Child Prim objects position in world</returns>
         public Vector3 GetWorldPosition()
         {
-            Vector3 ret;
             if (_parentID == 0)
-                // if a root SOP, my position is what it is
-                ret = GroupPosition;
-            else
-            {
-                // If a child SOP, my position is relative to the root SOP so take
-                //    my info and add the root's position and rotation to
-                //    get my world position.
-                Quaternion parentRot = ParentGroup.RootPart.RotationOffset;
-                Vector3 translationOffsetPosition = OffsetPosition * parentRot;
-                ret = ParentGroup.AbsolutePosition + translationOffsetPosition;
-            }
-            return ret;
+                return GroupPosition;
+
+            // If a child SOP, my position is relative to the root SOP so take
+            //    my info and add the root's position and rotation to
+            //    get my world position.
+            return ParentGroup.AbsolutePosition + OffsetPosition * ParentGroup.RootPart.RotationOffset;
         }
 
         /// <summary>
@@ -2697,34 +2611,12 @@ namespace OpenSim.Region.Framework.Scenes
         /// <returns></returns>
         public Quaternion GetWorldRotation()
         {
-            Quaternion newRot;
+            if (_parentID == 0)
+                return RotationOffset;
 
-            if (this.LinkNum == 0 || this.LinkNum == 1)
-            {
-                newRot = RotationOffset;
-            }
-            else
-            {
-                // A child SOP's rotation is relative to the root SOP's rotation.
-                // Combine them to get my absolute rotation.
-                Quaternion parentRot = ParentGroup.RootPart.RotationOffset;
-                Quaternion oldRot = RotationOffset;
-                newRot = parentRot * oldRot;
-            }
-
-            return newRot;
-        }
-
-        public void MoveToTarget(Vector3 target, float tau)
-        {
-            if (tau > 0)
-            {
-                ParentGroup.MoveToTarget(target, tau);
-            }
-            else
-            {
-                StopMoveToTarget();
-            }
+            // A child SOP's rotation is relative to the root SOP's rotation.
+            // Combine them to get my absolute rotation.
+            return ParentGroup.RootPart.RotationOffset * RotationOffset;
         }
 
         /// <summary>
@@ -2778,7 +2670,10 @@ namespace OpenSim.Region.Framework.Scenes
             detobj.velVector = obj.Velocity;
             detobj.colliderType = 0;
             detobj.groupUUID = obj.GroupID;
-            detobj.linkNumber = LinkNum;
+            if (VolumeDetectActive)
+                detobj.linkNumber = 0;
+            else
+                detobj.linkNumber = LinkNum;
             return detobj;
         }
 
@@ -2797,7 +2692,10 @@ namespace OpenSim.Region.Framework.Scenes
             else if(detobj.velVector != Vector3.Zero)
                 detobj.colliderType |= 0x2; //active
             detobj.groupUUID = av.ControllingClient.ActiveGroupId;
-            detobj.linkNumber = LinkNum;
+            if (VolumeDetectActive)
+                detobj.linkNumber = 0;
+            else
+                detobj.linkNumber = LinkNum;
 
             return detobj;
         }
@@ -2813,8 +2711,7 @@ namespace OpenSim.Region.Framework.Scenes
             detobj.velVector = Vector3.Zero;
             detobj.colliderType = 0;
             detobj.groupUUID = UUID.Zero;
-            detobj.linkNumber = LinkNum; // pass my link number not sure needed.. but no harm
-
+            detobj.linkNumber = LinkNum;
             return detobj;
         }
 
@@ -3106,27 +3003,7 @@ namespace OpenSim.Region.Framework.Scenes
                 }
                 //ParentGroup.RootPart.m_groupPosition = newpos;
             }
-/*
-            if (pa != null && _parentID != 0 && ParentGroup != null)
-            {
-                // Special case where a child object is requesting property updates.
-                // This happens when linksets are modified to use flexible links rather than
-                //    the default links.
-                // The simulator code presumes that child parts are only modified by scripts
-                //    so the logic for changing position/rotation/etc does not take into
-                //    account the physical object actually moving.
-                // This code updates the offset position and rotation of the child and then
-                //    lets the update code push the update to the viewer.
-                // Since physics engines do not normally generate this event for linkset children,
-                //    this code will not be active unless you have a specially configured
-                //    physics engine.
-                Quaternion invRootRotation = Quaternion.Normalize(Quaternion.Inverse(ParentGroup.RootPart.RotationOffset));
-                m_offsetPosition = pa.Position - m_groupPosition;
-                RotationOffset = pa.Orientation * invRootRotation;
-                // m_log.DebugFormat("{0} PhysicsRequestingTerseUpdate child: pos={1}, rot={2}, offPos={3}, offRot={4}",
-                //                     "[SCENE OBJECT PART]", pa.Position, pa.Orientation, m_offsetPosition, RotationOffset);
-            }
-*/
+
             ScheduleTerseUpdate();
         }
 
@@ -3475,7 +3352,29 @@ namespace OpenSim.Region.Framework.Scenes
         private const float ANGVELOCITY_TOLERANCE = 0.005f;
         private const float POSITION_TOLERANCE = 0.05f; // I don't like this, but I suppose it's necessary
         private const double TIME_MS_TOLERANCE = 200.0; //llSetPos has a 200ms delay. This should NOT be 3 seconds.
-        
+
+        private Vector3 ClampVectorForTerseUpdate(Vector3 v, float max)
+        {
+            float a, b;
+
+            a = Math.Abs(v.X);
+            b = Math.Abs(v.Y);
+            if (b > a)
+                a = b;
+            b = Math.Abs(v.Z);
+            if (b > a)
+                a = b;
+
+            if (a > max)
+            {
+                a = max / a;
+                v.X *= a;
+                v.Y *= a;
+                v.Z *= a;
+            }
+            return v;
+        }
+
         /// <summary>
         /// Tell all the prims which have had updates scheduled
         /// </summary>
@@ -3491,73 +3390,43 @@ namespace OpenSim.Region.Framework.Scenes
 
                 if(current == PrimUpdateFlags.TerseUpdate)
                 {
-                    Vector3 curvel = Velocity;
-                    Vector3 curacc = Acceleration;
-                    Vector3 angvel = AngularVelocity;
-
                     while(true) // just to avoid ugly goto
                     {
                         double elapsed = now - m_lastUpdateSentTime;
                         if (elapsed > TIME_MS_TOLERANCE)
                             break;
 
-                        if( Math.Abs(curacc.X - m_lastAcceleration.X) >  VELOCITY_TOLERANCE ||
-                                Math.Abs(curacc.Y - m_lastAcceleration.Y) >  VELOCITY_TOLERANCE ||
-                                Math.Abs(curacc.Z - m_lastAcceleration.Z) >  VELOCITY_TOLERANCE)
+                        if ( !Acceleration.ApproxEquals(m_lastAcceleration, VELOCITY_TOLERANCE))
                             break;
 
-                        if( Math.Abs(curvel.X - m_lastVelocity.X) >  VELOCITY_TOLERANCE ||
-                                Math.Abs(curvel.Y - m_lastVelocity.Y) >  VELOCITY_TOLERANCE ||
-                                Math.Abs(curvel.Z - m_lastVelocity.Z) >  VELOCITY_TOLERANCE)
+                        Vector3 curvel = ClampVectorForTerseUpdate(Velocity, 128f);
+                        Vector3 tmp = ClampVectorForTerseUpdate(m_lastVelocity, 128f);
+                        if (!curvel.ApproxEquals(tmp, VELOCITY_TOLERANCE))
                             break;
 
-                        float vx = Math.Abs(curvel.X);
-                        if(vx > 128.0)
-                            break;
-                        float vy = Math.Abs(curvel.Y);
-                        if(vy > 128.0)
-                            break;
-                        float vz = Math.Abs(curvel.Z);
-                        if(vz > 128.0)
-                            break;
-
-                        if(vx <  VELOCITY_TOLERANCE && vy <  VELOCITY_TOLERANCE && vz <  VELOCITY_TOLERANCE
-                                )
+                        if (Math.Abs(curvel.X) < 1e-4 && Math.Abs(curvel.Y) < 1e-4 && Math.Abs(curvel.Z) < 1e-4)
                         {
-                            if(!AbsolutePosition.ApproxEquals(m_lastPosition, POSITION_TOLERANCE))
+                            if (!AbsolutePosition.ApproxEquals(m_lastPosition, POSITION_TOLERANCE))
                                 break;
-                            if(vx <  1e-4 && vy <  1e-4 && vz <  1e-4 &&
-                                    (
-                                    Math.Abs(m_lastVelocity.X) > 1e-4 ||
+                            if (    Math.Abs(m_lastVelocity.X) > 1e-4 ||
                                     Math.Abs(m_lastVelocity.Y) > 1e-4 ||
                                     Math.Abs(m_lastVelocity.Z) > 1e-4
-                                    ))
-                                break;
+                                    )
+                            break;
                         }
 
-                        if( Math.Abs(angvel.X - m_lastAngularVelocity.X) >  ANGVELOCITY_TOLERANCE ||
-                                Math.Abs(angvel.Y - m_lastAngularVelocity.Y) >  ANGVELOCITY_TOLERANCE ||
-                                Math.Abs(angvel.Z - m_lastAngularVelocity.Z) >  ANGVELOCITY_TOLERANCE)
+                        Vector3 angvel = ClampVectorForTerseUpdate(AngularVelocity, 64f);
+                        tmp = ClampVectorForTerseUpdate(m_lastAngularVelocity, 64f);
+                        if (!angvel.ApproxEquals(tmp, ANGVELOCITY_TOLERANCE))
                             break;
 
-                                // viewer interpolators have a limit of 64rad/s
-                        float ax = Math.Abs(angvel.X);
-                        if(ax > 64.0)
-                            break;
-                        float ay = Math.Abs(angvel.Y);
-                        if(ay > 64.0)
-                            break;
-                        float az = Math.Abs(angvel.Z);
-                        if(az > 64.0)
-                            break;
-
-                        if (
-                                ax <  ANGVELOCITY_TOLERANCE &&
-                                ay <  ANGVELOCITY_TOLERANCE &&
-                                az <  ANGVELOCITY_TOLERANCE &&
+                        if (    Math.Abs(AngularVelocity.X) < 1e-4 && 
+                                Math.Abs(AngularVelocity.Y) < 1e-4 &&
+                                Math.Abs(AngularVelocity.Z) < 1e-4 &&
                                 !RotationOffset.ApproxEquals(m_lastRotation, ROTATION_TOLERANCE)
                                 )
                             break;
+
                         return;
                     }
                 }
@@ -4148,11 +4017,6 @@ namespace OpenSim.Region.Framework.Scenes
             SetText(text);
         }
 
-        public void StopMoveToTarget()
-        {
-            ParentGroup.StopMoveToTarget();
-        }
-
         public void StoreUndoState(ObjectChangeType change)
         {
             lock (m_UndoLock)
@@ -4513,7 +4377,7 @@ namespace OpenSim.Region.Framework.Scenes
                         q = iray.Origin + iray.Direction * a;
                     //}
 
-                    float distance2 = (float)GetDistanceTo(q, AXpos);
+                    float distance2 = Vector3.Distance(q, AXpos);
                     // Is this the closest hit to the object's origin?
                     //if (faceCenters)
                     //{
