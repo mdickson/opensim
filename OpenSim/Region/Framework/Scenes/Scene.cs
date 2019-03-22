@@ -951,18 +951,25 @@ namespace OpenSim.Region.Framework.Scenes
                 {
                     m_minNonphys = RegionInfo.NonphysPrimMin;
                 }
+                // don't allow nonsense values
+                if(m_minNonphys < 0.001f)
+                    m_minNonphys = 0.001f;
 
                 m_maxNonphys = startupConfig.GetFloat("NonPhysicalPrimMax", m_maxNonphys);
                 if (RegionInfo.NonphysPrimMax > 0)
                 {
                     m_maxNonphys = RegionInfo.NonphysPrimMax;
                 }
+                if (m_maxNonphys > 65536)
+                    m_maxNonphys = 65536;
 
                 m_minPhys = startupConfig.GetFloat("PhysicalPrimMin", m_minPhys);
                 if (RegionInfo.PhysPrimMin > 0)
                 {
                     m_minPhys = RegionInfo.PhysPrimMin;
                 }
+                if(m_minPhys < 0.01f)
+                    m_minPhys = 0.01f;
 
                 m_maxPhys = startupConfig.GetFloat("PhysicalPrimMax", m_maxPhys);
 
@@ -970,6 +977,8 @@ namespace OpenSim.Region.Framework.Scenes
                 {
                     m_maxPhys = RegionInfo.PhysPrimMax;
                 }
+                if (m_maxPhys > 2048)
+                    m_maxPhys = 2048;
 
                 m_linksetCapacity = startupConfig.GetInt("LinksetPrims", m_linksetCapacity);
                 if (RegionInfo.LinksetCapacity > 0)
@@ -1766,6 +1775,30 @@ namespace OpenSim.Region.Framework.Scenes
 
                             // Region ready should always be set
                             Ready = true;
+
+
+                            IConfig restartConfig = m_config.Configs["RestartModule"];
+                            if (restartConfig != null)
+                            {
+                                string markerPath = restartConfig.GetString("MarkerPath", String.Empty);
+
+                                if (markerPath != String.Empty)
+                                {
+                                    string path = Path.Combine(markerPath, RegionInfo.RegionID.ToString() + ".ready");
+                                    try
+                                    {
+                                        string pidstring = System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
+                                        FileStream fs = File.Create(path);
+                                        System.Text.ASCIIEncoding enc = new System.Text.ASCIIEncoding();
+                                        Byte[] buf = enc.GetBytes(pidstring);
+                                        fs.Write(buf, 0, buf.Length);
+                                        fs.Close();
+                                    }
+                                    catch (Exception)
+                                    {
+                                    }
+                                }
+                            }
                         }
                         else
                         {

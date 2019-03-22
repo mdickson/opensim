@@ -1001,7 +1001,7 @@ namespace OpenSim.Region.Framework.Scenes
             get
             {
                 PhysicsActor actor = PhysActor;
-                if (actor != null)
+                if (actor != null && actor.IsPhysical)
                 {
                     m_acceleration = actor.Acceleration;
                 }
@@ -1038,8 +1038,8 @@ namespace OpenSim.Region.Framework.Scenes
         {
             get
             {
-                if (m_text.Length > 256) // yes > 254
-                    return m_text.Substring(0, 256);
+                if (m_text.Length > 254)
+                    return m_text.Substring(0, 254);
                 return m_text;
             }
             set { m_text = value; }
@@ -2319,6 +2319,17 @@ namespace OpenSim.Region.Framework.Scenes
 
                 if (pa != null)
                 {
+                    if (UsePhysics != pa.IsPhysical)
+                    {
+                        float minsize = UsePhysics ? ParentGroup.Scene.m_minPhys : ParentGroup.Scene.m_minNonphys;
+                        float maxsize = UsePhysics ? ParentGroup.Scene.m_maxPhys : ParentGroup.Scene.m_maxNonphys;
+                        Vector3 scale = Scale;
+                        scale.X = Util.Clamp(scale.X, minsize, maxsize);
+                        scale.Y = Util.Clamp(scale.Y, minsize, maxsize);
+                        scale.Z = Util.Clamp(scale.Z, minsize, maxsize);
+                        Scale = scale;
+                    }
+
                     if (UsePhysics != pa.IsPhysical || isNew)
                     {
                         if (pa.IsPhysical) // implies UsePhysics==false for this block
@@ -2327,10 +2338,7 @@ namespace OpenSim.Region.Framework.Scenes
                             {
                                 ParentGroup.Scene.RemovePhysicalPrim(1);
 
-                                Velocity = new Vector3(0, 0, 0);
-                                Acceleration = new Vector3(0, 0, 0);
-                                AngularVelocity = new Vector3(0, 0, 0);
-                                APIDActive = false;
+                                Stop();
 
                                 if (pa.Phantom && !VolumeDetectActive)
                                 {
@@ -2470,7 +2478,10 @@ namespace OpenSim.Region.Framework.Scenes
 //            if (m_parentGroup == null || m_parentGroup.RootPart == this)
 //                f &= ~(PrimFlags.Touch | PrimFlags.Money);
 
-            return (uint)Flags | (uint)LocalFlags;
+            uint eff = (uint)Flags | (uint)LocalFlags;
+            if(m_inventory == null || m_inventory.Count == 0)
+                eff |= (uint)PrimFlags.InventoryEmpty;
+            return eff;
         }
 
         // some of this lines need be moved to other place later
@@ -3231,8 +3242,6 @@ namespace OpenSim.Region.Framework.Scenes
             if (ParentGroup.Scene.GetNumberOfClients() == 0)
                 return;
 
-            ParentGroup.QueueForUpdateCheck();
-
             bool isfull = false;
             if (ParentGroup.IsAttachment)
             {
@@ -3242,6 +3251,8 @@ namespace OpenSim.Region.Framework.Scenes
 
             lock (UpdateFlagLock)
                 UpdateFlag |= update;
+
+            ParentGroup.QueueForUpdateCheck();
 
             ParentGroup.Scene.EventManager.TriggerSceneObjectPartUpdated(this, isfull);
         }
@@ -3993,9 +4004,10 @@ namespace OpenSim.Region.Framework.Scenes
         /// <param name="text"></param>
         public void SetText(string text)
         {
-            Text = text;
+            string oldtext = m_text;
+            m_text = text;
 
-            if (ParentGroup != null)
+            if (ParentGroup != null && oldtext != text)
             {
                 ParentGroup.HasGroupChanged = true;
                 ScheduleFullUpdate();
@@ -4010,11 +4022,18 @@ namespace OpenSim.Region.Framework.Scenes
         /// <param name="alpha"></param>
         public void SetText(string text, Vector3 color, double alpha)
         {
+            Color oldcolor = Color;
+            string oldtext = m_text;
             Color = Color.FromArgb((int) (alpha*0xff),
                                    (int) (color.X*0xff),
                                    (int) (color.Y*0xff),
                                    (int) (color.Z*0xff));
-            SetText(text);
+            m_text = text;
+            if(ParentGroup != null && (oldcolor != Color || oldtext != m_text))
+            {
+                ParentGroup.HasGroupChanged = true;
+                ScheduleFullUpdate();
+            }
         }
 
         public void StoreUndoState(ObjectChangeType change)
@@ -4428,10 +4447,10 @@ namespace OpenSim.Region.Framework.Scenes
             SceneObjectSerializer.SOPToXml2(xmlWriter, this, new Dictionary<string, object>());
         }
 
-        public void TriggerScriptChangedEvent(Changed val)
+        public void TriggerScriptChangedEvent(Changed val, object data = null)
         {
             if (ParentGroup != null && ParentGroup.Scene != null)
-                ParentGroup.Scene.EventManager.TriggerOnScriptChangedEvent(LocalId, (uint)val);
+                ParentGroup.Scene.EventManager.TriggerOnScriptChangedEvent(LocalId, (uint)val, data);
         }
 
         public void TrimPermissions()
@@ -4711,14 +4730,13 @@ namespace OpenSim.Region.Framework.Scenes
             if ((SetPhantom && !UsePhysics && !SetVD) ||  ParentGroup.IsAttachment || PhysicsShapeType == (byte)PhysShapeType.none
                 || (Shape.PathCurve == (byte)Extrusion.Flexible))
             {
+                Stop();
                 if (pa != null)
                 {
                     if(wasUsingPhysics)
                         ParentGroup.Scene.RemovePhysicalPrim(1);
                     RemoveFromPhysics();
                 }
-
-                Stop();
             }
 
             else
@@ -4776,10 +4794,20 @@ namespace OpenSim.Region.Framework.Scenes
         /// <param name="applyDynamics">applies velocities, force and torque</param>
         private void AddToPhysics(bool isPhysical, bool isPhantom, bool building, bool applyDynamics)
         {
-            PhysicsActor pa;
+            if (ParentGroup.Scene != null)
+            {
+                float minsize = isPhysical ? ParentGroup.Scene.m_minPhys : ParentGroup.Scene.m_minNonphys;
+                float maxsize = isPhysical ? ParentGroup.Scene.m_maxPhys : ParentGroup.Scene.m_maxNonphys;
+                Vector3 scale = Scale;
+                scale.X = Util.Clamp(scale.X, minsize, maxsize);
+                scale.Y = Util.Clamp(scale.Y, minsize, maxsize);
+                scale.Z = Util.Clamp(scale.Z, minsize, maxsize);
+                Scale = scale;
+            }
 
+            PhysicsActor pa;
             Vector3 velocity = Velocity;
-            Vector3 rotationalVelocity = AngularVelocity;;
+            Vector3 rotationalVelocity = AngularVelocity; ;
 
             try
             {
@@ -5109,11 +5137,10 @@ namespace OpenSim.Region.Framework.Scenes
 
             if (changeFlags == 0)
                 return;
-            m_shape.TextureEntry = newTex.GetBytes();
+            m_shape.TextureEntry = newTex.GetBytes(9);
             TriggerScriptChangedEvent(changeFlags);
             ParentGroup.HasGroupChanged = true;
-            ScheduleFullUpdate();
-
+            ScheduleUpdate(PrimUpdateFlags.Textures);
         }
 
         /// <summary>
@@ -5139,10 +5166,10 @@ namespace OpenSim.Region.Framework.Scenes
             if (changeFlags == 0)
                 return;
 
-            m_shape.TextureEntry = newTex.GetBytes();
+            m_shape.TextureEntry = newTex.GetBytes(9);
             TriggerScriptChangedEvent(changeFlags);
             ParentGroup.HasGroupChanged = true;
-            ScheduleFullUpdate();
+            ScheduleUpdate(PrimUpdateFlags.Textures);
         }
 
         internal void UpdatePhysicsSubscribedEvents()
@@ -5554,20 +5581,26 @@ namespace OpenSim.Region.Framework.Scenes
         // handle osVolumeDetect
         public void ScriptSetVolumeDetect(bool makeVolumeDetect)
         {
+            if(ParentGroup.IsDeleted)
+                return;
+
             if(_parentID == 0)
             {
-                // if root prim do it via SOG
+                // if root prim do it is like llVolumeDetect
                 ParentGroup.ScriptSetVolumeDetect(makeVolumeDetect);
                 return;
             }
 
-            bool wasUsingPhysics = ((Flags & PrimFlags.Physics) != 0);
-            bool wasTemporary = ((Flags & PrimFlags.TemporaryOnRez) != 0);
-            bool wasPhantom = ((Flags & PrimFlags.Phantom) != 0);
+            if(ParentGroup.IsVolumeDetect)
+                return; // entire linkset is phantom already
+
+            bool wasUsingPhysics = ParentGroup.UsesPhysics;
+            bool wasTemporary = ParentGroup.IsTemporary;
+            bool wasPhantom = ParentGroup.IsPhantom;
 
             if(PhysActor != null)
                 PhysActor.Building = true;
-            UpdatePrimFlags(wasUsingPhysics,wasTemporary,wasPhantom,makeVolumeDetect,false);
+            UpdatePrimFlags(wasUsingPhysics, wasTemporary, wasPhantom, makeVolumeDetect, false);
         }
 
         protected static int m_animationSequenceNumber = (int)(Util.GetTimeStampTicks() & 0x5fffafL);

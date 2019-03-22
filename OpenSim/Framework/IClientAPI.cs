@@ -390,7 +390,7 @@ namespace OpenSim.Framework
         IClientAPI remoteClient, UUID invoice, UUID senderID, bool scripted, bool collisionEvents, bool physics);
 
     public delegate void EstateTeleportOneUserHomeRequest(
-        IClientAPI remoteClient, UUID invoice, UUID senderID, UUID prey);
+        IClientAPI remoteClient, UUID invoice, UUID senderID, UUID prey, bool kill);
 
     public delegate void EstateTeleportAllUsersHomeRequest(IClientAPI remoteClient, UUID invoice, UUID senderID);
 
@@ -671,7 +671,6 @@ namespace OpenSim.Framework
         Particles = 1 << 19,
         ExtraData = 1 << 20,
         Sound = 1 << 21,
-        Joint = 1 << 22,
 
         TerseUpdate = Position | Rotation | Velocity | Acceleration | AngularVelocity,
         FullUpdate =    0x00ffffff,
@@ -1098,8 +1097,6 @@ namespace OpenSim.Framework
 
         void SendCachedTextureResponse(ISceneEntity avatar, int serial, List<CachedTextureResponseArg> cachedTextures);
 
-        void SendStartPingCheck(byte seq);
-
         /// <summary>
         /// Tell the client that an object has been deleted
         /// </summary>
@@ -1109,7 +1106,7 @@ namespace OpenSim.Framework
 //        void SendPartFullUpdate(ISceneEntity ent, uint? parentID);
 
         void SendAnimations(UUID[] animID, int[] seqs, UUID sourceAgentId, UUID[] objectIDs);
-        void SendRegionHandshake(RegionInfo regionInfo, RegionHandshakeArgs args);
+        void SendRegionHandshake();
 
         /// <summary>
         /// Send chat to the viewer.
