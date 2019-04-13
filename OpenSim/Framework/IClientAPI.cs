@@ -596,22 +596,33 @@ namespace OpenSim.Framework
         public PrimUpdateFlags Flags
         {
             get { return m_flags; }
+            set { m_flags = value; }
         }
 
         public virtual void Update()
         {
             // we are on the new one
             if (m_flags.HasFlag(PrimUpdateFlags.CancelKill))
-                m_flags = PrimUpdateFlags.FullUpdatewithAnim;
+            {
+                if (m_flags.HasFlag(PrimUpdateFlags.UpdateProbe))
+                    m_flags = PrimUpdateFlags.UpdateProbe;
+                else
+                    m_flags = PrimUpdateFlags.FullUpdatewithAnim;
+            }
         }
 
         public virtual void Update(EntityUpdate oldupdate)
         {
             // we are on the new one
             PrimUpdateFlags updateFlags = oldupdate.Flags;
+            if (updateFlags.HasFlag(PrimUpdateFlags.UpdateProbe))
+                updateFlags &= ~PrimUpdateFlags.UpdateProbe;
             if (m_flags.HasFlag(PrimUpdateFlags.CancelKill))
             {
-                m_flags = PrimUpdateFlags.FullUpdatewithAnim;
+                if(m_flags.HasFlag(PrimUpdateFlags.UpdateProbe))
+                    m_flags = PrimUpdateFlags.UpdateProbe;
+                else
+                    m_flags = PrimUpdateFlags.FullUpdatewithAnim;
             }
             else
                 m_flags |= updateFlags;
@@ -679,6 +690,7 @@ namespace OpenSim.Framework
 
         FullUpdatewithAnim = FullUpdate | Animations,
 
+        UpdateProbe   = 0x10000000, // 1 << 28
         SendInTransit = 0x20000000, // 1 << 29
         CancelKill =    0x40000000, // 1 << 30 
         Kill =          0x80000000 // 1 << 31
@@ -696,6 +708,7 @@ namespace OpenSim.Framework
     public interface IClientAPI
     {
         Vector3 StartPos { get; set; }
+        float StartFar { get; set; }
 
         UUID AgentId { get; }
 
@@ -1500,6 +1513,6 @@ namespace OpenSim.Framework
         void SendAgentTerseUpdate(ISceneEntity presence);
 
         void SendPlacesReply(UUID queryID, UUID transactionID, PlacesReplyData[] data);
-        void CheckViewerCaps();
+        uint GetViewerCaps();
     }
 }
