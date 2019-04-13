@@ -369,6 +369,8 @@ namespace OpenSim.Tests.Common
             set { }
         }
 
+        public float StartFar { get; set; }
+
         public virtual UUID AgentId
         {
             get { return m_agentId; }
@@ -1398,7 +1400,10 @@ namespace OpenSim.Tests.Common
         {
         }
 
-        public void CheckViewerCaps() { }
+        public uint GetViewerCaps()
+        {
+            return 0x1000;
+        }
 
     }
 }
