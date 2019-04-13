@@ -524,6 +524,8 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
             set { }
         }
 
+        public float StartFar { get; set; }
+
         public bool TryGet<T>(out T iface)
         {
             iface = default(T);
@@ -943,7 +945,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
 
             if (OnCompleteMovementToRegion != null)
             {
-                OnCompleteMovementToRegion(this, true);
+                OnCompleteMovementToRegion(this, false);
             }
         }
 
@@ -1773,7 +1775,10 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
             return 0;
         }
 
-        public void CheckViewerCaps() { }
+        public uint GetViewerCaps()
+        {
+            return 0;
+        }
 
     }
 }

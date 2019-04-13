@@ -562,6 +562,8 @@ namespace OpenSim.Region.OptionalModules.World.NPC
             set { }
         }
 
+        public float StartFar { get; set; }
+
         public virtual UUID AgentId
         {
             get { return m_uuid; }
@@ -1384,7 +1386,10 @@ namespace OpenSim.Region.OptionalModules.World.NPC
             return 0;
         }
 
-        public void CheckViewerCaps() { }
+        public uint GetViewerCaps()
+        {
+            return 0;
+        }
 
     }
 }
