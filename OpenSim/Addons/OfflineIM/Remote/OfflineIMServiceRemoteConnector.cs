@@ -136,6 +136,31 @@ namespace OpenSim.OfflineIM
             return true;
         }
 
+        public bool EmailMessage(GridInstantMessage im, string recipientAddress, out string reason)
+        {
+            reason = string.Empty;
+            Dictionary<string, object> sendData = OfflineIMDataUtils.GridInstantMessage(im);
+
+            sendData.Add("RecipientAddress", recipientAddress);
+
+            Dictionary<string, object> ret = MakeRequest("EMAIL", sendData);
+
+            if (ret == null)
+            {
+                reason = "Bad response from server";
+                return false;
+            }
+
+            string result = ret["RESULT"].ToString();
+            if (result == "NULL" || result.ToLower() == "false")
+            {
+                reason = ret.ContainsKey("REASON") ? ret["REASON"].ToString() : "Unknown error";
+                return false;
+            }
+
+            return true;
+        }
+
         public void DeleteMessages(UUID userID)
         {
             Dictionary<string, object> sendData = new Dictionary<string, object>();

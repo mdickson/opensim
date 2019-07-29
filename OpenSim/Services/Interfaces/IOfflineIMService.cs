@@ -39,6 +39,14 @@ namespace OpenSim.Services.Interfaces
         bool StoreMessage(GridInstantMessage im, out string reason);
 
         /// <summary>
+        /// Send the offline IM by way of email if it's configured
+        /// </summary>
+        /// <param name="im">The message to send</param>
+        /// <param name="emailRecipient">an RFC compliant SMTP Email address for the recipient</param>
+        /// <param name="reason">Status of the operation in a human readable string</param>
+        /// <returns>True on Success, False on Failure with reason populated</returns>
+        bool EmailMessage(GridInstantMessage im, string emailRecipient, out string reason);
+        /// <summary>
         /// Delete messages to or from this user (or group).
         /// </summary>
         /// <param name="userID">A user or group ID</param>
