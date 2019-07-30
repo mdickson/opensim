@@ -28,9 +28,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Mail;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Timers;
 using System.Xml;
 using System.Xml.Serialization;
@@ -46,20 +48,44 @@ namespace OpenSim.OfflineIM
 {
     public class OfflineIMService : OfflineIMServiceBase, IOfflineIMService
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private const int MAX_IM = 25;
 
-        private XmlSerializer m_serializer;
+        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly XmlSerializer m_serializer = new XmlSerializer(typeof(GridInstantMessage));
         private static bool m_Initialized = false;
+
+        // For SMTP Email Support
+        protected bool SmtpEnabled = false;
+        protected string SmtpHostName = string.Empty;
+        protected string SmtpServer = string.Empty;
+        protected int SmtpPort = 25;
+        protected string SmtpUsername = string.Empty;
+        protected string SmtpPassword = string.Empty;
+        protected string ReplyTo = string.Empty;
 
         public OfflineIMService(IConfigSource config)
             : base(config)
         {
-            m_serializer = new XmlSerializer(typeof(GridInstantMessage));
             if (!m_Initialized)
             {
                 m_Database.DeleteOld();
                 m_Initialized = true;
+            }
+
+            IConfig smtpConfig = config.Configs["SMTP"];
+            if (smtpConfig != null)
+            {
+                SmtpEnabled = smtpConfig.GetBoolean("enabled", false);
+
+                if (SmtpEnabled == true)
+                {
+                    SmtpHostName = smtpConfig.GetString("host_domain_header_from", SmtpHostName);
+                    SmtpServer = smtpConfig.GetString("SMTP_SERVER_HOSTNAME", SmtpServer);
+                    SmtpPort = smtpConfig.GetInt("SMTP_SERVER_PORT", SmtpPort);
+                    SmtpUsername = smtpConfig.GetString("SMTP_SERVER_LOGIN", SmtpUsername);
+                    SmtpPassword = smtpConfig.GetString("SMTP_SERVER_PASSWORD", SmtpPassword);
+                    ReplyTo = smtpConfig.GetString("SMTP_REPLY_TO", ReplyTo);
+                }
             }
         }
 
@@ -122,7 +148,90 @@ namespace OpenSim.OfflineIM
             data.Data["Message"] = imXml;
 
             return m_Database.Store(data);
+        }
 
+        public bool EmailMessage(GridInstantMessage im, string emailRecipient, out string reason)
+        {
+            reason = string.Empty;
+
+            if (this.SmtpEnabled)
+            {
+                // Check the email is correct form in REGEX
+                string EMailpatternStrict = @"^(([^<>()[\]\\.,;:\s@\""]+"
+                    + @"(\.[^<>()[\]\\.,;:\s@\""]+)*)|(\"".+\""))@"
+                    + @"((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
+                    + @"\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+"
+                    + @"[a-zA-Z]{2,}))$";
+
+                Regex EMailreStrict = new Regex(EMailpatternStrict);
+
+                if (! EMailreStrict.IsMatch(emailRecipient))
+                {
+                    m_log.DebugFormat("[OFFLINE EMAIL]: REGEX Problem in EMail Address: {0}", emailRecipient);
+
+                    reason = "Malformed email address";
+                    return false;
+                }
+
+                var fromAddress = this.ReplyTo;
+                var fromUsername = im.fromAgentName;
+
+                if (string.IsNullOrEmpty(fromAddress))
+                {
+                    fromAddress = "donotreply@" + this.SmtpHostName;
+                }
+
+                if (!EMailreStrict.IsMatch(fromAddress))
+                {
+                    m_log.DebugFormat("[OFFLINE EMAIL]: REGEX Problem in ReplyTo Address: {0}", fromAddress);
+                    reason = "Configuration Error";
+                    return false;
+                }
+
+                try
+                {
+                    SmtpClient smtpClient = new SmtpClient(this.SmtpServer, this.SmtpPort);
+
+                    smtpClient.Credentials =
+                        new System.Net.NetworkCredential(this.SmtpUsername, this.SmtpPassword);
+                    smtpClient.UseDefaultCredentials = false;
+                    smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    smtpClient.EnableSsl = true;
+
+                    MailMessage mail = new MailMessage();
+
+                    //Setting From, To
+                    mail.From = new MailAddress(fromAddress);
+                    mail.To.Add(new MailAddress(emailRecipient));
+
+                    mail.Subject = string.Format("Offline Message from {0}@{1}", fromUsername, this.SmtpHostName);
+                    mail.Body = im.message;
+
+                    smtpClient.Send(mail);
+                }
+                catch (Exception e)
+                {
+                    m_log.DebugFormat("[OFFLINE EMAIL]: Exception: {0}", e.Message);
+                    reason = "Network Error";
+                    return false;
+                }
+
+                m_log.DebugFormat(
+                    "[OFFLINE EMAIL]: EMail sent to: {0} from {1}@{2}", 
+                    emailRecipient, 
+                    fromUsername, 
+                    this.SmtpHostName);
+
+                reason = "Message Sent";
+                return true;
+            }
+            else
+            {
+                m_log.Debug("[OFFLINE EMAIL]: Offline email is not enabled");
+
+                reason = "Not Enabled";
+                return false;
+            }
         }
 
         public void DeleteMessages(UUID userID)

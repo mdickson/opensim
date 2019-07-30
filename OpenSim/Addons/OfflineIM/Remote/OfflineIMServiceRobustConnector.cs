@@ -107,6 +107,8 @@ namespace OpenSim.OfflineIM
                         return HandleStore(request);
                     case "DELETE":
                         return HandleDelete(request);
+                    case "EMAIL":
+                        return HandleEmail(request);
                 }
                 m_log.DebugFormat("[OFFLINE IM HANDLER]: unknown method request: {0}", method);
             }
@@ -156,6 +158,30 @@ namespace OpenSim.OfflineIM
 
                 result["RESULT"] = dict;
             }
+
+            string xmlString = ServerUtils.BuildXmlResponse(result);
+
+            //m_log.DebugFormat("[XXX]: resp string: {0}", xmlString);
+            return Util.UTF8NoBomEncoding.GetBytes(xmlString);
+        }
+
+        byte[] HandleEmail(Dictionary<string, object> request)
+        {
+            Dictionary<string, object> result = new Dictionary<string, object>();
+
+            GridInstantMessage im = OfflineIMDataUtils.GridInstantMessage(request);
+            string recipientAddress = string.Empty;
+
+            if (request.ContainsKey("RecipientAddress") && request["RecipientAddress"] != null)
+                recipientAddress = request["RecipientAddress"].ToString();
+
+            string reason = string.Empty;
+
+            bool success = m_OfflineIMService.EmailMessage(im, recipientAddress, out reason);
+
+            result["RESULT"] = success.ToString();
+            if (!success)
+                result["REASON"] = reason;
 
             string xmlString = ServerUtils.BuildXmlResponse(result);
 

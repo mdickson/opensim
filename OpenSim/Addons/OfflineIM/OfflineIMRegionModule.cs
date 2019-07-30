@@ -37,6 +37,7 @@ using OpenSim.Framework.Client;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using System.Linq;
 
 namespace OpenSim.OfflineIM
 {
@@ -213,6 +214,7 @@ namespace OpenSim.OfflineIM
             string reason = string.Empty;
             bool success = m_OfflineIMService.StoreMessage(im, out reason);
 
+            // Let the sender know the message was queued for offline delivery
             if (im.dialog == (byte)InstantMessageDialog.MessageFromAgent)
             {
                 IClientAPI client = FindClient(new UUID(im.fromAgentID));
@@ -227,6 +229,52 @@ namespace OpenSim.OfflineIM
                         (success ? "Message saved." : "Message not saved: " + reason),
                         false, new Vector3()));
             }
+
+            // Handle Offline EMail Delivery as well.
+            // Look up the receiver's email address.
+            var recipientAddress = string.Empty;
+            var scene = m_SceneList.First();
+            var imViaEmail = false;
+
+            if (scene != null)
+            {
+                IUserProfilesService profileService = scene.UserProfilesService;
+
+                if (profileService == null)
+                {
+                    m_log.DebugFormat("[OfflineIM.V2]: WARNING cannot resolve Profile Service.");
+                    m_log.DebugFormat("[OfflineIM.V2]: Using Account and assuming imviaemail is true.");
+
+                    UserAccount account =
+                        scene.UserAccountService.GetUserAccount(
+                            scene.RegionInfo.ScopeID, new UUID(im.toAgentID));
+
+                    if (account != null)
+                    {
+                        recipientAddress = account.Email;
+                        imViaEmail = true;
+                    }
+                }
+                else
+                {
+                    UserPreferences userPreferences = new UserPreferences();
+                    userPreferences.UserId = new UUID(im.toAgentID);
+                    string prefsRequestResult = String.Empty;
+
+                    if (profileService.UserPreferencesRequest(ref userPreferences, ref prefsRequestResult) == true)
+                    {
+                        imViaEmail = userPreferences.IMViaEmail;
+                        recipientAddress = userPreferences.EMail;
+                    }
+                }
+            }
+
+            // If we got an email address, send it that way too
+            if (imViaEmail && !string.IsNullOrEmpty(recipientAddress))
+            {
+                string emailStatus = string.Empty;
+                bool result = m_OfflineIMService.EmailMessage(im, recipientAddress, out emailStatus);
+            }
         }
 
         #region IOfflineIM
@@ -239,6 +287,11 @@ namespace OpenSim.OfflineIM
         public bool StoreMessage(GridInstantMessage im, out string reason)
         {
             return m_OfflineIMService.StoreMessage(im, out reason);
+        }
+
+        public bool EmailMessage(GridInstantMessage im, string emailRecipient, out string reason)
+        {
+            return m_OfflineIMService.EmailMessage(im, emailRecipient, out reason);
         }
 
         public void DeleteMessages(UUID userID)
