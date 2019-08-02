@@ -924,6 +924,23 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
         }
 
         // Teleport functions
+        public void osLocalTeleportAgent(LSL_Key agent, LSL_Types.Vector3 position, LSL_Types.Vector3 velocity, LSL_Types.Vector3 lookat, LSL_Integer flags)
+        {
+            UUID agentId;
+            if (!UUID.TryParse(agent, out agentId))
+                return;
+
+            ScenePresence presence = World.GetScenePresence(agentId);
+            if (presence == null || presence.IsDeleted || presence.IsInTransit)
+                return;
+
+            Vector3 pos = presence.AbsolutePosition;
+            if (!checkAllowAgentTPbyLandOwner(agentId, pos))
+                return;
+
+            World.RequestLocalTeleport(presence, position, velocity, lookat, flags);
+        }
+
         public void osTeleportAgent(string agent, string regionName, LSL_Types.Vector3 position, LSL_Types.Vector3 lookat)
         {
             // High because there is no security check. High griefer potential
@@ -1581,6 +1598,16 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             }
 
             return 0.0f;
+        }
+
+        public LSL_Integer osGetParcelDwell(LSL_Vector pos)
+        {
+            LandData land = World.GetLandData(pos);
+            if (land != null)
+            {
+                return (int)land.Dwell;
+            }
+            return 0;
         }
 
         // Routines for creating and managing parcels programmatically
@@ -3818,15 +3845,40 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
         /// <summary>
         /// Set parameters for light projection in host prim
         /// </summary>
-        public void osSetProjectionParams(bool projection, LSL_Key texture, double fov, double focus, double amb)
+        public void osSetProjectionParams(LSL_Integer projection, LSL_Key texture, LSL_Float fov, LSL_Float focus, LSL_Float amb)
         {
-            osSetProjectionParams(UUID.Zero.ToString(), projection, texture, fov, focus, amb);
+            SetProjectionParams(m_host, projection, texture, fov, focus, amb);
+        }
+
+        /// <summary>
+        /// Set parameters for light projection of a linkset prim
+        /// </summary>
+        public void osSetProjectionParams(LSL_Integer linknum, LSL_Integer projection, LSL_Key texture, LSL_Float fov, LSL_Float focus, LSL_Float amb)
+        {
+            if (linknum == ScriptBaseClass.LINK_THIS || linknum == m_host.LinkNum)
+            {
+                SetProjectionParams(m_host, projection, texture, fov, focus, amb);
+                return;
+            }
+
+            if (linknum < 0 || linknum > m_host.ParentGroup.PrimCount)
+                return;
+
+            if(linknum < 2 && m_host.LinkNum < 2)
+            {
+                SetProjectionParams(m_host, projection, texture, fov, focus, amb);
+                return;
+            }
+
+            SceneObjectPart obj = m_host.ParentGroup.GetLinkNumPart(linknum);
+            if(obj != null)
+                SetProjectionParams(obj, projection, texture, fov, focus, amb);
         }
 
         /// <summary>
         /// Set parameters for light projection with uuid of target prim
         /// </summary>
-        public void osSetProjectionParams(LSL_Key prim, bool projection, LSL_Key texture, double fov, double focus, double amb)
+        public void osSetProjectionParams(LSL_Key prim, LSL_Integer llprojection, LSL_Key texture, LSL_Float fov, LSL_Float focus, LSL_Float amb)
         {
             CheckThreatLevel(ThreatLevel.High, "osSetProjectionParams");
 
@@ -3841,7 +3893,12 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                 if (obj == null)
                     return;
             }
+            SetProjectionParams(obj, llprojection, texture, fov, focus, amb);
+        }
 
+        private void SetProjectionParams(SceneObjectPart obj, LSL_Integer llprojection, LSL_Key texture, LSL_Float fov, LSL_Float focus, LSL_Float amb)
+        {
+            bool projection = llprojection != 0;
             obj.Shape.ProjectionEntry = projection;
             obj.Shape.ProjectionTextureUUID = new UUID(texture);
             obj.Shape.ProjectionFOV = (float)fov;

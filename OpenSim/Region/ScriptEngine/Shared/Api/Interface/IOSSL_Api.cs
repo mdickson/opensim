@@ -150,6 +150,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         string osGetAgentIP(string agent);
 
         // Teleport commands
+        void osLocalTeleportAgent(LSL_Key agent, LSL_Types.Vector3 position, LSL_Types.Vector3 velocity, LSL_Types.Vector3 lookat, LSL_Integer flags);
         void osTeleportAgent(string agent, string regionName, LSL_Types.Vector3 position, LSL_Types.Vector3 lookat);
         void osTeleportAgent(string agent, int regionX, int regionY, LSL_Types.Vector3 position, LSL_Types.Vector3 lookat);
         void osTeleportAgent(string agent, LSL_Types.Vector3 position, LSL_Types.Vector3 lookat);
@@ -259,6 +260,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         LSL_Float osGetWindParam(string plugin, string param);
 
         // Parcel commands
+        LSL_Integer osGetParcelDwell(vector pos);
         void osParcelJoin(vector pos1, vector pos2);
         void osParcelSubdivide(vector pos1, vector pos2);
         void osSetParcelDetails(vector pos, LSL_List rules);
@@ -393,8 +395,9 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         void osForceOtherSit(string avatar, string target);
         LSL_List osGetPrimitiveParams(LSL_Key prim, LSL_List rules);
         void osSetPrimitiveParams(LSL_Key prim, LSL_List rules);
-        void osSetProjectionParams(bool projection, LSL_Key texture, double fov, double focus, double amb);
-        void osSetProjectionParams(LSL_Key prim, bool projection, LSL_Key texture, double fov, double focus, double amb);
+        void osSetProjectionParams(LSL_Integer projection, LSL_Key texture, LSL_Float fov, LSL_Float focus, LSL_Float amb);
+        void osSetProjectionParams(LSL_Key prim, LSL_Integer projection, LSL_Key texture, LSL_Float fov, LSL_Float focus, LSL_Float amb);
+        void osSetProjectionParams(LSL_Integer linknumber, LSL_Integer projection, LSL_Key texture, LSL_Float fov, LSL_Float focus, LSL_Float amb);
 
         LSL_List osGetAvatarList();
         LSL_List osGetNPCList();

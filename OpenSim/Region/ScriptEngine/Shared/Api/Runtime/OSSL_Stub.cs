@@ -116,6 +116,11 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
             return m_OSSL_Functions.osGetWindParam(plugin, param);
         }
 
+        public LSL_Integer osGetParcelDwell(vector pos)
+        {
+            return m_OSSL_Functions.osGetParcelDwell(pos);
+        }
+
         public void osParcelJoin(vector pos1, vector pos2)
         {
             m_OSSL_Functions.osParcelJoin(pos1,pos2);
@@ -246,6 +251,11 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
         }
 
         // Teleport Functions
+
+        public void osLocalTeleportAgent(LSL_Key agent, vector position, vector velocity, vector lookat, LSL_Integer flags)
+        {
+            m_OSSL_Functions.osLocalTeleportAgent(agent, position, velocity, lookat, flags);
+        }
 
         public void osTeleportAgent(string agent, string regionName, vector position, vector lookat)
         {
@@ -1035,14 +1045,19 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
             m_OSSL_Functions.osSetPrimitiveParams(prim, rules);
         }
 
-        public void osSetProjectionParams(bool projection, LSL_Key texture, double fov, double focus, double amb)
+        public void osSetProjectionParams(LSL_Integer projection, LSL_Key texture, double fov, double focus, double amb)
         {
             m_OSSL_Functions.osSetProjectionParams(projection, texture, fov, focus, amb);
         }
 
-        public void osSetProjectionParams(LSL_Key prim, bool projection, LSL_Key texture, double fov, double focus, double amb)
+        public void osSetProjectionParams(LSL_Key prim, LSL_Integer projection, LSL_Key texture, double fov, double focus, double amb)
         {
             m_OSSL_Functions.osSetProjectionParams(prim, projection, texture, fov, focus, amb);
+        }
+
+        public void osSetProjectionParams(LSL_Integer linknumber, LSL_Integer projection, LSL_Key texture, LSL_Float fov, LSL_Float focus, LSL_Float amb)
+        {
+            m_OSSL_Functions.osSetProjectionParams(linknumber, projection, texture, fov, focus, amb);
         }
 
         public LSL_List osGetAvatarList()

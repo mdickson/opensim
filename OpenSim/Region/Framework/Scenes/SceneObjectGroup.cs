@@ -770,9 +770,9 @@ namespace OpenSim.Region.Framework.Scenes
                 }
 
                 if(av.IsNPC)
-                    av.crossingFlags = 0;
+                    av.m_crossingFlags = 0;
                 else
-                    av.crossingFlags = cflags;
+                    av.m_crossingFlags = cflags;
 
                 av.PrevSitOffset = av.OffsetPosition;
                 av.ParentID = 0;
@@ -821,7 +821,7 @@ namespace OpenSim.Region.Framework.Scenes
                    if(entityTransfer.CrossAgentCreateFarChild(av,destination, newpos, ctx))
                        crossedfar = true;
                    else
-                    av.crossingFlags = 0;
+                    av.m_crossingFlags = 0;
                 }
 
                 if(crossedfar)
@@ -834,7 +834,7 @@ namespace OpenSim.Region.Framework.Scenes
                     av.IsInTransit = true;
                     m_log.DebugFormat("[SCENE OBJECT]: Crossing avatar {0} to {1}", av.Name, val);
 
-                    if(av.crossingFlags > 0)
+                    if(av.m_crossingFlags > 0)
                         entityTransfer.CrossAgentToNewRegionAsync(av, newpos, destination, false, ctx);
 
                     if (av.IsChildAgent)
@@ -849,7 +849,7 @@ namespace OpenSim.Region.Framework.Scenes
                         av.ParentPart = null;
                         // In any case
                         av.IsInTransit = false;
-                        av.crossingFlags = 0;
+                        av.m_crossingFlags = 0;
                         m_log.DebugFormat("[SCENE OBJECT]: Crossing agent {0} {1} completed.", av.Firstname, av.Lastname);
                     }
                     else
@@ -865,7 +865,7 @@ namespace OpenSim.Region.Framework.Scenes
                         oldp.X = Util.Clamp<float>(oldp.X, 0.5f, sog.m_scene.RegionInfo.RegionSizeX - 0.5f);
                         oldp.Y = Util.Clamp<float>(oldp.Y, 0.5f, sog.m_scene.RegionInfo.RegionSizeY - 0.5f);
                         av.AbsolutePosition = oldp;
-                        av.crossingFlags = 0;
+                        av.m_crossingFlags = 0;
                         av.sitAnimation = "SIT";
                         av.IsInTransit = false;
                         if(av.Animator!= null)
@@ -926,7 +926,7 @@ namespace OpenSim.Region.Framework.Scenes
                     ScenePresence av = avinfo.av;
                     av.ParentUUID = UUID.Zero;
                     av.ParentID = avinfo.ParentID;
-                    av.crossingFlags = 0;
+                    av.m_crossingFlags = 0;
                 }
             }
             avsToCross.Clear();
@@ -2086,13 +2086,20 @@ namespace OpenSim.Region.Framework.Scenes
 
         public void ObjectGrabHandler(uint localId, Vector3 offsetPos, IClientAPI remoteClient)
         {
+
             if (m_rootPart.LocalId == localId)
             {
+                if((RootPart.ScriptEvents & scriptEvents.anytouch) != 0)
+                    lastTouchTime = Util.GetTimeStampMS();
                 OnGrabGroup(offsetPos, remoteClient);
             }
             else
             {
                 SceneObjectPart part = GetPart(localId);
+
+                if (((part.ScriptEvents & scriptEvents.anytouch) != 0) ||
+                    (part.PassTouches && (RootPart.ScriptEvents & scriptEvents.anytouch) != 0))
+                    lastTouchTime = Util.GetTimeStampMS();
                 OnGrabPart(part, offsetPos, remoteClient);
             }
         }
@@ -3615,6 +3622,10 @@ namespace OpenSim.Region.Framework.Scenes
 //            part.UpdatePrimFlags(UsesPhysics, IsTemporary, IsPhantom, IsVolumeDetect, false);
         }
 
+        double lastTouchTime = 0;
+
+
+
         /// <summary>
         /// If object is physical, apply force to move it around
         /// If object is not physical, just put it at the resulting location
@@ -3623,7 +3634,7 @@ namespace OpenSim.Region.Framework.Scenes
         /// <param name="offset">Always seems to be 0,0,0, so ignoring</param>
         /// <param name="pos">New position.  We do the math here to turn it into a force</param>
         /// <param name="remoteClient"></param>
-        public void GrabMovement(UUID partID, Vector3 offset, Vector3 pos, IClientAPI remoteClient)
+        public void GrabMovement(UUID partID, Vector3 offset, Vector3 pos, IClientAPI remoteClienth)
         {
             if (m_scene.EventManager.TriggerGroupMove(UUID, pos))
             {
@@ -3650,22 +3661,29 @@ namespace OpenSim.Region.Framework.Scenes
                 }
                 else
                 {
-                    NonPhysicalGrabMovement(pos);
+                    if(IsAttachment)
+                        return;
+
+                    // block movement if there was a touch at start
+                    double now = Util.GetTimeStampMS();
+                    if (now - lastTouchTime < 250)
+                    {
+                        lastTouchTime = now;
+                        return;
+                    }
+
+                    // a touch or pass may had become active ??
+                    if (((part.ScriptEvents & scriptEvents.anytouch) != 0) ||
+                        (part.PassTouches && (RootPart.ScriptEvents & scriptEvents.anytouch) != 0))
+                    {
+                        lastTouchTime = now;
+                        return;
+                    }
+
+                    lastTouchTime = 0;
+                    UpdateGroupPosition(pos);
                 }
             }
-        }
-
-        /// <summary>
-        /// Apply possition for grabbing non-physical linksets (Ctrl+Drag)
-        /// This MUST be blocked for linksets that contain touch scripts because the viewer triggers grab on the touch
-        /// event (Viewer Bug?) This would allow anyone to drag a linkset with a touch script. SL behaviour is also to
-        /// block grab on prims with touch events.
-        /// </summary>
-        /// <param name="pos">New Position</param>
-        public void NonPhysicalGrabMovement(Vector3 pos)
-        {
-            if(!IsAttachment && ScriptCount() == 0)
-                UpdateGroupPosition(pos);
         }
 
         /// <summary>
