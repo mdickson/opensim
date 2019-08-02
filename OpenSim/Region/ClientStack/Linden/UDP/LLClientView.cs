@@ -2880,13 +2880,14 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
 
         static private readonly byte[] SendXferPacketHeader = new byte[] {
-                Helpers.MSG_RELIABLE,
+                0, //Helpers.MSG_RELIABLE, Xfer control must provide reliabialty
                 0, 0, 0, 0, // sequence number
                 0, // extra
                 18 // ID (high frequency bigendian)
                 };
 
-        public void SendXferPacket(ulong xferID, uint packet, byte[] payload, bool isTaskInventory)
+        public void SendXferPacket(ulong xferID, uint packet,
+                byte[] XferData, int XferDataOffset, int XferDatapktLen, bool isTaskInventory)
         {
             UDPPacketBuffer buf = m_udpServer.GetNewUDPBuffer(m_udpClient.RemoteEndPoint);
             byte[] data = buf.Data;
@@ -2896,7 +2897,11 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
             Utils.UInt64ToBytesSafepos(xferID, data, 7); // 15
             Utils.UIntToBytesSafepos(packet, data, 15); // 19
-            int len = payload.Length;
+
+            int len = XferDatapktLen;
+            if (XferDataOffset == 0) // first packet needs to send the total xfer data len
+                len += 4;
+
             if (len > LLUDPServer.MAXPAYLOAD) // should never happen
                 len = LLUDPServer.MAXPAYLOAD;
             if (len == 0)
@@ -2908,7 +2913,15 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             {
                 data[19] = (byte)len;
                 data[20] = (byte)(len >> 8);
-                Buffer.BlockCopy(payload, 0, data, 21, len);
+                if(XferDataOffset == 0)
+                {
+                    // need to send total xfer data len
+                    Utils.IntToBytesSafepos(XferData.Length, data, 21);
+                    if (XferDatapktLen > 0)
+                        Buffer.BlockCopy(XferData, XferDataOffset, data, 25, XferDatapktLen);
+                }
+                else
+                    Buffer.BlockCopy(XferData, XferDataOffset, data, 21, XferDatapktLen);
             }
 
             buf.DataLength = 21 + len;
@@ -6334,7 +6347,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             rinfopack.AgentData.SessionID = SessionId;
             rinfoblk.BillableFactor = args.billableFactor;
             rinfoblk.EstateID = args.estateID;
-            rinfoblk.MaxAgents = args.maxAgents;
+            rinfoblk.MaxAgents = (byte)args.maxAgents;
             rinfoblk.ObjectBonusFactor = args.objectBonusFactor;
             rinfoblk.ParentEstateID = args.parentEstateID;
             rinfoblk.PricePerMeter = args.pricePerMeter;
@@ -6350,9 +6363,9 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             rinfoblk.SimName = Utils.StringToBytes(args.simName);
 
             rinfopack.RegionInfo2 = new RegionInfoPacket.RegionInfo2Block();
-            rinfopack.RegionInfo2.HardMaxAgents = uint.MaxValue;
-            rinfopack.RegionInfo2.HardMaxObjects = uint.MaxValue;
-            rinfopack.RegionInfo2.MaxAgents32 = uint.MaxValue;
+            rinfopack.RegionInfo2.HardMaxAgents = (uint)args.AgentCapacity;
+            rinfopack.RegionInfo2.HardMaxObjects = (uint)args.ObjectsCapacity;
+            rinfopack.RegionInfo2.MaxAgents32 = (uint)args.maxAgents;
             rinfopack.RegionInfo2.ProductName = Util.StringToBytes256(args.regionType);
             rinfopack.RegionInfo2.ProductSKU = Utils.EmptyBytes;
 
@@ -8000,7 +8013,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             AddLocalPacketHandler(PacketType.AssetUploadRequest, HandleAssetUploadRequest);
             AddLocalPacketHandler(PacketType.RequestXfer, HandleRequestXfer);
             AddLocalPacketHandler(PacketType.SendXferPacket, HandleSendXferPacket);
-            AddLocalPacketHandler(PacketType.ConfirmXferPacket, HandleConfirmXferPacket);
+            AddLocalPacketHandler(PacketType.ConfirmXferPacket, HandleConfirmXferPacket, false);
             AddLocalPacketHandler(PacketType.AbortXfer, HandleAbortXfer);
             AddLocalPacketHandler(PacketType.CreateInventoryFolder, HandleCreateInventoryFolder);
             AddLocalPacketHandler(PacketType.UpdateInventoryFolder, HandleUpdateInventoryFolder);
@@ -10623,12 +10636,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         {
             RequestXferPacket xferReq = (RequestXferPacket)Pack;
 
-            RequestXfer handlerRequestXfer = OnRequestXfer;
-
-            if (handlerRequestXfer != null)
-            {
-                handlerRequestXfer(this, xferReq.XferID.ID, Util.FieldToString(xferReq.XferID.Filename));
-            }
+            OnRequestXfer?.Invoke(this, xferReq.XferID.ID, Util.FieldToString(xferReq.XferID.Filename));
             return true;
         }
 
@@ -10636,11 +10644,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         {
             SendXferPacketPacket xferRec = (SendXferPacketPacket)Pack;
 
-            XferReceive handlerXferReceive = OnXferReceive;
-            if (handlerXferReceive != null)
-            {
-                handlerXferReceive(this, xferRec.XferID.ID, xferRec.XferID.Packet, xferRec.DataPacket.Data);
-            }
+            OnXferReceive?.Invoke(this, xferRec.XferID.ID, xferRec.XferID.Packet, xferRec.DataPacket.Data);
             return true;
         }
 
@@ -10648,23 +10652,15 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         {
             ConfirmXferPacketPacket confirmXfer = (ConfirmXferPacketPacket)Pack;
 
-            ConfirmXfer handlerConfirmXfer = OnConfirmXfer;
-            if (handlerConfirmXfer != null)
-            {
-                handlerConfirmXfer(this, confirmXfer.XferID.ID, confirmXfer.XferID.Packet);
-            }
+            OnConfirmXfer?.Invoke(this, confirmXfer.XferID.ID, confirmXfer.XferID.Packet);
             return true;
         }
 
         private bool HandleAbortXfer(IClientAPI sender, Packet Pack)
         {
             AbortXferPacket abortXfer = (AbortXferPacket)Pack;
-            AbortXfer handlerAbortXfer = OnAbortXfer;
-            if (handlerAbortXfer != null)
-            {
-                handlerAbortXfer(this, abortXfer.XferID.ID);
-            }
 
+            OnAbortXfer?.Invoke(this, abortXfer.XferID.ID);
             return true;
         }
 
