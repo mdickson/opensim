@@ -535,7 +535,7 @@ namespace SecondLife
             parameters.ReferencedAssemblies.Add(Path.Combine(rootPath,
                     "OpenSim.Region.ScriptEngine.Shared.Api.Runtime.dll"));
             parameters.ReferencedAssemblies.Add(Path.Combine(rootPath,
-                    "OpenMetaverseTypes.dll"));
+                    "OpenMetaverse.Types.dll"));
 
             if (m_scriptEngine.ScriptReferencedAssemblies != null)
                 Array.ForEach<string>(
