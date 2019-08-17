@@ -14,7 +14,7 @@
      <ReferencePath>../../../bin/</ReferencePath>
      <Reference localCopy="false" name="System"/>
      <Reference name="System.Xml"/>
-     <Reference name="OpenMetaverseTypes"/>
+     <Reference name="OpenMetaverse.Types"/>
      <Reference name="OpenSim.Framework"/>
      <Reference name="OpenSim.Region.Framework"/>
      <Reference name="OpenSim.Region.Framework.Interfaces"/>

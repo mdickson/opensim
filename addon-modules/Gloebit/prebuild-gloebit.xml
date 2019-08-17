@@ -16,7 +16,7 @@
   <Reference name="System.Web"/>
   <Reference name="System.Data"/>
   <Reference name="System.Xml"/>
-  <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+  <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
   <Reference name="OpenMetaverse" path="../../../bin/"/>
   <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
   <Reference name="Nini" path="../../../bin/"/>

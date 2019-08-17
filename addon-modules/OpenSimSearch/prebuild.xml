@@ -16,7 +16,7 @@
    <Reference name="System.Xml"/>
    <Reference name="System.Drawing"/>
    <Reference name="System.Runtime.Remoting"/>
-   <Reference name="OpenMetaverseTypes"/>
+   <Reference name="OpenMetaverse.Types"/>
    <Reference name="OpenMetaverse"/>
    <Reference name="Axiom.MathLib"/>
    <Reference name="OpenSim.Framework"/>
