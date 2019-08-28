@@ -945,9 +945,9 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
             return m_OSSL_Functions.osGetMapTexture();
         }
 
-        public key osGetRegionMapTexture(string regionName)
+        public key osGetRegionMapTexture(string regionNameOrID)
         {
-            return m_OSSL_Functions.osGetRegionMapTexture(regionName);
+            return m_OSSL_Functions.osGetRegionMapTexture(regionNameOrID);
         }
 
         public LSL_List osGetRegionStats()
@@ -1380,6 +1380,11 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
         public LSL_Key osGetInventoryLastOwner(LSL_String itemNameOrId)
         {
             return m_OSSL_Functions.osGetInventoryLastOwner(itemNameOrId);
+        }
+
+        public LSL_Key osGetInventoryItemKey(LSL_String name)
+        {
+            return m_OSSL_Functions.osGetInventoryItemKey(name);
         }
 
         public LSL_String osGetInventoryName(LSL_Key itemId)
