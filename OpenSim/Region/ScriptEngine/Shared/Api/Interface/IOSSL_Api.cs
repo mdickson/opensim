@@ -375,7 +375,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
 
         key osGetGender(LSL_Key rawAvatarId);
         key osGetMapTexture();
-        key osGetRegionMapTexture(string regionName);
+        key osGetRegionMapTexture(string regionNameOrID);
         LSL_List osGetRegionStats();
         vector osGetRegionSize();
 
@@ -549,6 +549,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         LSL_Integer osApproxEquals(rotation ra, rotation rb);
         LSL_Integer osApproxEquals(rotation ra, rotation rb, LSL_Float margin);
         LSL_Key osGetInventoryLastOwner(LSL_String itemNameOrId);
+        LSL_Key osGetInventoryItemKey(LSL_String name);
         LSL_String osGetInventoryName(LSL_Key itemId);
         LSL_String osGetInventoryDesc(LSL_String itemNameOrId);
         LSL_Key osGetLastChangedEventKey();
