@@ -242,7 +242,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             if (maxRTO != 0)
                 m_maxRTO = maxRTO;
 
-            m_burstTime = rates.BrustTime;
+            m_burstTime = rates.BurstTime;
             float m_burst = rates.ClientMaxRate * m_burstTime;
 
             // Create a token bucket throttle for this client that has the scene token bucket as a parent
@@ -251,7 +251,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             // Create an array of token buckets for this clients different throttle categories
             m_throttleCategories = new TokenBucket[THROTTLE_CATEGORY_COUNT];
 
-            m_burst = rates.Total * rates.BrustTime;
+            m_burst = rates.Total * rates.BurstTime;
 
             for (int i = 0; i < THROTTLE_CATEGORY_COUNT; i++)
             {
@@ -260,7 +260,10 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 // Initialize the packet outboxes, where packets sit while they are waiting for tokens
                 m_packetOutboxes[i] = new DoubleLocklessQueue<OutgoingPacket>();
                 // Initialize the token buckets that control the throttling for each category
-                m_throttleCategories[i] = new TokenBucket(m_throttleClient, rates.GetRate(type), m_burst);
+                //m_throttleCategories[i] = new TokenBucket(m_throttleClient, rates.GetRate(type), m_burst);
+                float rate = rates.GetRate(type);
+                float burst = rate * rates.BurstTime;
+                m_throttleCategories[i] = new TokenBucket(m_throttleClient, rate , burst);
             }
 
             // Default the retransmission timeout to one second
@@ -443,7 +446,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
             int total = resend + land + wind + cloud + task + texture + asset;
 
-            float m_burst = total * m_burstTime;
+            //float m_burst = total * m_burstTime;
 
             if (ThrottleDebugLevel > 0)
             {
@@ -453,7 +456,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             }
 
             TokenBucket bucket;
-
+            /*
             bucket = m_throttleCategories[(int)ThrottleOutPacketType.Resend];
             bucket.RequestedDripRate = resend;
             bucket.RequestedBurst = m_burst;
@@ -481,6 +484,34 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             bucket = m_throttleCategories[(int)ThrottleOutPacketType.Texture];
             bucket.RequestedDripRate = texture;
             bucket.RequestedBurst = m_burst;
+            */
+            bucket = m_throttleCategories[(int)ThrottleOutPacketType.Resend];
+            bucket.RequestedDripRate = resend;
+            bucket.RequestedBurst = resend * m_burstTime;
+
+            bucket = m_throttleCategories[(int)ThrottleOutPacketType.Land];
+            bucket.RequestedDripRate = land;
+            bucket.RequestedBurst = land * m_burstTime;
+
+            bucket = m_throttleCategories[(int)ThrottleOutPacketType.Wind];
+            bucket.RequestedDripRate = wind;
+            bucket.RequestedBurst = wind * m_burstTime;
+
+            bucket = m_throttleCategories[(int)ThrottleOutPacketType.Cloud];
+            bucket.RequestedDripRate = cloud;
+            bucket.RequestedBurst = cloud * m_burstTime;
+
+            bucket = m_throttleCategories[(int)ThrottleOutPacketType.Asset];
+            bucket.RequestedDripRate = asset;
+            bucket.RequestedBurst = asset * m_burstTime;
+
+            bucket = m_throttleCategories[(int)ThrottleOutPacketType.Task];
+            bucket.RequestedDripRate = task;
+            bucket.RequestedBurst = task * m_burstTime;
+
+            bucket = m_throttleCategories[(int)ThrottleOutPacketType.Texture];
+            bucket.RequestedDripRate = texture;
+            bucket.RequestedBurst = texture * m_burstTime;
 
             // Reset the packed throttles cached data
             m_packedThrottles = null;

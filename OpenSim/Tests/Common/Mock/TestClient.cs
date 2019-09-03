@@ -453,6 +453,11 @@ namespace OpenSim.Tests.Common
             get { return m_scene; }
         }
 
+        public UUID ScopeId
+        {
+            get { return UUID.Zero; }
+        }
+
         public bool SendLogoutPacketWhenClosing
         {
             set { }
@@ -819,7 +824,8 @@ namespace OpenSim.Tests.Common
         {
         }
 
-        public virtual void SendXferPacket(ulong xferID, uint packet, byte[] data, bool isTaskInventory)
+        public virtual void SendXferPacket(ulong xferID, uint packet,
+                byte[] XferData, int XferDataOffset, int XferDatapktLen, bool isTaskInventory)
         {
         }
 

@@ -154,7 +154,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
 
             m_debugEnabled = verbose;
 
-            MainConsole.Instance.OutputFormat("{0} verbose logging set to {1}", Name, m_debugEnabled);
+            MainConsole.Instance.Output("{0} verbose logging set to {1}", null, Name, m_debugEnabled);
         }
 
         public void RegionLoaded(Scene scene)
@@ -278,7 +278,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
             // There might be some problem with the thread we're generating this on but not
             //   doing the update at this time causes problems (Mantis #7920 and #7915)
             // TODO: move sending this update to a later time in the rootification of the client.
-            if(!sp.haveGroupInformation)
+            if(!sp.m_haveGroupInformation)
                 SendAgentGroupDataUpdate(sp.ControllingClient, false);
         }
 

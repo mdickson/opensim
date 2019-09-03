@@ -55,8 +55,15 @@
     ;# {BaseURL} {} {BaseURL} {"http://${Const|BaseHostname}} "http://${Const|BaseHostname}"
     BaseURL = http://${Const|BaseHostname}
 
+    ; If you run a grid, several services should not be availble to world, access to them should be blocked on firewall
+    ; PrivatePort should closed at the firewall.
+
     ;# {PublicPort} {} {PublicPort} {8002 9000} "8002"
     PublicPort = "8002"
+
+    ; you can also have them on a diferent url / IP
+    ;# {PrivURL} {} {PrivURL} {"http://${Const|BaseURL}} "${Const|BaseURL}"
+    PrivURL = ${Const|BaseURL}
 
     ;grid default private port 8003, not used in standalone
     ;# {PrivatePort} {} {PrivatePort} {8003} "8003"
@@ -927,14 +934,10 @@
 
 [YEngine]
     ;; experimental engine
-    ;; ONLY SUPORTS ONE REGION PER INSTANCE at this point
     ;; implements non preemptive microthreading, so fixing problems like llSleep or long events handlers
     ;; but those will suffer from timeslicing, so will be slower.
-    ;; compiles LSL directly to IL, so only suports LSL scripting (no C# etc) 
-    ;; shares the Xengine APIs like LSL, OSSL, etc.
-    ;; DANGER, do not use with HG, don't leave regions running alone with it.
-    ;; TPs or crossings to/from Xengine will full recompile scripts losing state.
-    ;; attachment scripts may misbehave, cars will stop on crossings, etc.
+    ;; warning: scripts state is lost on TP or cross to Xengine regions (cars stop, etc)
+	;; ignore its extensions (subset of original XMRengine), those are still undefined.
     Enabled = false
     ScriptStackSize = 256
     ScriptHeapSize = 256

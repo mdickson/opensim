@@ -359,7 +359,7 @@ namespace OpenSim.Framework.Console
         {
             string outText = text;
 
-            if (level != LOGLEVEL_NONE)
+            if (level != null)
             {
                 MatchCollection matches = m_categoryRegex.Matches(text);
 
@@ -389,13 +389,10 @@ namespace OpenSim.Framework.Console
             System.Console.WriteLine();
         }
 
-        public override void Output(string text)
+        public override void Output(string format, string level = null, params object[] components)
         {
-            Output(text, LOGLEVEL_NONE);
-        }
+            string text = String.Format(format, components);
 
-        public override void Output(string text, string level)
-        {
             FireOnOutput(text);
 
             lock (m_commandLine)

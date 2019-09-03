@@ -712,6 +712,7 @@ namespace OpenSim.Framework
 
         UUID AgentId { get; }
 
+        UUID ScopeId { get; }
         /// <summary>
         /// The scene agent for this client.  This will only be set if the client has an agent in a scene (i.e. if it
         /// is connected).
@@ -1235,7 +1236,8 @@ namespace OpenSim.Framework
         /// <param name="node"></param>
         void SendBulkUpdateInventory(InventoryNodeBase node);
 
-        void SendXferPacket(ulong xferID, uint packet, byte[] data, bool isTaskInventory);
+        void SendXferPacket(ulong xferID, uint packet,
+                byte[] XferData, int XferDataOffset, int XferDatapktLen, bool isTaskInventory);
 
         void SendAbortXferPacket(ulong xferID);
 

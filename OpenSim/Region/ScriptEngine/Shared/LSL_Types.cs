@@ -533,8 +533,12 @@ namespace OpenSim.Region.ScriptEngine.Shared
 
             public static Quaternion operator /(Quaternion a, Quaternion b)
             {
-                // assuming normalized
-                b.s = -b.s;
+                // assume normalized
+                // if not, sl seems to not normalize either
+                b.x = -b.x;
+                b.y = -b.y;
+                b.z = -b.z;
+
                 return a * b;
             }
 
@@ -608,6 +612,8 @@ namespace OpenSim.Region.ScriptEngine.Shared
                             size += 8;
                         else if (o is double)
                             size += 16;
+                        else if (o is list)
+                            size += ((list)o).Size;
                         else
                             throw new Exception("Unknown type in List.Size: " + o.GetType().ToString());
                     }

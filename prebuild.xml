@@ -102,7 +102,7 @@
       <Reference name="System.Drawing"/>
       <Reference name="System.Web"/>
       <Reference name="System.Security"/>
-       <Reference name="OpenMetaverseTypes" path="../../bin/"/>
+       <Reference name="OpenMetaverse.Types" path="../../bin/"/>
       <Reference name="OpenMetaverse" path="../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../bin/"/>
       <Reference name="XMLRPC" path="../../bin/"/>
@@ -139,7 +139,7 @@
 
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
@@ -174,7 +174,7 @@
       <Reference name="System.Core"/>
       <Reference name="log4net" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
@@ -206,7 +206,7 @@
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Monitoring"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="XMLRPC" path="../../../../bin/"/>
       <Reference name="log4net" path="../../../../bin/"/>
       <Reference name="HttpServer_OpenSim" path="../../../../bin/"/>
@@ -248,7 +248,7 @@
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Servers.HttpServer"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true">
          <Exclude name="obj" pattern="obj"/>
@@ -274,7 +274,7 @@
       <Reference name="System.Xml"/>
       <Reference name="log4net" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Services.Interfaces"/>
 
@@ -306,7 +306,7 @@
       <Reference name="XMLRPC" path="../../bin/"/>
       <Reference name="OpenMetaverse" path="../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="log4net" path="../../bin/"/>
       <Reference name="Mono.Addins" path="../../bin/"/>
@@ -334,7 +334,7 @@
       <Reference name="System.Xml"/>
       <Reference name="OpenSim.Framework.Console"/>
       <Reference name="OpenSim.Framework"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="Nini" path="../../../../bin/"/>
       <Reference name="log4net" path="../../../../bin/"/>
       <Files>
@@ -366,7 +366,7 @@
       <Reference name="OpenSim.Framework.Console"/>
       <Reference name="OpenSim.Framework.Monitoring"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="XMLRPC" path="../../../bin/"/>
       <Reference name="log4net" path="../../../bin/"/>
       <Reference name="HttpServer_OpenSim" path="../../../bin/"/>
@@ -399,7 +399,7 @@
       <Reference name="OpenSim.Framework.Servers.HttpServer"/>
       <Reference name="OpenSim.Services.Interfaces"/>
       <Reference name="OpenMetaverse" path="../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../bin/"/>
       <Reference name="Nini" path="../../bin/"/>
       <Reference name="log4net" path="../../bin/"/>
 
@@ -428,7 +428,7 @@
       <ReferencePath>../../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Xml"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
       <Reference name="nunit.framework" path="../../../../bin/"/>
@@ -458,7 +458,7 @@
       <Reference name="System.Xml"/>
       <Reference name="System.Drawing"/>
       <Reference name="System.Web"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Services.Interfaces"/>
@@ -507,7 +507,7 @@
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Web"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="Mono.Addins" path="../../../bin/"/>
@@ -541,7 +541,7 @@
 
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -571,7 +571,7 @@
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Web"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -604,7 +604,7 @@
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Web"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -640,7 +640,7 @@
       <Reference name="System.Web"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Drawing"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="Mono.Addins" path="../../../bin/"/>
@@ -683,7 +683,7 @@
       <Reference name="System.Web"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Drawing"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Data"/>
       <Reference name="OpenSim.Framework"/>
@@ -715,7 +715,7 @@
 
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -750,7 +750,7 @@
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Core"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -785,7 +785,7 @@
 
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -818,7 +818,7 @@
 
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
@@ -852,7 +852,7 @@
 
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -889,7 +889,7 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -924,7 +924,7 @@
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Core"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Services.Interfaces"/>
@@ -954,7 +954,7 @@
 
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -987,7 +987,7 @@
 
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -1021,7 +1021,7 @@
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Xml"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -1064,7 +1064,7 @@
       <Reference name="OpenSim.Services.Connectors"/>
       <Reference name="OpenSim.Services.Base"/>
       <Reference name="OpenSim.Server.Base"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
@@ -1093,7 +1093,7 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Serialization"/>
@@ -1133,7 +1133,7 @@
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Drawing"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -1168,7 +1168,7 @@
       <Reference name="OpenSim.Services.Interfaces"/>
       <Reference name="OpenSim.Services.Base"/>
       <Reference name="OpenSim.Data"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>	  
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="log4net" path="../../../bin/"/>
@@ -1204,7 +1204,7 @@
       <Reference name="OpenSim.Services.Base"/>
       <Reference name="OpenSim.Server.Base"/>
       <Reference name="OpenSim.Data"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
@@ -1233,7 +1233,7 @@
       <Reference name="System"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Web"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
@@ -1277,7 +1277,7 @@
       <Reference name="System.Web"/>
       <Reference name="System.Core"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="OpenSim.Capabilities"/>
       <Reference name="OpenSim.Framework"/>
@@ -1315,7 +1315,7 @@
       <ReferencePath>../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Xml"/>
-      <Reference name="OpenMetaverseTypes" path="../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../bin/"/>
       <Reference name="OpenMetaverse" path="../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../bin/"/>
       <Reference name="OpenSim.Framework"/>
@@ -1352,7 +1352,7 @@
       <ReferencePath>../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Xml"/>
-      <Reference name="OpenMetaverseTypes" path="../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../bin/"/>
       <Reference name="OpenMetaverse" path="../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../bin/"/>
       <Reference name="OpenSim.Framework"/>
@@ -1391,7 +1391,7 @@
       <Reference name="System.Xml"/>
       <Reference name="System.Web"/>
       <Reference name="NDesk.Options" path="../../../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../../../bin/"/>
       <Reference name="OpenSim.Data"/>
@@ -1436,7 +1436,7 @@
       <Reference name="System.Xml"/>
       <Reference name="System.Web"/>
       <Reference name="OpenMetaverse" path="../../../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../../../bin/"/>
       <Reference name="OpenSim.Capabilities"/>
       <Reference name="OpenSim.Region.Framework"/>
@@ -1484,7 +1484,7 @@
       <Reference name="System.Xml"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Data"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="MySql.Data" path="../../../bin/"/>
@@ -1526,7 +1526,7 @@
       <Reference name="OpenSim.Data"/>
       <Reference name="OpenSim.Region.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
 	  <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="log4net" path="../../../bin/"/>
@@ -1564,7 +1564,7 @@
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
       <Reference name="OpenSim.Region.Framework"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="Mono.Data.Sqlite"/>
@@ -1607,7 +1607,7 @@
       <Reference name="System.Data"/>
       <Reference name="Microsoft.CSharp" />
       <Reference name="NDesk.Options" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="CSJ2K" path="../../../bin/"/>
@@ -1673,7 +1673,7 @@
       <Reference name="System.Web"/>
       <Reference name="Ionic.Zip" path="../../../bin/"/>
       <Reference name="NDesk.Options" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="Mono.Data.SqliteClient" path="../../../bin/"/>
@@ -1729,7 +1729,7 @@
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
       <Reference name="OpenSim.Data"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Region.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -1786,7 +1786,7 @@
       <Reference name="System"/>
       <Reference name="System.Drawing"/>
       <Reference name="CSJ2K" path="../../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../../bin/"/>
       <Reference name="Nini" path="../../../../bin/"/>
@@ -1819,7 +1819,7 @@
 
       <ReferencePath>../../../../bin/</ReferencePath>
       <Reference name="System"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="Nini" path="../../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Region.PhysicsModules.SharedBase"/>
@@ -1846,7 +1846,7 @@
 
       <ReferencePath>../../../../bin/</ReferencePath>
       <Reference name="System"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="Nini" path="../../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Region.PhysicsModules.SharedBase"/>
@@ -1874,7 +1874,7 @@
       <ReferencePath>../../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Core"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="Nini" path="../../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -1906,7 +1906,7 @@
       <ReferencePath>../../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Core"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="Nini" path="../../../../bin/"/>
 
       <Reference name="OpenSim.Framework"/>
@@ -1941,7 +1941,7 @@
       <Reference name="System"/>
       <Reference name="System.Drawing"/>
       <Reference name="CSJ2K" path="../../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../../bin/"/>
       <Reference name="Nini" path="../../../../bin/"/>
@@ -1978,7 +1978,7 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="Nini.dll"  path="../../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Monitoring"/>
@@ -2018,7 +2018,7 @@
       <Reference name="System.Xml"/>
       <Reference name="Mono.Addins" path="../../../bin/"/>
       <Reference name="NDesk.Options" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
@@ -2061,7 +2061,7 @@
       <Reference name="Mono.Addins" path="../../../bin/"/>
       <Reference name="System"/>
       <Reference name="System.Xml"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="OpenSim"/>
       <Reference name="OpenSim.Region.CoreModules"/>
@@ -2129,7 +2129,7 @@
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="XMLRPC" path="../../../bin/"/>
@@ -2170,7 +2170,7 @@
       <Reference name="System.Data"/>
       <Reference name="System.Web"/>
       <Reference name="System.Xml"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="OpenSim"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Region.Framework"/>
@@ -2206,7 +2206,7 @@
       <Reference name="System.Data"/>
       <Reference name="System.Web"/>
       <Reference name="System.Xml"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../../../bin/"/>
       <Reference name="OpenSim"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Region.Framework"/>
@@ -2242,7 +2242,7 @@
       <Reference name="System.Drawing"/>
       <Reference name="System.Web"/>
       <Reference name="System.Xml"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../../../../bin/"/>
       <Reference name="OpenSim"/>
@@ -2284,7 +2284,7 @@
       <Reference name="OpenSim.Region.Framework"/>
       <Reference name="OpenSim.Region.ScriptEngine.Shared"/>
       <Reference name="OpenSim.Region.CoreModules"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../../bin/"/>
       <Reference name="Nini" path="../../../../../bin/"/>
       <Reference name="log4net" path="../../../../../bin/"/>
       <Reference name="Tools" path="../../../../../bin/"/>
@@ -2314,7 +2314,7 @@
       <Reference name="System.Data"/>
       <Reference name="System.Web"/>
       <Reference name="System.Xml"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../../bin/"/>
       <Reference name="OpenSim"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Region.Framework"/>
@@ -2353,7 +2353,7 @@
       <Reference name="System.Data"/>
       <Reference name="System.Web"/>
       <Reference name="System.Xml"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../../../bin/"/>
       <Reference name="OpenSim"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Region.Framework"/>
@@ -2389,7 +2389,7 @@
       <Reference name="System.Data"/>
       <Reference name="System.Web"/>
       <Reference name="System.Xml"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../../bin/"/>
       <Reference name="OpenSim"/>
       <Reference name="OpenSim.Framework"/>
@@ -2436,7 +2436,7 @@
       <Reference name="Nini"/>
       <Reference name="OpenMetaverse"/>
       <Reference name="OpenMetaverse.StructuredData"/>
-      <Reference name="OpenMetaverseTypes"/>
+      <Reference name="OpenMetaverse.Types"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
       <Reference name="OpenSim.Framework.Monitoring"/>
@@ -2488,7 +2488,7 @@
       <Reference name="MySql.Data" path="../../../bin/"/>
       <Reference name="log4net" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
 
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Data"/>
@@ -2535,7 +2535,7 @@
       <Reference name="Mono.Addins" path="../../../bin/"/>
       <Reference name="log4net" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
 
       <Reference name="OpenSim.Framework"/>
@@ -2580,7 +2580,7 @@
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Core"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -2609,7 +2609,7 @@
 
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -2665,7 +2665,7 @@
 
       <ReferencePath>../../../../bin/</ReferencePath>
       <Reference name="System"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Services.Interfaces"/>
@@ -2707,7 +2707,7 @@
       <Reference name="nunit.framework" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenSim.Data"/>
       <Reference name="OpenSim.Data.Null"/>
       <Reference name="OpenSim.Framework"/>
@@ -2775,7 +2775,7 @@
       <Reference name="System.Web"/>
       <Reference name="nunit.framework" path="../../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../../bin/"/>
       <Reference name="OpenSim.Capabilities"/>
       <Reference name="OpenSim.Capabilities.Handlers"/>
@@ -2812,7 +2812,7 @@
 
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Servers"/>
@@ -2856,7 +2856,7 @@
       <Reference name="System.Web"/>
       <Reference name="nunit.framework" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="OpenSim.Capabilities"/>
       <Reference name="OpenSim.Capabilities.Handlers"/>
@@ -2910,7 +2910,7 @@
       <Reference name="System.Drawing"/>
       <Reference name="System.Data"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Data"/>
       <Reference name="OpenSim.Region.Framework"/>
@@ -2951,7 +2951,7 @@
       <Reference name="System.Xml"/>
       <Reference name="System.Data"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="XMLRPC" path="../../../bin/"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -2980,7 +2980,7 @@
       <ReferencePath>../../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="OpenMetaverse" path="../../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../../bin/"/>
       <Reference name="OpenSim.Data"/>
       <Reference name="OpenSim.Services.Interfaces"/>
@@ -3045,7 +3045,7 @@
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Drawing"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="OpenSim.Data"/>
@@ -3164,7 +3164,7 @@
       <Reference name="System.Drawing"/>
       <Reference name="System.Runtime.Remoting"/>
       <Reference name="Mono.Addins" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim"/>
       <Reference name="OpenSim.ApplicationPlugins.RegionModulesController"/>
@@ -3227,7 +3227,7 @@
       <Reference name="Nini" path="../../../../../bin/"/>
       <Reference name="nunit.framework" path="../../../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../../../bin/"/>
       <Reference name="OpenSim.Capabilities"/>
       <Reference name="OpenSim.Framework"/>
@@ -3267,7 +3267,7 @@
       <Reference name="Nini" path="../../../../../../bin/"/>
       <Reference name="nunit.framework" path="../../../../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Monitoring"/>
       <Reference name="OpenSim.Region.ClientStack.LindenUDP"/>
@@ -3316,7 +3316,7 @@
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenSim.Region.ScriptEngine.Shared.CodeTools"/>
       <Reference name="OpenSim.Region.ScriptEngine.Shared"/>
       <Reference name="Tools" path="../../../bin/"/>
@@ -3363,7 +3363,7 @@
       <ReferencePath>../../../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Core"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../../bin/"/>
       <Reference name="Nini" path="../../../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
@@ -3401,7 +3401,7 @@
       <Reference name="log4net" path="../../../../../bin/"/>
       <Reference name="nunit.framework" path="../../../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Tests.Common"/>
       <Reference name="OpenSim.Region.Framework"/>
@@ -3434,7 +3434,7 @@
       <Reference name="log4net" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="nunit.framework" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="XMLRPC" path="../../../bin/"/>
@@ -3484,7 +3484,7 @@
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="nunit.framework" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="XMLRPC" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
@@ -3523,7 +3523,7 @@
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="nunit.framework" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="XMLRPC" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
@@ -3559,7 +3559,7 @@
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
       <Reference name="Mono.Addins" path="../../../bin/"/>
-      <Reference name="OpenMetaverseTypes" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim"/>
       <Reference name="OpenSim.ApplicationPlugins.RegionModulesController"/>

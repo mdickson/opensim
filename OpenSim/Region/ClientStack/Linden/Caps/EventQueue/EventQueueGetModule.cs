@@ -150,26 +150,27 @@ namespace OpenSim.Region.ClientStack.Linden
 
             if (!(args.Length == 3 && int.TryParse(args[2], out debugLevel)))
             {
-                MainConsole.Instance.OutputFormat("Usage: debug eq [0|1|2]");
+                MainConsole.Instance.Output("Usage: debug eq [0|1|2]");
             }
             else
             {
                 DebugLevel = debugLevel;
-                MainConsole.Instance.OutputFormat(
-                    "Set event queue debug level to {0} in {1}", DebugLevel, m_scene.RegionInfo.RegionName);
+                MainConsole.Instance.Output(
+                    "Set event queue debug level to {0} in {1}", null, DebugLevel, m_scene.RegionInfo.RegionName);
             }
         }
 
         protected void HandleShowEq(string module, string[] args)
         {
-            MainConsole.Instance.OutputFormat("For scene {0}", m_scene.Name);
+            MainConsole.Instance.Output("For scene {0}", null, m_scene.Name);
 
             lock (queues)
             {
                 foreach (KeyValuePair<UUID, Queue<OSD>> kvp in queues)
                 {
-                    MainConsole.Instance.OutputFormat(
+                    MainConsole.Instance.Output(
                         "For agent {0} there are {1} messages queued for send.",
+                        null,
                         kvp.Key, kvp.Value.Count);
                 }
             }
@@ -233,7 +234,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 else
                 {
                     m_log.WarnFormat(
-                            "[EVENTQUEUE]: (Enqueue) No queue found for agent {0} in region {2}",
+                            "[EVENTQUEUE]: (Enqueue) No queue found for agent {0} in region {1}",
                             avatarID,  m_scene.Name);
                 }
             }

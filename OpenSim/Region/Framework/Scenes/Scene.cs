@@ -1051,7 +1051,7 @@ namespace OpenSim.Region.Framework.Scenes
                     {
                         m_mapGenerationTimer.Interval = maptileRefresh * 1000;
                         m_mapGenerationTimer.Elapsed += RegenerateMaptileAndReregister;
-                        m_mapGenerationTimer.AutoReset = true;
+                        m_mapGenerationTimer.AutoReset = false;
                         m_mapGenerationTimer.Start();
                     }
                 }
@@ -1787,6 +1787,29 @@ namespace OpenSim.Region.Framework.Scenes
 
                             // Region ready should always be set
                             Ready = true;
+
+                            IConfig restartConfig = m_config.Configs["RestartModule"];
+                            if (restartConfig != null)
+                            {
+                                string markerPath = restartConfig.GetString("MarkerPath", String.Empty);
+
+                                if (markerPath != String.Empty)
+                                {
+                                    string path = Path.Combine(markerPath, RegionInfo.RegionID.ToString() + ".ready");
+                                    try
+                                    {
+                                        string pidstring = System.Diagnostics.Process.GetCurrentProcess().Id.ToString();
+                                        FileStream fs = File.Create(path);
+                                        System.Text.ASCIIEncoding enc = new System.Text.ASCIIEncoding();
+                                        Byte[] buf = enc.GetBytes(pidstring);
+                                        fs.Write(buf, 0, buf.Length);
+                                        fs.Close();
+                                    }
+                                    catch (Exception)
+                                    {
+                                    }
+                                }
+                            }
                         }
                         else
                         {
@@ -4806,6 +4829,20 @@ Label_GroupsDone:
             return true;
         }
 
+
+        /// <summary>
+        /// Tries to teleport agent within region.
+        /// </summary>
+        /// <param name="remoteClient"></param>
+        /// <param name="position"></param>
+        /// <param name="lookAt"></param>
+        /// <param name="teleportFlags"></param>
+        public void RequestLocalTeleport(ScenePresence sp, Vector3 position, Vector3 vel,
+                                            Vector3 lookat, int flags)
+        {
+            sp.LocalTeleport(position, vel, lookat, flags);
+        }
+
         /// <summary>
         /// Tries to teleport agent to another region.
         /// </summary>
@@ -6000,7 +6037,9 @@ Environment.Exit(1);
             // so that all simulators can retrieve it
             string error = GridService.RegisterRegion(RegionInfo.ScopeID, new GridRegion(RegionInfo));
             if (error != string.Empty)
-            throw new Exception(error);
+                throw new Exception(error);
+            if(m_generateMaptiles)
+                m_mapGenerationTimer.Start();
         }
 
         /// <summary>

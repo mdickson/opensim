@@ -88,13 +88,14 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
         private List<UUID> m_rootAgents = new List<UUID>();
         private volatile bool threadrunning = false;
         // expire time for the blacklists in seconds
-        private double expireBlackListTime = 600.0; // 10 minutes
+        protected double expireBlackListTime = 600.0; // 10 minutes
         // expire mapItems responses time in seconds. Throttles requests to regions that do answer
         private const double expireResponsesTime = 120.0; // 2 minutes ?
         //private int CacheRegionsDistance = 256;
 
-        private bool m_exportPrintScale = false; // prints the scale of map in meters on exported map
-        private bool m_exportPrintRegionName = false; // prints the region name exported map
+        protected bool m_exportPrintScale = false; // prints the scale of map in meters on exported map
+        protected bool m_exportPrintRegionName = false; // prints the region name exported map
+        protected bool m_showNPCs = true;
 
         #region INonSharedRegionModule Members
         public virtual void Initialise(IConfigSource config)
@@ -111,6 +112,8 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                 Util.GetConfigVarFromSections<bool>(config, "ExportMapAddScale", configSections, m_exportPrintScale);
             m_exportPrintRegionName =
                 Util.GetConfigVarFromSections<bool>(config, "ExportMapAddRegionName", configSections, m_exportPrintRegionName);
+            m_showNPCs =
+                Util.GetConfigVarFromSections<bool>(config, "ShowNPCs", configSections, m_showNPCs);
         }
 
         public virtual void AddRegion(Scene scene)
@@ -406,16 +409,10 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
 
             WorkManager.StartThread(
                 process,
-                string.Format("MapItemRequestThread ({0})", m_scene.RegionInfo.RegionName),
-                ThreadPriority.BelowNormal,
-                true,
-                false);
+                string.Format("MapItemRequestThread ({0})", m_scene.RegionInfo.RegionName));
             WorkManager.StartThread(
                 MapBlockSendThread,
-                string.Format("MapBlockSendThread ({0})", m_scene.RegionInfo.RegionName),
-                ThreadPriority.BelowNormal,
-                true,
-                false);
+                string.Format("MapBlockSendThread ({0})", m_scene.RegionInfo.RegionName));
         }
 
         /// <summary>
@@ -482,7 +479,7 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
             // viewers only ask for green dots to each region now
             // except at login with regionhandle 0
             // possible on some other rare ocasions
-            // use previus hack of sending all items with the green dots
+            // use previous hack of sending all items with the green dots
 
             bool adultRegion;
             if (regionhandle == 0)
@@ -493,7 +490,7 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                         // Service 6 right now (MAP_ITEM_AGENTS_LOCATION; green dots)
 
                         int tc = Environment.TickCount;
-                        if (m_scene.GetRootAgentCount() <= 1)
+                        if (m_scene.GetRootAgentCount() <= 1) //own position is not sent
                         {
                             mapitem = new mapItemReply(
                                         xstart + 1,
@@ -507,9 +504,12 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                         {
                             m_scene.ForEachRootScenePresence(delegate (ScenePresence sp)
                             {
-                            // Don't send a green dot for yourself
-                            if (sp.UUID != remoteClient.AgentId)
+                                // Don't send a green dot for yourself
+                                if (sp.UUID != remoteClient.AgentId)
                                 {
+                                    if (sp.PresenceType == PresenceType.Npc && !m_showNPCs)
+                                        return;
+
                                     mapitem = new mapItemReply(
                                         xstart + (uint)sp.AbsolutePosition.X,
                                         ystart + (uint)sp.AbsolutePosition.Y,
@@ -617,7 +617,7 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                 // Service 6 right now (MAP_ITEM_AGENTS_LOCATION; green dots)
 
                 int tc = Environment.TickCount;
-                if (m_scene.GetRootAgentCount() <= 1)
+                if (m_scene.GetRootAgentCount() <= 1) // own is not sent
                 {
                     mapitem = new mapItemReply(
                                 xstart + 1,
@@ -634,6 +634,9 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                         // Don't send a green dot for yourself
                         if (sp.UUID != remoteClient.AgentId)
                         {
+                            if (!m_showNPCs && sp.PresenceType == PresenceType.Npc)
+                                return;
+
                             mapitem = new mapItemReply(
                                 xstart + (uint)sp.AbsolutePosition.X,
                                 ystart + (uint)sp.AbsolutePosition.Y,
@@ -1189,6 +1192,7 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                             return;
 
                         GetAndSendBlocksInternal(req.client, req.minX, req.minY, req.maxX, req.maxY, req.flags);
+                        Watchdog.UpdateThread();
                     }
 
                     thisRunData.Clear();
@@ -1541,7 +1545,7 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
             if (consoleScene != null && consoleScene != m_scene)
                 return;
 
-            GenerateMaptile();
+            m_scene.RegenerateMaptileAndReregister(this, null);
         }
 
         public OSD HandleRemoteMapItemRequest(string path, OSD request, string endpoint)
@@ -1574,6 +1578,8 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                 OSDArray responsearr = new OSDArray(); // Don't preallocate. MT (m_scene.GetRootAgentCount());
                 m_scene.ForEachRootScenePresence(delegate (ScenePresence sp)
                 {
+                    if (!m_showNPCs && sp.IsNPC)
+                        return;
                     OSDMap responsemapdata = new OSDMap();
                     responsemapdata["X"] = OSD.FromInteger((int)(xstart + sp.AbsolutePosition.X));
                     responsemapdata["Y"] = OSD.FromInteger((int)(ystart + sp.AbsolutePosition.Y));

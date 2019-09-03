@@ -37,6 +37,7 @@ using System.Runtime;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Timers;
+using System.Net;
 using log4net;
 using NDesk.Options;
 using Nini.Config;
@@ -48,6 +49,7 @@ using OpenSim.Framework.Monitoring;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using OpenSim.Framework.Servers.HttpServer;
 
 namespace OpenSim
 {
@@ -119,6 +121,9 @@ namespace OpenSim
                 stpMinThreads = startupConfig.GetInt("MinPoolThreads", 2 );
                 stpMaxThreads = startupConfig.GetInt("MaxPoolThreads", 25);
                 m_consolePrompt = startupConfig.GetString("ConsolePrompt", @"Region (\R) ");
+
+                int dnsTimeout = startupConfig.GetInt("DnsTimeout", 30000);
+                try { ServicePointManager.DnsRefreshTimeout = dnsTimeout; } catch { }
             }
 
             if (Util.FireAndForgetMethod == FireAndForgetMethod.SmartThreadPool)
@@ -194,13 +199,14 @@ namespace OpenSim
                     break;
                 case "rest":
                     m_console = new RemoteConsole("Region");
-                    ((RemoteConsole)m_console).ReadConfig(Config);
                     break;
                 default:
                     m_console = new LocalConsole("Region", Config.Configs["Startup"]);
                     break;
                 }
             }
+
+            m_console.ReadConfig(Config);
 
             MainConsole.Instance = m_console;
 
@@ -224,16 +230,14 @@ namespace OpenSim
                 m_log.InfoFormat("[OPENSIM] Enabling remote managed stats fetch. URL = {0}", urlBase);
             }
 
-            if (m_console is RemoteConsole)
+            MethodInfo mi = m_console.GetType().GetMethod("SetServer", BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(BaseHttpServer) }, null);
+
+            if (mi != null)
             {
                 if (m_consolePort == 0)
-                {
-                    ((RemoteConsole)m_console).SetServer(m_httpServer);
-                }
+                    mi.Invoke(m_console, new object[] { m_httpServer });
                 else
-                {
-                    ((RemoteConsole)m_console).SetServer(MainServer.GetHttpServer(m_consolePort));
-                }
+                    mi.Invoke(m_console, new object[] { MainServer.GetHttpServer(m_consolePort) });
             }
 
             // Hook up to the watchdog timer
@@ -778,8 +782,8 @@ namespace OpenSim
             Scene existingScene;
             if (SceneManager.TryGetScene(regInfo.RegionID, out existingScene))
             {
-                MainConsole.Instance.OutputFormat(
-                    "ERROR: Cannot create region {0} with ID {1}, this ID is already assigned to region {2}",
+                MainConsole.Instance.Output(
+                    "ERROR: Cannot create region {0} with ID {1}, this ID is already assigned to region {2}", null,
                     regInfo.RegionName, regInfo.RegionID, existingScene.RegionInfo.RegionName);
 
                 return;
@@ -976,7 +980,7 @@ namespace OpenSim
                     SceneManager.ForEachSelectedScene(
                         scene =>
                         {
-                            MainConsole.Instance.OutputFormat("Loaded region modules in {0} are:", scene.Name);
+                            MainConsole.Instance.Output("Loaded region modules in {0} are:", null, scene.Name);
 
                             List<IRegionModuleBase> sharedModules = new List<IRegionModuleBase>();
                             List<IRegionModuleBase> nonSharedModules = new List<IRegionModuleBase>();
@@ -990,10 +994,10 @@ namespace OpenSim
                             }
 
                             foreach (IRegionModuleBase module in sharedModules.OrderBy(m => m.Name))
-                                MainConsole.Instance.OutputFormat("New Region Module (Shared): {0}", module.Name);
+                                MainConsole.Instance.Output("New Region Module (Shared): {0}", null, module.Name);
 
                             foreach (IRegionModuleBase module in nonSharedModules.OrderBy(m => m.Name))
-                                MainConsole.Instance.OutputFormat("New Region Module (Non-Shared): {0}", module.Name);
+                                MainConsole.Instance.Output("New Region Module (Non-Shared): {0}", null, module.Name);
                         }
                     );
 
