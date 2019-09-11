@@ -25,14 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
-using OpenSim.Region.ScriptEngine.Yengine;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Text;
 using System.Text.RegularExpressions;
 
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
@@ -145,9 +141,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
              * Get the && and || all out of the way...
              * Simply cast their left and right operands to boolean then process.
              */
-            for(int i = 0; i < booltypes.Length; i++)
+            for (int i = 0; i < booltypes.Length; i++)
             {
-                for(int j = 0; j < booltypes.Length; j++)
+                for (int j = 0; j < booltypes.Length; j++)
                 {
                     bos.Add(booltypes[i] + "&&" + booltypes[j],
                              new BinOpStr(typeof(bool), BinOpStrAndAnd));
@@ -225,7 +221,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             // This lets us do things like 3.5 * (x > 0).
 
             Dictionary<string, BinOpStr> bos2 = new Dictionary<string, BinOpStr>();
-            foreach(KeyValuePair<string, BinOpStr> kvp in bos)
+            foreach (KeyValuePair<string, BinOpStr> kvp in bos)
             {
                 string key = kvp.Key;
                 BinOpStr val = kvp.Value;
@@ -233,36 +229,36 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
             Regex wordReg = new Regex("\\w+");
             Regex opReg = new Regex("\\W+");
-            foreach(KeyValuePair<string, BinOpStr> kvp in bos)
+            foreach (KeyValuePair<string, BinOpStr> kvp in bos)
             {
                 string key = kvp.Key;
                 BinOpStr val = kvp.Value;
                 MatchCollection matches = wordReg.Matches(key);
-                if(matches.Count != 2)
+                if (matches.Count != 2)
                     continue;
                 Match opM = opReg.Match(key);
-                if(!opM.Success)
+                if (!opM.Success)
                     continue;
                 string left = matches[0].Value;
                 string right = matches[1].Value;
                 string op = opM.Value;
                 string key2;
-                if(left == "integer" && right == "integer")
+                if (left == "integer" && right == "integer")
                 {
                     key2 = "bool" + op + "bool";
-                    if(!bos2.ContainsKey(key2))
+                    if (!bos2.ContainsKey(key2))
                         bos2.Add(key2, val);
                     key2 = "bool" + op + "integer";
-                    if(!bos2.ContainsKey(key2))
+                    if (!bos2.ContainsKey(key2))
                         bos2.Add(key2, val);
                     key2 = "integer" + op + "bool";
-                    if(!bos2.ContainsKey(key2))
+                    if (!bos2.ContainsKey(key2))
                         bos2.Add(key2, val);
                 }
                 else
                 {
                     key2 = key.Replace("integer", "bool");
-                    if(!bos2.ContainsKey(key2))
+                    if (!bos2.ContainsKey(key2))
                         bos2.Add(key2, val);
                 }
             }

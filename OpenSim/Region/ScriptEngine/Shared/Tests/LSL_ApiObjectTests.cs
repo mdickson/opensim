@@ -25,25 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using log4net;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
-using OpenMetaverse.Assets;
-using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
-using OpenSim.Region.CoreModules.Avatar.AvatarFactory;
-using OpenSim.Region.OptionalModules.World.NPC;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.ScriptEngine.Shared;
 using OpenSim.Region.ScriptEngine.Shared.Api;
-using OpenSim.Region.ScriptEngine.Shared.Instance;
 using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
-using OpenSim.Services.Interfaces;
 using OpenSim.Tests.Common;
 using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
 using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
@@ -163,7 +151,8 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
             SceneObjectPart part1 =
                 new SceneObjectPart(UUID.Zero, PrimitiveBaseShape.Default,
                 Vector3.Zero, Quaternion.Identity,
-                Vector3.Zero) { Name = obj1Name, UUID = objUuid };
+                Vector3.Zero)
+                { Name = obj1Name, UUID = objUuid };
             Assert.That(scene.AddNewSceneObject(new SceneObjectGroup(part1), false), Is.True);
 
             LSL_Api apiGrp1 = new LSL_Api();
@@ -226,12 +215,12 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
                 0.00f,                                      // Prim hollow
                 new LSL_Types.Vector3(1.0d, -1.0d, 0.0d),   // Prim twist
                 new LSL_Types.Vector3(1.0d, 0.05d, 0.0d),   // Prim hole size
-                // Expression for y selected to test precision problems during byte
-                // cast in SetPrimitiveShapeParams.
+                                                            // Expression for y selected to test precision problems during byte
+                                                            // cast in SetPrimitiveShapeParams.
                 new LSL_Types.Vector3(0.0d, 0.35d + 0.1d, 0.0d),    // Prim shear
                 new LSL_Types.Vector3(0.0d, 1.0d, 0.0d),    // Prim profile cut
-                // Expression for y selected to test precision problems during sbyte
-                // cast in SetPrimitiveShapeParams.
+                                                            // Expression for y selected to test precision problems during sbyte
+                                                            // cast in SetPrimitiveShapeParams.
                 new LSL_Types.Vector3(-1.0d, 0.70d + 0.1d + 0.1d, 0.0d),    // Prim taper
                 1.11f,                                      // Prim revolutions
                 0.88f,                                      // Prim radius
@@ -247,11 +236,11 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
                 ScriptBaseClass.PRIM_HOLE_SQUARE,           // Prim hole type
                 new LSL_Types.Vector3(0.0d, 1.0d, 0.0d),    // Prim cut
                 0.99f,                                      // Prim hollow
-                // Expression for x selected to test precision problems during sbyte
-                // cast in SetPrimitiveShapeBlockParams.
+                                                            // Expression for x selected to test precision problems during sbyte
+                                                            // cast in SetPrimitiveShapeBlockParams.
                 new LSL_Types.Vector3(0.7d + 0.2d, 0.0d, 0.0d),     // Prim twist
-                // Expression for y selected to test precision problems during sbyte
-                // cast in SetPrimitiveShapeParams.
+                                                                    // Expression for y selected to test precision problems during sbyte
+                                                                    // cast in SetPrimitiveShapeParams.
                 new LSL_Types.Vector3(2.0d, (1.3d + 0.1d), 0.0d),   // Prim taper
                 new LSL_Types.Vector3(0.0d, 0.0d, 0.0d),    // Prim shear
                 0.70f);                                     // Prim hollow check

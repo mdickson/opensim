@@ -25,10 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenSim.Framework.Servers.HttpServer;
 using System.Collections;
 using System.Collections.Generic;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Servers.HttpServer;
 
 namespace OpenSim.Framework.Capabilities
 {
@@ -54,7 +53,7 @@ namespace OpenSim.Framework.Capabilities
         /// <param name="httpListenerHostname">host name of the HTTP server</param>
         /// <param name="httpListenerPort">HTTP port</param>
         public CapsHandlers(IHttpServer httpListener, string httpListenerHostname, uint httpListenerPort)
-           {
+        {
             m_httpListener = httpListener;
             m_httpListenerHostName = httpListenerHostname;
             m_httpListenerPort = httpListenerPort;

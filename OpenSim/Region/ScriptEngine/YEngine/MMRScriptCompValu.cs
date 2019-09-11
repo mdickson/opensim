@@ -25,17 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
-using OpenSim.Region.ScriptEngine.Yengine;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
 using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
-using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
 using LSL_Rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
 using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
@@ -113,11 +108,11 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         private static MethodInfo ArrVarPopMeth(FieldInfo fi)
         {
-            if(fi.Name == "iarLists")
+            if (fi.Name == "iarLists")
                 return avpmListMethInfo;
-            if(fi.Name == "iarObjects")
+            if (fi.Name == "iarObjects")
                 return avpmObjectMethInfo;
-            if(fi.Name == "iarStrings")
+            if (fi.Name == "iarStrings")
                 return avpmStringMethInfo;
             return null;
         }
@@ -151,7 +146,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         /*
          * call this before pushing value to be popped
-         */   
+         */
         public abstract void PopPost(ScriptCodeGen scg, Token errorAt);   // call this after pushing value to be popped
 
 
@@ -169,19 +164,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public TokenType GetRetType()
         {
-            if(!(type is TokenTypeSDTypeDelegate))
+            if (!(type is TokenTypeSDTypeDelegate))
                 return null;
             return ((TokenTypeSDTypeDelegate)type).decl.GetRetType();
         }
         public TokenType[] GetArgTypes()
         {
-            if(!(type is TokenTypeSDTypeDelegate))
+            if (!(type is TokenTypeSDTypeDelegate))
                 return null;
             return ((TokenTypeSDTypeDelegate)type).decl.GetArgTypes();
         }
         public string GetArgSig()
         {
-            if(!(type is TokenTypeSDTypeDelegate))
+            if (!(type is TokenTypeSDTypeDelegate))
                 return null;
             return ((TokenTypeSDTypeDelegate)type).decl.GetArgSig();
         }
@@ -215,15 +210,15 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             scg.ilGen.Emit(errorAt, OpCodes.Ldfld, var.vTableArray);   // which array
             scg.ilGen.Emit(errorAt, OpCodes.Ldc_I4, var.vTableIndex);  // which array element
-            if(type is TokenTypeFloat)
+            if (type is TokenTypeFloat)
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Ldelem_R8);
             }
-            else if(type is TokenTypeInt)
+            else if (type is TokenTypeInt)
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Ldelem_I4);
             }
-            else if(type is TokenTypeSDTypeDelegate)
+            else if (type is TokenTypeSDTypeDelegate)
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Ldelem, typeof(object));
                 scg.ilGen.Emit(errorAt, OpCodes.Castclass, ToSysType());
@@ -236,7 +231,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         protected void EmitFieldPushRef(ScriptCodeGen scg, Token errorAt, TokenDeclVar var)
         {
-            if(ArrVarPopMeth(var.vTableArray) != null)
+            if (ArrVarPopMeth(var.vTableArray) != null)
             {
                 scg.ErrorMsg(errorAt, "can't take address of this variable");
             }
@@ -247,7 +242,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         protected void EmitFieldPopPre(ScriptCodeGen scg, Token errorAt, TokenDeclVar var)
         {
-            if(ArrVarPopMeth(var.vTableArray) != null)
+            if (ArrVarPopMeth(var.vTableArray) != null)
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Ldc_I4, var.vTableIndex);
             }
@@ -260,19 +255,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         protected void EmitFieldPopPost(ScriptCodeGen scg, Token errorAt, TokenDeclVar var)
         {
-            if(ArrVarPopMeth(var.vTableArray) != null)
+            if (ArrVarPopMeth(var.vTableArray) != null)
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Call, ArrVarPopMeth(var.vTableArray));
             }
-            else if(type is TokenTypeFloat)
+            else if (type is TokenTypeFloat)
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Stelem_R8);
             }
-            else if(type is TokenTypeInt)
+            else if (type is TokenTypeInt)
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Stelem_I4);
             }
-            else if(type is TokenTypeSDTypeDelegate)
+            else if (type is TokenTypeSDTypeDelegate)
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Stelem, typeof(object));
             }
@@ -300,7 +295,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     }
 
     // The value is kept in an (XMR_Array) array element
-    public class CompValuArEle: CompValu
+    public class CompValuArEle : CompValu
     {
         public CompValu arr;
         private CompValu idx;
@@ -356,7 +351,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     }
 
     // The value is kept in the current function's argument list
-    public class CompValuArg: CompValu
+    public class CompValuArg : CompValu
     {
         public int index;
         public bool readOnly;
@@ -375,27 +370,27 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override void PushVal(ScriptCodeGen scg, Token errorAt)
         {
-            if(index < ldargs.Length)
+            if (index < ldargs.Length)
                 scg.ilGen.Emit(errorAt, ldargs[index]);
-            else if(index <= 255)
+            else if (index <= 255)
                 scg.ilGen.Emit(errorAt, OpCodes.Ldarg_S, index);
             else
                 scg.ilGen.Emit(errorAt, OpCodes.Ldarg, index);
         }
         public override void PushRef(ScriptCodeGen scg, Token errorAt)
         {
-            if(readOnly)
+            if (readOnly)
             {
                 scg.ErrorMsg(errorAt, "location cannot be written to");
             }
-            if(index <= 255)
+            if (index <= 255)
                 scg.ilGen.Emit(errorAt, OpCodes.Ldarga_S, index);
             else
                 scg.ilGen.Emit(errorAt, OpCodes.Ldarga, index);
         }
         public override void PopPost(ScriptCodeGen scg, Token errorAt)
         {
-            if(readOnly)
+            if (readOnly)
             {
                 scg.ErrorMsg(errorAt, "location cannot be written to");
             }
@@ -416,13 +411,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     }
 
     // The value is a character constant
-    public class CompValuChar: CompValu
+    public class CompValuChar : CompValu
     {
         public char x;
 
         public CompValuChar(TokenType type, char x) : base(type)
         {
-            if(!(this.type is TokenTypeChar))
+            if (!(this.type is TokenTypeChar))
             {
                 this.type = new TokenTypeChar(this.type);
             }
@@ -443,7 +438,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     }
 
     // The value is kept in a struct/class field of an internal struct/class
-    public class CompValuField: CompValu
+    public class CompValuField : CompValu
     {
         CompValu obj;
         FieldInfo field;
@@ -455,7 +450,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override void PushVal(ScriptCodeGen scg, Token errorAt)
         {
-            if(field.ReflectedType.IsValueType)
+            if (field.ReflectedType.IsValueType)
             {
                 obj.PushRef(scg, errorAt);
             }
@@ -467,7 +462,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override void PushRef(ScriptCodeGen scg, Token errorAt)
         {
-            if(field.ReflectedType.IsValueType)
+            if (field.ReflectedType.IsValueType)
             {
                 obj.PushRef(scg, errorAt);
             }
@@ -479,7 +474,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override void PopPre(ScriptCodeGen scg, Token errorAt)
         {
-            if(field.ReflectedType.IsValueType)
+            if (field.ReflectedType.IsValueType)
             {
                 obj.PushRef(scg, errorAt);
             }
@@ -507,7 +502,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     }
 
     // Accessing an element of a fixed-dimension array
-    public class CompValuFixArEl: CompValu
+    public class CompValuFixArEl : CompValu
     {
         private CompValu baseRVal;
         private CompValu[] subRVals;
@@ -535,7 +530,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
             TokenName name = new TokenName(sdtType, "Get");
             TokenType[] argsig = new TokenType[nSubs];
-            for(int i = 0; i < nSubs; i++)
+            for (int i = 0; i < nSubs; i++)
             {
                 argsig[i] = tokenTypeInt;
             }
@@ -543,7 +538,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
             name = new TokenName(sdtType, "Set");
             argsig = new TokenType[nSubs + 1];
-            for(int i = 0; i < nSubs; i++)
+            for (int i = 0; i < nSubs; i++)
             {
                 argsig[i] = tokenTypeInt;
             }
@@ -558,7 +553,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             // call script-defined class' Get() method to fetch the value
             baseRVal.PushVal(scg, errorAt);
-            for(int i = 0; i < nSubs; i++)
+            for (int i = 0; i < nSubs; i++)
             {
                 subRVals[i].PushVal(scg, errorAt, tokenTypeInt);
             }
@@ -580,7 +575,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             // set up call to script-defined class' Set() method to write the value
             baseRVal.PushVal(scg, errorAt);
-            for(int i = 0; i < nSubs; i++)
+            for (int i = 0; i < nSubs; i++)
             {
                 subRVals[i].PushVal(scg, errorAt, tokenTypeInt);
             }
@@ -611,7 +606,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             int nSubs = subRVals.Length;
             TokenType[] argsig = new TokenType[nSubs];
             argsig[0] = new TokenTypeInt(sdtType);
-            for(int i = 0; ++i < nSubs;)
+            for (int i = 0; ++i < nSubs;)
             {
                 argsig[i] = argsig[0];
             }
@@ -633,13 +628,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     }
 
     // The value is a float constant
-    public class CompValuFloat: CompValu
+    public class CompValuFloat : CompValu
     {
         public double x;
 
         public CompValuFloat(TokenType type, double x) : base(type)
         {
-            if(!(this.type is TokenTypeFloat))
+            if (!(this.type is TokenTypeFloat))
             {
                 this.type = new TokenTypeFloat(this.type);
             }
@@ -664,7 +659,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     // ie, the XMRInstance pointer is a hidden first argument.
     // There is just one of these created when the function is being compiled as there is only one value
     // of the function.
-    public class CompValuGlobalMeth: CompValu
+    public class CompValuGlobalMeth : CompValu
     {
         private TokenDeclVar func;
 
@@ -682,7 +677,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public override void PushVal(ScriptCodeGen scg, Token errorAt)
         {
             string dtn = type.ToString();
-            if(dtn.StartsWith("delegate "))
+            if (dtn.StartsWith("delegate "))
                 dtn = dtn.Substring(9);
 
             // delegateinstance = (signature)scriptinstance.GetScriptMethodDelegate (methName, signature, arg0);
@@ -711,7 +706,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public override void CallPre(ScriptCodeGen scg, Token errorAt)
         {
-            if(!this.func.IsFuncTrivial(scg))
+            if (!this.func.IsFuncTrivial(scg))
                 new ScriptCodeGen.CallLabel(scg, errorAt);
 
             // all script-defined global functions are static methods created by DynamicMethod()
@@ -721,14 +716,14 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public override void CallPost(ScriptCodeGen scg, Token errorAt)
         {
             scg.ilGen.Emit(errorAt, OpCodes.Call, func.ilGen);
-            if(!this.func.IsFuncTrivial(scg))
+            if (!this.func.IsFuncTrivial(scg))
                 scg.openCallLabel = null;
         }
     }
 
     // The value is in a script-global variable = ScriptModule instance variable
     // It could also be a script-global property
-    public class CompValuGlobalVar: CompValu
+    public class CompValuGlobalVar : CompValu
     {
         private static readonly FieldInfo glblVarsFieldInfo = typeof(XMRInstAbstract).GetField("glblVars");
 
@@ -737,20 +732,20 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public CompValuGlobalVar(TokenDeclVar declVar, XMRInstArSizes glblSizes) : base(declVar.type)
         {
             this.declVar = declVar;
-            if((declVar.getProp == null) && (declVar.setProp == null))
+            if ((declVar.getProp == null) && (declVar.setProp == null))
             {
                 declVar.type.AssignVarSlot(declVar, glblSizes);
             }
         }
         public override void PushVal(ScriptCodeGen scg, Token errorAt)
         {
-            if((declVar.getProp == null) && (declVar.setProp == null))
+            if ((declVar.getProp == null) && (declVar.setProp == null))
             {
                 scg.PushXMRInst();
                 scg.ilGen.Emit(errorAt, OpCodes.Ldfld, glblVarsFieldInfo);
                 EmitFieldPushVal(scg, errorAt, declVar);
             }
-            else if(declVar.getProp != null)
+            else if (declVar.getProp != null)
             {
                 declVar.getProp.location.CallPre(scg, errorAt);
                 declVar.getProp.location.CallPost(scg, errorAt);
@@ -763,7 +758,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override void PushRef(ScriptCodeGen scg, Token errorAt)
         {
-            if((declVar.getProp == null) && (declVar.setProp == null))
+            if ((declVar.getProp == null) && (declVar.setProp == null))
             {
                 scg.PushXMRInst();
                 scg.ilGen.Emit(errorAt, OpCodes.Ldfld, glblVarsFieldInfo);
@@ -776,24 +771,24 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override void PopPre(ScriptCodeGen scg, Token errorAt)
         {
-            if((declVar.getProp == null) && (declVar.setProp == null))
+            if ((declVar.getProp == null) && (declVar.setProp == null))
             {
                 scg.PushXMRInst();
                 scg.ilGen.Emit(errorAt, OpCodes.Ldfld, glblVarsFieldInfo);
                 EmitFieldPopPre(scg, errorAt, declVar);
             }
-            else if(declVar.setProp == null)
+            else if (declVar.setProp == null)
             {
                 scg.ErrorMsg(errorAt, "property not writable");
             }
         }
         public override void PopPost(ScriptCodeGen scg, Token errorAt)
         {
-            if((declVar.getProp == null) && (declVar.setProp == null))
+            if ((declVar.getProp == null) && (declVar.setProp == null))
             {
                 EmitFieldPopPost(scg, errorAt, declVar);
             }
-            else if(declVar.setProp != null)
+            else if (declVar.setProp != null)
             {
                 EmitPopPostProp(scg, errorAt, declVar.type, declVar.setProp.location);
             }
@@ -820,7 +815,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
     // The value is in an $idxprop property of a script-defined type class or interface instance.
     // Reading and writing is via a method call.
-    public class CompValuIdxProp: CompValu
+    public class CompValuIdxProp : CompValu
     {
         private TokenDeclVar idxProp;  // $idxprop property within baseRVal
         private CompValu baseRVal;     // pointer to class or interface object containing property
@@ -842,18 +837,18 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public override void PushVal(ScriptCodeGen scg, Token errorAt)
         {
-            if(idxProp.getProp != null)
+            if (idxProp.getProp != null)
             {
-                if(!idxProp.getProp.IsFuncTrivial(scg))
+                if (!idxProp.getProp.IsFuncTrivial(scg))
                 {
-                    for(int i = indices.Length; --i >= 0;)
+                    for (int i = indices.Length; --i >= 0;)
                     {
                         indices[i] = scg.Trivialize(indices[i], errorAt);
                     }
                 }
                 CompValu getProp = GetIdxPropMeth(idxProp.getProp);
                 getProp.CallPre(scg, errorAt);
-                for(int i = 0; i < indices.Length; i++)
+                for (int i = 0; i < indices.Length; i++)
                 {
                     indices[i].PushVal(scg, errorAt, argTypes[i]);
                 }
@@ -882,18 +877,18 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public override void PopPre(ScriptCodeGen scg, Token errorAt)
         {
-            if(idxProp.setProp != null)
+            if (idxProp.setProp != null)
             {
-                if(!idxProp.setProp.IsFuncTrivial(scg))
+                if (!idxProp.setProp.IsFuncTrivial(scg))
                 {
-                    for(int i = indices.Length; --i >= 0;)
+                    for (int i = indices.Length; --i >= 0;)
                     {
                         indices[i] = scg.Trivialize(indices[i], errorAt);
                     }
                 }
                 this.setProp = GetIdxPropMeth(idxProp.setProp);
                 this.setProp.CallPre(scg, errorAt);
-                for(int i = 0; i < indices.Length; i++)
+                for (int i = 0; i < indices.Length; i++)
                 {
                     indices[i].PushVal(scg, errorAt, argTypes[i]);
                 }
@@ -911,7 +906,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public override void PopPost(ScriptCodeGen scg, Token errorAt)
         {
-            if(idxProp.setProp != null)
+            if (idxProp.setProp != null)
             {
                 this.setProp.CallPost(scg, errorAt);
             }
@@ -924,21 +919,21 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public override bool IsReadTrivial(ScriptCodeGen scg, Token readAt)
         {
             // if no getter, reading would throw an error, so doesn't really matter what we say
-            if(idxProp.getProp == null)
+            if (idxProp.getProp == null)
                 return true;
 
             // assume interface methods are always non-trivial because we don't know anything about the actual implementation
-            if(baseRVal.type is TokenTypeSDTypeInterface)
+            if (baseRVal.type is TokenTypeSDTypeInterface)
                 return false;
 
             // accessing it in any way can't be trivial if reading the pointer isn't trivial
-            if(!baseRVal.IsReadTrivial(scg, readAt))
+            if (!baseRVal.IsReadTrivial(scg, readAt))
                 return false;
 
             // likewise with the indices
-            foreach(CompValu idx in indices)
+            foreach (CompValu idx in indices)
             {
-                if(!idx.IsReadTrivial(scg, readAt))
+                if (!idx.IsReadTrivial(scg, readAt))
                     return false;
             }
 
@@ -951,7 +946,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         private CompValu GetIdxPropMeth(TokenDeclVar meth)
         {
-            if(baseRVal.type is TokenTypeSDTypeClass)
+            if (baseRVal.type is TokenTypeSDTypeClass)
             {
                 return new CompValuInstMember(meth, baseRVal, false);
             }
@@ -961,7 +956,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
     // This represents the type and location of an internally-defined function
     // that a script can call
-    public class CompValuInline: CompValu
+    public class CompValuInline : CompValu
     {
         public TokenDeclInline declInline;
 
@@ -994,14 +989,14 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     // The value is the entrypoint of a script-defined type's interface method combined with
     // the pointer used to access the method.  Thus there is one of these per call site.
     // They also handle accessing interface properties.
-    public class CompValuIntfMember: CompValu
+    public class CompValuIntfMember : CompValu
     {
         private TokenDeclVar declVar;
         private CompValu baseRVal;
 
         public CompValuIntfMember(TokenDeclVar declVar, CompValu baseRVal) : base(declVar.type)
         {
-            if(this.type == null)
+            if (this.type == null)
                 throw new Exception("interface member type is null");
             this.declVar = declVar;   // which element of the baseRVal vector to be accessed
             this.baseRVal = baseRVal;  // the vector of delegates implementing the interface
@@ -1013,14 +1008,14 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public override void PushVal(ScriptCodeGen scg, Token errorAt)
         {
-            if(declVar.retType != null)
+            if (declVar.retType != null)
             {
                 baseRVal.PushVal(scg, errorAt);                        // push pointer to delegate array on stack
                 scg.ilGen.Emit(errorAt, OpCodes.Ldc_I4, declVar.vTableIndex);   // select which delegate to access
                 scg.ilGen.Emit(errorAt, OpCodes.Ldelem, typeof(Delegate));     // push delegate on stack
                 scg.ilGen.Emit(errorAt, OpCodes.Castclass, type.ToSysType());  // cast to correct delegate class
             }
-            else if(declVar.getProp != null)
+            else if (declVar.getProp != null)
             {
                 CompValu getProp = new CompValuIntfMember(declVar.getProp, baseRVal);
                 getProp.CallPre(scg, errorAt);                        // reading property, call its getter
@@ -1048,7 +1043,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public override void PopPre(ScriptCodeGen scg, Token errorAt)
         {
-            if(declVar.setProp == null)
+            if (declVar.setProp == null)
             {
                 // read-only property
                 scg.ErrorMsg(errorAt, "member not writable");
@@ -1056,7 +1051,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override void PopPost(ScriptCodeGen scg, Token errorAt)
         {
-            if(declVar.setProp != null)
+            if (declVar.setProp != null)
             {
                 CompValu setProp = new CompValuIntfMember(declVar.setProp, baseRVal);
                 EmitPopPostProp(scg, errorAt, declVar.type, setProp);
@@ -1096,7 +1091,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
     // The value is the entrypoint of an internal instance method
     // such as XMR_Array.index()
-    public class CompValuIntInstMeth: CompValu
+    public class CompValuIntInstMeth : CompValu
     {
         private TokenTypeSDTypeDelegate delType;
         private CompValu baseRVal;
@@ -1138,7 +1133,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
     // The value is fetched by calling an internal instance method
     // such as XMR_Array.count
-    public class CompValuIntInstROProp: CompValu
+    public class CompValuIntInstROProp : CompValu
     {
         private CompValu baseRVal;
         private MethodInfo methInfo;
@@ -1170,7 +1165,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     //       field: value is in one of the arrays contained within XMRSDTypeClObj.instVars
     //      method: value is a delegate; can be called
     //    property: reading and writing is via a method call
-    public class CompValuInstMember: CompValu
+    public class CompValuInstMember : CompValu
     {
         private static readonly FieldInfo instVarsFieldInfo = typeof(XMRSDTypeClObj).GetField("instVars");
         private static readonly FieldInfo vTableFieldInfo = typeof(XMRSDTypeClObj).GetField("sdtcVTable");
@@ -1188,19 +1183,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public override void PushVal(ScriptCodeGen scg, Token errorAt)
         {
-            if(declVar.retType != null)
+            if (declVar.retType != null)
             {
                 // a method's value, ie, without applying the (arglist), is a delegate...
                 PushValMethod(scg, errorAt);
             }
-            else if(declVar.vTableArray != null)
+            else if (declVar.vTableArray != null)
             {
                 // a field's value is its XMRSDTypeClObj.instVars array element
                 baseRVal.PushVal(scg, errorAt);
                 scg.ilGen.Emit(errorAt, OpCodes.Ldfld, instVarsFieldInfo);
                 EmitFieldPushVal(scg, errorAt, declVar);
             }
-            else if(declVar.getProp != null)
+            else if (declVar.getProp != null)
             {
                 // a property's value is calling its get method with no arguments
                 CompValu getProp = new CompValuInstMember(declVar.getProp, baseRVal, ignoreVirt);
@@ -1216,7 +1211,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override void PushRef(ScriptCodeGen scg, Token errorAt)
         {
-            if(declVar.vTableArray != null)
+            if (declVar.vTableArray != null)
             {
                 // a field's value is its XMRSDTypeClObj.instVars array element
                 baseRVal.PushVal(scg, errorAt);
@@ -1231,14 +1226,14 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override void PopPre(ScriptCodeGen scg, Token errorAt)
         {
-            if(declVar.vTableArray != null)
+            if (declVar.vTableArray != null)
             {
                 // a field's value is its XMRSDTypeClObj.instVars array element
                 baseRVal.PushVal(scg, errorAt);
                 scg.ilGen.Emit(errorAt, OpCodes.Ldfld, instVarsFieldInfo);
                 EmitFieldPopPre(scg, errorAt, declVar);
             }
-            else if(declVar.setProp == null)
+            else if (declVar.setProp == null)
             {
                 // read-only property
                 scg.ErrorMsg(errorAt, "member not writable");
@@ -1246,11 +1241,11 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override void PopPost(ScriptCodeGen scg, Token errorAt)
         {
-            if(declVar.vTableArray != null)
+            if (declVar.vTableArray != null)
             {
                 EmitFieldPopPost(scg, errorAt, declVar);
             }
-            else if(declVar.setProp != null)
+            else if (declVar.setProp != null)
             {
                 CompValu setProp = new CompValuInstMember(declVar.setProp, baseRVal, ignoreVirt);
                 EmitPopPostProp(scg, errorAt, declVar.type, setProp);
@@ -1266,24 +1261,24 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             // accessing it in any way can't be trivial if reading the pointer isn't trivial.
             // this also handles strict right-to-left mode detection as the side-effect can
             // only apply to the pointer (it can't change which field or method we access).
-            if(!baseRVal.IsReadTrivial(scg, readAt))
+            if (!baseRVal.IsReadTrivial(scg, readAt))
                 return false;
 
             // now the only way it can be non-trivial to read is if it is a property and the 
             // getter() method is non-trivial.  reading a method means getting a delegate 
             // which is always trivial, and reading a simple field is always trivial, ie, no 
             // CheckRun() call can possibly be involved.
-            if(declVar.retType != null)
+            if (declVar.retType != null)
             {
                 // a method's value, ie, without applying the (arglist), is a delegate...
                 return true;
             }
-            if(declVar.vTableArray != null)
+            if (declVar.vTableArray != null)
             {
                 // a field's value is its XMRSDTypeClObj.instVars array element
                 return true;
             }
-            if(declVar.getProp != null)
+            if (declVar.getProp != null)
             {
                 // a property's value is calling its get method with no arguments
                 return declVar.getProp.IsFuncTrivial(scg);
@@ -1295,7 +1290,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public override void CallPre(ScriptCodeGen scg, Token errorAt)
         {
-            if(declVar.retType != null)
+            if (declVar.retType != null)
             {
                 CallPreMethod(scg, errorAt);
             }
@@ -1306,7 +1301,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override void CallPost(ScriptCodeGen scg, Token errorAt)
         {
-            if(declVar.retType != null)
+            if (declVar.retType != null)
             {
                 CallPostMethod(scg, errorAt);
             }
@@ -1321,10 +1316,10 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         private void PushValMethod(ScriptCodeGen scg, Token errorAt)
         {
-            if((declVar.sdtFlags & ScriptReduce.SDT_STATIC) != 0)
+            if ((declVar.sdtFlags & ScriptReduce.SDT_STATIC) != 0)
                 throw new Exception("dont use for statics");
 
-            if(ignoreVirt || (declVar.vTableIndex < 0))
+            if (ignoreVirt || (declVar.vTableIndex < 0))
             {
 
                 /*
@@ -1359,13 +1354,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         private void CallPreMethod(ScriptCodeGen scg, Token errorAt)
         {
-            if((declVar.sdtFlags & ScriptReduce.SDT_STATIC) != 0)
+            if ((declVar.sdtFlags & ScriptReduce.SDT_STATIC) != 0)
                 throw new Exception("dont use for statics");
 
-            if(!this.declVar.IsFuncTrivial(scg))
+            if (!this.declVar.IsFuncTrivial(scg))
                 new ScriptCodeGen.CallLabel(scg, errorAt);
 
-            if(ignoreVirt || (declVar.vTableIndex < 0))
+            if (ignoreVirt || (declVar.vTableIndex < 0))
             {
                 baseRVal.PushVal(scg, errorAt);                                 // 'this' being passed directly to method
             }
@@ -1380,7 +1375,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         private void CallPostMethod(ScriptCodeGen scg, Token errorAt)
         {
-            if(ignoreVirt || (declVar.vTableIndex < 0))
+            if (ignoreVirt || (declVar.vTableIndex < 0))
             {
                 // non-virt instance, just call function directly
                 scg.ilGen.Emit(errorAt, OpCodes.Call, declVar.ilGen);
@@ -1393,19 +1388,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 scg.ilGen.Emit(errorAt, OpCodes.Callvirt, invokeMethodInfo);
             }
 
-            if(!this.declVar.IsFuncTrivial(scg))
+            if (!this.declVar.IsFuncTrivial(scg))
                 scg.openCallLabel = null;
         }
     }
 
     // The value is an integer constant
-    public class CompValuInteger: CompValu
+    public class CompValuInteger : CompValu
     {
         public int x;
 
         public CompValuInteger(TokenType type, int x) : base(type)
         {
-            if(!(this.type is TokenTypeInt))
+            if (!(this.type is TokenTypeInt))
             {
                 this.type = new TokenTypeInt(this.type);
             }
@@ -1426,7 +1421,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     }
 
     // The value is an element of a list
-    public class CompValuListEl: CompValu
+    public class CompValuListEl : CompValu
     {
         private static readonly MethodInfo getElementFromListMethodInfo =
                  typeof(CompValuListEl).GetMethod("GetElementFromList", new Type[] { typeof(LSL_List), typeof(int) });
@@ -1458,22 +1453,22 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public static object GetElementFromList(LSL_List lis, int idx)
         {
             object element = lis.Data[idx];
-            if(element is LSL_Float)
+            if (element is LSL_Float)
                 return TypeCast.EHArgUnwrapFloat(element);
-            if(element is LSL_Integer)
+            if (element is LSL_Integer)
                 return TypeCast.EHArgUnwrapInteger(element);
-            if(element is LSL_String)
+            if (element is LSL_String)
                 return TypeCast.EHArgUnwrapString(element);
-            if(element is OpenMetaverse.Quaternion)
+            if (element is OpenMetaverse.Quaternion)
                 return TypeCast.EHArgUnwrapRotation(element);
-            if(element is OpenMetaverse.Vector3)
+            if (element is OpenMetaverse.Vector3)
                 return TypeCast.EHArgUnwrapVector(element);
             return element;
         }
     }
 
     // The value is kept in a script-addressable local variable
-    public class CompValuLocalVar: CompValu
+    public class CompValuLocalVar : CompValu
     {
         private static int htpopseq = 0;
 
@@ -1481,7 +1476,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public CompValuLocalVar(TokenType type, string name, ScriptCodeGen scg) : base(type)
         {
-            if(type.ToHeapTrackerType() != null)
+            if (type.ToHeapTrackerType() != null)
             {
                 localBuilder = scg.ilGen.DeclareLocal(type.ToHeapTrackerType(), name);
                 scg.HeapLocals.Add(localBuilder);
@@ -1498,14 +1493,14 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public override void PushVal(ScriptCodeGen scg, Token errorAt)
         {
             scg.ilGen.Emit(errorAt, OpCodes.Ldloc, localBuilder);
-            if(type.ToHeapTrackerType() != null)
+            if (type.ToHeapTrackerType() != null)
             {
                 type.CallHeapTrackerPushMeth(errorAt, scg.ilGen);
             }
         }
         public override void PushRef(ScriptCodeGen scg, Token errorAt)
         {
-            if(type.ToHeapTrackerType() != null)
+            if (type.ToHeapTrackerType() != null)
             {
                 scg.ErrorMsg(errorAt, "can't take ref of heap-tracked type " + type.ToString());
                 scg.ilGen.Emit(errorAt, OpCodes.Ldnull);
@@ -1518,14 +1513,14 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public override void PopPre(ScriptCodeGen scg, Token errorAt)
         {
-            if(type.ToHeapTrackerType() != null)
+            if (type.ToHeapTrackerType() != null)
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Ldloc, localBuilder);
             }
         }
         public override void PopPost(ScriptCodeGen scg, Token errorAt)
         {
-            if(type.ToHeapTrackerType() != null)
+            if (type.ToHeapTrackerType() != null)
             {
                 type.CallHeapTrackerPopMeth(errorAt, scg.ilGen);
             }
@@ -1537,7 +1532,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public void Pop(ScriptCodeGen scg, Token errorAt)
         {
-            if(type.ToHeapTrackerType() != null)
+            if (type.ToHeapTrackerType() != null)
             {
                 /*
                  * Popping into a heap tracker wrapped local variable.
@@ -1574,7 +1569,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     }
 
     // The value is a null
-    public class CompValuNull: CompValu
+    public class CompValuNull : CompValu
     {
         public CompValuNull(TokenType type) : base(type) { }
         public override void PushVal(ScriptCodeGen scg, Token errorAt)
@@ -1592,7 +1587,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     }
 
     // The value is a rotation
-    public class CompValuRot: CompValu
+    public class CompValuRot : CompValu
     {
         public CompValu x;
         public CompValu y;
@@ -1608,7 +1603,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public CompValuRot(TokenType type, CompValu x, CompValu y, CompValu z, CompValu w) :
                 base(type)
         {
-            if(!(type is TokenTypeRot))
+            if (!(type is TokenTypeRot))
             {
                 this.type = new TokenTypeRot(type);
             }
@@ -1639,7 +1634,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             // the supplied values must be trivial because when we call their PushVal()s
             // there will be stuff on the stack for all but the first PushVal() and so
             // they would have a non-empty stack at their call label.
-            if(!this.w.IsReadTrivial(scg, readAt) ||
+            if (!this.w.IsReadTrivial(scg, readAt) ||
                 !this.x.IsReadTrivial(scg, readAt) ||
                 !this.y.IsReadTrivial(scg, readAt) ||
                 !this.z.IsReadTrivial(scg, readAt))
@@ -1652,7 +1647,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     }
 
     // The value is in a static field of an internally defined struct/class
-    public class CompValuSField: CompValu
+    public class CompValuSField : CompValu
     {
         public FieldInfo field;
 
@@ -1662,12 +1657,12 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override void PushVal(ScriptCodeGen scg, Token errorAt)
         {
-            if((field.Attributes & FieldAttributes.Literal) == 0)
+            if ((field.Attributes & FieldAttributes.Literal) == 0)
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Ldsfld, field);
                 return;
             }
-            if(field.FieldType == typeof(LSL_Rotation))
+            if (field.FieldType == typeof(LSL_Rotation))
             {
                 LSL_Rotation rot = (LSL_Rotation)field.GetValue(null);
                 scg.ilGen.Emit(errorAt, OpCodes.Ldc_R8, rot.x);
@@ -1677,7 +1672,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 scg.ilGen.Emit(errorAt, OpCodes.Newobj, ScriptCodeGen.lslRotationConstructorInfo);
                 return;
             }
-            if(field.FieldType == typeof(LSL_Vector))
+            if (field.FieldType == typeof(LSL_Vector))
             {
                 LSL_Vector vec = (LSL_Vector)field.GetValue(null);
                 scg.ilGen.Emit(errorAt, OpCodes.Ldc_R8, vec.x);
@@ -1686,7 +1681,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 scg.ilGen.Emit(errorAt, OpCodes.Newobj, ScriptCodeGen.lslRotationConstructorInfo);
                 return;
             }
-            if(field.FieldType == typeof(string))
+            if (field.FieldType == typeof(string))
             {
                 string str = (string)field.GetValue(null);
                 scg.ilGen.Emit(errorAt, OpCodes.Ldstr, str);
@@ -1696,7 +1691,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override void PushRef(ScriptCodeGen scg, Token errorAt)
         {
-            if((field.Attributes & FieldAttributes.Literal) != 0)
+            if ((field.Attributes & FieldAttributes.Literal) != 0)
             {
                 throw new Exception("can't write a constant");
             }
@@ -1707,7 +1702,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override void PopPost(ScriptCodeGen scg, Token errorAt)
         {
-            if((field.Attributes & FieldAttributes.Literal) != 0)
+            if ((field.Attributes & FieldAttributes.Literal) != 0)
             {
                 throw new Exception("can't write a constant");
             }
@@ -1728,7 +1723,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     }
 
     // The value is a character within a string
-    public class CompValuStrChr: CompValu
+    public class CompValuStrChr : CompValu
     {
         private static readonly MethodInfo getCharFromStringMethodInfo =
                  typeof(CompValuStrChr).GetMethod("GetCharFromString", new Type[] { typeof(string), typeof(int) });
@@ -1764,13 +1759,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     }
 
     // The value is a key or string constant
-    public class CompValuString: CompValu
+    public class CompValuString : CompValu
     {
         public string x;
 
         public CompValuString(TokenType type, string x) : base(type)
         {
-            if(!(type is TokenTypeKey) && !(this.type is TokenTypeStr))
+            if (!(type is TokenTypeKey) && !(this.type is TokenTypeStr))
             {
                 throw new Exception("bad type " + type.ToString());
             }
@@ -1791,7 +1786,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     }
 
     // The value is kept in a temp local variable
-    public class CompValuTemp: CompValu
+    public class CompValuTemp : CompValu
     {
         public ScriptMyLocal localBuilder;
 
@@ -1826,7 +1821,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     }
 
     // The value is a vector
-    public class CompValuVec: CompValu
+    public class CompValuVec : CompValu
     {
         public CompValu x;
         public CompValu y;
@@ -1839,7 +1834,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public CompValuVec(TokenType type, CompValu x, CompValu y, CompValu z) : base(type)
         {
-            if(!(type is TokenTypeVec))
+            if (!(type is TokenTypeVec))
             {
                 this.type = new TokenTypeVec(type);
             }
@@ -1868,7 +1863,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             // the supplied values must be trivial because when we call their PushVal()s
             // there will be stuff on the stack for all but the first PushVal() and so
             // they would have a non-empty stack at their call label.
-            if(!this.x.IsReadTrivial(scg, readAt) ||
+            if (!this.x.IsReadTrivial(scg, readAt) ||
                 !this.y.IsReadTrivial(scg, readAt) ||
                 !this.z.IsReadTrivial(scg, readAt))
             {
@@ -1880,7 +1875,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     }
 
     // Used to indicate value will be discarded (eg, where to put return value from a call)
-    public class CompValuVoid: CompValuTemp
+    public class CompValuVoid : CompValuTemp
     {
         public CompValuVoid(Token token) : base((token is TokenTypeVoid) ? (TokenTypeVoid)token : new TokenTypeVoid(token))
         {

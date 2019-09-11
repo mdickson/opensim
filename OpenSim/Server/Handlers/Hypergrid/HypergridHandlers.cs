@@ -24,18 +24,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Net;
-using System.Reflection;
-
-using OpenSim.Services.Interfaces;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-
 using log4net;
 using Nwc.XmlRpc;
 using OpenMetaverse;
+using OpenSim.Services.Interfaces;
+using System.Collections;
+using System.Net;
+using System.Reflection;
+using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Server.Handlers.Hypergrid
 {

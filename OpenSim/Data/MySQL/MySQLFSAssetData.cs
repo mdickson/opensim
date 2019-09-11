@@ -25,15 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Data;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
 using log4net;
 using MySql.Data.MySqlClient;
 using OpenMetaverse;
+using OpenSim.Framework;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Reflection;
 
 namespace OpenSim.Data.MySQL
 {
@@ -227,7 +226,7 @@ namespace OpenSim.Data.MySQL
                     cmd.Parameters.AddWithValue("?id", meta.ID);
                     cmd.Parameters.AddWithValue("?name", meta.Name);
                     cmd.Parameters.AddWithValue("?description", meta.Description);
-//                    cmd.Parameters.AddWithValue("?type", meta.Type.ToString());
+                    //                    cmd.Parameters.AddWithValue("?type", meta.Type.ToString());
                     cmd.Parameters.AddWithValue("?type", meta.Type);
                     cmd.Parameters.AddWithValue("?hash", hash);
                     cmd.Parameters.AddWithValue("?asset_flags", meta.Flags);
@@ -247,16 +246,16 @@ namespace OpenSim.Data.MySQL
 
                 }
 
-//                return false;
+                //                return false;
                 // if the asset already exits
                 // assume it was already correctly stored
                 // or regions will keep retry.
                 return true;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 m_log.Error("[FSAssets] Failed to store asset with ID " + meta.ID);
-        m_log.Error(e.ToString());
+                m_log.Error(e.ToString());
                 return false;
             }
         }
@@ -329,9 +328,9 @@ namespace OpenSim.Data.MySQL
                     return 0;
                 }
 
-                using(MySqlCommand cmd = conn.CreateCommand())
+                using (MySqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = String.Format("select count(*) as count from {0}",m_Table);
+                    cmd.CommandText = String.Format("select count(*) as count from {0}", m_Table);
 
                     using (IDataReader reader = cmd.ExecuteReader())
                     {
@@ -348,10 +347,10 @@ namespace OpenSim.Data.MySQL
 
         public bool Delete(string id)
         {
-            using(MySqlCommand cmd = new MySqlCommand())
+            using (MySqlCommand cmd = new MySqlCommand())
             {
 
-                cmd.CommandText = String.Format("delete from {0} where id = ?id",m_Table);
+                cmd.CommandText = String.Format("delete from {0} where id = ?id", m_Table);
 
                 cmd.Parameters.AddWithValue("?id", id);
 

@@ -25,26 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Net;
-using System.Reflection;
 using log4net;
-using Nini.Config;
-using Nwc.XmlRpc;
 using Mono.Addins;
+using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Servers;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using PresenceInfo = OpenSim.Services.Interfaces.PresenceInfo;
-using OpenSim.Services.Interfaces;
-using OpenSim.Services.Connectors.InstantMessage;
-using OpenSim.Services.Connectors.Hypergrid;
 using OpenSim.Server.Handlers.Hypergrid;
+using OpenSim.Services.Connectors.Hypergrid;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
 {
@@ -143,14 +137,14 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
             // Try root avatar only first
             foreach (Scene scene in m_Scenes)
             {
-//                m_log.DebugFormat(
-//                    "[HG INSTANT MESSAGE]: Looking for root agent {0} in {1}",
-//                    toAgentID.ToString(), scene.RegionInfo.RegionName);
+                //                m_log.DebugFormat(
+                //                    "[HG INSTANT MESSAGE]: Looking for root agent {0} in {1}",
+                //                    toAgentID.ToString(), scene.RegionInfo.RegionName);
                 ScenePresence sp = scene.GetScenePresence(toAgentID);
                 if (sp != null && !sp.IsChildAgent && !sp.IsDeleted)
                 {
                     // Local message
-//                  m_log.DebugFormat("[HG INSTANT MESSAGE]: Delivering IM to root agent {0} {1}", user.Name, toAgentID);
+                    //                  m_log.DebugFormat("[HG INSTANT MESSAGE]: Delivering IM to root agent {0} {1}", user.Name, toAgentID);
                     sp.ControllingClient.SendInstantMessage(im);
 
                     // Message sent
@@ -159,7 +153,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
                 }
             }
 
-//            m_log.DebugFormat("[HG INSTANT MESSAGE]: Delivering IM to {0} via XMLRPC", im.toAgentID);
+            //            m_log.DebugFormat("[HG INSTANT MESSAGE]: Delivering IM to {0} via XMLRPC", im.toAgentID);
             // Is the user a local user?
             string url = string.Empty;
             bool foreigner = false;
@@ -205,7 +199,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
             foreach (Scene scene in m_Scenes)
             {
                 ScenePresence sp = scene.GetScenePresence(toAgentID);
-                if(sp != null && !sp.IsChildAgent && !sp.IsDeleted)
+                if (sp != null && !sp.IsChildAgent && !sp.IsDeleted)
                 {
                     scene.EventManager.TriggerIncomingInstantMessage(gim);
                     successful = true;
@@ -269,7 +263,8 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
                         {
                             agentUUI = uasConn.GetUUI(fromAgent, toAgent);
                         }
-                        catch (Exception e) {
+                        catch (Exception e)
+                        {
                             m_log.Debug("[HG MESSAGE TRANSFER]: GetUUI call failed ", e);
                         }
 

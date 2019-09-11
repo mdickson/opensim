@@ -25,22 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Reflection;
-using System.IO;
-using System.Web;
 using log4net;
-using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Services.Interfaces;
-using Caps = OpenSim.Framework.Capabilities.Caps;
-using OSDMap = OpenMetaverse.StructuredData.OSDMap;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.IO;
+using System.Reflection;
+using System.Web;
 using OSDArray = OpenMetaverse.StructuredData.OSDArray;
+using OSDMap = OpenMetaverse.StructuredData.OSDMap;
 
 namespace OpenSim.Capabilities.Handlers
 {
@@ -58,7 +55,7 @@ namespace OpenSim.Capabilities.Handlers
 
         protected override byte[] ProcessRequest(string path, Stream request, IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
-//            m_log.DebugFormat("[GET_DISPLAY_NAMES]: called {0}", httpRequest.Url.Query);
+            //            m_log.DebugFormat("[GET_DISPLAY_NAMES]: called {0}", httpRequest.Url.Query);
 
             NameValueCollection query = HttpUtility.ParseQueryString(httpRequest.Url.Query);
             string[] ids = query.GetValues("ids");
@@ -70,22 +67,22 @@ namespace OpenSim.Capabilities.Handlers
                 return new byte[0];
             }
 
-            Dictionary<UUID,string> names = m_UserManagement.GetUsersNames(ids, UUID.Zero);
+            Dictionary<UUID, string> names = m_UserManagement.GetUsersNames(ids, UUID.Zero);
 
             OSDMap osdReply = new OSDMap();
             OSDArray agents = new OSDArray();
 
             osdReply["agents"] = agents;
-            foreach (KeyValuePair<UUID,string> kvp in names)
+            foreach (KeyValuePair<UUID, string> kvp in names)
             {
                 if (string.IsNullOrEmpty(kvp.Value))
                     continue;
-                if(kvp.Key == UUID.Zero)
+                if (kvp.Key == UUID.Zero)
                     continue;
 
-                string[] parts = kvp.Value.Split(new char[] {' '});
+                string[] parts = kvp.Value.Split(new char[] { ' ' });
                 OSDMap osdname = new OSDMap();
-                if(parts[0] == "Unknown")
+                if (parts[0] == "Unknown")
                 {
                     osdname["display_name_next_update"] = OSD.FromDate(DateTime.UtcNow.AddHours(1));
                     osdname["display_name_expires"] = OSD.FromDate(DateTime.UtcNow.AddHours(2));

@@ -25,11 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using System;
 using System.Collections.Generic;
-using OpenMetaverse;
-using System.Text;
 using System.IO;
+using System.Text;
 using System.Xml;
 
 namespace OpenSim.Framework
@@ -49,10 +49,10 @@ namespace OpenSim.Framework
 
         public PhysicsInertiaData(PhysicsInertiaData source)
         {
-           TotalMass = source.TotalMass;
-           CenterOfMass = source.CenterOfMass;
-           Inertia = source.Inertia;
-           InertiaRotation = source.InertiaRotation;
+            TotalMass = source.TotalMass;
+            CenterOfMass = source.CenterOfMass;
+            Inertia = source.Inertia;
+            InertiaRotation = source.InertiaRotation;
         }
 
         private XmlTextWriter writer;
@@ -190,12 +190,12 @@ namespace OpenSim.Framework
             bool error;
             PhysicsInertiaData v;
             UTF8Encoding enc = new UTF8Encoding();
-            using(MemoryStream ms = new MemoryStream(enc.GetBytes(text)))
-                using(XmlTextReader xreader = new XmlTextReader(ms))
-                {
-                    v = new PhysicsInertiaData();
-                    v.FromXml2(xreader, out error);
-                }
+            using (MemoryStream ms = new MemoryStream(enc.GetBytes(text)))
+            using (XmlTextReader xreader = new XmlTextReader(ms))
+            {
+                v = new PhysicsInertiaData();
+                v.FromXml2(xreader, out error);
+            }
 
             if (error)
                 return null;

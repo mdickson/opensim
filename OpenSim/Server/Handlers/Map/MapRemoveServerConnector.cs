@@ -25,22 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Server.Base;
+using OpenSim.Server.Handlers.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Xml;
-
-using Nini.Config;
-using log4net;
-using OpenMetaverse;
-
-using OpenSim.Framework;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Server.Handlers.Base;
-
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Server.Handlers.MapImage
@@ -101,9 +98,9 @@ namespace OpenSim.Server.Handlers.MapImage
 
         public override byte[] Handle(string path, Stream requestData, IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
-//            m_log.DebugFormat("[MAP SERVICE IMAGE HANDLER]: Received {0}", path);
+            //            m_log.DebugFormat("[MAP SERVICE IMAGE HANDLER]: Received {0}", path);
             string body;
-            using(StreamReader sr = new StreamReader(requestData))
+            using (StreamReader sr = new StreamReader(requestData))
                 body = sr.ReadToEnd();
             body = body.Trim();
 
@@ -119,7 +116,7 @@ namespace OpenSim.Server.Handlers.MapImage
                 int x = 0, y = 0;
                 Int32.TryParse(request["X"].ToString(), out x);
                 Int32.TryParse(request["Y"].ToString(), out y);
-//                UUID scopeID = new UUID("07f8d88e-cd5e-4239-a0ed-843f75d09992");
+                //                UUID scopeID = new UUID("07f8d88e-cd5e-4239-a0ed-843f75d09992");
                 UUID scopeID = UUID.Zero;
                 if (request.ContainsKey("SCOPE"))
                     UUID.TryParse(request["SCOPE"].ToString(), out scopeID);
@@ -215,22 +212,22 @@ namespace OpenSim.Server.Handlers.MapImage
 
         private byte[] DocToBytes(XmlDocument doc)
         {
-            using(MemoryStream ms = new MemoryStream())
+            using (MemoryStream ms = new MemoryStream())
             {
-                using(XmlTextWriter xw = new XmlTextWriter(ms,null))
+                using (XmlTextWriter xw = new XmlTextWriter(ms, null))
                 {
                     xw.Formatting = Formatting.Indented;
                     doc.WriteTo(xw);
                     xw.Flush();
                 }
-            return ms.ToArray();
+                return ms.ToArray();
             }
         }
 
         private System.Net.IPAddress GetCallerIP(IOSHttpRequest request)
         {
-//            if (!m_Proxy)
-//                return request.RemoteIPEndPoint.Address;
+            //            if (!m_Proxy)
+            //                return request.RemoteIPEndPoint.Address;
 
             // We're behind a proxy
             string xff = "X-Forwarded-For";
@@ -240,7 +237,7 @@ namespace OpenSim.Server.Handlers.MapImage
 
             if (xffValue == null || (xffValue != null && xffValue == string.Empty))
             {
-//                m_log.WarnFormat("[MAP IMAGE HANDLER]: No XFF header");
+                //                m_log.WarnFormat("[MAP IMAGE HANDLER]: No XFF header");
                 return request.RemoteIPEndPoint.Address;
             }
 

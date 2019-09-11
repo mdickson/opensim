@@ -25,20 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using Mono.Addins;
 using OpenSim.Framework;
 using OpenSim.Region.CoreModules.World.WorldMap;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.Hypergrid
 {
@@ -64,7 +63,7 @@ namespace OpenSim.Region.CoreModules.Hypergrid
             {
                 m_Enabled = true;
 
-                m_MapImageServerURL = Util.GetConfigVarFromSections<string>(source, "MapTileURL", new string[] {"LoginService", "HGWorldMap", "SimulatorFeatures"});
+                m_MapImageServerURL = Util.GetConfigVarFromSections<string>(source, "MapTileURL", new string[] { "LoginService", "HGWorldMap", "SimulatorFeatures" });
 
                 if (!string.IsNullOrEmpty(m_MapImageServerURL))
                 {
@@ -150,7 +149,7 @@ namespace OpenSim.Region.CoreModules.Hypergrid
 
         protected override List<MapBlockData> GetAndSendBlocksInternal(IClientAPI remoteClient, int minX, int minY, int maxX, int maxY, uint flag)
         {
-            List<MapBlockData>  mapBlocks = base.GetAndSendBlocksInternal(remoteClient, minX, minY, maxX, maxY, flag);
+            List<MapBlockData> mapBlocks = base.GetAndSendBlocksInternal(remoteClient, minX, minY, maxX, maxY, flag);
             lock (m_SeenMapBlocks)
             {
                 if (!m_SeenMapBlocks.ContainsKey(remoteClient.AgentId))
@@ -162,7 +161,7 @@ namespace OpenSim.Region.CoreModules.Hypergrid
                     List<MapBlockData> seen = m_SeenMapBlocks[remoteClient.AgentId];
                     List<MapBlockData> newBlocks = new List<MapBlockData>();
                     foreach (MapBlockData b in mapBlocks)
-                        if (seen.Find(delegate(MapBlockData bdata) { return bdata.X == b.X && bdata.Y == b.Y; }) == null)
+                        if (seen.Find(delegate (MapBlockData bdata) { return bdata.X == b.X && bdata.Y == b.Y; }) == null)
                             newBlocks.Add(b);
                     seen.AddRange(newBlocks);
                 }

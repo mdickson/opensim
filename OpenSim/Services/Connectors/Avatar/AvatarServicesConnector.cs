@@ -26,18 +26,15 @@
  */
 
 using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
-using Nini.Config;
-using OpenSim.Framework;
-using OpenSim.Framework.ServiceAuth;
-using OpenSim.Services.Interfaces;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 using IAvatarService = OpenSim.Services.Interfaces.IAvatarService;
-using OpenSim.Server.Base;
-using OpenMetaverse;
 
 namespace OpenSim.Services.Connectors
 {
@@ -98,7 +95,7 @@ namespace OpenSim.Services.Connectors
         public bool SetAppearance(UUID userID, AvatarAppearance appearance)
         {
             AvatarData avatar = new AvatarData(appearance);
-            return SetAvatar(userID,avatar);
+            return SetAvatar(userID, avatar);
         }
 
         public AvatarData GetAvatar(UUID userID)

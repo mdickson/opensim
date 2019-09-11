@@ -25,30 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Reflection;
-using System.IO;
-using System.Web;
-using log4net;
-using Nini.Config;
 using Mono.Addins;
+using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using OpenMetaverse.Imaging;
 using OpenSim.Framework;
 using OpenSim.Framework.Console;
-using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using Caps = OpenSim.Framework.Capabilities.Caps;
-using OpenSim.Capabilities.Handlers;
 
 namespace OpenSim.Region.ClientStack.Linden
 {
@@ -56,8 +45,8 @@ namespace OpenSim.Region.ClientStack.Linden
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "RegionConsoleModule")]
     public class RegionConsoleModule : INonSharedRegionModule, IRegionConsole
     {
-//        private static readonly ILog m_log =
-//            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log =
+        //            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private Scene m_scene;
         private IEventQueue m_eventQueue;
@@ -68,7 +57,7 @@ namespace OpenSim.Region.ClientStack.Linden
 
         public void Initialise(IConfigSource source)
         {
-            m_commands.AddCommand( "Help", false, "help", "help [<item>]", "Display help on a particular command or on a list of commands in a category", Help);
+            m_commands.AddCommand("Help", false, "help", "help [<item>]", "Display help on a particular command or on a list of commands in a category", Help);
         }
 
         public void AddRegion(Scene s)
@@ -104,12 +93,12 @@ namespace OpenSim.Region.ClientStack.Linden
 
         public void RegisterCaps(UUID agentID, Caps caps)
         {
-//            if (!m_scene.RegionInfo.EstateSettings.IsEstateManagerOrOwner(agentID) && !m_scene.Permissions.IsGod(agentID))
-//                return;
+            //            if (!m_scene.RegionInfo.EstateSettings.IsEstateManagerOrOwner(agentID) && !m_scene.Permissions.IsGod(agentID))
+            //                return;
 
             UUID capID = UUID.Random();
 
-//            m_log.DebugFormat("[REGION CONSOLE]: /CAPS/{0} in region {1}", capID, m_scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[REGION CONSOLE]: /CAPS/{0} in region {1}", capID, m_scene.RegionInfo.RegionName);
             caps.RegisterHandler(
                     "SimConsoleAsync",
                     new ConsoleHandler("/CAPS/" + capID + "/", "SimConsoleAsync", agentID, this, m_scene));
@@ -124,7 +113,7 @@ namespace OpenSim.Region.ClientStack.Linden
             ConsoleMessage handlerConsoleMessage = OnConsoleMessage;
 
             if (handlerConsoleMessage != null)
-                handlerConsoleMessage( agentID, message);
+                handlerConsoleMessage(agentID, message);
         }
 
         public bool RunCommand(string command, UUID invokerID)
@@ -164,8 +153,8 @@ namespace OpenSim.Region.ClientStack.Linden
 
     public class ConsoleHandler : BaseStreamHandler
     {
-//        private static readonly ILog m_log =
-//            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log =
+        //            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private RegionConsoleModule m_consoleModule;
         private UUID m_agentID;
@@ -174,7 +163,7 @@ namespace OpenSim.Region.ClientStack.Linden
         private bool m_consoleIsOn = false;
 
         public ConsoleHandler(string path, string name, UUID agentID, RegionConsoleModule module, Scene scene)
-                :base("POST", path, name, agentID.ToString())
+                : base("POST", path, name, agentID.ToString())
         {
             m_agentID = agentID;
             m_consoleModule = module;
@@ -186,7 +175,7 @@ namespace OpenSim.Region.ClientStack.Linden
         protected override byte[] ProcessRequest(string path, Stream request, IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
             string message;
-            using(StreamReader reader = new StreamReader(request))
+            using (StreamReader reader = new StreamReader(request))
                 message = reader.ReadToEnd();
 
             OSD osd = OSDParser.DeserializeLLSDXml(message);

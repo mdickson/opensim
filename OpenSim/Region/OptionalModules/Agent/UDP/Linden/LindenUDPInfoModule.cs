@@ -25,21 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Console;
 using OpenSim.Framework.Monitoring;
 using OpenSim.Region.ClientStack.LindenUDP;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace OpenSim.Region.OptionalModules.UDP.Linden
 {
@@ -62,22 +61,22 @@ namespace OpenSim.Region.OptionalModules.UDP.Linden
 
         public void Initialise(IConfigSource source)
         {
-//            m_log.DebugFormat("[LINDEN UDP INFO MODULE]: INITIALIZED MODULE");
+            //            m_log.DebugFormat("[LINDEN UDP INFO MODULE]: INITIALIZED MODULE");
         }
 
         public void PostInitialise()
         {
-//            m_log.DebugFormat("[LINDEN UDP INFO MODULE]: POST INITIALIZED MODULE");
+            //            m_log.DebugFormat("[LINDEN UDP INFO MODULE]: POST INITIALIZED MODULE");
         }
 
         public void Close()
         {
-//            m_log.DebugFormat("[LINDEN UDP INFO MODULE]: CLOSED MODULE");
+            //            m_log.DebugFormat("[LINDEN UDP INFO MODULE]: CLOSED MODULE");
         }
 
         public void AddRegion(Scene scene)
         {
-//            m_log.DebugFormat("[LINDEN UDP INFO MODULE]: REGION {0} ADDED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[LINDEN UDP INFO MODULE]: REGION {0} ADDED", scene.RegionInfo.RegionName);
 
             lock (m_scenes)
                 m_scenes[scene.RegionInfo.RegionID] = scene;
@@ -128,7 +127,7 @@ namespace OpenSim.Region.OptionalModules.UDP.Linden
 
         public void RemoveRegion(Scene scene)
         {
-//            m_log.DebugFormat("[LINDEN UDP INFO MODULE]: REGION {0} REMOVED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[LINDEN UDP INFO MODULE]: REGION {0} REMOVED", scene.RegionInfo.RegionName);
 
             lock (m_scenes)
                 m_scenes.Remove(scene.RegionInfo.RegionID);
@@ -136,7 +135,7 @@ namespace OpenSim.Region.OptionalModules.UDP.Linden
 
         public void RegionLoaded(Scene scene)
         {
-//            m_log.DebugFormat("[LINDEN UDP INFO MODULE]: REGION {0} LOADED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[LINDEN UDP INFO MODULE]: REGION {0} LOADED", scene.RegionInfo.RegionName);
         }
 
         protected string HandleImageQueuesClear(string[] cmd)
@@ -184,7 +183,7 @@ namespace OpenSim.Region.OptionalModules.UDP.Linden
         protected string GetColumnEntry(string entry, int maxLength, int columnPadding)
         {
             return string.Format(
-                "{0,-" + maxLength +  "}{1,-" + columnPadding + "}",
+                "{0,-" + maxLength + "}{1,-" + columnPadding + "}",
                 entry.Length > maxLength ? entry.Substring(0, maxLength) : entry,
                 "");
         }
@@ -210,7 +209,7 @@ namespace OpenSim.Region.OptionalModules.UDP.Linden
             int maxNameLength = 18;
             int maxRegionNameLength = 14;
             int maxTypeLength = 4;
-//            int totalInfoFieldsLength = maxNameLength + columnPadding + maxRegionNameLength + columnPadding + maxTypeLength + columnPadding;
+            //            int totalInfoFieldsLength = maxNameLength + columnPadding + maxRegionNameLength + columnPadding + maxTypeLength + columnPadding;
 
             report.Append(GetColumnEntry("User", maxNameLength, columnPadding));
             report.Append(GetColumnEntry("Region", maxRegionNameLength, columnPadding));
@@ -236,7 +235,7 @@ namespace OpenSim.Region.OptionalModules.UDP.Linden
                 foreach (Scene scene in m_scenes.Values)
                 {
                     scene.ForEachClient(
-                        delegate(IClientAPI client)
+                        delegate (IClientAPI client)
                         {
                             if (client is LLClientView)
                             {
@@ -375,7 +374,7 @@ namespace OpenSim.Region.OptionalModules.UDP.Linden
                 "Q Pkts",
                 "Q Pkts");
 
-            report.AppendFormat("{0,-" + totalInfoFieldsLength +  "}", "");
+            report.AppendFormat("{0,-" + totalInfoFieldsLength + "}", "");
             report.AppendFormat(
                 "{0,7} {1,7} {2,7} {3,7} {4,9} {5,7} {6,7} {7,7} {8,7} {9,7} {10,8} {11,7}\n",
                 "Last In",
@@ -396,7 +395,7 @@ namespace OpenSim.Region.OptionalModules.UDP.Linden
                 foreach (Scene scene in m_scenes.Values)
                 {
                     scene.ForEachClient(
-                        delegate(IClientAPI client)
+                        delegate (IClientAPI client)
                         {
                             if (client is IStatsCollector)
                             {
@@ -465,7 +464,7 @@ namespace OpenSim.Region.OptionalModules.UDP.Linden
                 "Texture",
                 "Asset");
 
-            report.AppendFormat("{0,-" + totalInfoFieldsLength +  "}", "");
+            report.AppendFormat("{0,-" + totalInfoFieldsLength + "}", "");
             report.AppendFormat(
                 "{0,8} {1,8} {2,7} {3,8} {4,7} {5,7} {6,7} {7,7} {8,9} {9,7}\n",
                 "kb/s",
@@ -486,7 +485,7 @@ namespace OpenSim.Region.OptionalModules.UDP.Linden
                 foreach (Scene scene in m_scenes.Values)
                 {
                     scene.ForEachClient(
-                        delegate(IClientAPI client)
+                        delegate (IClientAPI client)
                         {
                             if (client is LLClientView)
                             {
@@ -521,8 +520,8 @@ namespace OpenSim.Region.OptionalModules.UDP.Linden
                                     (ci.windThrottle * 8) / 1000,
                                     (ci.cloudThrottle * 8) / 1000,
                                     (ci.taskThrottle * 8) / 1000,
-                                    (ci.textureThrottle  * 8) / 1000,
-                                    (ci.assetThrottle  * 8) / 1000);
+                                    (ci.textureThrottle * 8) / 1000,
+                                    (ci.assetThrottle * 8) / 1000);
                             }
                         });
                 }

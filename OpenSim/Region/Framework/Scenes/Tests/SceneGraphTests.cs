@@ -25,14 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.IO;
-using System.Reflection;
-using System.Text;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Region.Framework.Scenes;
 using OpenSim.Tests.Common;
 
 namespace OpenSim.Region.Framework.Scenes.Tests
@@ -44,7 +39,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public void TestDuplicateObject()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             Scene scene = new SceneHelpers().SetupScene();
 
@@ -56,11 +51,11 @@ namespace OpenSim.Region.Framework.Scenes.Tests
 
             SceneObjectPart part1
                 = new SceneObjectPart(ownerId, PrimitiveBaseShape.Default, Vector3.Zero, Quaternion.Identity, Vector3.Zero)
-                    { Name = part1Name, UUID = part1Id };
+                { Name = part1Name, UUID = part1Id };
             SceneObjectGroup so = new SceneObjectGroup(part1);
             SceneObjectPart part2
                 = new SceneObjectPart(ownerId, PrimitiveBaseShape.Default, Vector3.Zero, Quaternion.Identity, Vector3.Zero)
-                    { Name = part2Name, UUID = part2Id };
+                { Name = part2Name, UUID = part2Id };
             so.AddPart(part2);
 
             scene.AddNewSceneObject(so, false);
@@ -85,7 +80,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
             Assert.That(dupePart2.PhysActor, Is.Not.Null);
             */
 
-//            TestHelpers.DisableLogging();
+            //            TestHelpers.DisableLogging();
         }
     }
 }

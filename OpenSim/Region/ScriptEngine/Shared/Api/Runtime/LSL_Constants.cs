@@ -25,10 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using vector = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Vector3;
-using rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
 using LSLInteger = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
+using rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
+using vector = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Vector3;
 
 namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 {
@@ -893,26 +892,26 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
         // Constants for osTeleportObject
 
         //ApiDesc osTeleportObject no flags
-        public const int OSTPOBJ_NONE           = 0x0;
+        public const int OSTPOBJ_NONE = 0x0;
         //ApiDesc osTeleportObject flag: stop at destination
-        public const int OSTPOBJ_STOPATTARGET   = 0x1;
+        public const int OSTPOBJ_STOPATTARGET = 0x1;
         //ApiDesc osTeleportObject flag: stop at jump point if tp fails
-        public const int OSTPOBJ_STOPONFAIL     = 0x2;
+        public const int OSTPOBJ_STOPONFAIL = 0x2;
         //ApiDesc osTeleportObject flag: the rotation is the final rotation, otherwise is a added rotation
-        public const int OSTPOBJ_SETROT         = 0x4;
+        public const int OSTPOBJ_SETROT = 0x4;
 
         //ApiDesc osLocalTeleportAgent no flags
-        public const int OS_LTPAG_NONE          = 0x0;
+        public const int OS_LTPAG_NONE = 0x0;
         //ApiDesc osLocalTeleportAgent use velocity
-        public const int OS_LTPAG_USEVEL        = 0x1;
+        public const int OS_LTPAG_USEVEL = 0x1;
         //ApiDesc osLocalTeleportAgent use lookat
-        public const int OS_LTPAG_USELOOKAT     = 0x2;
+        public const int OS_LTPAG_USELOOKAT = 0x2;
         //ApiDesc osLocalTeleportAgent align lookat to velocity
-        public const int OS_LTPAG_ALGNLV        = 0x4;
+        public const int OS_LTPAG_ALGNLV = 0x4;
         //ApiDesc osLocalTeleportAgent force fly
-        public const int OS_LTPAG_FORCEFLY      = 0x8;
+        public const int OS_LTPAG_FORCEFLY = 0x8;
         //ApiDesc osLocalTeleportAgent force no fly
-        public const int OS_LTPAG_FORCENOFLY    = 0x16;
+        public const int OS_LTPAG_FORCENOFLY = 0x16;
 
         // Constants for Windlight
         public const int WL_WATER_COLOR = 0;

@@ -28,15 +28,14 @@
 using log4net;
 using Mono.Addins;
 using Nini.Config;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
+using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Server.Base;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-using OpenMetaverse;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Land
 {
@@ -121,8 +120,8 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Land
         public LandData GetLandData(UUID scopeID, ulong regionHandle, uint x, uint y, out byte regionAccess)
         {
             regionAccess = 2;
-//            m_log.DebugFormat("[LAND CONNECTOR]: request for land data in {0} at {1}, {2}",
-//                  regionHandle, x, y);
+            //            m_log.DebugFormat("[LAND CONNECTOR]: request for land data in {0} at {1}, {2}",
+            //                  regionHandle, x, y);
 
             uint rx = 0, ry = 0;
             Util.RegionHandleToWorldLoc(regionHandle, out rx, out ry);
@@ -130,16 +129,16 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Land
             foreach (Scene s in m_Scenes)
             {
                 uint t = s.RegionInfo.WorldLocX;
-                if( rx < t)
+                if (rx < t)
                     continue;
                 t += s.RegionInfo.RegionSizeX;
-                if( rx >= t)
+                if (rx >= t)
                     continue;
                 t = s.RegionInfo.WorldLocY;
-                if( ry < t)
+                if (ry < t)
                     continue;
                 t += s.RegionInfo.RegionSizeY;
-                if( ry  < t)
+                if (ry < t)
                 {
                     LandData land = s.GetLandData(x, y);
                     regionAccess = s.RegionInfo.AccessLevel;

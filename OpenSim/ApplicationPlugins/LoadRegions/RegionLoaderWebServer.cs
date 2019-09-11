@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenSim.Framework;
 using System;
 using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Xml;
-using log4net;
-using Nini.Config;
-using OpenSim.Framework;
 
 namespace OpenSim.ApplicationPlugins.LoadRegions
 {

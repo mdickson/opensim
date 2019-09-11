@@ -25,9 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -35,8 +32,9 @@ using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-
-using OpenSim.Region.CoreModules.World.Wind;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules
 {
@@ -67,7 +65,7 @@ namespace OpenSim.Region.CoreModules
         public void Initialise(IConfigSource config)
         {
             m_windConfig = config.Configs["Wind"];
-//            string desiredWindPlugin = m_dWindPluginName;
+            //            string desiredWindPlugin = m_dWindPluginName;
 
             if (m_windConfig != null)
             {
@@ -183,7 +181,7 @@ namespace OpenSim.Region.CoreModules
 
             //  Remove our hooks
             m_scene.EventManager.OnFrame -= WindUpdate;
-//            m_scene.EventManager.OnMakeRootAgent -= OnAgentEnteredRegion;
+            //            m_scene.EventManager.OnMakeRootAgent -= OnAgentEnteredRegion;
 
         }
 
@@ -424,7 +422,7 @@ namespace OpenSim.Region.CoreModules
                 try
                 {
                     GenWind();
-                    m_scene.ForEachClient(delegate(IClientAPI client)
+                    m_scene.ForEachClient(delegate (IClientAPI client)
                     {
                         client.SendWindData(m_dataVersion, windSpeeds);
                     });

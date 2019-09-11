@@ -25,12 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenSim.Framework.Serialization;
+using OpenSim.Region.Framework.Scenes;
 using System;
 using System.IO;
 using System.Net;
-using OpenMetaverse;
-using OpenSim.Framework.Serialization;
-using OpenSim.Region.Framework.Scenes;
 
 namespace OpenSim.Region.CoreModules.World.Archiver
 {
@@ -104,12 +103,12 @@ namespace OpenSim.Region.CoreModules.World.Archiver
 
         public static Stream URIFetch(Uri uri)
         {
-            HttpWebRequest request  = (HttpWebRequest)WebRequest.Create(uri);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
 
             // request.Credentials = credentials;
 
             request.ContentLength = 0;
-            request.KeepAlive     = false;
+            request.KeepAlive = false;
 
             WebResponse response = request.GetResponse();
             Stream file = response.GetResponseStream();

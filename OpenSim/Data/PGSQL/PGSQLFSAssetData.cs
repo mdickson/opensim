@@ -25,16 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Npgsql;
+using OpenMetaverse;
+using OpenSim.Framework;
 using System;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Data;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using log4net;
-using OpenMetaverse;
-using Npgsql;
-using NpgsqlTypes;
+using System.Reflection;
 
 namespace OpenSim.Data.PGSQL
 {
@@ -80,7 +78,7 @@ namespace OpenSim.Data.PGSQL
         {
             get { return GetType().Assembly; }
         }
-        
+
         #region IPlugin Members
 
         public string Version { get { return "1.0.0.0"; } }
@@ -161,8 +159,8 @@ namespace OpenSim.Data.PGSQL
                 string query = String.Format("UPDATE {0} SET \"access_time\" = :access_time WHERE \"id\" = :id", m_Table);
                 if (existingAsset == null)
                 {
-                   query = String.Format("insert into {0} (\"id\", \"type\", \"hash\", \"asset_flags\", \"create_time\", \"access_time\") values ( :id, :type, :hash, :asset_flags, :create_time, :access_time)", m_Table);
-                   found = true;
+                    query = String.Format("insert into {0} (\"id\", \"type\", \"hash\", \"asset_flags\", \"create_time\", \"access_time\") values ( :id, :type, :hash, :asset_flags, :create_time, :access_time)", m_Table);
+                    found = true;
                 }
 
                 using (NpgsqlConnection dbcon = new NpgsqlConnection(m_connectionString))
@@ -180,10 +178,10 @@ namespace OpenSim.Data.PGSQL
                 }
                 return found;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 m_log.Error("[PGSQL FSASSETS] Failed to store asset with ID " + meta.ID);
-		        m_log.Error(e.ToString());
+                m_log.Error(e.ToString());
                 return false;
             }
         }
@@ -210,7 +208,7 @@ namespace OpenSim.Data.PGSQL
                 {
                     while (reader.Read())
                     {
-                        UUID id = DBGuid.FromDB(reader["id"]);;
+                        UUID id = DBGuid.FromDB(reader["id"]); ;
                         exists.Add(id);
                     }
                 }
@@ -257,7 +255,7 @@ namespace OpenSim.Data.PGSQL
         {
             int imported = 0;
             string limit = String.Empty;
-            if(count != -1)
+            if (count != -1)
             {
                 limit = String.Format(" limit {0} offset {1}", start, count);
             }
@@ -278,7 +276,7 @@ namespace OpenSim.Data.PGSQL
                             {
                                 MainConsole.Instance.Output(String.Format("{0} assets imported so far", imported));
                             }
-    
+
                             AssetBase asset = new AssetBase();
                             AssetMetadata meta = new AssetMetadata();
 

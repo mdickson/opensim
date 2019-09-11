@@ -25,7 +25,6 @@
  * THE SOFTWARE.
  */
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -58,7 +57,7 @@ namespace OpenSim.Region.PhysicsModules.ConvexDecompositionDotNet
             int i3 = vl.getIndex(p3);
 
             // do *not* process degenerate triangles!
-            if ( i1 != i2 && i1 != i3 && i2 != i3 )
+            if (i1 != i2 && i1 != i3 && i2 != i3)
             {
                 list.Add(i1);
                 list.Add(i2);

@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using OpenSim.Framework;
 using Nini.Config;
+using OpenSim.Framework;
+using System;
 
 namespace OpenSim.Region.ClientStack.LindenUDP
 {
@@ -98,7 +98,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 BurstTime *= 1e-3f;
 
                 // Adaptive is broken
-//                AdaptiveThrottlesEnabled = throttleConfig.GetBoolean("enable_adaptive_throttles", false);
+                //                AdaptiveThrottlesEnabled = throttleConfig.GetBoolean("enable_adaptive_throttles", false);
                 AdaptiveThrottlesEnabled = false;
                 MinimumAdaptiveThrottleRate = throttleConfig.GetInt("adaptive_throttle_min_bps", 32000);
             }

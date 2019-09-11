@@ -28,11 +28,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
-using OpenMetaverse.Interfaces;
-using System.Threading;
 using log4net;
+using OpenMetaverse.Interfaces;
+using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 
 #pragma warning disable 420
 namespace OpenSim.Framework

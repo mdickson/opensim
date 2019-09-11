@@ -25,24 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.IO;
-using System.Reflection;
-using System.Net;
-using System.Text;
-
-using OpenSim.Server.Base;
-using OpenSim.Server.Handlers.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Framework;
-using OpenSim.Framework.Servers.HttpServer;
-
+using log4net;
+using Nwc.XmlRpc;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using Nwc.XmlRpc;
-using Nini.Config;
-using log4net;
+using OpenSim.Framework;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Collections;
+using System.Net;
+using System.Reflection;
 
 
 namespace OpenSim.Server.Handlers.Login
@@ -76,17 +69,17 @@ namespace OpenSim.Server.Handlers.Login
             {
                 // Debug code to show exactly what login parameters the viewer is sending us.
                 // TODO: Extract into a method that can be generally applied if one doesn't already exist.
-//                foreach (string key in requestData.Keys)
-//                {
-//                    object value = requestData[key];
-//                    Console.WriteLine("{0}:{1}", key, value);
-//                    if (value is ArrayList)
-//                    {
-//                        ICollection col = value as ICollection;
-//                        foreach (object item in col)
-//                            Console.WriteLine("  {0}", item);
-//                    }
-//                }
+                //                foreach (string key in requestData.Keys)
+                //                {
+                //                    object value = requestData[key];
+                //                    Console.WriteLine("{0}:{1}", key, value);
+                //                    if (value is ArrayList)
+                //                    {
+                //                        ICollection col = value as ICollection;
+                //                        foreach (object item in col)
+                //                            Console.WriteLine("  {0}", item);
+                //                    }
+                //                }
 
                 if (requestData.ContainsKey("first") && requestData["first"] != null &&
                     requestData.ContainsKey("last") && requestData["last"] != null && (
@@ -221,7 +214,7 @@ namespace OpenSim.Server.Handlers.Login
 
                     LoginResponse reply = null;
                     reply = m_LocalService.Login(map["first"].AsString(), map["last"].AsString(), map["passwd"].AsString(), startLocation, scopeID,
-                        map["version"].AsString(), map["channel"].AsString(), map["mac"].AsString(), map["id0"].AsString(), remoteClient,false);
+                        map["version"].AsString(), map["channel"].AsString(), map["mac"].AsString(), map["id0"].AsString(), remoteClient, false);
                     return reply.ToOSDMap();
 
                 }
@@ -235,10 +228,10 @@ namespace OpenSim.Server.Handlers.Login
             sock.MaxPayloadSize = 16384; //16 kb payload
             sock.InitialMsgTimeout = 5000; //5 second first message to trigger at least one of these events
             sock.NoDelay_TCP_Nagle = true;
-            sock.OnData += delegate(object sender, WebsocketDataEventArgs data) { sock.Close("fail"); };
-            sock.OnPing += delegate(object sender, PingEventArgs pingdata) { sock.Close("fail"); };
-            sock.OnPong += delegate(object sender, PongEventArgs pongdata) { sock.Close("fail"); };
-            sock.OnText += delegate(object sender, WebsocketTextEventArgs text)
+            sock.OnData += delegate (object sender, WebsocketDataEventArgs data) { sock.Close("fail"); };
+            sock.OnPing += delegate (object sender, PingEventArgs pingdata) { sock.Close("fail"); };
+            sock.OnPong += delegate (object sender, PongEventArgs pongdata) { sock.Close("fail"); };
+            sock.OnText += delegate (object sender, WebsocketTextEventArgs text)
                                {
                                    OSD request = null;
                                    try
@@ -264,7 +257,7 @@ namespace OpenSim.Server.Handlers.Login
                                                (sender as WebSocketHttpServerHandler).GetRemoteIPEndpoint();
                                            LoginResponse reply = null;
                                            reply = m_LocalService.Login(first, last, passwd, start, scope, version,
-                                                                        channel, mac, id0, endPoint,false);
+                                                                        channel, mac, id0, endPoint, false);
                                            sock.SendMessage(OSDParser.SerializeJsonString(reply.ToOSDMap()));
 
                                        }

@@ -250,7 +250,7 @@ namespace OpenSim.Region.PhysicsModules.ConvexDecompositionDotNet
             float x = p.x;
             float y = p.y;
             float z = p.z;
-            float d = x*plane.x + y*plane.y + z*plane.z + plane.w;
+            float d = x * plane.x + y * plane.y + z * plane.z + plane.w;
             return d;
         }
 

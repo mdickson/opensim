@@ -25,17 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Npgsql;
+using OpenMetaverse;
+using OpenSim.Framework;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
-using log4net;
-using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Data;
 using RegionFlags = OpenSim.Framework.RegionFlags;
-using Npgsql;
 
 namespace OpenSim.Data.PGSQL
 {
@@ -70,7 +68,7 @@ namespace OpenSim.Data.PGSQL
                 m.Update();
             }
             LoadFieldTypes();
-         }
+        }
 
         private void LoadFieldTypes()
         {
@@ -98,7 +96,7 @@ namespace OpenSim.Data.PGSQL
 
         public List<RegionData> Get(string regionName, UUID scopeID)
         {
-            string sql = "select * from "+m_Realm+" where lower(\"regionName\") like lower(:regionName) ";
+            string sql = "select * from " + m_Realm + " where lower(\"regionName\") like lower(:regionName) ";
             if (scopeID != UUID.Zero)
                 sql += " and \"ScopeID\" = :scopeID";
             sql += " order by lower(\"regionName\")";
@@ -117,7 +115,7 @@ namespace OpenSim.Data.PGSQL
         public RegionData Get(int posX, int posY, UUID scopeID)
         {
             // extend database search for maximum region size area
-            string sql = "select * from "+m_Realm+" where \"locX\" between :startX and :endX and \"locY\" between :startY and :endY";
+            string sql = "select * from " + m_Realm + " where \"locX\" between :startX and :endX and \"locY\" between :startY and :endY";
             if (scopeID != UUID.Zero)
                 sql += " and \"ScopeID\" = :scopeID";
 
@@ -160,7 +158,7 @@ namespace OpenSim.Data.PGSQL
 
         public RegionData Get(UUID regionID, UUID scopeID)
         {
-            string sql = "select * from "+m_Realm+" where uuid = :regionID";
+            string sql = "select * from " + m_Realm + " where uuid = :regionID";
             if (scopeID != UUID.Zero)
                 sql += " and \"ScopeID\" = :scopeID";
             using (NpgsqlConnection conn = new NpgsqlConnection(m_ConnectionString))
@@ -181,7 +179,7 @@ namespace OpenSim.Data.PGSQL
         public List<RegionData> Get(int startX, int startY, int endX, int endY, UUID scopeID)
         {
             // extend database search for maximum region size area
-            string sql = "select * from "+m_Realm+" where \"locX\" between :startX and :endX and \"locY\" between :startY and :endY";
+            string sql = "select * from " + m_Realm + " where \"locX\" between :startX and :endX and \"locY\" between :startY and :endY";
             if (scopeID != UUID.Zero)
                 sql += " and \"ScopeID\" = :scopeID";
 
@@ -205,7 +203,7 @@ namespace OpenSim.Data.PGSQL
 
             List<RegionData> ret = new List<RegionData>();
 
-            if(dbret.Count == 0)
+            if (dbret.Count == 0)
                 return ret;
 
             foreach (RegionData r in dbret)

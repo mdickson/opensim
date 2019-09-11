@@ -25,17 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Server.Base;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-
-using OpenSim.Services.Interfaces;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using OpenSim.Server.Base;
-using OpenSim.Framework;
-
-using OpenMetaverse;
-using log4net;
 
 namespace OpenSim.Services.Connectors.Friends
 {
@@ -144,7 +141,8 @@ namespace OpenSim.Services.Connectors.Friends
 
         private bool Call(GridRegion region, Dictionary<string, object> sendData)
         {
-            Util.FireAndForget(x => {
+            Util.FireAndForget(x =>
+            {
                 string reqString = ServerUtils.BuildQueryString(sendData);
                 //m_log.DebugFormat("[FRIENDS SIM CONNECTOR]: queryString = {0}", reqString);
                 if (region == null)
@@ -165,9 +163,9 @@ namespace OpenSim.Services.Connectors.Friends
 
                         if (replyData.ContainsKey("RESULT"))
                         {
-//                            if (replyData["RESULT"].ToString().ToLower() == "true")
-//                                return;
-//                            else
+                            //                            if (replyData["RESULT"].ToString().ToLower() == "true")
+                            //                                return;
+                            //                            else
                             return;
                         }
                         else

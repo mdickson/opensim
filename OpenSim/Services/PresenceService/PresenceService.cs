@@ -25,17 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Reflection;
-using Nini.Config;
 using log4net;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
+using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Data;
 using OpenSim.Services.Interfaces;
-using OpenMetaverse;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Services.PresenceService
 {
@@ -173,8 +170,8 @@ namespace OpenSim.Services.PresenceService
                     info.Add(ret);
                 }
 
-//                m_log.DebugFormat(
-//                    "[PRESENCE SERVICE]: GetAgents for {0} found {1} presences", userIDStr, data.Length);
+                //                m_log.DebugFormat(
+                //                    "[PRESENCE SERVICE]: GetAgents for {0} found {1} presences", userIDStr, data.Length);
             }
 
             return info.ToArray();

@@ -25,21 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Mono.Addins;
+using NDesk.Options;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using log4net;
-using NDesk.Options;
-using Nini.Config;
-using Mono.Addins;
-
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-
-using OpenMetaverse;
 
 namespace OpenSim.Region.CoreModules.World.Archiver
 {
@@ -114,15 +111,15 @@ namespace OpenSim.Region.CoreModules.World.Archiver
             bool debug = false;
 
             OptionSet options = new OptionSet();
-            options.Add("m|merge", delegate(string v) { mergeOar = (v != null); });
-            options.Add("s|skip-assets", delegate(string v) { skipAssets = (v != null); });
-            options.Add("force-terrain", delegate(string v) { forceTerrain = (v != null); });
-            options.Add("forceterrain", delegate(string v) { forceTerrain = (v != null); });   // downward compatibility
-            options.Add("force-parcels", delegate(string v) { forceParcels = (v != null); });
-            options.Add("forceparcels", delegate(string v) { forceParcels = (v != null); });   // downward compatibility
-            options.Add("no-objects", delegate(string v) { noObjects = (v != null); });
-            options.Add("default-user=", delegate(string v) { defaultUser = (v == null) ? "" : v; });
-            options.Add("displacement=", delegate(string v)
+            options.Add("m|merge", delegate (string v) { mergeOar = (v != null); });
+            options.Add("s|skip-assets", delegate (string v) { skipAssets = (v != null); });
+            options.Add("force-terrain", delegate (string v) { forceTerrain = (v != null); });
+            options.Add("forceterrain", delegate (string v) { forceTerrain = (v != null); });   // downward compatibility
+            options.Add("force-parcels", delegate (string v) { forceParcels = (v != null); });
+            options.Add("forceparcels", delegate (string v) { forceParcels = (v != null); });   // downward compatibility
+            options.Add("no-objects", delegate (string v) { noObjects = (v != null); });
+            options.Add("default-user=", delegate (string v) { defaultUser = (v == null) ? "" : v; });
+            options.Add("displacement=", delegate (string v)
             {
                 try
                 {
@@ -135,7 +132,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                     return;
                 }
             });
-            options.Add("rotation=", delegate(string v)
+            options.Add("rotation=", delegate (string v)
             {
                 try
                 {
@@ -150,7 +147,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                 //pass this in as degrees now, convert to radians later during actual work phase
                 rotation = Util.Clamp<float>(rotation, -359f, 359f);
             });
-            options.Add("rotation-center=", delegate(string v)
+            options.Add("rotation-center=", delegate (string v)
             {
                 try
                 {
@@ -164,7 +161,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                     return;
                 }
             });
-            options.Add("bounding-origin=", delegate(string v)
+            options.Add("bounding-origin=", delegate (string v)
             {
                 try
                 {
@@ -177,7 +174,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                     return;
                 }
             });
-            options.Add("bounding-size=", delegate(string v)
+            options.Add("bounding-size=", delegate (string v)
             {
                 try
                 {
@@ -190,7 +187,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                     return;
                 }
             });
-            options.Add("d|debug", delegate(string v) { debug = (v != null); });
+            options.Add("d|debug", delegate (string v) { debug = (v != null); });
 
             // Send a message to the region ready module
             /* bluewall* Disable this for the time being
@@ -204,10 +201,10 @@ namespace OpenSim.Region.CoreModules.World.Archiver
 
             List<string> mainParams = options.Parse(cmdparams);
 
-//            m_log.DebugFormat("MERGE OAR IS [{0}]", mergeOar);
-//
-//            foreach (string param in mainParams)
-//                m_log.DebugFormat("GOT PARAM [{0}]", param);
+            //            m_log.DebugFormat("MERGE OAR IS [{0}]", mergeOar);
+            //
+            //            foreach (string param in mainParams)
+            //                m_log.DebugFormat("GOT PARAM [{0}]", param);
 
             Dictionary<string, object> archiveOptions = new Dictionary<string, object>();
             if (mergeOar) archiveOptions.Add("merge", null);
@@ -264,14 +261,14 @@ namespace OpenSim.Region.CoreModules.World.Archiver
             OptionSet ops = new OptionSet();
 
             // legacy argument [obsolete]
-            ops.Add("p|profile=", delegate(string v) { Console.WriteLine("\n WARNING: -profile option is obsolete and it will not work. Use -home instead.\n"); });
+            ops.Add("p|profile=", delegate (string v) { Console.WriteLine("\n WARNING: -profile option is obsolete and it will not work. Use -home instead.\n"); });
             // preferred
-            ops.Add("h|home=", delegate(string v) { options["home"] = v; });
+            ops.Add("h|home=", delegate (string v) { options["home"] = v; });
 
-            ops.Add("noassets", delegate(string v) { options["noassets"] = v != null; });
+            ops.Add("noassets", delegate (string v) { options["noassets"] = v != null; });
             ops.Add("publish", v => options["wipe-owners"] = v != null);
-            ops.Add("perm=", delegate(string v) { options["checkPermissions"] = v; });
-            ops.Add("all", delegate(string v) { options["all"] = v != null; });
+            ops.Add("perm=", delegate (string v) { options["checkPermissions"] = v; });
+            ops.Add("all", delegate (string v) { options["all"] = v != null; });
 
             List<string> mainParams = ops.Parse(cmdparams);
 
@@ -283,8 +280,8 @@ namespace OpenSim.Region.CoreModules.World.Archiver
 
             // Not doing this right now as this causes some problems with auto-backup systems.  Maybe a force flag is
             // needed
-//            if (!ConsoleUtil.CheckFileDoesNotExist(MainConsole.Instance, path))
-//                return;
+            //            if (!ConsoleUtil.CheckFileDoesNotExist(MainConsole.Instance, path))
+            //                return;
 
             ArchiveRegion(path, options);
         }

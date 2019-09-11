@@ -25,23 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using Nini.Config;
 using log4net;
-using System;
-using System.Reflection;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml;
-using System.Xml.Serialization;
-using System.Collections.Generic;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Framework.ServiceAuth;
 using OpenSim.Server.Base;
 using OpenSim.Services.Interfaces;
-using OpenSim.Framework;
-using OpenSim.Framework.ServiceAuth;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenMetaverse;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Xml;
 
 namespace OpenSim.Server.Handlers.Authentication
 {
@@ -56,7 +52,8 @@ namespace OpenSim.Server.Handlers.Authentication
         private bool m_AllowSetPassword = false;
 
         public AuthenticationServerPostHandler(IAuthenticationService service) :
-                this(service, null, null) {}
+                this(service, null, null)
+        { }
 
         public AuthenticationServerPostHandler(IAuthenticationService service, IConfig config, IServiceAuth auth) :
                 base("POST", "/auth", auth)
@@ -74,27 +71,27 @@ namespace OpenSim.Server.Handlers.Authentication
         protected override byte[] ProcessRequest(string path, Stream request,
                 IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
-//            m_log.Error("[XXX]: Authenticating...");
+            //            m_log.Error("[XXX]: Authenticating...");
             string[] p = SplitParams(path);
 
             if (p.Length > 0)
             {
                 switch (p[0])
                 {
-                case "plain":
-                    string body;
-                    using(StreamReader sr = new StreamReader(request))
-                        body = sr.ReadToEnd();
-                    return DoPlainMethods(body);
+                    case "plain":
+                        string body;
+                        using (StreamReader sr = new StreamReader(request))
+                            body = sr.ReadToEnd();
+                        return DoPlainMethods(body);
 
-                case "crypt":
-                    byte[] buffer = new byte[request.Length];
-                    long length = request.Length;
-                    if (length > 16384)
-                        length = 16384;
-                    request.Read(buffer, 0, (int)length);
+                    case "crypt":
+                        byte[] buffer = new byte[request.Length];
+                        long length = request.Length;
+                        if (length > 16384)
+                            length = 16384;
+                        request.Read(buffer, 0, (int)length);
 
-                    return DoEncryptedMethods(buffer);
+                        return DoEncryptedMethods(buffer);
                 }
             }
             return new byte[0];

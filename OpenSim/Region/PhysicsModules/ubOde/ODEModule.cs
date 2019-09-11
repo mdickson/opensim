@@ -1,12 +1,12 @@
-﻿using System;
+﻿using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
-using log4net;
-using Nini.Config;
-using Mono.Addins;
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Interfaces;
 
 namespace OpenSim.Region.PhysicsModule.ubOde
 {
@@ -21,7 +21,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
         private bool OSOdeLib;
 
 
-       #region INonSharedRegionModule
+        #region INonSharedRegionModule
 
         public string Name
         {
@@ -76,7 +76,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             if (!m_Enabled)
                 return;
 
-            if(m_scenes.ContainsKey(scene)) // ???
+            if (m_scenes.ContainsKey(scene)) // ???
                 return;
             ODEScene newodescene = new ODEScene(scene, m_config, Name, Version, OSOdeLib);
             m_scenes[scene] = newodescene;
@@ -90,7 +90,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             // a odescene.dispose is called later directly by scene.cs
             // since it is seen as a module interface
 
-            if(m_scenes.ContainsKey(scene))
+            if (m_scenes.ContainsKey(scene))
                 m_scenes.Remove(scene);
         }
 
@@ -99,7 +99,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             if (!m_Enabled)
                 return;
 
-            if(m_scenes.ContainsKey(scene))
+            if (m_scenes.ContainsKey(scene))
             {
                 m_scenes[scene].RegionLoaded();
             }

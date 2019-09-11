@@ -28,12 +28,9 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
 using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
-using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
-using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
 using LSL_Rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
 using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_Vector = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Vector3;
@@ -55,7 +52,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public static ScriptConst Lookup(string name)
         {
             ScriptConst sc;
-            if(!scriptConstants.TryGetValue(name, out sc))
+            if (!scriptConstants.TryGetValue(name, out sc))
                 sc = null;
             return sc;
         }
@@ -64,13 +61,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             Dictionary<string, ScriptConst> sc = new Dictionary<string, ScriptConst>();
 
-             // For every event code, define XMREVENTCODE_<eventname> and XMREVENTMASKn_<eventname> symbols.
-            for(int i = 0; i < 64; i++)
+            // For every event code, define XMREVENTCODE_<eventname> and XMREVENTMASKn_<eventname> symbols.
+            for (int i = 0; i < 64; i++)
             {
                 try
                 {
                     string s = ((ScriptEventCode)i).ToString();
-                    if((s.Length > 0) && (s[0] >= 'a') && (s[0] <= 'z'))
+                    if ((s.Length > 0) && (s[0] >= 'a') && (s[0] <= 'z'))
                     {
                         new ScriptConst(sc,
                                          "XMREVENTCODE_" + s,
@@ -85,8 +82,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 catch { }
             }
 
-             // Also get all the constants from XMRInstAbstract and ScriptBaseClass etc as well.
-            for(Type t = typeof(XMRInstAbstract); t != typeof(object); t = t.BaseType)
+            // Also get all the constants from XMRInstAbstract and ScriptBaseClass etc as well.
+            for (Type t = typeof(XMRInstAbstract); t != typeof(object); t = t.BaseType)
             {
                 AddInterfaceConstants(sc, t.GetFields());
             }
@@ -101,16 +98,16 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public static void AddInterfaceConstants(Dictionary<string, ScriptConst> sc, FieldInfo[] allFields)
         {
             List<FieldInfo> ucfs = new List<FieldInfo>(allFields.Length);
-            foreach(FieldInfo f in allFields)
+            foreach (FieldInfo f in allFields)
             {
                 string fieldName = f.Name;
                 int i;
-                for(i = fieldName.Length; --i >= 0;)
+                for (i = fieldName.Length; --i >= 0;)
                 {
-                    if("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_".IndexOf(fieldName[i]) < 0)
+                    if ("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_".IndexOf(fieldName[i]) < 0)
                         break;
                 }
-                if(i < 0)
+                if (i < 0)
                     ucfs.Add(f);
             }
             AddInterfaceConstants(sc, ucfs.GetEnumerator());
@@ -119,54 +116,54 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         // this one accepts all fields given to it
         public static void AddInterfaceConstants(Dictionary<string, ScriptConst> sc, IEnumerator<FieldInfo> fields)
         {
-            if(sc == null)
+            if (sc == null)
                 sc = scriptConstants;
 
-            for(fields.Reset(); fields.MoveNext();)
+            for (fields.Reset(); fields.MoveNext();)
             {
                 FieldInfo constField = fields.Current;
                 Type fieldType = constField.FieldType;
                 CompValu cv;
 
-                 // The location of a simple number is the number itself.
-                 // Access to the value gets compiled as an ldc instruction.
-                if(fieldType == typeof(double))
+                // The location of a simple number is the number itself.
+                // Access to the value gets compiled as an ldc instruction.
+                if (fieldType == typeof(double))
                 {
                     cv = new CompValuFloat(new TokenTypeFloat(null),
                                             (double)(double)constField.GetValue(null));
                 }
-                else if(fieldType == typeof(int))
+                else if (fieldType == typeof(int))
                 {
                     cv = new CompValuInteger(new TokenTypeInt(null),
                                               (int)constField.GetValue(null));
                 }
-                else if(fieldType == typeof(LSL_Integer))
+                else if (fieldType == typeof(LSL_Integer))
                 {
                     cv = new CompValuInteger(new TokenTypeInt(null),
                                               ((LSL_Integer)constField.GetValue(null)).value);
                 }
 
-                 // The location of a string is the string itself.
-                 // Access to the value gets compiled as an ldstr instruction.
-                else if(fieldType == typeof(string))
+                // The location of a string is the string itself.
+                // Access to the value gets compiled as an ldstr instruction.
+                else if (fieldType == typeof(string))
                 {
                     cv = new CompValuString(new TokenTypeStr(null),
                                              (string)constField.GetValue(null));
                 }
-                else if(fieldType == typeof(LSL_String))
+                else if (fieldType == typeof(LSL_String))
                 {
                     cv = new CompValuString(new TokenTypeStr(null),
                                              (string)(LSL_String)constField.GetValue(null));
                 }
 
-                 // The location of everything else (objects) is the static field in the interface definition.
-                 // Access to the value gets compiled as an ldsfld instruction.
+                // The location of everything else (objects) is the static field in the interface definition.
+                // Access to the value gets compiled as an ldsfld instruction.
                 else
                 {
                     cv = new CompValuSField(TokenType.FromSysType(null, fieldType), constField);
                 }
 
-                 // Add to dictionary.
+                // Add to dictionary.
                 new ScriptConst(sc, constField.Name, cv);
             }
         }
@@ -181,36 +178,36 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             CompValu cv = null;
 
-            if(value is char)
+            if (value is char)
             {
                 cv = new CompValuChar(new TokenTypeChar(null), (char)value);
             }
-            if(value is double)
+            if (value is double)
             {
                 cv = new CompValuFloat(new TokenTypeFloat(null), (double)(double)value);
             }
-            if(value is float)
+            if (value is float)
             {
                 cv = new CompValuFloat(new TokenTypeFloat(null), (double)(float)value);
             }
-            if(value is int)
+            if (value is int)
             {
                 cv = new CompValuInteger(new TokenTypeInt(null), (int)value);
             }
-            if(value is string)
+            if (value is string)
             {
                 cv = new CompValuString(new TokenTypeStr(null), (string)value);
             }
 
-            if(value is LSL_Float)
+            if (value is LSL_Float)
             {
                 cv = new CompValuFloat(new TokenTypeFloat(null), (double)((LSL_Float)value).value);
             }
-            if(value is LSL_Integer)
+            if (value is LSL_Integer)
             {
                 cv = new CompValuInteger(new TokenTypeInt(null), ((LSL_Integer)value).value);
             }
-            if(value is LSL_Rotation)
+            if (value is LSL_Rotation)
             {
                 LSL_Rotation r = (LSL_Rotation)value;
                 CompValu x = new CompValuFloat(new TokenTypeFloat(null), r.x);
@@ -219,11 +216,11 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 CompValu s = new CompValuFloat(new TokenTypeFloat(null), r.s);
                 cv = new CompValuRot(new TokenTypeRot(null), x, y, z, s);
             }
-            if(value is LSL_String)
+            if (value is LSL_String)
             {
                 cv = new CompValuString(new TokenTypeStr(null), (string)(LSL_String)value);
             }
-            if(value is LSL_Vector)
+            if (value is LSL_Vector)
             {
                 LSL_Vector v = (LSL_Vector)value;
                 CompValu x = new CompValuFloat(new TokenTypeFloat(null), v.x);
@@ -232,7 +229,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 cv = new CompValuVec(new TokenTypeVec(null), x, y, z);
             }
 
-            if(value is OpenMetaverse.Quaternion)
+            if (value is OpenMetaverse.Quaternion)
             {
                 OpenMetaverse.Quaternion r = (OpenMetaverse.Quaternion)value;
                 CompValu x = new CompValuFloat(new TokenTypeFloat(null), r.X);
@@ -241,11 +238,11 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 CompValu s = new CompValuFloat(new TokenTypeFloat(null), r.W);
                 cv = new CompValuRot(new TokenTypeRot(null), x, y, z, s);
             }
-            if(value is OpenMetaverse.UUID)
+            if (value is OpenMetaverse.UUID)
             {
                 cv = new CompValuString(new TokenTypeKey(null), value.ToString());
             }
-            if(value is OpenMetaverse.Vector3)
+            if (value is OpenMetaverse.Vector3)
             {
                 OpenMetaverse.Vector3 v = (OpenMetaverse.Vector3)value;
                 CompValu x = new CompValuFloat(new TokenTypeFloat(null), v.X);
@@ -254,7 +251,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 cv = new CompValuVec(new TokenTypeVec(null), x, y, z);
             }
 
-            if(cv == null)
+            if (cv == null)
                 throw new Exception("bad type " + value.GetType().Name);
             return new ScriptConst(scriptConstants, name, cv);
         }

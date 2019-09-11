@@ -25,11 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using OpenMetaverse;
 using NUnit.Framework;
+using OpenMetaverse;
+using System;
+using System.Text;
 
 namespace OpenSim.Data.Tests
 {

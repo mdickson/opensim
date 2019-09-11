@@ -25,21 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Text;
 using log4net;
-using Nini.Config;
 using Mono.Addins;
+using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Text;
 // using OpenSim.Services.Interfaces;
 using Caps = OpenSim.Framework.Capabilities.Caps;
 
@@ -96,7 +96,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 //
                 m_SearchURL = config.GetString("SearchServerURI", m_SearchURL);
 
-                m_DestinationGuideURL = config.GetString ("DestinationGuideURI", m_DestinationGuideURL);
+                m_DestinationGuideURL = config.GetString("DestinationGuideURI", m_DestinationGuideURL);
 
                 if (m_DestinationGuideURL == string.Empty) // Make this consistent with the variable in the LoginService config
                     m_DestinationGuideURL = config.GetString("DestinationGuide", m_DestinationGuideURL);
@@ -169,7 +169,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 typesMap["prim"] = true;
                 m_features["PhysicsShapeTypes"] = typesMap;
 
-                if(m_doScriptSyntax && m_scriptSyntaxID != UUID.Zero)
+                if (m_doScriptSyntax && m_scriptSyntaxID != UUID.Zero)
                     m_features["LSLSyntaxId"] = OSD.FromUUID(m_scriptSyntaxID);
 
                 OSDMap meshAnim = new OSDMap();
@@ -180,7 +180,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 // Extra information for viewers that want to use it
                 // TODO: Take these out of here into their respective modules, like map-server-url
                 OSDMap extrasMap;
-                if(m_features.ContainsKey("OpenSimExtras"))
+                if (m_features.ContainsKey("OpenSimExtras"))
                 {
                     extrasMap = (OSDMap)m_features["OpenSimExtras"];
                 }
@@ -312,7 +312,7 @@ namespace OpenSim.Region.ClientStack.Linden
             {
                 OSDMap extrasMap = new OSDMap();
 
-                foreach(string key in extraFeatures.Keys)
+                foreach (string key in extraFeatures.Keys)
                 {
                     extrasMap[key] = (string)extraFeatures[key];
 
@@ -336,29 +336,29 @@ namespace OpenSim.Region.ClientStack.Linden
 
         private void ReadScriptSyntax()
         {
-            lock(m_scriptSyntaxLock)
+            lock (m_scriptSyntaxLock)
             {
-                if(!m_doScriptSyntax || m_scriptSyntaxID != UUID.Zero)
+                if (!m_doScriptSyntax || m_scriptSyntaxID != UUID.Zero)
                     return;
 
-                if(!File.Exists("ScriptSyntax.xml"))
+                if (!File.Exists("ScriptSyntax.xml"))
                     return;
 
                 try
                 {
                     using (StreamReader sr = File.OpenText("ScriptSyntax.xml"))
                     {
-                        StringBuilder sb = new StringBuilder(400*1024);
+                        StringBuilder sb = new StringBuilder(400 * 1024);
 
-                        string s="";
-                        char[] trimc = new char[] {' ','\t', '\n', '\r'};
+                        string s = "";
+                        char[] trimc = new char[] { ' ', '\t', '\n', '\r' };
 
                         s = sr.ReadLine();
-                        if(s == null)
+                        if (s == null)
                             return;
                         s = s.Trim(trimc);
                         UUID id;
-                        if(!UUID.TryParse(s,out id))
+                        if (!UUID.TryParse(s, out id))
                             return;
 
                         while ((s = sr.ReadLine()) != null)

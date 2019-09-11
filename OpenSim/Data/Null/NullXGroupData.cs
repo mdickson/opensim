@@ -25,26 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using log4net;
 using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Data;
+using System.Collections.Generic;
 
 namespace OpenSim.Data.Null
 {
     public class NullXGroupData : IXGroupData
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private Dictionary<UUID, XGroup> m_groups = new Dictionary<UUID, XGroup>();
 
-        public NullXGroupData(string connectionString, string realm) {}
+        public NullXGroupData(string connectionString, string realm) { }
 
         public bool StoreGroup(XGroup group)
         {

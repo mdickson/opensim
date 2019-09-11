@@ -25,15 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
+using OpenSim.Data;
+using OpenSim.Data.Null;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using log4net;
-using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Data;
-using OpenSim.Data.Null;
 
 namespace OpenSim.Tests.Common
 {
@@ -42,35 +39,35 @@ namespace OpenSim.Tests.Common
         private Dictionary<UUID, XInventoryFolder> m_allFolders = new Dictionary<UUID, XInventoryFolder>();
         private Dictionary<UUID, XInventoryItem> m_allItems = new Dictionary<UUID, XInventoryItem>();
 
-        public TestXInventoryDataPlugin(string conn, string realm) {}
+        public TestXInventoryDataPlugin(string conn, string realm) { }
 
         public XInventoryItem[] GetItems(string[] fields, string[] vals)
         {
-//            Console.WriteLine(
-//                "Requesting items, fields {0}, vals {1}", string.Join(", ", fields), string.Join(", ", vals));
+            //            Console.WriteLine(
+            //                "Requesting items, fields {0}, vals {1}", string.Join(", ", fields), string.Join(", ", vals));
 
             List<XInventoryItem> origItems = Get<XInventoryItem>(fields, vals, m_allItems.Values.ToList());
 
             XInventoryItem[] items = origItems.Select(i => i.Clone()).ToArray();
 
-//            Console.WriteLine("Found {0} items", items.Length);
-//            Array.ForEach(items, i => Console.WriteLine("Found item {0} {1}", i.inventoryName, i.inventoryID));
+            //            Console.WriteLine("Found {0} items", items.Length);
+            //            Array.ForEach(items, i => Console.WriteLine("Found item {0} {1}", i.inventoryName, i.inventoryID));
 
             return items;
         }
 
         public XInventoryFolder[] GetFolders(string[] fields, string[] vals)
         {
-//            Console.WriteLine(
-//                "Requesting folders, fields {0}, vals {1}", string.Join(", ", fields), string.Join(", ", vals));
+            //            Console.WriteLine(
+            //                "Requesting folders, fields {0}, vals {1}", string.Join(", ", fields), string.Join(", ", vals));
 
             List<XInventoryFolder> origFolders
                 = Get<XInventoryFolder>(fields, vals, m_allFolders.Values.ToList());
 
             XInventoryFolder[] folders = origFolders.Select(f => f.Clone()).ToArray();
 
-//            Console.WriteLine("Found {0} folders", folders.Length);
-//            Array.ForEach(folders, f => Console.WriteLine("Found folder {0} {1}", f.folderName, f.folderID));
+            //            Console.WriteLine("Found {0} folders", folders.Length);
+            //            Array.ForEach(folders, f => Console.WriteLine("Found folder {0} {1}", f.folderName, f.folderID));
 
             return folders;
         }
@@ -79,7 +76,7 @@ namespace OpenSim.Tests.Common
         {
             m_allFolders[folder.folderID] = folder.Clone();
 
-//            Console.WriteLine("Added folder {0} {1}", folder.folderName, folder.folderID);
+            //            Console.WriteLine("Added folder {0} {1}", folder.folderName, folder.folderID);
 
             return true;
         }
@@ -88,9 +85,9 @@ namespace OpenSim.Tests.Common
         {
             m_allItems[item.inventoryID] = item.Clone();
 
-//            Console.WriteLine(
-//                "Added item {0} {1}, folder {2}, creator {3}, owner {4}",
-//                item.inventoryName, item.inventoryID, item.parentFolderID, item.creatorID, item.avatarID);
+            //            Console.WriteLine(
+            //                "Added item {0} {1}, folder {2}, creator {3}, owner {4}",
+            //                item.inventoryName, item.inventoryID, item.parentFolderID, item.creatorID, item.avatarID);
 
             return true;
         }
@@ -133,12 +130,12 @@ namespace OpenSim.Tests.Common
 
             folder.parentFolderID = new UUID(newParent);
 
-//            XInventoryFolder[] newParentFolders
-//                = GetFolders(new string[] { "folderID" }, new string[] { folder.parentFolderID.ToString() });
+            //            XInventoryFolder[] newParentFolders
+            //                = GetFolders(new string[] { "folderID" }, new string[] { folder.parentFolderID.ToString() });
 
-//            Console.WriteLine(
-//                "Moved folder {0} {1}, to {2} {3}",
-//                folder.folderName, folder.folderID, newParentFolders[0].folderName, folder.parentFolderID);
+            //            Console.WriteLine(
+            //                "Moved folder {0} {1}, to {2} {3}",
+            //                folder.folderName, folder.folderID, newParentFolders[0].folderName, folder.parentFolderID);
 
             // TODO: Really need to implement folder version incrementing, though this should be common code anyway,
             // not reimplemented in each db plugin.

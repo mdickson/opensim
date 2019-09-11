@@ -25,15 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenSim.Framework;
 using Mono.Addins;
+using OpenSim.Framework;
 
 namespace OpenSim
 {
     /// <summary>
     /// OpenSimulator Application Plugin framework interface
     /// </summary>
-    [TypeExtensionPoint(NodeName="Plugin", NodeType = typeof(PluginExtensionNode), Path="/OpenSim/Startup")]
+    [TypeExtensionPoint(NodeName = "Plugin", NodeType = typeof(PluginExtensionNode), Path = "/OpenSim/Startup")]
     public interface IApplicationPlugin : IPlugin
     {
         /// <summary>

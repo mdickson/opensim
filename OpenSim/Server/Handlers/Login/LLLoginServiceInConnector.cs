@@ -25,16 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using Nini.Config;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
 using OpenSim.Framework;
 using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Server.Base;
 using OpenSim.Server.Handlers.Base;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Server.Handlers.Login
 {
@@ -106,10 +105,10 @@ namespace OpenSim.Server.Handlers.Login
         private void InitializeHandlers(IHttpServer server)
         {
             LLLoginHandlers loginHandlers = new LLLoginHandlers(m_LoginService, m_Proxy);
-//            server.AddXmlRPCHandler("login_to_simulator",
-//                new XmlRpcBasicDOSProtector(loginHandlers.HandleXMLRPCLogin, loginHandlers.HandleXMLRPCLoginBlocked,
-//                    m_DosProtectionOptions).Process, false);
-            server.AddXmlRPCHandler("login_to_simulator",loginHandlers.HandleXMLRPCLogin, false);
+            //            server.AddXmlRPCHandler("login_to_simulator",
+            //                new XmlRpcBasicDOSProtector(loginHandlers.HandleXMLRPCLogin, loginHandlers.HandleXMLRPCLoginBlocked,
+            //                    m_DosProtectionOptions).Process, false);
+            server.AddXmlRPCHandler("login_to_simulator", loginHandlers.HandleXMLRPCLogin, false);
             server.AddXmlRPCHandler("set_login_level", loginHandlers.HandleXMLRPCSetLoginLevel, false);
             server.SetDefaultLLSDHandler(loginHandlers.HandleLLSDLogin);
             server.AddWebSocketHandler("/WebSocket/GridLogin", loginHandlers.HandleWebSocketLoginEvents);

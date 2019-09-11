@@ -24,20 +24,17 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Services.Connectors;
-
-using OpenMetaverse;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Services.Connectors;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.MuteList
 {
@@ -64,14 +61,14 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.MuteList
 
         public void Initialise(IConfigSource source)
         {
-           // only active for core mute lists module
+            // only active for core mute lists module
             IConfig moduleConfig = source.Configs["Messaging"];
             if (moduleConfig == null)
                 return;
 
             if (moduleConfig.GetString("MuteListModule", "None") != "MuteListModule")
                 return;
-            
+
             moduleConfig = source.Configs["Modules"];
             if (moduleConfig != null)
             {

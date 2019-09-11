@@ -16,20 +16,21 @@
  * along with OpenSim-MoneyModule-Gloebit.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System;
-using Nini.Config;
 using OpenSim.Data.MySQL;
 using OpenSim.Data.PGSQL;
 using OpenSim.Data.SQLite;
 
 namespace Gloebit.GloebitMoneyModule
 {
-    class GloebitUserData {
+    class GloebitUserData
+    {
 
         private static IGloebitUserData m_impl;
 
-        public static void Initialise(string storageProvider, string connectionString) {
-            switch(storageProvider) {
+        public static void Initialise(string storageProvider, string connectionString)
+        {
+            switch (storageProvider)
+            {
                 case "OpenSim.Data.SQLite.dll":
                     m_impl = new SQLiteImpl(connectionString);
                     break;
@@ -44,11 +45,13 @@ namespace Gloebit.GloebitMoneyModule
             }
         }
 
-        public static IGloebitUserData Instance {
+        public static IGloebitUserData Instance
+        {
             get { return m_impl; }
         }
 
-        public interface IGloebitUserData {
+        public interface IGloebitUserData
+        {
             GloebitUser[] Get(string field, string key);
 
             GloebitUser[] Get(string[] fields, string[] keys);
@@ -56,21 +59,24 @@ namespace Gloebit.GloebitMoneyModule
             bool Store(GloebitUser user);
         }
 
-        private class SQLiteImpl : SQLiteGenericTableHandler<GloebitUser>, IGloebitUserData {
+        private class SQLiteImpl : SQLiteGenericTableHandler<GloebitUser>, IGloebitUserData
+        {
             public SQLiteImpl(string connectionString)
                 : base(connectionString, "GloebitUsers", "GloebitUsersSQLite")
             {
             }
         }
 
-        private class MySQLImpl : MySQLGenericTableHandler<GloebitUser>, IGloebitUserData {
+        private class MySQLImpl : MySQLGenericTableHandler<GloebitUser>, IGloebitUserData
+        {
             public MySQLImpl(string connectionString)
                 : base(connectionString, "GloebitUsers", "GloebitUsersMySQL")
             {
             }
         }
 
-        private class PGSQLImpl : PGSQLGenericTableHandler<GloebitUser>, IGloebitUserData {
+        private class PGSQLImpl : PGSQLGenericTableHandler<GloebitUser>, IGloebitUserData
+        {
             public PGSQLImpl(string connectionString)
                 : base(connectionString, "GloebitUsers", "GloebitUsersPGSQL")
             {

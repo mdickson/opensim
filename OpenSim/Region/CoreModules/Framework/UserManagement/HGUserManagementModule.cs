@@ -24,24 +24,17 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Services.Connectors.Hypergrid;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
-
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Region.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
-using OpenSim.Services.Connectors.Hypergrid;
-
-using OpenMetaverse;
-using OpenMetaverse.Packets;
-using log4net;
-using Nini.Config;
-using Mono.Addins;
 
 namespace OpenSim.Region.CoreModules.Framework.UserManagement
 {

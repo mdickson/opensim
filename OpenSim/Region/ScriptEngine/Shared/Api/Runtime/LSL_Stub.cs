@@ -25,16 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Diagnostics; //for [DebuggerNonUserCode]
-using System.Runtime.Remoting.Lifetime;
-using System.Threading;
-using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
 using OpenSim.Region.ScriptEngine.Interfaces;
 using OpenSim.Region.ScriptEngine.Shared.Api.Interfaces;
-
+using System;
+using System.Diagnostics; //for [DebuggerNonUserCode]
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
 using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
 using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;

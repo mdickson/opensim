@@ -25,15 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Reflection;
-using System.Text;
-using System.IO;
-using OpenMetaverse.StructuredData;
-using OpenMetaverse;
 using log4net;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Framework.Servers.HttpServer
 {
@@ -77,7 +73,7 @@ namespace OpenSim.Framework.Servers.HttpServer
             if (parameters == null)
                 throw new ArgumentNullException("parameters");
 
-            if(string.IsNullOrWhiteSpace(uri))
+            if (string.IsNullOrWhiteSpace(uri))
                 return false;
 
             OSDMap request = new OSDMap();

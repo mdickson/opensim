@@ -25,24 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using Nini.Config;
 using log4net;
-using System;
-using System.Reflection;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml;
-using System.Xml.Serialization;
-using System.Collections.Generic;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
-using FriendInfo = OpenSim.Services.Interfaces.FriendInfo;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
+using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Servers.HttpServer;
-using OpenMetaverse;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Xml;
+using FriendInfo = OpenSim.Services.Interfaces.FriendInfo;
 
 namespace OpenSim.Server.Handlers.Hypergrid
 {
@@ -72,7 +66,7 @@ namespace OpenSim.Server.Handlers.Hypergrid
                 IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
             string body;
-            using(StreamReader sr = new StreamReader(requestData))
+            using (StreamReader sr = new StreamReader(requestData))
                 body = sr.ReadToEnd();
             body = body.Trim();
 
@@ -99,7 +93,7 @@ namespace OpenSim.Server.Handlers.Hypergrid
                     case "deletefriendship":
                         return DeleteFriendship(request);
 
-                        /* Same as inter-sim */
+                    /* Same as inter-sim */
                     case "friendship_offered":
                         return FriendshipOffered(request);
 
@@ -108,19 +102,19 @@ namespace OpenSim.Server.Handlers.Hypergrid
 
                     case "statusnotification":
                         return StatusNotification(request);
-                    /*
-                    case "friendship_approved":
-                        return FriendshipApproved(request);
+                        /*
+                        case "friendship_approved":
+                            return FriendshipApproved(request);
 
-                    case "friendship_denied":
-                        return FriendshipDenied(request);
+                        case "friendship_denied":
+                            return FriendshipDenied(request);
 
-                    case "friendship_terminated":
-                        return FriendshipTerminated(request);
+                        case "friendship_terminated":
+                            return FriendshipTerminated(request);
 
-                    case "grant_rights":
-                        return GrantRights(request);
-                        */
+                        case "grant_rights":
+                            return GrantRights(request);
+                            */
                 }
 
                 m_log.DebugFormat("[HGFRIENDS HANDLER]: unknown method {0}", method);

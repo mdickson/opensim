@@ -47,13 +47,13 @@ using OMV = OpenMetaverse;
 
 namespace OpenSim.Region.PhysicsModule.ODE
 {
-//#if dDOUBLE
-// don't see much use in double precision with time steps of 20ms and 10 iterations used on opensim
-// at least we save same memory and memory access time, FPU performance on intel usually is similar
-//	using dReal = System.Double;
-//#else
+    //#if dDOUBLE
+    // don't see much use in double precision with time steps of 20ms and 10 iterations used on opensim
+    // at least we save same memory and memory access time, FPU performance on intel usually is similar
+    //	using dReal = System.Double;
+    //#else
     using dReal = System.Single;
-//#endif
+    //#endif
 
     internal static class SafeNativeMethods
     {
@@ -177,12 +177,12 @@ namespace OpenSim.Region.PhysicsModule.ODE
 
         internal enum dSweepAndPruneAxis : int
         {
-            XYZ = ((0)|(1<<2)|(2<<4)),
-            XZY = ((0)|(2<<2)|(1<<4)),
-            YXZ = ((1)|(0<<2)|(2<<4)),
-            YZX = ((1)|(2<<2)|(0<<4)),
-            ZXY = ((2)|(0<<2)|(1<<4)),
-            ZYX = ((2)|(1<<2)|(0<<4))
+            XYZ = ((0) | (1 << 2) | (2 << 4)),
+            XZY = ((0) | (2 << 2) | (1 << 4)),
+            YXZ = ((1) | (0 << 2) | (2 << 4)),
+            YZX = ((1) | (2 << 2) | (0 << 4)),
+            ZXY = ((2) | (0 << 2) | (1 << 4)),
+            ZYX = ((2) | (1 << 2) | (0 << 4))
         }
 
         #endregion
@@ -294,9 +294,9 @@ namespace OpenSim.Region.PhysicsModule.ODE
         {
             internal Matrix3(dReal m00, dReal m10, dReal m20, dReal m01, dReal m11, dReal m21, dReal m02, dReal m12, dReal m22)
             {
-                M00 = m00;  M10 = m10;  M20 = m20;  _m30 = 0.0f;
-                M01 = m01;  M11 = m11;  M21 = m21;  _m31 = 0.0f;
-                M02 = m02;  M12 = m12;  M22 = m22;  _m32 = 0.0f;
+                M00 = m00; M10 = m10; M20 = m20; _m30 = 0.0f;
+                M01 = m01; M11 = m11; M21 = m21; _m31 = 0.0f;
+                M02 = m02; M12 = m12; M22 = m22; _m32 = 0.0f;
             }
             internal dReal M00, M10, M20;
             private dReal _m30;
@@ -355,7 +355,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
         {
             internal Vector3(dReal x, dReal y, dReal z)
             {
-                X = x;  Y = y;  Z = z;  _w = 0.0f;
+                X = x; Y = y; Z = z; _w = 0.0f;
             }
             internal dReal X, Y, Z;
             private dReal _w;
@@ -367,7 +367,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
         {
             internal Vector4(dReal x, dReal y, dReal z, dReal w)
             {
-                X = x;  Y = y;  Z = z;  W = w;
+                X = x; Y = y; Z = z; W = w;
             }
             internal dReal X, Y, Z, W;
         }
@@ -961,7 +961,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
         [DllImport("ode", CallingConvention = CallingConvention.Cdecl, EntryPoint = "dGeomHeightfieldDataBuildByte"), SuppressUnmanagedCodeSecurity]
         internal static extern void GeomHeightfieldDataBuildByte(IntPtr d, IntPtr pHeightData, int bCopyHeightData,
                 dReal width, dReal depth, int widthSamples, int depthSamples,
-                dReal scale, dReal offset, dReal thickness,	int bWrap);
+                dReal scale, dReal offset, dReal thickness, int bWrap);
 
         [DllImport("ode", CallingConvention = CallingConvention.Cdecl, EntryPoint = "dGeomHeightfieldDataBuildCallback"), SuppressUnmanagedCodeSecurity]
         internal static extern void GeomHeightfieldDataBuildCallback(IntPtr d, IntPtr pUserData, HeightfieldGetHeight pCallback,
@@ -1749,7 +1749,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
         internal static extern void Multiply0(out dReal A00, ref dReal B00, ref dReal C00, int p, int q, int r);
 
         [DllImport("ode", CallingConvention = CallingConvention.Cdecl, EntryPoint = "dMultiply0"), SuppressUnmanagedCodeSecurity]
-        private static extern void MultiplyiM3V3(out Vector3 vout, ref Matrix3 matrix, ref Vector3 vect,int p, int q, int r);
+        private static extern void MultiplyiM3V3(out Vector3 vout, ref Matrix3 matrix, ref Vector3 vect, int p, int q, int r);
         internal static void MultiplyM3V3(out Vector3 outvector, ref Matrix3 matrix, ref Vector3 invector)
         {
             MultiplyiM3V3(out outvector, ref matrix, ref invector, 3, 3, 1);

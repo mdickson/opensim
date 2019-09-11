@@ -25,12 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenSim.Framework;
 using System.Collections.Generic;
 using System.Reflection;
-using log4net;
-using Nini.Config;
-using OpenSim.Framework;
-using OpenMetaverse;
 
 namespace OpenSim.Region.PhysicsModules.SharedBase
 {
@@ -59,13 +58,13 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
 
         }
 
-/*
-        public override PhysicsActor AddPrim(Vector3 position, Vector3 size, Quaternion rotation)
-        {
-            m_log.InfoFormat("NullPhysicsScene : AddPrim({0},{1})", position, size);
-            return PhysicsActor.Null;
-        }
-*/
+        /*
+                public override PhysicsActor AddPrim(Vector3 position, Vector3 size, Quaternion rotation)
+                {
+                    m_log.InfoFormat("NullPhysicsScene : AddPrim({0},{1})", position, size);
+                    return PhysicsActor.Null;
+                }
+        */
 
         public override PhysicsActor AddPrimShape(string primName, PrimitiveBaseShape pbs, Vector3 position,
                                                   Vector3 size, Quaternion rotation, bool isPhysical, uint localid)
@@ -98,7 +97,7 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
         {
         }
 
-        public override Dictionary<uint,float> GetTopColliders()
+        public override Dictionary<uint, float> GetTopColliders()
         {
             Dictionary<uint, float> returncolliders = new Dictionary<uint, float>();
             return returncolliders;

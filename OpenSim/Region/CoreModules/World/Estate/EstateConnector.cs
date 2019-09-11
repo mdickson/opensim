@@ -25,19 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-
-using OpenSim.Services.Interfaces;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using OpenSim.Server.Base;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Scenes;
-
-using OpenMetaverse;
-using log4net;
 
 namespace OpenSim.Region.CoreModules.World.Estate
 {
@@ -94,7 +91,7 @@ namespace OpenSim.Region.CoreModules.World.Estate
             {
                 if (s.RegionInfo.EstateSettings.EstateID == EstateID)
                     s.RegionInfo.RegionSettings.Covenant = CovenantID;
-//                    s.ReloadEstateData();
+                //                    s.ReloadEstateData();
             }
 
             SendToEstate(EstateID, sendData);
@@ -154,19 +151,19 @@ namespace OpenSim.Region.CoreModules.World.Estate
                     {
                         string url = sreg.ExternalHostName + ":" + sreg.HttpPort;
                         regions.Remove(sreg.RegionID);
-                        if(!done.Contains(url)) // we may have older regs with same url lost in dbs
+                        if (!done.Contains(url)) // we may have older regs with same url lost in dbs
                             done.Add(url);
                     }
                 }
             }
 
-            if(regions.Count == 0)
+            if (regions.Count == 0)
                 return;
 
             Scene baseScene = m_EstateModule.Scenes[0];
             UUID ScopeID = baseScene.RegionInfo.ScopeID;
             IGridService gridService = baseScene.GridService;
-            if(gridService == null)
+            if (gridService == null)
                 return;
 
             // Send to remote regions
@@ -176,7 +173,7 @@ namespace OpenSim.Region.CoreModules.World.Estate
                 if (region != null)
                 {
                     string url = region.ExternalHostName + ":" + region.HttpPort;
-                    if(done.Contains(url))
+                    if (done.Contains(url))
                         continue;
                     Call(region, sendData);
                     done.Add(url);
@@ -191,7 +188,7 @@ namespace OpenSim.Region.CoreModules.World.Estate
             try
             {
                 string url = "";
-                if(port != 0)
+                if (port != 0)
                     url = "http://" + region.ExternalHostName + ":" + port + "/";
                 else
                     url = region.ServerURI;

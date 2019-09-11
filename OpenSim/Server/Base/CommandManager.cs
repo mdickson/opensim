@@ -26,16 +26,12 @@
  */
 
 
+using Mono.Addins;
+using OpenSim.Framework;
 using System;
-using System.Text;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Mono.Addins.Setup;
-using Mono.Addins;
-using Mono.Addins.Description;
-using OpenSim.Framework;
+using System.Linq;
 
 namespace OpenSim.Server.Base
 {
@@ -74,27 +70,27 @@ namespace OpenSim.Server.Base
             // list installed plugins
             MainConsole.Instance.Commands.AddCommand("Plugin", true,
                                                      "plugin list installed",
-                                                     "plugin list installed","List install plugins",
+                                                     "plugin list installed", "List install plugins",
                                                      HandleConsoleListInstalledPlugin);
 
             // list plugins available from registered repositories
             MainConsole.Instance.Commands.AddCommand("Plugin", true,
                                                      "plugin list available",
-                                                     "plugin list available","List available plugins",
+                                                     "plugin list available", "List available plugins",
                                                      HandleConsoleListAvailablePlugin);
             // List available updates
             MainConsole.Instance.Commands.AddCommand("Plugin", true,
-                                                     "plugin updates", "plugin updates","List available updates",
+                                                     "plugin updates", "plugin updates", "List available updates",
                                                      HandleConsoleListUpdates);
 
             // Update plugin
             MainConsole.Instance.Commands.AddCommand("Plugin", true,
-                                                     "plugin update", "plugin update \"plugin index\"","Update the plugin",
+                                                     "plugin update", "plugin update \"plugin index\"", "Update the plugin",
                                                      HandleConsoleUpdatePlugin);
 
             // Add repository
             MainConsole.Instance.Commands.AddCommand("Repository", true,
-                                                     "repo add", "repo add \"url\"","Add repository",
+                                                     "repo add", "repo add \"url\"", "Add repository",
                                                      HandleConsoleAddRepo);
 
             // Refresh repo
@@ -129,7 +125,7 @@ namespace OpenSim.Server.Base
 
             // *
             MainConsole.Instance.Commands.AddCommand("Plugin", true,
-                                                     "plugin info", "plugin info \"plugin index\"","Show detailed information for plugin",
+                                                     "plugin info", "plugin info \"plugin index\"", "Show detailed information for plugin",
                                                      HandleConsoleShowAddinInfo);
 
             // Plugin disable
@@ -264,7 +260,7 @@ namespace OpenSim.Server.Base
         // Register repository
         private void HandleConsoleAddRepo(string module, string[] cmd)
         {
-            if ( cmd.Length == 3)
+            if (cmd.Length == 3)
             {
                 PluginManager.AddRepository(cmd[2]);
             }

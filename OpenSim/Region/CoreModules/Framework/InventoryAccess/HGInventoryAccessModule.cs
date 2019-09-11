@@ -25,24 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Client;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Connectors.Hypergrid;
 using OpenSim.Services.Interfaces;
-using OpenSim.Server.Base;
-
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-
-using OpenMetaverse;
-using log4net;
-using Nini.Config;
-using Mono.Addins;
 
 namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
 {
@@ -73,7 +68,7 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
         private bool m_CheckSeparateAssets = false;
         private string m_LocalAssetsURL = string.Empty;
 
-//        private bool m_Initialized = false;
+        //        private bool m_Initialized = false;
 
         #region INonSharedRegionModule
 
@@ -159,7 +154,7 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
                 if (sp is ScenePresence)
                 {
                     AgentCircuitData aCircuit = ((ScenePresence)sp).Scene.AuthenticateHandler.GetAgentCircuitData(client.AgentId);
-                    if (aCircuit != null &&  (aCircuit.teleportFlags & (uint)Constants.TeleportFlags.ViaHGLogin) != 0)
+                    if (aCircuit != null && (aCircuit.teleportFlags & (uint)Constants.TeleportFlags.ViaHGLogin) != 0)
                     {
                         if (m_RestrictInventoryAccessAbroad)
                         {
@@ -545,7 +540,7 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
         {
             if (m_bypassPermissions) return true;
 
-            if(sp == null || sog == null)
+            if (sp == null || sog == null)
                 return false;
 
             if (!m_OutboundPermission && !UserManagementModule.IsLocalGridUser(sp.UUID))

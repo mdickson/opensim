@@ -25,9 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -35,6 +32,9 @@ using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules
 {
@@ -51,10 +51,10 @@ namespace OpenSim.Region.CoreModules
         //
         // Global Constants used to determine where in the sky the sun is
         //
-        private const double m_SeasonalTilt   =  0.03 * Math.PI;  // A daily shift of approximately 1.7188 degrees
-        private const double m_AverageTilt    = -0.25 * Math.PI;  // A 45 degree tilt
-        private const double m_SunCycle       =  2.0D * Math.PI;  // A perfect circle measured in radians
-        private const double m_SeasonalCycle  =  2.0D * Math.PI;  // Ditto
+        private const double m_SeasonalTilt = 0.03 * Math.PI;  // A daily shift of approximately 1.7188 degrees
+        private const double m_AverageTilt = -0.25 * Math.PI;  // A 45 degree tilt
+        private const double m_SunCycle = 2.0D * Math.PI;  // A perfect circle measured in radians
+        private const double m_SeasonalCycle = 2.0D * Math.PI;  // Ditto
 
         //
         //    Per Region Values
@@ -69,13 +69,13 @@ namespace OpenSim.Region.CoreModules
         private bool receivedEstateToolsSunUpdate = false;
 
         // Sun's position information is updated and sent to clients every m_UpdateInterval frames
-        private int    m_UpdateInterval           = 0;
+        private int m_UpdateInterval = 0;
 
         // Number of real time hours per virtual day
-        private double m_DayLengthHours           = 0;
+        private double m_DayLengthHours = 0;
 
         // Number of virtual days to a virtual year
-        private int    m_YearLengthDays           = 0;
+        private int m_YearLengthDays = 0;
 
         // Ratio of Daylight hours to Night time hours.  This is accomplished by shifting the
         // sun's orbit above the horizon
@@ -87,10 +87,10 @@ namespace OpenSim.Region.CoreModules
         // private double m_longitude      = 0;
         // private double m_latitude       = 0;
         // Configurable defaults                     Defaults close to SL
-        private int    d_frame_mod      = 100;    // Every 10 seconds (actually less)
-        private double d_day_length     = 4;      // A VW day is 4 RW hours long
-        private int    d_year_length    = 60;     // There are 60 VW days in a VW year
-        private double d_day_night      = 0.5;   // axis offset: Default Hoizon shift to try and closely match the sun model in LL Viewer
+        private int d_frame_mod = 100;    // Every 10 seconds (actually less)
+        private double d_day_length = 4;      // A VW day is 4 RW hours long
+        private int d_year_length = 60;     // There are 60 VW days in a VW year
+        private double d_day_night = 0.5;   // axis offset: Default Hoizon shift to try and closely match the sun model in LL Viewer
         private double d_DayTimeSunHourScale = 0.5; // Day/Night hours are equal
 
 
@@ -98,10 +98,10 @@ namespace OpenSim.Region.CoreModules
         // private double d_latitude       = 41.29;
 
         // Frame counter
-        private uint   m_frame          = 0;
+        private uint m_frame = 0;
 
         // Cached Scene reference
-        private Scene  m_scene          = null;
+        private Scene m_scene = null;
 
         // Calculated Once in the lifetime of a region
         private long TicksToEpoch;              // Elapsed time for 1/1/1970
@@ -116,7 +116,7 @@ namespace OpenSim.Region.CoreModules
         private double HorizonShift;            // Axis offset to skew day and night
         private double TotalDistanceTravelled;  // Distance since beginning of time (in radians)
         private double SeasonalOffset;          // Seaonal variation of tilt
-        private float  Magnitude;               // Normal tilt
+        private float Magnitude;               // Normal tilt
         // private double VWTimeRatio;             // VW time as a ratio of real time
 
         // Working values
@@ -274,7 +274,7 @@ namespace OpenSim.Region.CoreModules
             m_frame = 0;
 
             // This one puts an entry in the main help screen
-//            m_scene.AddCommand("Regions", this, "sun", "sun", "Usage: sun [param] [value] - Get or Update Sun module paramater", null);
+            //            m_scene.AddCommand("Regions", this, "sun", "sun", "Usage: sun [param] [value] - Get or Update Sun module paramater", null);
 
             TimeZone local = TimeZone.CurrentTimeZone;
             TicksUTCOffset = local.GetUtcOffset(local.ToLocalTime(DateTime.Now)).Ticks;
@@ -294,33 +294,33 @@ namespace OpenSim.Region.CoreModules
                 // Year length in days
                 m_YearLengthDays = config.Configs["Sun"].GetInt("year_length", d_year_length);
                 // Day length in decimal hours
-                m_DayLengthHours  = config.Configs["Sun"].GetDouble("day_length", d_day_length);
+                m_DayLengthHours = config.Configs["Sun"].GetDouble("day_length", d_day_length);
 
                 // Horizon shift, this is used to shift the sun's orbit, this affects the day / night ratio
                 // must hard code to ~.5 to match sun position in LL based viewers
-                m_HorizonShift   = config.Configs["Sun"].GetDouble("day_night_offset", d_day_night);
+                m_HorizonShift = config.Configs["Sun"].GetDouble("day_night_offset", d_day_night);
 
                 // Scales the sun hours 0...12 vs 12...24, essentially makes daylight hours longer/shorter vs nighttime hours
                 m_DayTimeSunHourScale = config.Configs["Sun"].GetDouble("day_time_sun_hour_scale", d_DayTimeSunHourScale);
 
                 // Update frequency in frames
-                m_UpdateInterval   = config.Configs["Sun"].GetInt("update_interval", d_frame_mod);
+                m_UpdateInterval = config.Configs["Sun"].GetInt("update_interval", d_frame_mod);
             }
             catch (Exception e)
             {
                 m_log.Debug("[SUN]: Configuration access failed, using defaults. Reason: " + e.Message);
                 m_YearLengthDays = d_year_length;
-                m_DayLengthHours  = d_day_length;
-                m_HorizonShift   = d_day_night;
-                m_UpdateInterval   = d_frame_mod;
+                m_DayLengthHours = d_day_length;
+                m_HorizonShift = d_day_night;
+                m_UpdateInterval = d_frame_mod;
                 m_DayTimeSunHourScale = d_DayTimeSunHourScale;
 
                 // m_latitude    = d_latitude;
                 // m_longitude   = d_longitude;
             }
 
-            SecondsPerSunCycle = (uint) (m_DayLengthHours * 60 * 60);
-            SecondsPerYear     = (uint) (SecondsPerSunCycle*m_YearLengthDays);
+            SecondsPerSunCycle = (uint)(m_DayLengthHours * 60 * 60);
+            SecondsPerYear = (uint)(SecondsPerSunCycle * m_YearLengthDays);
 
             // Ration of real-to-virtual time
 
@@ -329,12 +329,12 @@ namespace OpenSim.Region.CoreModules
             // Speed of rotation needed to complete a cycle in the
             // designated period (day and season)
 
-            SunSpeed           = m_SunCycle/SecondsPerSunCycle;
-            SeasonSpeed        = m_SeasonalCycle/SecondsPerYear;
+            SunSpeed = m_SunCycle / SecondsPerSunCycle;
+            SeasonSpeed = m_SeasonalCycle / SecondsPerYear;
 
             // Horizon translation
 
-            HorizonShift      = m_HorizonShift; // Z axis translation
+            HorizonShift = m_HorizonShift; // Z axis translation
             // HoursToRadians    = (SunCycle/24)*VWTimeRatio;
 
             m_log.Debug("[SUN]: Initialization completed. Day is " + SecondsPerSunCycle + " seconds, and year is " + m_YearLengthDays + " days");
@@ -487,7 +487,7 @@ namespace OpenSim.Region.CoreModules
 
         private void SunUpdateToAllClients()
         {
-            m_scene.ForEachRootClient(delegate(IClientAPI client)
+            m_scene.ForEachRootClient(delegate (IClientAPI client)
             {
                 SunToClient(client);
             });
@@ -528,16 +528,16 @@ namespace OpenSim.Region.CoreModules
             {
                 case "year_length":
                     m_YearLengthDays = (int)value;
-                    SecondsPerYear = (uint) (SecondsPerSunCycle*m_YearLengthDays);
-                    SeasonSpeed = m_SeasonalCycle/SecondsPerYear;
+                    SecondsPerYear = (uint)(SecondsPerSunCycle * m_YearLengthDays);
+                    SeasonSpeed = m_SeasonalCycle / SecondsPerYear;
                     break;
 
                 case "day_length":
                     m_DayLengthHours = value;
-                    SecondsPerSunCycle = (uint) (m_DayLengthHours * 60 * 60);
-                    SecondsPerYear = (uint) (SecondsPerSunCycle*m_YearLengthDays);
-                    SunSpeed = m_SunCycle/SecondsPerSunCycle;
-                    SeasonSpeed = m_SeasonalCycle/SecondsPerYear;
+                    SecondsPerSunCycle = (uint)(m_DayLengthHours * 60 * 60);
+                    SecondsPerYear = (uint)(SecondsPerSunCycle * m_YearLengthDays);
+                    SunSpeed = m_SunCycle / SecondsPerSunCycle;
+                    SeasonSpeed = m_SeasonalCycle / SecondsPerYear;
                     break;
 
                 case "day_night_offset":
@@ -557,7 +557,7 @@ namespace OpenSim.Region.CoreModules
                     value = (value + 18.0) % 24.0;
                     // set the current offset so that the effective sun time is the parameter
                     m_CurrentTimeOffset = 0; // clear this first so we use raw time
-                    m_CurrentTimeOffset = (ulong)(SecondsPerSunCycle * value/ 24.0) - (CurrentTime % SecondsPerSunCycle);
+                    m_CurrentTimeOffset = (ulong)(SecondsPerSunCycle * value / 24.0) - (CurrentTime % SecondsPerSunCycle);
                     break;
 
                 default:
@@ -628,7 +628,7 @@ namespace OpenSim.Region.CoreModules
                 Output.Add("The following parameters can be changed or viewed:");
                 foreach (KeyValuePair<string, string> kvp in GetParamList())
                 {
-                    Output.Add(String.Format("{0} - {1}",kvp.Key, kvp.Value));
+                    Output.Add(String.Format("{0} - {1}", kvp.Key, kvp.Value));
                 }
                 return Output;
             }
@@ -649,7 +649,7 @@ namespace OpenSim.Region.CoreModules
             else if (args.Length == 3)
             {
                 double value = 0.0;
-                if (! double.TryParse(args[2], out value))
+                if (!double.TryParse(args[2], out value))
                 {
                     Output.Add(String.Format("The parameter value {0} is not a valid number.", args[2]));
                     return Output;

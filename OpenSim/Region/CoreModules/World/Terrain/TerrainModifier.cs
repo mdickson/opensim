@@ -24,11 +24,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using log4net;
+using OpenSim.Region.Framework.Interfaces;
 using System;
 using System.Reflection;
-using log4net;
-
-using OpenSim.Region.Framework.Interfaces;
 
 namespace OpenSim.Region.CoreModules.World.Terrain
 {
@@ -69,7 +68,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain
             if (result == String.Empty)
             {
                 int index = 3;
-                while(++index < args.Length && result == String.Empty)
+                while (++index < args.Length && result == String.Empty)
                 {
                     arg = args[index];
                     // check for shape
@@ -83,7 +82,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain
                         {
                             data.shape = arg.StartsWith("-ell=") ? "ellipse" : "rectangle";
                             val = arg.Substring(arg.IndexOf("=") + 1);
-                            string[] coords = val.Split(new char[] {','});
+                            string[] coords = val.Split(new char[] { ',' });
                             if ((coords.Length < 3) || (coords.Length > 4))
                             {
                                 result = String.Format("Bad format for shape parameter {0}", arg);
@@ -161,7 +160,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain
                     f = (float)d;
                     result = String.Empty;
                 }
-                catch(InvalidCastException)
+                catch (InvalidCastException)
                 {
                     result = String.Format("{0} is invalid", s);
                     f = -1.0f;
@@ -212,16 +211,16 @@ namespace OpenSim.Region.CoreModules.World.Terrain
                 xMid = 0;
                 yMid = 0;
             }
-//            m_log.DebugFormat("Apply {0} mask {1}x{2} @ {3},{4}", data.shape, xMax, yMax, xMid, yMid);
+            //            m_log.DebugFormat("Apply {0} mask {1}x{2} @ {3},{4}", data.shape, xMax, yMax, xMid, yMid);
             double[,] buffer = map.GetDoubles();
             int yDim = yMax;
-            while(--yDim >= 0)
+            while (--yDim >= 0)
             {
                 int yPos = data.y0 + yDim - yMid;
                 if ((yPos >= 0) && (yPos < map.Height))
                 {
                     int xDim = xMax;
-                    while(--xDim >= 0)
+                    while (--xDim >= 0)
                     {
                         int xPos = data.x0 + xDim - xMid;
                         if ((xPos >= 0) && (xPos < map.Width) && (mask[xDim, yDim]))
@@ -273,10 +272,10 @@ namespace OpenSim.Region.CoreModules.World.Terrain
         {
             bool[,] mask = new bool[xSize, ySize];
             int yPos = ySize;
-            while(--yPos >= 0)
+            while (--yPos >= 0)
             {
                 int xPos = xSize;
-                while(--xPos >= 0)
+                while (--xPos >= 0)
                 {
                     mask[xPos, yPos] = true;
                 }
@@ -305,13 +304,13 @@ namespace OpenSim.Region.CoreModules.World.Terrain
             int yPos = 0;
 
             // first set of points
-            while(stoppingX >= stoppingY)
+            while (stoppingX >= stoppingY)
             {
                 int yUpper = yRadius + yPos;
                 int yLower = yRadius - yPos;
                 // fill in the mask
                 int xNow = xPos;
-                while(xNow >= 0)
+                while (xNow >= 0)
                 {
                     mask[xRadius + xNow, yUpper] = true;
                     mask[xRadius - xNow, yUpper] = true;
@@ -342,13 +341,13 @@ namespace OpenSim.Region.CoreModules.World.Terrain
             stoppingX = 0L;
             stoppingY = twoASquared * yRadius;
 
-            while(stoppingX <= stoppingY)
+            while (stoppingX <= stoppingY)
             {
                 int xUpper = xRadius + xPos;
                 int xLower = xRadius - xPos;
                 // fill in the mask
                 int yNow = yPos;
-                while(yNow >= 0)
+                while (yNow >= 0)
                 {
                     mask[xUpper, yRadius + yNow] = true;
                     mask[xUpper, yRadius - yNow] = true;

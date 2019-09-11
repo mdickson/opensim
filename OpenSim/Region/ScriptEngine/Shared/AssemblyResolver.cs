@@ -54,9 +54,9 @@ namespace OpenSim.Region.ScriptEngine.Shared
             foreach (string s in pathList)
             {
                 string path = Path.Combine(Directory.GetCurrentDirectory(),
-                        Path.Combine(s, assemblyName))+".dll";
+                        Path.Combine(s, assemblyName)) + ".dll";
 
-//                    Console.WriteLine("Trying to resolve {0}", path);
+                //                    Console.WriteLine("Trying to resolve {0}", path);
 
                 if (File.Exists(path))
                     return Assembly.LoadFrom(path);

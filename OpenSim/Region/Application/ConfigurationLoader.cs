@@ -25,15 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenSim.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Threading;
 using System.Xml;
-using log4net;
-using Nini.Config;
-using OpenSim.Framework;
 
 namespace OpenSim
 {
@@ -143,7 +142,7 @@ namespace OpenSim
 
             m_log.Info("[CONFIG]: Reading configuration settings");
 
-            for (int i = 0 ; i < sources.Count ; i++)
+            for (int i = 0; i < sources.Count; i++)
             {
                 if (ReadConfig(m_config, sources[i]))
                 {
@@ -181,7 +180,7 @@ namespace OpenSim
                     OpenSimConfigSource overrideConfig = new OpenSimConfigSource();
                     overrideConfig.Source = new IniConfigSource();
 
-                    for (int i = 0 ; i < overrideSources.Count ; i++)
+                    for (int i = 0; i < overrideSources.Count; i++)
                     {
                         if (ReadConfig(overrideConfig, overrideSources[i]))
                         {

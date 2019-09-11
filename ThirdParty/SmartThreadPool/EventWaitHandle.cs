@@ -15,21 +15,21 @@ namespace Amib.Threading.Internal
     /// </summary>
     public class STPEventWaitHandle
     {
-        #region Public Constants
+#region Public Constants
 
         public const int WaitTimeout = Timeout.Infinite;
 
-        #endregion
+#endregion
 
-        #region Private External Constants
+#region Private External Constants
 
         private const Int32 WAIT_FAILED = -1;
         private const Int32 WAIT_TIMEOUT = 0x102;
         private const UInt32 INFINITE = 0xFFFFFFFF;
 
-        #endregion
+#endregion
 
-        #region WaitAll and WaitAny
+#region WaitAll and WaitAny
 
         internal static bool WaitOne(WaitHandle waitHandle, int millisecondsTimeout, bool exitContext)
         {
@@ -91,14 +91,14 @@ namespace Amib.Threading.Internal
             return WaitAny(waitHandles, millisecondsTimeout, false);
         }
 
-        #endregion
+#endregion
 
-        #region External methods
+#region External methods
 
         [DllImport("coredll.dll", SetLastError = true)]
         public static extern int WaitForMultipleObjects(uint nCount, IntPtr[] lpHandles, bool fWaitAll, uint dwMilliseconds);
 
-        #endregion
+#endregion
     }
 }
 #endif

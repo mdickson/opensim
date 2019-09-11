@@ -44,9 +44,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Text;
 
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
@@ -102,7 +100,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public Token(Token original)
         {
-            if(original != null)
+            if (original != null)
             {
                 this.emsg = original.emsg;
                 this.file = original.file;
@@ -119,7 +117,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public void ErrorMsg(string message)
         {
-            if(emsg != null)
+            if (emsg != null)
             {
                 emsg(this, message);
             }
@@ -144,10 +142,10 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             get
             {
                 string loc = file + "(" + line + "," + posn + ")";
-                if(copiedFrom == null)
+                if (copiedFrom == null)
                     return loc;
                 string fromLoc = copiedFrom.SrcLoc;
-                if(fromLoc.StartsWith(loc))
+                if (fromLoc.StartsWith(loc))
                     return fromLoc;
                 return loc + ":" + fromLoc;
             }
@@ -183,7 +181,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
      *        Along with TokenEnd, it keeps insertion/removal of intermediate tokens
      *        simple as the intermediate tokens always have non-null nextToken,prevToken.
      */
-    public class TokenBegin: Token
+    public class TokenBegin : Token
     {
         private class Options
         {
@@ -219,17 +217,17 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             sourceHash = null;
 
-             // Now do the tokenization.
+            // Now do the tokenization.
             TokenBegin tokenBegin = new TokenBegin(emsg, "", 0, 0);
             tokenBegin.cameFrom = cameFrom;
             tokenBegin.saveSource = saveSource;
             tokenBegin.lastToken = tokenBegin;
             tokenBegin.source = source;
             tokenBegin.filNam = cameFrom;
-            if(saveSource != null)
+            if (saveSource != null)
                 saveSource.WriteLine(source);
             tokenBegin.Tokenize();
-            if(tokenBegin.youveAnError)
+            if (tokenBegin.youveAnError)
                 return null;
             tokenBegin.AppendToken(new TokenEnd(emsg, tokenBegin.filNam, ++tokenBegin.lineNo, 0));
 
@@ -240,12 +238,12 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             byte[] hashBytes = md5.ComputeHash(new TokenStream(tokenBegin));
             int hashBytesLen = hashBytes.Length;
             StringBuilder sb = new StringBuilder(hashBytesLen * 2);
-            for(int i = 0; i < hashBytesLen; i++)
+            for (int i = 0; i < hashBytesLen; i++)
             {
                 sb.Append(hashBytes[i].ToString("X2"));
             }
             sourceHash = sb.ToString();
-            if(saveSource != null)
+            if (saveSource != null)
             {
                 saveSource.WriteLine("");
                 saveSource.WriteLine("********************************************************************************");
@@ -263,7 +261,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          * Null delimeters between the tokens.
          * Used for creating the source hash.
          */
-        private class TokenStream: Stream
+        private class TokenStream : Stream
         {
             private Token curTok;
             private bool delim;
@@ -332,21 +330,21 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             public override int Read(byte[] buffer, int offset, int count)
             {
                 int len, total;
-                for(total = 0; total < count; total += len)
+                for (total = 0; total < count; total += len)
                 {
-                    while((len = curLen - curOfs) <= 0)
+                    while ((len = curLen - curOfs) <= 0)
                     {
-                        if(curTok is TokenEnd)
+                        if (curTok is TokenEnd)
                             goto done;
                         curTok = curTok.nextToken;
-                        if(curTok is TokenEnd)
+                        if (curTok is TokenEnd)
                             goto done;
                         curBuf = System.Text.Encoding.UTF8.GetBytes(curTok.ToString());
                         curOfs = 0;
                         curLen = curBuf.Length;
                         delim = true;
                     }
-                    if(delim)
+                    if (delim)
                     {
                         buffer[offset + total] = 0;
                         delim = false;
@@ -354,13 +352,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     }
                     else
                     {
-                        if(len > count - total)
+                        if (len > count - total)
                             len = count - total;
                         Array.Copy(curBuf, curOfs, buffer, offset + total, len);
                         curOfs += len;
                     }
                 }
-                done:
+            done:
                 return total;
             }
         }
@@ -376,20 +374,20 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             bolIdx = 0;
             lineNo = 0;
-            for(int i = 0; i < source.Length; i++)
+            for (int i = 0; i < source.Length; i++)
             {
                 char c = source[i];
-                if(c == '\n')
+                if (c == '\n')
                 {
 
-                     // Increment source line number and set char index of beg of next line.
+                    // Increment source line number and set char index of beg of next line.
                     lineNo++;
                     bolIdx = i + 1;
 
-                     // Check for '#' lineno filename newline
-                     // lineno is line number of next line in file
-                     // If found, save values and remove tokens from stream
-                    if((lastToken is TokenStr) &&
+                    // Check for '#' lineno filename newline
+                    // lineno is line number of next line in file
+                    // If found, save values and remove tokens from stream
+                    if ((lastToken is TokenStr) &&
                         (lastToken.prevToken is TokenInt) &&
                         (lastToken.prevToken.prevToken is TokenKwHash))
                     {
@@ -401,25 +399,25 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     continue;
                 }
 
-                 // Skip over whitespace.
-                if(c <= ' ')
+                // Skip over whitespace.
+                if (c <= ' ')
                     continue;
 
-                 // Skip over comments.
-                if((i + 2 <= source.Length) && source.Substring(i, 2).Equals("//"))
+                // Skip over comments.
+                if ((i + 2 <= source.Length) && source.Substring(i, 2).Equals("//"))
                 {
-                    while((i < source.Length) && (source[i] != '\n'))
+                    while ((i < source.Length) && (source[i] != '\n'))
                         i++;
                     lineNo++;
                     bolIdx = i + 1;
                     continue;
                 }
-                if((i + 2 <= source.Length) && (source.Substring(i, 2).Equals("/*")))
+                if ((i + 2 <= source.Length) && (source.Substring(i, 2).Equals("/*")))
                 {
                     i += 2;
-                    while((i + 1 < source.Length) && (((c = source[i]) != '*') || (source[i + 1] != '/')))
+                    while ((i + 1 < source.Length) && (((c = source[i]) != '*') || (source[i + 1] != '/')))
                     {
-                        if(c == '\n')
+                        if (c == '\n')
                         {
                             lineNo++;
                             bolIdx = i + 1;
@@ -430,51 +428,51 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     continue;
                 }
 
-                 // Check for numbers.
-                if((c >= '0') && (c <= '9'))
+                // Check for numbers.
+                if ((c >= '0') && (c <= '9'))
                 {
                     int j = TryParseFloat(i);
-                    if(j == 0)
+                    if (j == 0)
                         j = TryParseInt(i);
                     i = --j;
                     continue;
                 }
-                if((c == '.') && (i + 1 < source.Length) && (source[i + 1] >= '0') && (source[i + 1] <= '9'))
+                if ((c == '.') && (i + 1 < source.Length) && (source[i + 1] >= '0') && (source[i + 1] <= '9'))
                 {
                     int j = TryParseFloat(i);
-                    if(j > 0)
+                    if (j > 0)
                         i = --j;
                     continue;
                 }
 
-                 // Check for quoted strings.
-                if(c == '"')
+                // Check for quoted strings.
+                if (c == '"')
                 {
                     StringBuilder sb = new StringBuilder();
                     bool backslash;
                     int j;
 
                     backslash = false;
-                    for(j = i; ++j < source.Length;)
+                    for (j = i; ++j < source.Length;)
                     {
                         c = source[j];
-                        if(c == '\\' && !backslash)
+                        if (c == '\\' && !backslash)
                         {
                             backslash = true;
                             continue;
                         }
-                        if(c == '\n')
+                        if (c == '\n')
                         {
                             lineNo++;
                             bolIdx = j + 1;
                         }
                         else
                         {
-                            if(!backslash && (c == '"'))
+                            if (!backslash && (c == '"'))
                                 break;
-                            if(backslash && (c == 'n'))
+                            if (backslash && (c == 'n'))
                                 c = '\n';
-                            if(backslash && (c == 't'))
+                            if (backslash && (c == 't'))
                             {
                                 sb.Append("   ");
                                 c = ' ';
@@ -483,7 +481,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                         backslash = false;
                         sb.Append(c);
                     }
-                    if(j - i > MAX_STRING_LEN)
+                    if (j - i > MAX_STRING_LEN)
                     {
                         TokenError(i, "string too long, max " + MAX_STRING_LEN);
                     }
@@ -495,8 +493,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     continue;
                 }
 
-                 // Check for quoted characters.
-                if(c == '\'')
+                // Check for quoted characters.
+                if (c == '\'')
                 {
                     char cb = (char)0;
                     bool backslash, overflow, underflow;
@@ -505,26 +503,26 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     backslash = false;
                     overflow = false;
                     underflow = true;
-                    for(j = i; ++j < source.Length;)
+                    for (j = i; ++j < source.Length;)
                     {
                         c = source[j];
-                        if(c == '\\' && !backslash)
+                        if (c == '\\' && !backslash)
                         {
                             backslash = true;
                             continue;
                         }
-                        if(c == '\n')
+                        if (c == '\n')
                         {
                             lineNo++;
                             bolIdx = j + 1;
                         }
                         else
                         {
-                            if(!backslash && (c == '\''))
+                            if (!backslash && (c == '\''))
                                 break;
-                            if(backslash && (c == 'n'))
+                            if (backslash && (c == 'n'))
                                 c = '\n';
-                            if(backslash && (c == 't'))
+                            if (backslash && (c == 't'))
                                 c = '\t';
                         }
                         backslash = false;
@@ -532,7 +530,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                         underflow = false;
                         cb = c;
                     }
-                    if(underflow || overflow)
+                    if (underflow || overflow)
                     {
                         TokenError(i, "character must be exactly one character");
                     }
@@ -544,60 +542,60 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     continue;
                 }
 
-                 // Check for keywords/names.
-                if((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_') || (c == '$' && options.dollarsigns))
+                // Check for keywords/names.
+                if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_') || (c == '$' && options.dollarsigns))
                 {
                     int j;
 
-                    for(j = i; ++j < source.Length;)
+                    for (j = i; ++j < source.Length;)
                     {
                         c = source[j];
-                        if(c >= 'a' && c <= 'z')
+                        if (c >= 'a' && c <= 'z')
                             continue;
-                        if(c >= 'A' && c <= 'Z')
+                        if (c >= 'A' && c <= 'Z')
                             continue;
-                        if(c >= '0' && c <= '9')
+                        if (c >= '0' && c <= '9')
                             continue;
-                        if(c == '$' && options.dollarsigns)
+                        if (c == '$' && options.dollarsigns)
                             continue;
-                        if(c != '_')
+                        if (c != '_')
                             break;
                     }
-                    if(j - i > MAX_NAME_LEN)
+                    if (j - i > MAX_NAME_LEN)
                     {
                         TokenError(i, "name too long, max " + MAX_NAME_LEN);
                     }
                     else
                     {
                         string name = source.Substring(i, j - i);
-                        if(name == "quaternion")
+                        if (name == "quaternion")
                             name = "rotation";  // see lslangtest1.lsl
-                        if(keywords.ContainsKey(name))
+                        if (keywords.ContainsKey(name))
                         {
                             Object[] args = new Object[] { emsg, filNam, lineNo, i - bolIdx };
                             AppendToken((Token)keywords[name].Invoke(args));
                         }
-                        else if(options.arrays && arrayKeywords.ContainsKey(name))
+                        else if (options.arrays && arrayKeywords.ContainsKey(name))
                         {
                             Object[] args = new Object[] { emsg, filNam, lineNo, i - bolIdx };
                             AppendToken((Token)arrayKeywords[name].Invoke(args));
                         }
-                        else if(options.advFlowCtl && advFlowCtlKeywords.ContainsKey(name))
+                        else if (options.advFlowCtl && advFlowCtlKeywords.ContainsKey(name))
                         {
                             Object[] args = new Object[] { emsg, filNam, lineNo, i - bolIdx };
                             AppendToken((Token)advFlowCtlKeywords[name].Invoke(args));
                         }
-                        else if(options.tryCatch && tryCatchKeywords.ContainsKey(name))
+                        else if (options.tryCatch && tryCatchKeywords.ContainsKey(name))
                         {
                             Object[] args = new Object[] { emsg, filNam, lineNo, i - bolIdx };
                             AppendToken((Token)tryCatchKeywords[name].Invoke(args));
                         }
-                        else if(options.objects && objectsKeywords.ContainsKey(name))
+                        else if (options.objects && objectsKeywords.ContainsKey(name))
                         {
                             Object[] args = new Object[] { emsg, filNam, lineNo, i - bolIdx };
                             AppendToken((Token)objectsKeywords[name].Invoke(args));
                         }
-                        else if(options.chars && charsKeywords.ContainsKey(name))
+                        else if (options.chars && charsKeywords.ContainsKey(name))
                         {
                             Object[] args = new Object[] { emsg, filNam, lineNo, i - bolIdx };
                             AppendToken((Token)charsKeywords[name].Invoke(args));
@@ -611,13 +609,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     continue;
                 }
 
-                 // Check for option enables.
-                if((c == ';') && (lastToken is TokenName) &&
+                // Check for option enables.
+                if ((c == ';') && (lastToken is TokenName) &&
                         (lastToken.prevToken is TokenName) &&
                         (strcasecmp(((TokenName)lastToken.prevToken).val, "yoption") == 0))
                 {
                     string opt = ((TokenName)lastToken).val;
-                    if(strcasecmp(opt, "allowall") == 0)
+                    if (strcasecmp(opt, "allowall") == 0)
                     {
                         options.arrays = true;
                         options.advFlowCtl = true;
@@ -627,19 +625,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                         //                        options.noRightToLeft = true;
                         options.dollarsigns = true;
                     }
-                    else if(strcasecmp(opt, "arrays") == 0)
+                    else if (strcasecmp(opt, "arrays") == 0)
                         options.arrays = true;
-                    else if(strcasecmp(opt, "advflowctl") == 0)
+                    else if (strcasecmp(opt, "advflowctl") == 0)
                         options.advFlowCtl = true;
-                    else if(strcasecmp(opt, "trycatch") == 0)
+                    else if (strcasecmp(opt, "trycatch") == 0)
                         options.tryCatch = true;
-                    else if(strcasecmp(opt, "objects") == 0)
+                    else if (strcasecmp(opt, "objects") == 0)
                         options.objects = true;
-                    else if(strcasecmp(opt, "chars") == 0)
+                    else if (strcasecmp(opt, "chars") == 0)
                         options.chars = true;
-                    else if(strcasecmp(opt, "norighttoleft") == 0)
+                    else if (strcasecmp(opt, "norighttoleft") == 0)
                         options.noRightToLeft = true;
-                    else if(strcasecmp(opt, "dollarsigns") == 0)
+                    else if (strcasecmp(opt, "dollarsigns") == 0)
                         options.dollarsigns = true;
                     else
                         lastToken.ErrorMsg("unknown YOption");
@@ -649,18 +647,18 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     continue;
                 }
 
-                 // Lastly, check for delimeters.
+                // Lastly, check for delimeters.
                 {
                     int j;
                     int len = 0;
 
-                    for(j = 0; j < delims.Length; j++)
+                    for (j = 0; j < delims.Length; j++)
                     {
                         len = delims[j].str.Length;
-                        if((i + len <= source.Length) && (source.Substring(i, len).Equals(delims[j].str)))
+                        if ((i + len <= source.Length) && (source.Substring(i, len).Equals(delims[j].str)))
                             break;
                     }
-                    if(j < delims.Length)
+                    if (j < delims.Length)
                     {
                         Object[] args = { emsg, filNam, lineNo, i - bolIdx };
                         Token kwToken = (Token)delims[j].ctorInfo.Invoke(args);
@@ -670,7 +668,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     }
                 }
 
-                 // Don't know what it is!
+                // Don't know what it is!
                 TokenError(i, "unknown character '" + c + "'");
             }
         }
@@ -700,28 +698,28 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             error = false;
             exponent = 0;
             mantissa = 0;
-            for(j = i; j < source.Length; j++)
+            for (j = i; j < source.Length; j++)
             {
                 c = source[j];
-                if((c >= '0') && (c <= '9'))
+                if ((c >= '0') && (c <= '9'))
                 {
                     m = mantissa * 10 + (ulong)(c - '0');
-                    if(m / 10 != mantissa)
+                    if (m / 10 != mantissa)
                     {
-                        if(!decimals)
+                        if (!decimals)
                             exponent++;
                     }
                     else
                     {
                         mantissa = m;
-                        if(decimals)
+                        if (decimals)
                             exponent--;
                     }
                     continue;
                 }
-                if(c == '.')
+                if (c == '.')
                 {
-                    if(decimals)
+                    if (decimals)
                     {
                         TokenError(i, "more than one decimal point");
                         return j;
@@ -729,45 +727,45 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     decimals = true;
                     continue;
                 }
-                if((c == 'E') || (c == 'e'))
+                if ((c == 'E') || (c == 'e'))
                 {
-                    if(++j >= source.Length)
+                    if (++j >= source.Length)
                     {
                         TokenError(i, "floating exponent off end of source");
                         return j;
                     }
                     c = source[j];
                     negexp = (c == '-');
-                    if(negexp || (c == '+'))
+                    if (negexp || (c == '+'))
                         j++;
                     y = 0;
                     nulexp = true;
-                    for(; j < source.Length; j++)
+                    for (; j < source.Length; j++)
                     {
                         c = source[j];
-                        if((c < '0') || (c > '9'))
+                        if ((c < '0') || (c > '9'))
                             break;
                         x = y * 10 + (c - '0');
-                        if(x / 10 != y)
+                        if (x / 10 != y)
                         {
-                            if(!error)
+                            if (!error)
                                 TokenError(i, "floating exponent overflow");
                             error = true;
                         }
                         y = x;
                         nulexp = false;
                     }
-                    if(nulexp)
+                    if (nulexp)
                     {
                         TokenError(i, "bad or missing floating exponent");
                         return j;
                     }
-                    if(negexp)
+                    if (negexp)
                     {
                         x = exponent - y;
-                        if(x > exponent)
+                        if (x > exponent)
                         {
-                            if(!error)
+                            if (!error)
                                 TokenError(i, "floating exponent overflow");
                             error = true;
                         }
@@ -775,9 +773,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     else
                     {
                         x = exponent + y;
-                        if(x < exponent)
+                        if (x < exponent)
                         {
-                            if(!error)
+                            if (!error)
                                 TokenError(i, "floating exponent overflow");
                             error = true;
                         }
@@ -795,28 +793,28 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     c = source[j];
                     if (((c >= '0') && (c <= '9')) || c == '.' || ((c == 'E') || (c == 'e')) || ((c == 'F') || (c == 'f')))
                     {
-                        TokenError(j-1, "Syntax error");
+                        TokenError(j - 1, "Syntax error");
                         return j;
                     }
                     break;
                 }
                 break;
             }
-            if(!decimals)
+            if (!decimals)
             {
                 return 0;
             }
 
             f = mantissa;
-            if((exponent != 0) && (mantissa != 0) && !error)
+            if ((exponent != 0) && (mantissa != 0) && !error)
             {
                 f10 = 10.0;
-                if(exponent < 0)
+                if (exponent < 0)
                 {
                     exponent = -exponent;
-                    while(exponent > 0)
+                    while (exponent > 0)
                     {
-                        if((exponent & 1) != 0)
+                        if ((exponent & 1) != 0)
                         {
                             f /= f10;
                         }
@@ -826,9 +824,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 }
                 else
                 {
-                    while(exponent > 0)
+                    while (exponent > 0)
                     {
-                        if((exponent & 1) != 0)
+                        if ((exponent & 1) != 0)
                         {
                             f *= f10;
                         }
@@ -837,7 +835,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     }
                 }
             }
-            if(!error)
+            if (!error)
             {
                 AppendToken(new TokenFloat(emsg, filNam, lineNo, i - bolIdx, f));
             }
@@ -862,53 +860,53 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             basse = 10;
             error = false;
             mantissa = 0;
-            for(j = i; j < source.Length; j++)
+            for (j = i; j < source.Length; j++)
             {
                 c = source[j];
-                if((c >= '0') && (c <= '9'))
+                if ((c >= '0') && (c <= '9'))
                 {
                     m = mantissa * basse + (uint)(c - '0');
-                    if(m / basse != mantissa)
+                    if (m / basse != mantissa)
                     {
-                        if(!error)
+                        if (!error)
                             TokenError(i, "integer overflow");
                         error = true;
                     }
                     mantissa = m;
                     continue;
                 }
-                if((basse == 16) && ((c >= 'A') && (c <= 'F')))
+                if ((basse == 16) && ((c >= 'A') && (c <= 'F')))
                 {
                     m = mantissa * basse + (uint)(c - 'A') + 10U;
-                    if(m / basse != mantissa)
+                    if (m / basse != mantissa)
                     {
-                        if(!error)
+                        if (!error)
                             TokenError(i, "integer overflow");
                         error = true;
                     }
                     mantissa = m;
                     continue;
                 }
-                if((basse == 16) && ((c >= 'a') && (c <= 'f')))
+                if ((basse == 16) && ((c >= 'a') && (c <= 'f')))
                 {
                     m = mantissa * basse + (uint)(c - 'a') + 10U;
-                    if(m / basse != mantissa)
+                    if (m / basse != mantissa)
                     {
-                        if(!error)
+                        if (!error)
                             TokenError(i, "integer overflow");
                         error = true;
                     }
                     mantissa = m;
                     continue;
                 }
-                if(((c == 'x') || (c == 'X')) && (mantissa == 0) && (basse == 10))
+                if (((c == 'x') || (c == 'X')) && (mantissa == 0) && (basse == 10))
                 {
                     basse = 16;
                     continue;
                 }
                 break;
             }
-            if(!error)
+            if (!error)
             {
                 AppendToken(new TokenInt(emsg, filNam, lineNo, i - bolIdx, (int)mantissa));
             }
@@ -1142,7 +1140,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
      *        They are all sub-types of Token.
      */
 
-    public class TokenChar: Token
+    public class TokenChar : Token
     {
         public char val;
         public TokenChar(TokenErrorMessage emsg, string file, int line, int posn, char val) : base(emsg, file, line, posn)
@@ -1155,7 +1153,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override string ToString()
         {
-            switch(val)
+            switch (val)
             {
                 case '\'':
                     return "'\\''";
@@ -1171,7 +1169,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class TokenFloat: Token
+    public class TokenFloat : Token
     {
         public double val;
         public TokenFloat(TokenErrorMessage emsg, string file, int line, int posn, double val) : base(emsg, file, line, posn)
@@ -1184,7 +1182,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class TokenInt: Token
+    public class TokenInt : Token
     {
         public int val;
         public TokenInt(TokenErrorMessage emsg, string file, int line, int posn, int val) : base(emsg, file, line, posn)
@@ -1201,7 +1199,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class TokenName: Token
+    public class TokenName : Token
     {
         public string val;
         public TokenName(TokenErrorMessage emsg, string file, int line, int posn, string val) : base(emsg, file, line, posn)
@@ -1218,7 +1216,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class TokenStr: Token
+    public class TokenStr : Token
     {
         public string val;
         public TokenStr(TokenErrorMessage emsg, string file, int line, int posn, string val) : base(emsg, file, line, posn)
@@ -1227,7 +1225,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override string ToString()
         {
-            if((val.IndexOf('"') < 0) &&
+            if ((val.IndexOf('"') < 0) &&
                 (val.IndexOf('\\') < 0) &&
                 (val.IndexOf('\n') < 0) &&
                 (val.IndexOf('\t') < 0))
@@ -1236,10 +1234,10 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             int len = val.Length;
             StringBuilder sb = new StringBuilder(len * 2 + 2);
             sb.Append('"');
-            for(int i = 0; i < len; i++)
+            for (int i = 0; i < len; i++)
             {
                 char c = val[i];
-                switch(c)
+                switch (c)
                 {
                     case '"':
                         {
@@ -1279,7 +1277,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     /*
      * This one marks the end-of-file.
      */
-    public class TokenEnd: Token
+    public class TokenEnd : Token
     {
         public TokenEnd(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { }
     }
@@ -1290,7 +1288,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     public delegate object TokenRValConstBinOpDelegate(object left, object right);
     public delegate object TokenRValConstUnOpDelegate(object right);
 
-    public class TokenKw: Token
+    public class TokenKw : Token
     {
         public TokenRValConstBinOpDelegate binOpConst;
         public TokenRValConstUnOpDelegate unOpConst;
@@ -1303,7 +1301,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class TokenKwDotDotDot: TokenKw
+    public class TokenKwDotDotDot : TokenKw
     {
         public TokenKwDotDotDot(TokenErrorMessage emsg, string file,
                                 int line, int posn) : base(emsg, file, line, posn)
@@ -1323,7 +1321,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "...";
         }
     }
-    public class TokenKwAndAndAnd: TokenKw
+    public class TokenKwAndAndAnd : TokenKw
     {
         public TokenKwAndAndAnd(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn)
         {
@@ -1342,7 +1340,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "&&&";
         }
     }
-    public class TokenKwOrOrOr: TokenKw
+    public class TokenKwOrOrOr : TokenKw
     {
         public TokenKwOrOrOr(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn)
         {
@@ -1361,7 +1359,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "|||";
         }
     }
-    public class TokenKwAsnLSh: TokenKw
+    public class TokenKwAsnLSh : TokenKw
     {
         public TokenKwAsnLSh(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn)
         {
@@ -1380,7 +1378,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "<<=";
         }
     }
-    public class TokenKwAsnRSh: TokenKw
+    public class TokenKwAsnRSh : TokenKw
     {
         public TokenKwAsnRSh(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwAsnRSh(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1389,7 +1387,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return ">>=";
         }
     }
-    public class TokenKwCmpLE: TokenKw
+    public class TokenKwCmpLE : TokenKw
     {
         public TokenKwCmpLE(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwCmpLE(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1398,7 +1396,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "<=";
         }
     }
-    public class TokenKwCmpGE: TokenKw
+    public class TokenKwCmpGE : TokenKw
     {
         public TokenKwCmpGE(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwCmpGE(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1407,7 +1405,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return ">=";
         }
     }
-    public class TokenKwCmpEQ: TokenKw
+    public class TokenKwCmpEQ : TokenKw
     {
         public TokenKwCmpEQ(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwCmpEQ(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1416,7 +1414,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "==";
         }
     }
-    public class TokenKwCmpNE: TokenKw
+    public class TokenKwCmpNE : TokenKw
     {
         public TokenKwCmpNE(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwCmpNE(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1425,7 +1423,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "!=";
         }
     }
-    public class TokenKwIncr: TokenKw
+    public class TokenKwIncr : TokenKw
     {
         public TokenKwIncr(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwIncr(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1434,7 +1432,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "++";
         }
     }
-    public class TokenKwDecr: TokenKw
+    public class TokenKwDecr : TokenKw
     {
         public TokenKwDecr(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwDecr(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1443,7 +1441,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "--";
         }
     }
-    public class TokenKwAndAnd: TokenKw
+    public class TokenKwAndAnd : TokenKw
     {
         public TokenKwAndAnd(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwAndAnd(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1452,7 +1450,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "&&";
         }
     }
-    public class TokenKwOrOr: TokenKw
+    public class TokenKwOrOr : TokenKw
     {
         public TokenKwOrOr(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwOrOr(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1461,7 +1459,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "||";
         }
     }
-    public class TokenKwAsnAdd: TokenKw
+    public class TokenKwAsnAdd : TokenKw
     {
         public TokenKwAsnAdd(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwAsnAdd(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1470,7 +1468,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "+=";
         }
     }
-    public class TokenKwAsnAnd: TokenKw
+    public class TokenKwAsnAnd : TokenKw
     {
         public TokenKwAsnAnd(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwAsnAnd(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1479,7 +1477,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "&=";
         }
     }
-    public class TokenKwAsnSub: TokenKw
+    public class TokenKwAsnSub : TokenKw
     {
         public TokenKwAsnSub(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwAsnSub(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1488,7 +1486,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "-=";
         }
     }
-    public class TokenKwAsnMul: TokenKw
+    public class TokenKwAsnMul : TokenKw
     {
         public TokenKwAsnMul(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwAsnMul(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1497,7 +1495,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "*=";
         }
     }
-    public class TokenKwAsnDiv: TokenKw
+    public class TokenKwAsnDiv : TokenKw
     {
         public TokenKwAsnDiv(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwAsnDiv(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1506,7 +1504,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "/=";
         }
     }
-    public class TokenKwAsnMod: TokenKw
+    public class TokenKwAsnMod : TokenKw
     {
         public TokenKwAsnMod(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwAsnMod(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1515,7 +1513,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "%=";
         }
     }
-    public class TokenKwAsnOr: TokenKw
+    public class TokenKwAsnOr : TokenKw
     {
         public TokenKwAsnOr(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwAsnOr(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1524,7 +1522,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "|=";
         }
     }
-    public class TokenKwAsnXor: TokenKw
+    public class TokenKwAsnXor : TokenKw
     {
         public TokenKwAsnXor(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwAsnXor(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1533,7 +1531,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "^=";
         }
     }
-    public class TokenKwLSh: TokenKw
+    public class TokenKwLSh : TokenKw
     {
         public TokenKwLSh(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.LSh; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwLSh(Token original) : base(original) { binOpConst = TokenRValConstOps.LSh; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1542,7 +1540,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "<<";
         }
     }
-    public class TokenKwRSh: TokenKw
+    public class TokenKwRSh : TokenKw
     {
         public TokenKwRSh(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.RSh; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwRSh(Token original) : base(original) { binOpConst = TokenRValConstOps.RSh; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1551,7 +1549,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return ">>";
         }
     }
-    public class TokenKwTilde: TokenKw
+    public class TokenKwTilde : TokenKw
     {
         public TokenKwTilde(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Not; sdtClassOp = true; }
         public TokenKwTilde(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Not; sdtClassOp = true; }
@@ -1560,7 +1558,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "~";
         }
     }
-    public class TokenKwExclam: TokenKw
+    public class TokenKwExclam : TokenKw
     {
         public TokenKwExclam(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwExclam(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1569,7 +1567,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "!";
         }
     }
-    public class TokenKwAt: TokenKw
+    public class TokenKwAt : TokenKw
     {
         public TokenKwAt(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwAt(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1578,7 +1576,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "@";
         }
     }
-    public class TokenKwMod: TokenKw
+    public class TokenKwMod : TokenKw
     {
         public TokenKwMod(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Mod; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwMod(Token original) : base(original) { binOpConst = TokenRValConstOps.Mod; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1587,7 +1585,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "%";
         }
     }
-    public class TokenKwXor: TokenKw
+    public class TokenKwXor : TokenKw
     {
         public TokenKwXor(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Xor; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwXor(Token original) : base(original) { binOpConst = TokenRValConstOps.Xor; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1596,7 +1594,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "^";
         }
     }
-    public class TokenKwAnd: TokenKw
+    public class TokenKwAnd : TokenKw
     {
         public TokenKwAnd(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.And; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwAnd(Token original) : base(original) { binOpConst = TokenRValConstOps.And; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1605,7 +1603,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "&";
         }
     }
-    public class TokenKwMul: TokenKw
+    public class TokenKwMul : TokenKw
     {
         public TokenKwMul(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Mul; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwMul(Token original) : base(original) { binOpConst = TokenRValConstOps.Mul; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1614,7 +1612,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "*";
         }
     }
-    public class TokenKwParOpen: TokenKw
+    public class TokenKwParOpen : TokenKw
     {
         public TokenKwParOpen(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwParOpen(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1623,7 +1621,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "(";
         }
     }
-    public class TokenKwParClose: TokenKw
+    public class TokenKwParClose : TokenKw
     {
         public TokenKwParClose(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwParClose(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1632,7 +1630,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return ")";
         }
     }
-    public class TokenKwSub: TokenKw
+    public class TokenKwSub : TokenKw
     {
         public TokenKwSub(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Sub; unOpConst = TokenRValConstOps.Neg; sdtClassOp = true; }
         public TokenKwSub(Token original) : base(original) { binOpConst = TokenRValConstOps.Sub; unOpConst = TokenRValConstOps.Neg; sdtClassOp = true; }
@@ -1641,7 +1639,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "-";
         }
     }
-    public class TokenKwAdd: TokenKw
+    public class TokenKwAdd : TokenKw
     {
         public TokenKwAdd(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Add; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwAdd(Token original) : base(original) { binOpConst = TokenRValConstOps.Add; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1650,7 +1648,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "+";
         }
     }
-    public class TokenKwAssign: TokenKw
+    public class TokenKwAssign : TokenKw
     {
         public TokenKwAssign(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwAssign(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1659,7 +1657,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "=";
         }
     }
-    public class TokenKwBrcOpen: TokenKw
+    public class TokenKwBrcOpen : TokenKw
     {
         public TokenKwBrcOpen(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwBrcOpen(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1668,7 +1666,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "{";
         }
     }
-    public class TokenKwBrcClose: TokenKw
+    public class TokenKwBrcClose : TokenKw
     {
         public TokenKwBrcClose(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwBrcClose(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1677,7 +1675,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "}";
         }
     }
-    public class TokenKwBrkOpen: TokenKw
+    public class TokenKwBrkOpen : TokenKw
     {
         public TokenKwBrkOpen(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwBrkOpen(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1686,7 +1684,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "[";
         }
     }
-    public class TokenKwBrkClose: TokenKw
+    public class TokenKwBrkClose : TokenKw
     {
         public TokenKwBrkClose(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwBrkClose(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1695,7 +1693,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "]";
         }
     }
-    public class TokenKwSemi: TokenKw
+    public class TokenKwSemi : TokenKw
     {
         public TokenKwSemi(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwSemi(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1704,7 +1702,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return ";";
         }
     }
-    public class TokenKwColon: TokenKw
+    public class TokenKwColon : TokenKw
     {
         public TokenKwColon(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwColon(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1713,7 +1711,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return ":";
         }
     }
-    public class TokenKwCmpLT: TokenKw
+    public class TokenKwCmpLT : TokenKw
     {
         public TokenKwCmpLT(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwCmpLT(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1722,7 +1720,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "<";
         }
     }
-    public class TokenKwCmpGT: TokenKw
+    public class TokenKwCmpGT : TokenKw
     {
         public TokenKwCmpGT(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwCmpGT(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1731,7 +1729,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return ">";
         }
     }
-    public class TokenKwComma: TokenKw
+    public class TokenKwComma : TokenKw
     {
         public TokenKwComma(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwComma(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1740,7 +1738,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return ",";
         }
     }
-    public class TokenKwDot: TokenKw
+    public class TokenKwDot : TokenKw
     {
         public TokenKwDot(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwDot(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1749,7 +1747,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return ".";
         }
     }
-    public class TokenKwQMark: TokenKw
+    public class TokenKwQMark : TokenKw
     {
         public TokenKwQMark(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwQMark(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1758,7 +1756,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "?";
         }
     }
-    public class TokenKwDiv: TokenKw
+    public class TokenKwDiv : TokenKw
     {
         public TokenKwDiv(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Div; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwDiv(Token original) : base(original) { binOpConst = TokenRValConstOps.Div; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1767,7 +1765,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "/";
         }
     }
-    public class TokenKwOr: TokenKw
+    public class TokenKwOr : TokenKw
     {
         public TokenKwOr(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Or; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
         public TokenKwOr(Token original) : base(original) { binOpConst = TokenRValConstOps.Or; unOpConst = TokenRValConstOps.Null; sdtClassOp = true; }
@@ -1776,7 +1774,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "|";
         }
     }
-    public class TokenKwHash: TokenKw
+    public class TokenKwHash : TokenKw
     {
         public TokenKwHash(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwHash(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1786,7 +1784,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class TokenKwAbstract: TokenKw
+    public class TokenKwAbstract : TokenKw
     {
         public TokenKwAbstract(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwAbstract(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1795,7 +1793,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "abstract";
         }
     }
-    public class TokenKwBase: TokenKw
+    public class TokenKwBase : TokenKw
     {
         public TokenKwBase(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwBase(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1804,7 +1802,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "base";
         }
     }
-    public class TokenKwBreak: TokenKw
+    public class TokenKwBreak : TokenKw
     {
         public TokenKwBreak(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwBreak(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1813,7 +1811,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "break";
         }
     }
-    public class TokenKwCase: TokenKw
+    public class TokenKwCase : TokenKw
     {
         public TokenKwCase(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwCase(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1822,7 +1820,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "case";
         }
     }
-    public class TokenKwCatch: TokenKw
+    public class TokenKwCatch : TokenKw
     {
         public TokenKwCatch(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwCatch(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1831,7 +1829,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "catch";
         }
     }
-    public class TokenKwClass: TokenKw
+    public class TokenKwClass : TokenKw
     {
         public TokenKwClass(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwClass(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1840,7 +1838,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "class";
         }
     }
-    public class TokenKwConst: TokenKw
+    public class TokenKwConst : TokenKw
     {
         public TokenKwConst(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwConst(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1849,7 +1847,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "constant";
         }
     }
-    public class TokenKwConstructor: TokenKw
+    public class TokenKwConstructor : TokenKw
     {
         public TokenKwConstructor(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwConstructor(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1858,7 +1856,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "constructor";
         }
     }
-    public class TokenKwCont: TokenKw
+    public class TokenKwCont : TokenKw
     {
         public TokenKwCont(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwCont(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1867,7 +1865,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "continue";
         }
     }
-    public class TokenKwDelegate: TokenKw
+    public class TokenKwDelegate : TokenKw
     {
         public TokenKwDelegate(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwDelegate(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1876,7 +1874,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "delegate";
         }
     }
-    public class TokenKwDefault: TokenKw
+    public class TokenKwDefault : TokenKw
     {
         public TokenKwDefault(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwDefault(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1885,7 +1883,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "default";
         }
     }
-    public class TokenKwDestructor: TokenKw
+    public class TokenKwDestructor : TokenKw
     {
         public TokenKwDestructor(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwDestructor(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1894,7 +1892,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "destructor";
         }
     }
-    public class TokenKwDo: TokenKw
+    public class TokenKwDo : TokenKw
     {
         public TokenKwDo(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwDo(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1903,7 +1901,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "do";
         }
     }
-    public class TokenKwElse: TokenKw
+    public class TokenKwElse : TokenKw
     {
         public TokenKwElse(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwElse(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1912,7 +1910,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "else";
         }
     }
-    public class TokenKwFinal: TokenKw
+    public class TokenKwFinal : TokenKw
     {
         public TokenKwFinal(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwFinal(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1921,7 +1919,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "final";
         }
     }
-    public class TokenKwFinally: TokenKw
+    public class TokenKwFinally : TokenKw
     {
         public TokenKwFinally(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwFinally(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1930,7 +1928,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "finally";
         }
     }
-    public class TokenKwFor: TokenKw
+    public class TokenKwFor : TokenKw
     {
         public TokenKwFor(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwFor(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1939,7 +1937,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "for";
         }
     }
-    public class TokenKwForEach: TokenKw
+    public class TokenKwForEach : TokenKw
     {
         public TokenKwForEach(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwForEach(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1948,7 +1946,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "foreach";
         }
     }
-    public class TokenKwGet: TokenKw
+    public class TokenKwGet : TokenKw
     {
         public TokenKwGet(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwGet(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1957,7 +1955,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "get";
         }
     }
-    public class TokenKwIf: TokenKw
+    public class TokenKwIf : TokenKw
     {
         public TokenKwIf(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwIf(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1966,7 +1964,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "if";
         }
     }
-    public class TokenKwIn: TokenKw
+    public class TokenKwIn : TokenKw
     {
         public TokenKwIn(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwIn(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1975,7 +1973,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "in";
         }
     }
-    public class TokenKwInterface: TokenKw
+    public class TokenKwInterface : TokenKw
     {
         public TokenKwInterface(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwInterface(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1984,7 +1982,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "interface";
         }
     }
-    public class TokenKwIs: TokenKw
+    public class TokenKwIs : TokenKw
     {
         public TokenKwIs(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwIs(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -1993,7 +1991,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "is";
         }
     }
-    public class TokenKwJump: TokenKw
+    public class TokenKwJump : TokenKw
     {
         public TokenKwJump(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwJump(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2002,7 +2000,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "jump";
         }
     }
-    public class TokenKwNew: TokenKw
+    public class TokenKwNew : TokenKw
     {
         public TokenKwNew(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwNew(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2011,7 +2009,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "new";
         }
     }
-    public class TokenKwOverride: TokenKw
+    public class TokenKwOverride : TokenKw
     {
         public TokenKwOverride(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwOverride(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2020,7 +2018,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "override";
         }
     }
-    public class TokenKwPartial: TokenKw
+    public class TokenKwPartial : TokenKw
     {
         public TokenKwPartial(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwPartial(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2029,7 +2027,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "partial";
         }
     }
-    public class TokenKwPrivate: TokenKw
+    public class TokenKwPrivate : TokenKw
     {
         public TokenKwPrivate(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwPrivate(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2038,7 +2036,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "private";
         }
     }
-    public class TokenKwProtected: TokenKw
+    public class TokenKwProtected : TokenKw
     {
         public TokenKwProtected(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwProtected(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2047,7 +2045,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "protected";
         }
     }
-    public class TokenKwPublic: TokenKw
+    public class TokenKwPublic : TokenKw
     {
         public TokenKwPublic(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwPublic(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2056,7 +2054,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "public";
         }
     }
-    public class TokenKwRet: TokenKw
+    public class TokenKwRet : TokenKw
     {
         public TokenKwRet(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwRet(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2065,7 +2063,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "return";
         }
     }
-    public class TokenKwSet: TokenKw
+    public class TokenKwSet : TokenKw
     {
         public TokenKwSet(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwSet(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2074,7 +2072,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "set";
         }
     }
-    public class TokenKwState: TokenKw
+    public class TokenKwState : TokenKw
     {
         public TokenKwState(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwState(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2083,7 +2081,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "state";
         }
     }
-    public class TokenKwStatic: TokenKw
+    public class TokenKwStatic : TokenKw
     {
         public TokenKwStatic(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwStatic(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2092,7 +2090,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "static";
         }
     }
-    public class TokenKwSwitch: TokenKw
+    public class TokenKwSwitch : TokenKw
     {
         public TokenKwSwitch(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwSwitch(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2101,7 +2099,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "switch";
         }
     }
-    public class TokenKwThis: TokenKw
+    public class TokenKwThis : TokenKw
     {
         public TokenKwThis(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwThis(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2110,7 +2108,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "this";
         }
     }
-    public class TokenKwThrow: TokenKw
+    public class TokenKwThrow : TokenKw
     {
         public TokenKwThrow(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwThrow(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2119,7 +2117,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "throw";
         }
     }
-    public class TokenKwTry: TokenKw
+    public class TokenKwTry : TokenKw
     {
         public TokenKwTry(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwTry(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2128,7 +2126,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "try";
         }
     }
-    public class TokenKwTypedef: TokenKw
+    public class TokenKwTypedef : TokenKw
     {
         public TokenKwTypedef(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwTypedef(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2137,7 +2135,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "typedef";
         }
     }
-    public class TokenKwUndef: TokenKw
+    public class TokenKwUndef : TokenKw
     {
         public TokenKwUndef(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwUndef(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2146,7 +2144,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "undef";
         }
     }
-    public class TokenKwVirtual: TokenKw
+    public class TokenKwVirtual : TokenKw
     {
         public TokenKwVirtual(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwVirtual(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2155,7 +2153,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "virtual";
         }
     }
-    public class TokenKwWhile: TokenKw
+    public class TokenKwWhile : TokenKw
     {
         public TokenKwWhile(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
         public TokenKwWhile(Token original) : base(original) { binOpConst = TokenRValConstOps.Null; unOpConst = TokenRValConstOps.Null; sdtClassOp = false; }
@@ -2186,19 +2184,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public static object Div(object left, object right)
         {
-            if((left is int) && (right is int))
+            if ((left is int) && (right is int))
             {
                 return (int)left / (int)right;
             }
-            if((left is int) && (right is double))
+            if ((left is int) && (right is double))
             {
                 return (int)left / (double)right;
             }
-            if((left is double) && (right is int))
+            if ((left is double) && (right is int))
             {
                 return (double)left / (int)right;
             }
-            if((left is double) && (right is double))
+            if ((left is double) && (right is double))
             {
                 return (double)left / (double)right;
             }
@@ -2206,19 +2204,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public static object Mod(object left, object right)
         {
-            if((left is int) && (right is int))
+            if ((left is int) && (right is int))
             {
                 return (int)left % (int)right;
             }
-            if((left is int) && (right is double))
+            if ((left is int) && (right is double))
             {
                 return (int)left % (double)right;
             }
-            if((left is double) && (right is int))
+            if ((left is double) && (right is int))
             {
                 return (double)left % (int)right;
             }
-            if((left is double) && (right is double))
+            if ((left is double) && (right is double))
             {
                 return (double)left % (double)right;
             }
@@ -2226,19 +2224,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public static object Mul(object left, object right)
         {
-            if((left is int) && (right is int))
+            if ((left is int) && (right is int))
             {
                 return (int)left * (int)right;
             }
-            if((left is int) && (right is double))
+            if ((left is int) && (right is double))
             {
                 return (int)left * (double)right;
             }
-            if((left is double) && (right is int))
+            if ((left is double) && (right is int))
             {
                 return (double)left * (int)right;
             }
-            if((left is double) && (right is double))
+            if ((left is double) && (right is double))
             {
                 return (double)left * (double)right;
             }
@@ -2246,19 +2244,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public static object And(object left, object right)
         {
-            if((left is int) && (right is int))
+            if ((left is int) && (right is int))
             {
                 return (int)left & (int)right;
             }
-            if((left is int) && (right is double))
+            if ((left is int) && (right is double))
             {
                 return (int)left & (int)(double)right;
             }
-            if((left is double) && (right is int))
+            if ((left is double) && (right is int))
             {
                 return (int)(double)left & (int)right;
             }
-            if((left is double) && (right is double))
+            if ((left is double) && (right is double))
             {
                 return (int)(double)left & (int)(double)right;
             }
@@ -2266,19 +2264,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public static object LSh(object left, object right)
         {
-            if((left is int) && (right is int))
+            if ((left is int) && (right is int))
             {
                 return (int)left << (int)right;
             }
-            if((left is int) && (right is double))
+            if ((left is int) && (right is double))
             {
                 return (int)left << (int)(double)right;
             }
-            if((left is double) && (right is int))
+            if ((left is double) && (right is int))
             {
                 return (int)(double)left << (int)right;
             }
-            if((left is double) && (right is double))
+            if ((left is double) && (right is double))
             {
                 return (int)(double)left << (int)(double)right;
             }
@@ -2286,19 +2284,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public static object Or(object left, object right)
         {
-            if((left is int) && (right is int))
+            if ((left is int) && (right is int))
             {
                 return (int)left | (int)right;
             }
-            if((left is int) && (right is double))
+            if ((left is int) && (right is double))
             {
                 return (int)left | (int)(double)right;
             }
-            if((left is double) && (right is int))
+            if ((left is double) && (right is int))
             {
                 return (int)(double)left | (int)right;
             }
-            if((left is double) && (right is double))
+            if ((left is double) && (right is double))
             {
                 return (int)(double)left | (int)(double)right;
             }
@@ -2306,19 +2304,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public static object RSh(object left, object right)
         {
-            if((left is int) && (right is int))
+            if ((left is int) && (right is int))
             {
                 return (int)left >> (int)right;
             }
-            if((left is int) && (right is double))
+            if ((left is int) && (right is double))
             {
                 return (int)left >> (int)(double)right;
             }
-            if((left is double) && (right is int))
+            if ((left is double) && (right is int))
             {
                 return (int)(double)left >> (int)right;
             }
-            if((left is double) && (right is double))
+            if ((left is double) && (right is double))
             {
                 return (int)(double)left >> (int)(double)right;
             }
@@ -2326,19 +2324,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public static object Xor(object left, object right)
         {
-            if((left is int) && (right is int))
+            if ((left is int) && (right is int))
             {
                 return (int)left ^ (int)right;
             }
-            if((left is int) && (right is double))
+            if ((left is int) && (right is double))
             {
                 return (int)left ^ (int)(double)right;
             }
-            if((left is double) && (right is int))
+            if ((left is double) && (right is int))
             {
                 return (int)(double)left ^ (int)right;
             }
-            if((left is double) && (right is double))
+            if ((left is double) && (right is double))
             {
                 return (int)(double)left ^ (int)(double)right;
             }
@@ -2346,47 +2344,47 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public static object Add(object left, object right)
         {
-            if((left is char) && (right is int))
+            if ((left is char) && (right is int))
             {
                 return (char)((char)left + (int)right);
             }
-            if((left is double) && (right is double))
+            if ((left is double) && (right is double))
             {
                 return (double)left + (double)right;
             }
-            if((left is double) && (right is int))
+            if ((left is double) && (right is int))
             {
                 return (double)left + (int)right;
             }
-            if((left is double) && (right is string))
+            if ((left is double) && (right is string))
             {
                 return TypeCast.FloatToString((double)left) + (string)right;
             }
-            if((left is int) && (right is double))
+            if ((left is int) && (right is double))
             {
                 return (int)left + (double)right;
             }
-            if((left is int) && (right is int))
+            if ((left is int) && (right is int))
             {
                 return (int)left + (int)right;
             }
-            if((left is int) && (right is string))
+            if ((left is int) && (right is string))
             {
                 return TypeCast.IntegerToString((int)left) + (string)right;
             }
-            if((left is string) && (right is char))
+            if ((left is string) && (right is char))
             {
                 return (string)left + (char)right;
             }
-            if((left is string) && (right is double))
+            if ((left is string) && (right is double))
             {
                 return (string)left + TypeCast.FloatToString((double)right);
             }
-            if((left is string) && (right is int))
+            if ((left is string) && (right is int))
             {
                 return (string)left + TypeCast.IntegerToString((int)right);
             }
-            if((left is string) && (right is string))
+            if ((left is string) && (right is string))
             {
                 return (string)left + (string)right;
             }
@@ -2394,23 +2392,23 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public static object Sub(object left, object right)
         {
-            if((left is char) && (right is int))
+            if ((left is char) && (right is int))
             {
                 return (char)((char)left - (int)right);
             }
-            if((left is int) && (right is int))
+            if ((left is int) && (right is int))
             {
                 return (int)left - (int)right;
             }
-            if((left is int) && (right is double))
+            if ((left is int) && (right is double))
             {
                 return (int)left - (double)right;
             }
-            if((left is double) && (right is int))
+            if ((left is double) && (right is int))
             {
                 return (double)left - (int)right;
             }
-            if((left is double) && (right is double))
+            if ((left is double) && (right is double))
             {
                 return (double)left - (double)right;
             }
@@ -2422,11 +2420,11 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public static object Neg(object right)
         {
-            if(right is int)
+            if (right is int)
             {
                 return -(int)right;
             }
-            if(right is double)
+            if (right is double)
             {
                 return -(double)right;
             }
@@ -2434,7 +2432,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public static object Not(object right)
         {
-            if(right is int)
+            if (right is int)
             {
                 return ~(int)right;
             }
@@ -2445,7 +2443,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     /*
      * Various datatypes.
      */
-    public abstract class TokenType: Token
+    public abstract class TokenType : Token
     {
 
         public TokenType(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { }
@@ -2453,37 +2451,37 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public static TokenType FromSysType(Token original, System.Type typ)
         {
-            if(typ == typeof(LSL_List))
+            if (typ == typeof(LSL_List))
                 return new TokenTypeList(original);
-            if(typ == typeof(LSL_Rotation))
+            if (typ == typeof(LSL_Rotation))
                 return new TokenTypeRot(original);
-            if(typ == typeof(void))
+            if (typ == typeof(void))
                 return new TokenTypeVoid(original);
-            if(typ == typeof(LSL_Vector))
+            if (typ == typeof(LSL_Vector))
                 return new TokenTypeVec(original);
-            if(typ == typeof(float))
+            if (typ == typeof(float))
                 return new TokenTypeFloat(original);
-            if(typ == typeof(int))
+            if (typ == typeof(int))
                 return new TokenTypeInt(original);
-            if(typ == typeof(string))
+            if (typ == typeof(string))
                 return new TokenTypeStr(original);
-            if(typ == typeof(double))
+            if (typ == typeof(double))
                 return new TokenTypeFloat(original);
-            if(typ == typeof(bool))
+            if (typ == typeof(bool))
                 return new TokenTypeBool(original);
-            if(typ == typeof(object))
+            if (typ == typeof(object))
                 return new TokenTypeObject(original);
-            if(typ == typeof(XMR_Array))
+            if (typ == typeof(XMR_Array))
                 return new TokenTypeArray(original);
-            if(typ == typeof(LSL_Integer))
+            if (typ == typeof(LSL_Integer))
                 return new TokenTypeLSLInt(original);
-            if(typ == typeof(LSL_Float))
+            if (typ == typeof(LSL_Float))
                 return new TokenTypeLSLFloat(original);
-            if(typ == typeof(LSL_String))
+            if (typ == typeof(LSL_String))
                 return new TokenTypeLSLString(original);
-            if(typ == typeof(char))
+            if (typ == typeof(char))
                 return new TokenTypeChar(original);
-            if(typ == typeof(Exception))
+            if (typ == typeof(Exception))
                 return new TokenTypeExc(original);
 
             throw new Exception("unknown script type " + typ.ToString());
@@ -2491,31 +2489,31 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public static TokenType FromLSLType(Token original, string typ)
         {
-            if(typ == "list")
+            if (typ == "list")
                 return new TokenTypeList(original);
-            if(typ == "rotation")
+            if (typ == "rotation")
                 return new TokenTypeRot(original);
-            if(typ == "vector")
+            if (typ == "vector")
                 return new TokenTypeVec(original);
-            if(typ == "float")
+            if (typ == "float")
                 return new TokenTypeFloat(original);
-            if(typ == "integer")
+            if (typ == "integer")
                 return new TokenTypeInt(original);
-            if(typ == "key")
+            if (typ == "key")
                 return new TokenTypeKey(original);
-            if(typ == "string")
+            if (typ == "string")
                 return new TokenTypeStr(original);
-            if(typ == "object")
+            if (typ == "object")
                 return new TokenTypeObject(original);
-            if(typ == "array")
+            if (typ == "array")
                 return new TokenTypeArray(original);
-            if(typ == "bool")
+            if (typ == "bool")
                 return new TokenTypeBool(original);
-            if(typ == "void")
+            if (typ == "void")
                 return new TokenTypeVoid(original);
-            if(typ == "char")
+            if (typ == "char")
                 return new TokenTypeChar(original);
-            if(typ == "exception")
+            if (typ == "exception")
                 return new TokenTypeExc(original);
 
             throw new Exception("unknown type " + typ);
@@ -2528,36 +2526,36 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public static int StaticSize(System.Type typ)
         {
-            if(typ == typeof(LSL_List))
+            if (typ == typeof(LSL_List))
                 return 96;
-            if(typ == typeof(LSL_Rotation))
+            if (typ == typeof(LSL_Rotation))
                 return 80;
-            if(typ == typeof(void))
+            if (typ == typeof(void))
                 return 0;
-            if(typ == typeof(LSL_Vector))
+            if (typ == typeof(LSL_Vector))
                 return 72;
-            if(typ == typeof(float))
+            if (typ == typeof(float))
                 return 8;
-            if(typ == typeof(int))
+            if (typ == typeof(int))
                 return 8;
-            if(typ == typeof(string))
+            if (typ == typeof(string))
                 return 40;
-            if(typ == typeof(double))
+            if (typ == typeof(double))
                 return 8;
-            if(typ == typeof(bool))
+            if (typ == typeof(bool))
                 return 8;
-            if(typ == typeof(XMR_Array))
+            if (typ == typeof(XMR_Array))
                 return 96;
-            if(typ == typeof(object))
+            if (typ == typeof(object))
                 return 32;
-            if(typ == typeof(char))
+            if (typ == typeof(char))
                 return 2;
 
-            if(typ == typeof(LSL_Integer))
+            if (typ == typeof(LSL_Integer))
                 return 32;
-            if(typ == typeof(LSL_Float))
+            if (typ == typeof(LSL_Float))
                 return 32;
-            if(typ == typeof(LSL_String))
+            if (typ == typeof(LSL_String))
                 return 40;
 
             throw new Exception("unknown type " + typ.ToString());
@@ -2614,7 +2612,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class TokenTypeArray: TokenType
+    public class TokenTypeArray : TokenType
     {
         private static readonly FieldInfo iarArraysFieldInfo = typeof(XMRInstArrays).GetField("iarArrays");
 
@@ -2634,7 +2632,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             declVar.vTableIndex = arSizes.iasArrays++;
         }
     }
-    public class TokenTypeBool: TokenType
+    public class TokenTypeBool : TokenType
     {
         public TokenTypeBool(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { }
         public TokenTypeBool(Token original) : base(original) { }
@@ -2647,7 +2645,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "bool";
         }
     }
-    public class TokenTypeChar: TokenType
+    public class TokenTypeChar : TokenType
     {
         private static readonly FieldInfo iarCharsFieldInfo = typeof(XMRInstArrays).GetField("iarChars");
 
@@ -2667,7 +2665,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             declVar.vTableIndex = arSizes.iasChars++;
         }
     }
-    public class TokenTypeExc: TokenType
+    public class TokenTypeExc : TokenType
     {
         private static readonly FieldInfo iarObjectsFieldInfo = typeof(XMRInstArrays).GetField("iarObjects");
 
@@ -2687,7 +2685,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             declVar.vTableIndex = arSizes.iasObjects++;
         }
     }
-    public class TokenTypeFloat: TokenType
+    public class TokenTypeFloat : TokenType
     {
         private static readonly FieldInfo iarFloatsFieldInfo = typeof(XMRInstArrays).GetField("iarFloats");
 
@@ -2707,7 +2705,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             declVar.vTableIndex = arSizes.iasFloats++;
         }
     }
-    public class TokenTypeInt: TokenType
+    public class TokenTypeInt : TokenType
     {
         private static readonly FieldInfo iarIntegersFieldInfo = typeof(XMRInstArrays).GetField("iarIntegers");
 
@@ -2727,7 +2725,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             declVar.vTableIndex = arSizes.iasIntegers++;
         }
     }
-    public class TokenTypeKey: TokenType
+    public class TokenTypeKey : TokenType
     {
         private static readonly FieldInfo iarStringsFieldInfo = typeof(XMRInstArrays).GetField("iarStrings");
 
@@ -2747,7 +2745,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             declVar.vTableIndex = arSizes.iasStrings++;
         }
     }
-    public class TokenTypeList: TokenType
+    public class TokenTypeList : TokenType
     {
         private static readonly FieldInfo iarListsFieldInfo = typeof(XMRInstArrays).GetField("iarLists");
         private static readonly ConstructorInfo htListCtor = typeof(HeapTrackerList).GetConstructor(new Type[] { typeof(XMRInstAbstract) });
@@ -2784,7 +2782,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             HeapTrackerList.GenPush(errorAt, ilGen);
         }
     }
-    public class TokenTypeObject: TokenType
+    public class TokenTypeObject : TokenType
     {
         private static readonly FieldInfo iarObjectsFieldInfo = typeof(XMRInstArrays).GetField("iarObjects");
         private static readonly ConstructorInfo htObjectCtor = typeof(HeapTrackerObject).GetConstructor(new Type[] { typeof(XMRInstAbstract) });
@@ -2821,7 +2819,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             HeapTrackerObject.GenPush(errorAt, ilGen);
         }
     }
-    public class TokenTypeRot: TokenType
+    public class TokenTypeRot : TokenType
     {
         private static readonly FieldInfo iarRotationsFieldInfo = typeof(XMRInstArrays).GetField("iarRotations");
 
@@ -2841,7 +2839,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             declVar.vTableIndex = arSizes.iasRotations++;
         }
     }
-    public class TokenTypeStr: TokenType
+    public class TokenTypeStr : TokenType
     {
         private static readonly FieldInfo iarStringsFieldInfo = typeof(XMRInstArrays).GetField("iarStrings");
         private static readonly ConstructorInfo htStringCtor = typeof(HeapTrackerString).GetConstructor(new Type[] { typeof(XMRInstAbstract) });
@@ -2878,7 +2876,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             HeapTrackerString.GenPush(errorAt, ilGen);
         }
     }
-    public class TokenTypeUndef: TokenType
+    public class TokenTypeUndef : TokenType
     {  // for the 'undef' constant, ie, null object pointer
         public TokenTypeUndef(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { }
         public TokenTypeUndef(Token original) : base(original) { }
@@ -2891,7 +2889,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return "undef";
         }
     }
-    public class TokenTypeVec: TokenType
+    public class TokenTypeVec : TokenType
     {
         private static readonly FieldInfo iarVectorsFieldInfo = typeof(XMRInstArrays).GetField("iarVectors");
 
@@ -2911,7 +2909,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             declVar.vTableIndex = arSizes.iasVectors++;
         }
     }
-    public class TokenTypeVoid: TokenType
+    public class TokenTypeVoid : TokenType
     {  // used only for function/method return types
         public TokenTypeVoid(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { }
         public TokenTypeVoid(Token original) : base(original) { }
@@ -2925,7 +2923,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class TokenTypeLSLFloat: TokenTypeFloat
+    public class TokenTypeLSLFloat : TokenTypeFloat
     {
         public TokenTypeLSLFloat(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { }
         public TokenTypeLSLFloat(Token original) : base(original) { }
@@ -2934,7 +2932,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return typeof(LSL_Float);
         }
     }
-    public class TokenTypeLSLInt: TokenTypeInt
+    public class TokenTypeLSLInt : TokenTypeInt
     {
         public TokenTypeLSLInt(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { }
         public TokenTypeLSLInt(Token original) : base(original) { }
@@ -2943,7 +2941,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return typeof(LSL_Integer);
         }
     }
-    public class TokenTypeLSLKey: TokenTypeKey
+    public class TokenTypeLSLKey : TokenTypeKey
     {
         public TokenTypeLSLKey(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { }
         public TokenTypeLSLKey(Token original) : base(original) { }
@@ -2952,7 +2950,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return typeof(LSL_Key);
         }
     }
-    public class TokenTypeLSLString: TokenTypeStr
+    public class TokenTypeLSLString : TokenTypeStr
     {
         public TokenTypeLSLString(TokenErrorMessage emsg, string file, int line, int posn) : base(emsg, file, line, posn) { }
         public TokenTypeLSLString(Token original) : base(original) { }

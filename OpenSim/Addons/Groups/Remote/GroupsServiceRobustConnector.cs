@@ -25,21 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
-using System.Text;
-using System.Xml;
-using System.Collections.Generic;
-using System.IO;
+using log4net;
 using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Framework.ServiceAuth;
+using OpenSim.Server.Base;
 using OpenSim.Server.Handlers.Base;
-using log4net;
-using OpenMetaverse;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 namespace OpenSim.Groups
 {
@@ -65,8 +62,8 @@ namespace OpenSim.Groups
                 key = groupsConfig.GetString("SecretKey", string.Empty);
                 m_log.DebugFormat("[Groups.RobustConnector]: Starting with secret key {0}", key);
             }
-//            else
-//                m_log.DebugFormat("[Groups.RobustConnector]: Unable to find {0} section in configuration", m_ConfigName);
+            //            else
+            //                m_log.DebugFormat("[Groups.RobustConnector]: Unable to find {0} section in configuration", m_ConfigName);
 
             m_GroupsService = new GroupsService(config);
 
@@ -92,7 +89,7 @@ namespace OpenSim.Groups
                 IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
             string body;
-            using(StreamReader sr = new StreamReader(requestData))
+            using (StreamReader sr = new StreamReader(requestData))
                 body = sr.ReadToEnd();
 
             body = body.Trim();
@@ -110,7 +107,7 @@ namespace OpenSim.Groups
                 string method = request["METHOD"].ToString();
                 request.Remove("METHOD");
 
-//                m_log.DebugFormat("[Groups.Handler]: {0}", method);
+                //                m_log.DebugFormat("[Groups.Handler]: {0}", method);
                 switch (method)
                 {
                     case "PUTGROUP":
@@ -730,7 +727,7 @@ namespace OpenSim.Groups
 
             else if (request.ContainsKey("NoticeID")) // just one
             {
-                GroupNoticeInfo notice =  m_GroupsService.GetGroupNotice(request["RequestingAgentID"].ToString(), new UUID(request["NoticeID"].ToString()));
+                GroupNoticeInfo notice = m_GroupsService.GetGroupNotice(request["RequestingAgentID"].ToString(), new UUID(request["NoticeID"].ToString()));
 
                 if (notice == null)
                     NullResult(result, "NO such notice");

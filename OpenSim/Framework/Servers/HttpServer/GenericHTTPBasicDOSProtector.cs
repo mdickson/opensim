@@ -48,14 +48,14 @@ namespace OpenSim.Framework.Servers.HttpServer
         public Hashtable Process(Hashtable request)
         {
             Hashtable process = null;
-            string clientstring= GetClientString(request);
+            string clientstring = GetClientString(request);
             string endpoint = GetRemoteAddr(request);
             if (_dosProtector.Process(clientstring, endpoint))
-                process =  _normalMethod(request);
+                process = _normalMethod(request);
             else
                 process = _throttledMethod(request);
 
-            if (_options.MaxConcurrentSessions>0)
+            if (_options.MaxConcurrentSessions > 0)
                 _dosProtector.ProcessEnd(clientstring, endpoint);
 
             return process;

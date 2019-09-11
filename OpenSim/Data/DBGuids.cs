@@ -25,10 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using OpenMetaverse;
+using System;
 
 namespace OpenSim.Data
 {
@@ -54,7 +52,7 @@ namespace OpenSim.Data
 
             if (id.GetType() == typeof(string))
             {
-                Guid gg; 
+                Guid gg;
                 if (Guid.TryParse((string)id, out gg))
                     return new UUID(gg);
                 return UUID.Zero;

@@ -25,22 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Mono.Addins;
+using netcd;
+using netcd.Advanced;
+using netcd.Advanced.Requests;
+using netcd.Serialization;
+using Nini.Config;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
-using log4net;
-using Mono.Addins;
-using Nini.Config;
-using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using netcd;
-using netcd.Serialization;
-using netcd.Advanced;
-using netcd.Advanced.Requests;
 
 namespace OpenSim.Region.OptionalModules.Framework.Monitoring
 {
@@ -88,7 +84,7 @@ namespace OpenSim.Region.OptionalModules.Framework.Monitoring
 
             try
             {
-                string[] endpoints = etcdUrls.Split(new char[] {','});
+                string[] endpoints = etcdUrls.Split(new char[] { ',' });
                 List<Uri> uris = new List<Uri>();
                 foreach (string endpoint in endpoints)
                     uris.Add(new Uri(endpoint.Trim()));
@@ -124,7 +120,7 @@ namespace OpenSim.Region.OptionalModules.Framework.Monitoring
 
                 try
                 {
-                    m_client.Advanced.CreateDirectory(new CreateDirectoryRequest() {Key = m_etcdBasePath});
+                    m_client.Advanced.CreateDirectory(new CreateDirectoryRequest() { Key = m_etcdBasePath });
                 }
                 catch (Exception e)
                 {

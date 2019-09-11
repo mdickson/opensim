@@ -25,17 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using System.Reflection;
-using System.Xml;
-using System.IO;
 using log4net;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Reflection;
+using System.Xml;
 //using OpenSim.Framework.Console;
 
 namespace OpenSim.Framework
@@ -45,17 +44,17 @@ namespace OpenSim.Framework
     {
         public bool valid = false;
         public UUID regionID = UUID.Zero;
-        public Vector3 waterColor = new Vector3(4.0f,38.0f,64.0f);
+        public Vector3 waterColor = new Vector3(4.0f, 38.0f, 64.0f);
         public float waterFogDensityExponent = 4.0f;
         public float underwaterFogModifier = 0.25f;
-        public Vector3 reflectionWaveletScale = new Vector3(2.0f,2.0f,2.0f);
+        public Vector3 reflectionWaveletScale = new Vector3(2.0f, 2.0f, 2.0f);
         public float fresnelScale = 0.40f;
         public float fresnelOffset = 0.50f;
         public float refractScaleAbove = 0.03f;
         public float refractScaleBelow = 0.20f;
         public float blurMultiplier = 0.040f;
-        public Vector2 bigWaveDirection = new Vector2(1.05f,-0.42f);
-        public Vector2 littleWaveDirection = new Vector2(1.11f,-1.16f);
+        public Vector2 bigWaveDirection = new Vector2(1.05f, -0.42f);
+        public Vector2 littleWaveDirection = new Vector2(1.11f, -1.16f);
         public UUID normalMapTexture = new UUID("822ded49-9a6c-f61c-cb89-6df54f42cdf4");
         public Vector4 horizon = new Vector4(0.25f, 0.25f, 0.32f, 0.32f);
         public float hazeHorizon = 0.19f;
@@ -66,7 +65,7 @@ namespace OpenSim.Framework
         public UInt16 maxAltitude = 1605;
         public Vector4 sunMoonColor = new Vector4(0.24f, 0.26f, 0.30f, 0.30f);
         public float sunMoonPosition = 0.317f;
-        public Vector4 ambient = new Vector4(0.35f,0.35f,0.35f,0.35f);
+        public Vector4 ambient = new Vector4(0.35f, 0.35f, 0.35f, 0.35f);
         public float eastAngle = 0.0f;
         public float sunGlowFocus = 0.10f;
         public float sunGlowSize = 1.75f;
@@ -180,7 +179,7 @@ namespace OpenSim.Framework
 
         private Dictionary<String, String> m_extraSettings = new Dictionary<string, string>();
 
-        public UUID CacheID { get; set;}
+        public UUID CacheID { get; set; }
         // Apparently, we're applying the same estatesettings regardless of whether it's local or remote.
 
         // MT: Yes. Estates can't span trust boundaries. Therefore, it can be
@@ -397,17 +396,25 @@ namespace OpenSim.Framework
 
         public string ServerURI
         {
-            get {
-                if ( m_serverURI != string.Empty ) {
+            get
+            {
+                if (m_serverURI != string.Empty)
+                {
                     return m_serverURI;
-                } else {
+                }
+                else
+                {
                     return "http://" + m_externalHostName + ":" + m_httpPort + "/";
                 }
             }
-            set {
-                if ( value.EndsWith("/") ) {
+            set
+            {
+                if (value.EndsWith("/"))
+                {
                     m_serverURI = value;
-                } else {
+                }
+                else
+                {
                     m_serverURI = value + '/';
                 }
             }
@@ -425,7 +432,7 @@ namespace OpenSim.Framework
             set { m_remotingPort = value; }
         }
 
-        
+
         /// <value>
         /// This accessor can throw all the exceptions that Dns.GetHostAddresses can throw.
         ///
@@ -591,7 +598,7 @@ namespace OpenSim.Framework
                 config.Set("Location", location);
             }
 
-            string[] locationElements = location.Split(new char[] {','});
+            string[] locationElements = location.Split(new char[] { ',' });
 
             RegionLocX = Convert.ToUInt32(locationElements[0]);
             RegionLocY = Convert.ToUInt32(locationElements[1]);
@@ -1002,7 +1009,7 @@ namespace OpenSim.Framework
                                                 "Max prims an object will hold", m_linksetCapacity.ToString(), true);
 
             configMember.addConfigurationOption("agent_capacity", ConfigurationOption.ConfigurationTypes.TYPE_INT32,
-                                                "Max avatars this sim will hold",AgentCapacity.ToString(), true);
+                                                "Max avatars this sim will hold", AgentCapacity.ToString(), true);
 
             configMember.addConfigurationOption("scope_id", ConfigurationOption.ConfigurationTypes.TYPE_UUID,
                                                 "Scope ID for this region", ScopeID.ToString(), true);
@@ -1080,41 +1087,41 @@ namespace OpenSim.Framework
             switch (configuration_key)
             {
                 case "sim_UUID":
-                    RegionID = (UUID) configuration_result;
-                    originRegionID = (UUID) configuration_result;
+                    RegionID = (UUID)configuration_result;
+                    originRegionID = (UUID)configuration_result;
                     break;
                 case "sim_name":
-                    RegionName = (string) configuration_result;
+                    RegionName = (string)configuration_result;
                     break;
                 case "sim_location_x":
-                    RegionLocX = (uint) configuration_result;
+                    RegionLocX = (uint)configuration_result;
                     break;
                 case "sim_location_y":
-                    RegionLocY = (uint) configuration_result;
+                    RegionLocY = (uint)configuration_result;
                     break;
                 case "sim_size_x":
-                    RegionSizeX = (uint) configuration_result;
+                    RegionSizeX = (uint)configuration_result;
                     break;
                 case "sim_size_y":
-                    RegionSizeY = (uint) configuration_result;
+                    RegionSizeY = (uint)configuration_result;
                     break;
                 case "sim_size_z":
-                    RegionSizeZ = (uint) configuration_result;
+                    RegionSizeZ = (uint)configuration_result;
                     break;
                 case "datastore":
-                    DataStore = (string) configuration_result;
+                    DataStore = (string)configuration_result;
                     break;
                 case "internal_ip_address":
-                    IPAddress address = (IPAddress) configuration_result;
+                    IPAddress address = (IPAddress)configuration_result;
                     m_internalEndPoint = new IPEndPoint(address, 0);
                     break;
                 case "internal_ip_port":
-                    m_internalEndPoint.Port = (int) configuration_result;
+                    m_internalEndPoint.Port = (int)configuration_result;
                     break;
                 case "external_host_name":
-                    if ((string) configuration_result != "SYSTEMIP")
+                    if ((string)configuration_result != "SYSTEMIP")
                     {
-                        m_externalHostName = (string) configuration_result;
+                        m_externalHostName = (string)configuration_result;
                     }
                     else
                     {

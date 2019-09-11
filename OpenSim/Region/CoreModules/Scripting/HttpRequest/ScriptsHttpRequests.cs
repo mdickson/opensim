@@ -25,25 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.IO;
-using System.Net;
-using System.Net.Mail;
-using System.Net.Security;
-using System.Text;
-using System.Threading;
-using System.Security.Cryptography.X509Certificates;
+using Amib.Threading;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using Mono.Addins;
-using Amib.Threading;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 
 /*****************************************************
  *
@@ -93,7 +90,7 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "HttpRequestModule")]
     public class HttpRequestModule : ISharedRegionModule, IHttpRequestModule
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private object m_httpListLock = new object();
         private int m_httpTimeout = 30000;
@@ -164,7 +161,7 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
             }
             m_RequestsThrottle[localID] = th;
 
-            if(!ret)
+            if (!ret)
                 return false;
 
             if (m_OwnerRequestsThrottle.TryGetValue(ownerID, out th))
@@ -231,11 +228,11 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
                         case (int)HttpRequestConstants.HTTP_BODY_MAXLENGTH:
 
                             int len;
-                            if(int.TryParse(parms[i + 1], out len))
+                            if (int.TryParse(parms[i + 1], out len))
                             {
-                                if(len > HttpRequestClass.HttpBodyMaxLenMAX)
+                                if (len > HttpRequestClass.HttpBodyMaxLenMAX)
                                     len = HttpRequestClass.HttpBodyMaxLenMAX;
-                                else if(len < 64) //???
+                                else if (len < 64) //???
                                     len = 64;
                                 htc.HttpBodyMaxLen = len;
                             }
@@ -267,7 +264,7 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
                                     htc.HttpCustomHeaders = new List<string>();
 
                                 htc.HttpCustomHeaders.Add(parms[i]);
-                                htc.HttpCustomHeaders.Add(parms[i+1]);
+                                htc.HttpCustomHeaders.Add(parms[i + 1]);
                                 int nexti = i + 2;
                                 if (nexti >= parms.Length || Char.IsDigit(parms[nexti][0]))
                                     break;
@@ -321,13 +318,13 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
             {
                 foreach (HttpRequestClass tmpReq in m_pendingRequests.Values)
                 {
-                    if(tmpReq.ItemID == m_itemID)
+                    if (tmpReq.ItemID == m_itemID)
                     {
                         tmpReq.Stop();
                         toremove.Add(tmpReq.ReqID);
                     }
                 }
-                foreach(UUID id in toremove)
+                foreach (UUID id in toremove)
                     m_pendingRequests.Remove(id);
             }
         }
@@ -354,7 +351,7 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
         public IServiceRequest GetNextCompletedRequest()
         {
             HttpRequestClass req;
-            if(m_CompletedRequests.TryDequeue(out req))
+            if (m_CompletedRequests.TryDequeue(out req))
                 return req;
 
             return null;
@@ -396,9 +393,9 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
                 m_primOwnerBurst = httpConfig.GetFloat("PrimOwnerRequestsBurst", m_primOwnerBurst);
                 m_primOwnerPerSec = httpConfig.GetFloat("PrimOwnerRequestsPerSec", m_primOwnerPerSec);
                 m_httpTimeout = httpConfig.GetInt("RequestsTimeOut", m_httpTimeout);
-                if(m_httpTimeout > 60000)
+                if (m_httpTimeout > 60000)
                     m_httpTimeout = 60000;
-                else if(m_httpTimeout < 200)
+                else if (m_httpTimeout < 200)
                     m_httpTimeout = 200;
             }
 
@@ -475,14 +472,14 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
         /// </summary>
         public HttpRequestModule RequestModule { get; set; }
 
-        public bool Finished { get; private set;}
-        public bool Removed{ get; set;}
+        public bool Finished { get; private set; }
+        public bool Removed { get; set; }
 
         public static int HttpBodyMaxLenMAX = 16384;
 
         // Parameter members and default values
         public int HttpBodyMaxLen = 2048;
-        public string HttpMethod  = "GET";
+        public string HttpMethod = "GET";
         public string HttpMIMEType = "text/plain;charset=utf-8";
         public int HttpTimeout;
         public bool HttpVerifyCert = true;
@@ -494,8 +491,8 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
 
         // Request info
         public UUID ReqID { get; set; }
-        public UUID ItemID {  get; set;}
-        public uint LocalID { get; set;}
+        public UUID ItemID { get; set; }
+        public uint LocalID { get; set; }
 
         public string proxyurl;
         public string proxyexcepts;
@@ -532,9 +529,9 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
 
         public static bool ValidateServerCertificate(
             object sender,
-            X509Certificate  certificate,
-            X509Chain  chain,
-            SslPolicyErrors  sslPolicyErrors)
+            X509Certificate certificate,
+            X509Chain chain,
+            SslPolicyErrors sslPolicyErrors)
         {
             // If this is a web request we need to check the headers first
             // We may want to ignore SSL
@@ -570,8 +567,8 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
 
         public void SendRequest()
         {
-            if(Removed)
-                 return;
+            if (Removed)
+                return;
 
             HttpWebResponse response = null;
             Stream resStream = null;
@@ -600,10 +597,10 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
                     // a desired security exception.  But at the moment we'll use a dummy header instead.
                     Request.Headers.Add("NoVerifyCert", "true");
                 }
-//                else
-//                {
-//                    Request.ConnectionGroupName="Verify";
-//                }
+                //                else
+                //                {
+                //                    Request.ConnectionGroupName="Verify";
+                //                }
 
                 if (!HttpPragmaNoCache)
                 {
@@ -614,7 +611,7 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
                 {
                     for (int i = 0; i < HttpCustomHeaders.Count; i += 2)
                         Request.Headers.Add(HttpCustomHeaders[i],
-                                            HttpCustomHeaders[i+1]);
+                                            HttpCustomHeaders[i + 1]);
                 }
 
                 if (!string.IsNullOrEmpty(proxyurl))
@@ -649,7 +646,7 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
                 try
                 {
                     // execute the request
-                    response = (HttpWebResponse) Request.GetResponse();
+                    response = (HttpWebResponse)Request.GetResponse();
                 }
                 catch (WebException e)
                 {
@@ -665,7 +662,7 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
                 resStream = response.GetResponseStream();
                 int totalBodyBytes = 0;
                 int maxBytes = HttpBodyMaxLen;
-                if(maxBytes > buf.Length)
+                if (maxBytes > buf.Length)
                     maxBytes = buf.Length;
 
                 // we need to read all allowed or UFT8 conversion may fail
@@ -679,7 +676,7 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
 
                 } while (count > 0); // any more data to read?
 
-                if(totalBodyBytes > 0)
+                if (totalBodyBytes > 0)
                 {
                     tempString = Util.UTF8.GetString(buf, 0, totalBodyBytes);
                     ResponseBody = tempString.Replace("\r", "");
@@ -712,7 +709,7 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
                     ResponseBody = e.Message;
                 }
             }
-//            catch (Exception e)
+            //            catch (Exception e)
             catch
             {
                 // Don't crash on anything else
@@ -763,7 +760,7 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
                             Redirects++;
                             ResponseBody = null;
 
-//                            m_log.DebugFormat("Redirecting to [{0}]", Url);
+                            //                            m_log.DebugFormat("Redirecting to [{0}]", Url);
 
                             Process();
                         }
@@ -784,7 +781,7 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
             try
             {
                 Removed = true;
-                if(WorkItem == null)
+                if (WorkItem == null)
                     return;
 
                 if (!WorkItem.Cancel())

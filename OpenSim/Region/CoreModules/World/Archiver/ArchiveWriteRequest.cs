@@ -25,28 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Reflection;
-using System.Runtime;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Xml;
 using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Monitoring;
 using OpenSim.Framework.Serialization;
-using OpenSim.Region.CoreModules.World.Terrain;
+using OpenSim.Framework.Serialization.External;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using Ionic.Zlib;
-using GZipStream = Ionic.Zlib.GZipStream;
-using CompressionMode = Ionic.Zlib.CompressionMode;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Runtime;
+using System.Xml;
 using CompressionLevel = Ionic.Zlib.CompressionLevel;
-using OpenSim.Framework.Serialization.External;
+using CompressionMode = Ionic.Zlib.CompressionMode;
+using GZipStream = Ionic.Zlib.GZipStream;
 using PermissionMask = OpenSim.Framework.PermissionMask;
 
 namespace OpenSim.Region.CoreModules.World.Archiver
@@ -160,7 +154,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
             if (MultiRegionFormat)
             {
                 m_log.InfoFormat("[ARCHIVER]: Saving {0} regions", SceneManager.Instance.Scenes.Count);
-                SceneManager.Instance.ForEachScene(delegate(Scene scene)
+                SceneManager.Instance.ForEachScene(delegate (Scene scene)
                 {
                     scenesGroup.AddScene(scene);
                 });
@@ -185,7 +179,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                 HashSet<UUID> failedIDs = new HashSet<UUID>();
                 HashSet<UUID> uncertainAssetsUUIDs = new HashSet<UUID>();
 
-                scenesGroup.ForEachScene(delegate(Scene scene)
+                scenesGroup.ForEachScene(delegate (Scene scene)
                 {
                     string regionDir = MultiRegionFormat ? scenesGroup.GetRegionDir(scene.RegionInfo.RegionID) : "";
                     ArchiveOneRegion(scene, regionDir, assetUuids, failedIDs, uncertainAssetsUUIDs);
@@ -196,7 +190,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                 if (SaveAssets)
                 {
                     m_log.DebugFormat("[ARCHIVER]: Saving {0} assets", assetUuids.Count);
-                    
+
                     AssetsRequest ar = new AssetsRequest(
                             new AssetsArchiver(m_archiveWriter), assetUuids,
                             failedIDs.Count,
@@ -208,7 +202,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                 else
                 {
                     m_log.DebugFormat("[ARCHIVER]: Not saving assets since --noassets was specified");
-//                    CloseArchive(string.Empty);
+                    //                    CloseArchive(string.Empty);
                 }
                 CloseArchive(string.Empty);
             }
@@ -226,7 +220,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
         }
 
         private void ArchiveOneRegion(Scene scene, string regionDir, Dictionary<UUID, sbyte> assetUuids,
-            HashSet<UUID> failedIDs, HashSet<UUID>  uncertainAssetsUUIDs)
+            HashSet<UUID> failedIDs, HashSet<UUID> uncertainAssetsUUIDs)
         {
             m_log.InfoFormat("[ARCHIVER]: Writing region {0}", scene.Name);
 
@@ -271,19 +265,19 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                     int possible = assetGatherer.possibleNotAssetCount;
                     assetGatherer.AddForInspection(sceneObject);
                     assetGatherer.GatherAll();
-                    curErrorCntr =  assetGatherer.ErrorCount - curErrorCntr;
+                    curErrorCntr = assetGatherer.ErrorCount - curErrorCntr;
                     possible = assetGatherer.possibleNotAssetCount - possible;
-                    if(curErrorCntr > 0)
+                    if (curErrorCntr > 0)
                     {
                         m_log.ErrorFormat("[ARCHIVER]: object {0} '{1}', at {2}, contains {3} references to missing or damaged assets",
-                            sceneObject.UUID, sceneObject.Name ,sceneObject.AbsolutePosition.ToString(), curErrorCntr);
-                        if(possible > 0)
+                            sceneObject.UUID, sceneObject.Name, sceneObject.AbsolutePosition.ToString(), curErrorCntr);
+                        if (possible > 0)
                             m_log.WarnFormat("[ARCHIVER Warning]: object also contains {0} references that may be to missing or damaged assets or not a problem", possible);
                     }
-                    else if(possible > 0)
+                    else if (possible > 0)
                     {
                         m_log.WarnFormat("[ARCHIVER Warning]: object {0} '{1}', at {2}, contains {3} references that may be to missing or damaged assets or not a problem",
-                            sceneObject.UUID, sceneObject.Name ,sceneObject.AbsolutePosition.ToString(), possible);
+                            sceneObject.UUID, sceneObject.Name, sceneObject.AbsolutePosition.ToString(), possible);
                     }
                 }
 
@@ -295,7 +289,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                 m_log.DebugFormat(
                     "[ARCHIVER]: {0} region scene objects to save reference {1} possible assets",
                     sceneObjects.Count, assetUuids.Count - prevAssets + errors);
-                if(errors > 0)
+                if (errors > 0)
                     m_log.DebugFormat("[ARCHIVER]: {0} of these have problems or are not assets and will be ignored", errors);
             }
 
@@ -425,36 +419,36 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                 majorVersion = 0;
                 minorVersion = 8;
             }
-//
-//            if (m_options.ContainsKey("version"))
-//            {
-//                string[] parts = m_options["version"].ToString().Split('.');
-//                if (parts.Length >= 1)
-//                {
-//                    majorVersion = Int32.Parse(parts[0]);
-//
-//                    if (parts.Length >= 2)
-//                        minorVersion = Int32.Parse(parts[1]);
-//                }
-//            }
-//
-//            if (majorVersion < MIN_MAJOR_VERSION || majorVersion > MAX_MAJOR_VERSION)
-//            {
-//                throw new Exception(
-//                    string.Format(
-//                        "OAR version number for save must be between {0} and {1}",
-//                        MIN_MAJOR_VERSION, MAX_MAJOR_VERSION));
-//            }
-//            else if (majorVersion == MAX_MAJOR_VERSION)
-//            {
-//                // Force 1.0
-//                minorVersion = 0;
-//            }
-//            else if (majorVersion == MIN_MAJOR_VERSION)
-//            {
-//                // Force 0.4
-//                minorVersion = 4;
-//            }
+            //
+            //            if (m_options.ContainsKey("version"))
+            //            {
+            //                string[] parts = m_options["version"].ToString().Split('.');
+            //                if (parts.Length >= 1)
+            //                {
+            //                    majorVersion = Int32.Parse(parts[0]);
+            //
+            //                    if (parts.Length >= 2)
+            //                        minorVersion = Int32.Parse(parts[1]);
+            //                }
+            //            }
+            //
+            //            if (majorVersion < MIN_MAJOR_VERSION || majorVersion > MAX_MAJOR_VERSION)
+            //            {
+            //                throw new Exception(
+            //                    string.Format(
+            //                        "OAR version number for save must be between {0} and {1}",
+            //                        MIN_MAJOR_VERSION, MAX_MAJOR_VERSION));
+            //            }
+            //            else if (majorVersion == MAX_MAJOR_VERSION)
+            //            {
+            //                // Force 1.0
+            //                minorVersion = 0;
+            //            }
+            //            else if (majorVersion == MIN_MAJOR_VERSION)
+            //            {
+            //                // Force 0.4
+            //                minorVersion = 4;
+            //            }
 
             m_log.InfoFormat("[ARCHIVER]: Creating version {0}.{1} OAR", majorVersion, minorVersion);
             if (majorVersion == 1)
@@ -605,7 +599,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
             foreach (SceneObjectGroup sceneObject in sceneObjects)
             {
                 //m_log.DebugFormat("[ARCHIVER]: Saving {0} {1}, {2}", entity.Name, entity.UUID, entity.GetType());
-                if(sceneObject.IsDeleted || sceneObject.inTransit)
+                if (sceneObject.IsDeleted || sceneObject.inTransit)
                     continue;
                 string serializedObject = serializer.SerializeGroupToXml2(sceneObject, m_options);
                 string objectPath = string.Format("{0}{1}", regionDir, ArchiveHelpers.CreateObjectPath(sceneObject));

@@ -25,16 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using log4net;
-using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
 using OpenSim.Tests.Common;
 
 namespace OpenSim.Region.Framework.Scenes.Tests
@@ -69,12 +62,12 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public void TestMove()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             ScenePresence sp = SceneHelpers.AddScenePresence(m_scene, TestHelpers.ParseTail(0x1));
 
             Vector3 startPos = sp.AbsolutePosition;
-//            Vector3 startPos = new Vector3(128, 128, 30);
+            //            Vector3 startPos = new Vector3(128, 128, 30);
 
             // For now, we'll make the scene presence fly to simplify this test, but this needs to change.
             sp.Flying = true;

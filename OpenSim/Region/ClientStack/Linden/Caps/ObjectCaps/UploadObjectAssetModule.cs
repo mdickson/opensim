@@ -25,29 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Specialized;
-using System.Reflection;
-using System.IO;
-using System.Web;
-using Mono.Addins;
 using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 using OpenMetaverse.Messages.Linden;
+using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
-using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
+using System;
+using System.Collections;
+using System.Reflection;
 using Caps = OpenSim.Framework.Capabilities.Caps;
-using OSD = OpenMetaverse.StructuredData.OSD;
-using OSDMap = OpenMetaverse.StructuredData.OSDMap;
-using OpenSim.Framework.Capabilities;
 using ExtraParamType = OpenMetaverse.ExtraParamType;
+using OSDMap = OpenMetaverse.StructuredData.OSDMap;
 
 namespace OpenSim.Region.ClientStack.Linden
 {
@@ -177,7 +170,7 @@ namespace OpenSim.Region.ClientStack.Linden
             Vector3 pos = avatar.AbsolutePosition + (Vector3.UnitX * avatar.Rotation);
             Quaternion rot = Quaternion.Identity;
             Vector3 rootpos = Vector3.Zero;
-//            Quaternion rootrot = Quaternion.Identity;
+            //            Quaternion rootrot = Quaternion.Identity;
 
             SceneObjectGroup rootGroup = null;
             SceneObjectGroup[] allparts = new SceneObjectGroup[message.Objects.Length];
@@ -189,7 +182,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 if (i == 0)
                 {
                     rootpos = obj.Position;
-//                    rootrot = obj.Rotation;
+                    //                    rootrot = obj.Rotation;
                 }
 
                 // Combine the extraparams data into it's ugly blob again....
@@ -209,7 +202,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 //                     obj.ExtraParams[extparams].ExtraParamData.Length);
                 //
                 //    position += obj.ExtraParams[extparams].ExtraParamData.Length;
-               // }
+                // }
 
                 //pbs.ExtraParams = extraparams;
                 for (int extparams = 0; extparams < obj.ExtraParams.Length; extparams++)
@@ -256,28 +249,28 @@ namespace OpenSim.Region.ClientStack.Linden
                     }
                 }
 
-                pbs.PathBegin = (ushort) obj.PathBegin;
-                pbs.PathCurve = (byte) obj.PathCurve;
-                pbs.PathEnd = (ushort) obj.PathEnd;
-                pbs.PathRadiusOffset = (sbyte) obj.RadiusOffset;
-                pbs.PathRevolutions = (byte) obj.Revolutions;
-                pbs.PathScaleX = (byte) obj.ScaleX;
-                pbs.PathScaleY = (byte) obj.ScaleY;
-                pbs.PathShearX = (byte) obj.ShearX;
-                pbs.PathShearY = (byte) obj.ShearY;
-                pbs.PathSkew = (sbyte) obj.Skew;
-                pbs.PathTaperX = (sbyte) obj.TaperX;
-                pbs.PathTaperY = (sbyte) obj.TaperY;
-                pbs.PathTwist = (sbyte) obj.Twist;
-                pbs.PathTwistBegin = (sbyte) obj.TwistBegin;
-                pbs.HollowShape = (HollowShape) obj.ProfileHollow;
-                pbs.PCode = (byte) PCode.Prim;
-                pbs.ProfileBegin = (ushort) obj.ProfileBegin;
-                pbs.ProfileCurve = (byte) obj.ProfileCurve;
-                pbs.ProfileEnd = (ushort) obj.ProfileEnd;
+                pbs.PathBegin = (ushort)obj.PathBegin;
+                pbs.PathCurve = (byte)obj.PathCurve;
+                pbs.PathEnd = (ushort)obj.PathEnd;
+                pbs.PathRadiusOffset = (sbyte)obj.RadiusOffset;
+                pbs.PathRevolutions = (byte)obj.Revolutions;
+                pbs.PathScaleX = (byte)obj.ScaleX;
+                pbs.PathScaleY = (byte)obj.ScaleY;
+                pbs.PathShearX = (byte)obj.ShearX;
+                pbs.PathShearY = (byte)obj.ShearY;
+                pbs.PathSkew = (sbyte)obj.Skew;
+                pbs.PathTaperX = (sbyte)obj.TaperX;
+                pbs.PathTaperY = (sbyte)obj.TaperY;
+                pbs.PathTwist = (sbyte)obj.Twist;
+                pbs.PathTwistBegin = (sbyte)obj.TwistBegin;
+                pbs.HollowShape = (HollowShape)obj.ProfileHollow;
+                pbs.PCode = (byte)PCode.Prim;
+                pbs.ProfileBegin = (ushort)obj.ProfileBegin;
+                pbs.ProfileCurve = (byte)obj.ProfileCurve;
+                pbs.ProfileEnd = (ushort)obj.ProfileEnd;
                 pbs.Scale = obj.Scale;
-                pbs.State = (byte) 0;
-                pbs.LastAttachPoint = (byte) 0;
+                pbs.State = (byte)0;
+                pbs.LastAttachPoint = (byte)0;
                 SceneObjectPart prim = new SceneObjectPart();
                 prim.UUID = UUID.Random();
                 prim.CreatorID = AgentId;
@@ -301,7 +294,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 {
                     UploadObjectAssetMessage.Object.Face face = obj.Faces[j];
 
-                    Primitive.TextureEntryFace primFace = tmp.CreateFace((uint) j);
+                    Primitive.TextureEntryFace primFace = tmp.CreateFace((uint)j);
 
                     primFace.Bump = face.Bump;
                     primFace.RGBA = face.Color;
@@ -315,7 +308,7 @@ namespace OpenSim.Region.ClientStack.Linden
                     primFace.OffsetV = face.OffsetT;
                     primFace.RepeatU = face.ScaleS;
                     primFace.RepeatV = face.ScaleT;
-                    primFace.TexMapType = (MappingType) (face.MediaFlags & 6);
+                    primFace.TexMapType = (MappingType)(face.MediaFlags & 6);
                 }
 
                 pbs.TextureEntry = tmp.GetBytes();

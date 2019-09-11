@@ -25,24 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using log4net;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-
-using OpenSim.Framework;
-
-using Animation = OpenSim.Framework.Animation;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace OpenSim.Region.Framework.Scenes.Animation
 {
     [Serializable]
     public class AnimationSet
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private OpenSim.Framework.Animation m_implicitDefaultAnimation = new OpenSim.Framework.Animation();
         private OpenSim.Framework.Animation m_defaultAnimation = new OpenSim.Framework.Animation();
@@ -167,9 +161,9 @@ namespace OpenSim.Region.Framework.Scenes.Animation
         /// </summary>
         public bool TrySetDefaultAnimation(string anim, int sequenceNum, UUID objectID)
         {
-//            m_log.DebugFormat(
-//                "[ANIMATION SET]: Setting default animation {0}, sequence number {1}, object id {2}",
-//                anim, sequenceNum, objectID);
+            //            m_log.DebugFormat(
+            //                "[ANIMATION SET]: Setting default animation {0}, sequence number {1}, object id {2}",
+            //                anim, sequenceNum, objectID);
 
             if (DefaultAvatarAnimations.AnimsUUID.ContainsKey(anim))
             {
@@ -198,7 +192,7 @@ namespace OpenSim.Region.Framework.Scenes.Animation
                     objectIDs[0] = m_defaultAnimation.ObjectID;
                 }
 
-                for (int i = 0; i < m_animations.Count; ++i,++j)
+                for (int i = 0; i < m_animations.Count; ++i, ++j)
                 {
                     animIDs[j] = m_animations[i].AnimID;
                     sequenceNums[j] = m_animations[i].SequenceNum;
@@ -226,9 +220,9 @@ namespace OpenSim.Region.Framework.Scenes.Animation
         {
             int ret = 0;
             foreach (OpenSim.Framework.Animation anim in theArray)
-            { 
+            {
                 m_animations.Add(anim);
-                if(anim.SequenceNum > ret)
+                if (anim.SequenceNum > ret)
                     ret = anim.SequenceNum;
             }
             return ret;

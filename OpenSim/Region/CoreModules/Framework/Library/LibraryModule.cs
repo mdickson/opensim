@@ -24,24 +24,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.CoreModules.Avatar.Inventory.Archiver;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-
-using OpenSim.Framework;
-
-using OpenSim.Region.CoreModules.Avatar.Inventory.Archiver;
-using OpenSim.Region.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
-using OpenSim.Server.Base;
-
-using OpenMetaverse;
-using log4net;
-using Mono.Addins;
-using Nini.Config;
 using PermissionMask = OpenSim.Framework.PermissionMask;
 
 namespace OpenSim.Region.CoreModules.Framework.Library
@@ -53,7 +49,7 @@ namespace OpenSim.Region.CoreModules.Framework.Library
         private static bool m_HasRunOnce = false;
 
         private bool m_Enabled = false;
-//        private string m_LibraryName = "OpenSim Library";
+        //        private string m_LibraryName = "OpenSim Library";
         private Scene m_Scene;
 
         private ILibraryService m_Library;
@@ -216,21 +212,21 @@ namespace OpenSim.Region.CoreModules.Framework.Library
             }
         }
 
-//        private void DumpLibrary()
-//        {
-//            InventoryFolderImpl lib = m_Library.LibraryRootFolder;
-//
-//            m_log.DebugFormat(" - folder {0}", lib.Name);
-//            DumpFolder(lib);
-//        }
-//
-//        private void DumpLibrary()
-//        {
-//            InventoryFolderImpl lib = m_Scene.CommsManager.UserProfileCacheService.LibraryRoot;
-//
-//            m_log.DebugFormat(" - folder {0}", lib.Name);
-//            DumpFolder(lib);
-//        }
+        //        private void DumpLibrary()
+        //        {
+        //            InventoryFolderImpl lib = m_Library.LibraryRootFolder;
+        //
+        //            m_log.DebugFormat(" - folder {0}", lib.Name);
+        //            DumpFolder(lib);
+        //        }
+        //
+        //        private void DumpLibrary()
+        //        {
+        //            InventoryFolderImpl lib = m_Scene.CommsManager.UserProfileCacheService.LibraryRoot;
+        //
+        //            m_log.DebugFormat(" - folder {0}", lib.Name);
+        //            DumpFolder(lib);
+        //        }
 
         private void DumpFolder(InventoryFolderImpl folder)
         {

@@ -25,19 +25,18 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Xml;
 using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
-
 using OpenSim.Region.CoreModules.World.Land;
 using OpenSim.Region.DataSnapshot.Interfaces;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Xml;
 
 namespace OpenSim.Region.DataSnapshot.Providers
 {
@@ -122,7 +121,7 @@ namespace OpenSim.Region.DataSnapshot.Providers
         {
             XmlNode parent = nodeFactory.CreateNode(XmlNodeType.Element, "parceldata", "");
             ILandChannel landChannel = m_scene.LandChannel;
-            if(landChannel == null)
+            if (landChannel == null)
                 return parent;
 
             List<ILandObject> parcels = landChannel.AllParcels();
@@ -268,7 +267,7 @@ namespace OpenSim.Region.DataSnapshot.Providers
                             {
                                 XmlNode username = nodeFactory.CreateNode(XmlNodeType.Element, "name", "");
                                 UserAccount account = m_scene.UserAccountService.GetUserAccount(m_scene.RegionInfo.ScopeID, userOwnerUUID);
-                                if(account != null)
+                                if (account != null)
                                     username.InnerText = account.FirstName + " " + account.LastName;
                                 else
                                     username.InnerText = "UnKnown";
@@ -377,13 +376,16 @@ namespace OpenSim.Region.DataSnapshot.Providers
         public void OnNewClient(IClientAPI client)
         {
             //Land hooks
-            client.OnParcelDivideRequest += delegate(int west, int south, int east, int north,
-                IClientAPI remote_client) { this.Stale = true; };
-            client.OnParcelJoinRequest += delegate(int west, int south, int east, int north,
-                IClientAPI remote_client) { this.Stale = true; };
-            client.OnParcelPropertiesUpdateRequest += delegate(LandUpdateArgs args, int local_id,
-                IClientAPI remote_client) { this.Stale = true; };
-            client.OnParcelBuy += delegate(UUID agentId, UUID groupId, bool final, bool groupOwned,
+            client.OnParcelDivideRequest += delegate (int west, int south, int east, int north,
+                IClientAPI remote_client)
+            { this.Stale = true; };
+            client.OnParcelJoinRequest += delegate (int west, int south, int east, int north,
+                IClientAPI remote_client)
+            { this.Stale = true; };
+            client.OnParcelPropertiesUpdateRequest += delegate (LandUpdateArgs args, int local_id,
+                IClientAPI remote_client)
+            { this.Stale = true; };
+            client.OnParcelBuy += delegate (UUID agentId, UUID groupId, bool final, bool groupOwned,
                 bool removeContribution, int parcelLocalID, int parcelArea, int parcelPrice, bool authenticated)
             { this.Stale = true; };
         }

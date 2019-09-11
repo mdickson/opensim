@@ -32,15 +32,10 @@
 
 // terrain patchs must be 16mx16m
 
-using System;
-using System.Collections.Generic;
-
-using log4net;
-
-using OpenSim.Framework;
-
 using OpenMetaverse;
 using OpenMetaverse.Packets;
+using OpenSim.Framework;
+using System;
 
 namespace OpenSim.Region.ClientStack.LindenUDP
 {
@@ -60,7 +55,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
         static OpenSimTerrainCompressor()
         {
-            if(Constants.TerrainPatchSize != 16)
+            if (Constants.TerrainPatchSize != 16)
                 throw new Exception("Terrain patch size must be 16m x 16m");
 
             // Initialize the decompression tables
@@ -155,66 +150,66 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             return iout;
         }
 
-/*
-        // new using terrain data and patchs indexes
-        public static List<LayerDataPacket> CreateLayerDataPackets(TerrainData terrData, int[] map)
-        {
-            List<LayerDataPacket> ret = new List<LayerDataPacket>();
-
-            int numberPatchs = map.Length / 2;
-            byte[] data = new byte[numberPatchs * 256 * 2];
-
-            //create packet and global header
-            LayerDataPacket layer = new LayerDataPacket();
-
-            byte landPacketType;
-            if (terrData.SizeX > Constants.RegionSize || terrData.SizeY > Constants.RegionSize)
-                landPacketType = (byte)TerrainPatch.LayerType.LandExtended;
-            else
-                landPacketType = (byte)TerrainPatch.LayerType.Land;
-
-            layer.LayerID.Type = landPacketType;
-
-            BitPack bitpack = new BitPack(data, 0);
-            bitpack.PackBits(STRIDE, 16);
-            bitpack.PackBitsFromByte(16);
-            bitpack.PackBitsFromByte(landPacketType);
-
-            int s;
-            for (int i = 0; i < numberPatchs; i++)
-            {
-                s = 2 * i;
-                CreatePatchFromTerrainData(bitpack, terrData, map[s], map[s + 1]);
-
-                if (bitpack.BytePos > 950 && i != numberPatchs - 1)
+        /*
+                // new using terrain data and patchs indexes
+                public static List<LayerDataPacket> CreateLayerDataPackets(TerrainData terrData, int[] map)
                 {
-                    //finish this packet
+                    List<LayerDataPacket> ret = new List<LayerDataPacket>();
+
+                    int numberPatchs = map.Length / 2;
+                    byte[] data = new byte[numberPatchs * 256 * 2];
+
+                    //create packet and global header
+                    LayerDataPacket layer = new LayerDataPacket();
+
+                    byte landPacketType;
+                    if (terrData.SizeX > Constants.RegionSize || terrData.SizeY > Constants.RegionSize)
+                        landPacketType = (byte)TerrainPatch.LayerType.LandExtended;
+                    else
+                        landPacketType = (byte)TerrainPatch.LayerType.Land;
+
+                    layer.LayerID.Type = landPacketType;
+
+                    BitPack bitpack = new BitPack(data, 0);
+                    bitpack.PackBits(STRIDE, 16);
+                    bitpack.PackBitsFromByte(16);
+                    bitpack.PackBitsFromByte(landPacketType);
+
+                    int s;
+                    for (int i = 0; i < numberPatchs; i++)
+                    {
+                        s = 2 * i;
+                        CreatePatchFromTerrainData(bitpack, terrData, map[s], map[s + 1]);
+
+                        if (bitpack.BytePos > 950 && i != numberPatchs - 1)
+                        {
+                            //finish this packet
+                            bitpack.PackBitsFromByte(END_OF_PATCHES);
+
+                            layer.LayerData.Data = new byte[bitpack.BytePos + 1];
+                            Buffer.BlockCopy(bitpack.Data, 0, layer.LayerData.Data, 0, bitpack.BytePos + 1);
+                            ret.Add(layer);
+
+                            // start another
+                            layer = new LayerDataPacket();
+                            layer.LayerID.Type = landPacketType;
+
+                            bitpack = new BitPack(data, 0);
+                            bitpack.PackBits(STRIDE, 16);
+                            bitpack.PackBitsFromByte(16);
+                            bitpack.PackBitsFromByte(landPacketType);
+                        }
+                    }
+
                     bitpack.PackBitsFromByte(END_OF_PATCHES);
 
                     layer.LayerData.Data = new byte[bitpack.BytePos + 1];
                     Buffer.BlockCopy(bitpack.Data, 0, layer.LayerData.Data, 0, bitpack.BytePos + 1);
                     ret.Add(layer);
 
-                    // start another
-                    layer = new LayerDataPacket();
-                    layer.LayerID.Type = landPacketType;
-
-                    bitpack = new BitPack(data, 0);
-                    bitpack.PackBits(STRIDE, 16);
-                    bitpack.PackBitsFromByte(16);
-                    bitpack.PackBitsFromByte(landPacketType);
+                    return ret;
                 }
-            }
-
-            bitpack.PackBitsFromByte(END_OF_PATCHES);
-
-            layer.LayerData.Data = new byte[bitpack.BytePos + 1];
-            Buffer.BlockCopy(bitpack.Data, 0, layer.LayerData.Data, 0, bitpack.BytePos + 1);
-            ret.Add(layer);
-
-            return ret;
-        }
-*/
+        */
 
         public static void CreatePatchFromTerrainData(BitPack output, TerrainData terrData, int patchX, int patchY)
         {
@@ -307,20 +302,20 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
             int lastZeroindx = 256 - postquant;
 
-            fixed(int * patch = _patch)
+            fixed (int* patch = _patch)
             {
                 if (lastZeroindx != 256)
                     patch[lastZeroindx] = 0;
 
                 int i = 0;
-                while(i < 256)
+                while (i < 256)
                 {
                     int temp = patch[i];
 
                     if (temp == 0)
                     {
                         int j = i + 1;
-                        while(j < lastZeroindx)
+                        while (j < lastZeroindx)
                         {
                             if (patch[j] != 0)
                                 break;
@@ -334,12 +329,12 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         }
 
                         i = j - i;
-                        while(i > 8)
+                        while (i > 8)
                         {
                             output.PackBitsFromByte(ZERO_CODE);
                             i -= 8;
                         }
-                        if( i > 0)
+                        if (i > 0)
                             output.PackBitsFromByte(ZERO_CODE, i);
                         i = j;
                         continue;
@@ -408,7 +403,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         private unsafe static void BuildQuantizeTable16()
         {
             const float oosob = 2.0f / 16;
-            fixed(float* fQuantizeTable16 = QuantizeTable16)
+            fixed (float* fQuantizeTable16 = QuantizeTable16)
             {
                 for (int j = 0; j < 16; j++)
                 {
@@ -447,7 +442,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         }
                         else
                         {
-                            if (j < 15 ) j++;
+                            if (j < 15) j++;
                             else i++;
 
                             right = true;

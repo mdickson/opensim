@@ -25,10 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -36,6 +32,10 @@ using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace OpenSim.Region.OptionalModules
 {
@@ -64,7 +64,7 @@ namespace OpenSim.Region.OptionalModules
 
             List<string> modules = new List<string>(permissionModules.Split(',').Select(m => m.Trim()));
 
-            if(!modules.Contains("PrimLimitsModule"))
+            if (!modules.Contains("PrimLimitsModule"))
                 return;
 
             m_log.DebugFormat("[PRIM LIMITS]: Initialized module");
@@ -140,7 +140,7 @@ namespace OpenSim.Region.OptionalModules
             float newX = newPoint.X;
             float newY = newPoint.Y;
             if (newX < -1.0f || newX > (m_scene.RegionInfo.RegionSizeX + 1.0f) ||
-                newY < -1.0f || newY > (m_scene.RegionInfo.RegionSizeY + 1.0f) )
+                newY < -1.0f || newY > (m_scene.RegionInfo.RegionSizeY + 1.0f))
                 return true;
 
             if (sog == null)
@@ -151,11 +151,11 @@ namespace OpenSim.Region.OptionalModules
             if (newParcel == null)
                 return true;
 
-            if(!enteringRegion)
+            if (!enteringRegion)
             {
                 Vector3 oldPoint = sog.AbsolutePosition;
                 ILandObject oldParcel = m_scene.LandChannel.GetLandObject(oldPoint.X, oldPoint.Y);
-                if(oldParcel != null && oldParcel.Equals(newParcel))
+                if (oldParcel != null && oldParcel.Equals(newParcel))
                     return true;
             }
 
@@ -167,7 +167,7 @@ namespace OpenSim.Region.OptionalModules
 
             if (response != null)
             {
-                if(m_dialogModule != null)
+                if (m_dialogModule != null)
                     m_dialogModule.SendAlertToUser(sog.OwnerID, response);
                 return false;
             }
@@ -220,7 +220,7 @@ namespace OpenSim.Region.OptionalModules
                             if (!mgrs.Contains(ownerID))
                             {
                                 // caller is not an Estate Manager
-                                if ((lo.PrimCounts.Users[ownerID] + objectCount) >  maxPrimsPerUser)
+                                if ((lo.PrimCounts.Users[ownerID] + objectCount) > maxPrimsPerUser)
                                 {
                                     response = "Unable to rez object because you have reached your limit";
                                 }

@@ -25,12 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 using NUnit.Framework;
-using OpenSim.Framework;
+using OpenMetaverse;
 using OpenSim.Framework.Serialization.External;
 using OpenSim.Tests.Common;
 
@@ -128,7 +124,7 @@ namespace OpenSim.Framework.Serialization.Tests
         public void TestRegionSettingsDeserialize()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             RegionSettings deserRs = RegionSettingsSerializer.Deserialize(m_serializedRs);
             Assert.That(deserRs, Is.Not.Null);

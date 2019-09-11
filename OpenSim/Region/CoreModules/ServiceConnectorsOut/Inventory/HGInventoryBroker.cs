@@ -28,18 +28,17 @@
 using log4net;
 using Mono.Addins;
 using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Server.Base;
+using OpenSim.Services.Connectors;
+using OpenSim.Services.Connectors.SimianGrid;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using OpenSim.Framework;
-
-using OpenSim.Server.Base;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
-using OpenSim.Services.Connectors;
-using OpenSim.Services.Connectors.SimianGrid;
-using OpenMetaverse;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Inventory
 {
@@ -56,7 +55,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Inventory
         private Dictionary<string, IInventoryService> m_connectors = new Dictionary<string, IInventoryService>();
 
         // A cache of userIDs --> ServiceURLs, for HGBroker only
-        protected Dictionary<UUID, string> m_InventoryURLs = new Dictionary<UUID,string>();
+        protected Dictionary<UUID, string> m_InventoryURLs = new Dictionary<UUID, string>();
 
         private List<Scene> m_Scenes = new List<Scene>();
 
@@ -211,12 +210,12 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Inventory
                 {
                     m_log.DebugFormat("[INVENTORY CACHE]: OnClientClosed in {0}, but user {1} still in sim. Keeping inventoryURL in cache",
                             scene.RegionInfo.RegionName, clientID);
-                        return;
+                    return;
                 }
             }
 
             if (m_InventoryURLs.ContainsKey(clientID)) // if it's in cache
-                    DropInventoryServiceURL(clientID);
+                DropInventoryServiceURL(clientID);
 
             m_Cache.RemoveAll(clientID);
         }
@@ -256,11 +255,11 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Inventory
                                 return;
                             }
                         }
-//                        else
-//                        {
-//                            m_log.DebugFormat("[HG INVENTORY CONNECTOR]: User {0} does not have InventoryServerURI. OH NOES!", userID);
-//                            return;
-//                        }
+                        //                        else
+                        //                        {
+                        //                            m_log.DebugFormat("[HG INVENTORY CONNECTOR]: User {0} does not have InventoryServerURI. OH NOES!", userID);
+                        //                            return;
+                        //                        }
                     }
                 }
                 if (sp == null)
@@ -303,7 +302,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Inventory
             lock (m_InventoryURLs)
             {
                 if (m_InventoryURLs.ContainsKey(userID))
-                  return m_InventoryURLs[userID];
+                    return m_InventoryURLs[userID];
             }
 
             return null; //it means that the methods should forward to local grid's inventory

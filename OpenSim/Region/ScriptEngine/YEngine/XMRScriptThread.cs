@@ -59,19 +59,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public void StartThreadWorker(int i)
         {
             Thread thd;
-            if(i >= 0)
+            if (i >= 0)
                 thd = Yengine.StartMyThread(RunScriptThread, "YScript" + i.ToString(), ThreadPriority.BelowNormal);
             else
                 thd = Yengine.StartMyThread(RunScriptThread, "YScript", ThreadPriority.BelowNormal);
-            lock(m_WakeUpLock)
+            lock (m_WakeUpLock)
                 m_RunningInstances.Add(thd.ManagedThreadId, null);
         }
 
         public void StopThreadWorkers()
         {
-            lock(m_WakeUpLock)
+            lock (m_WakeUpLock)
             {
-                while(m_RunningInstances.Count != 0)
+                while (m_RunningInstances.Count != 0)
                 {
                     Monitor.PulseAll(m_WakeUpLock);
                     Monitor.Wait(m_WakeUpLock, Watchdog.DEFAULT_WATCHDOG_TIMEOUT_MS / 2);
@@ -85,7 +85,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public void WakeUpOne()
         {
-            lock(m_WakeUpLock)
+            lock (m_WakeUpLock)
             {
                 m_WakeUpOne++;
                 Monitor.Pulse(m_WakeUpLock);
@@ -94,7 +94,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public void SuspendThreads()
         {
-            lock(m_WakeUpLock)
+            lock (m_WakeUpLock)
             {
                 m_SuspendScriptThreadFlag = true;
                 Monitor.PulseAll(m_WakeUpLock);
@@ -103,7 +103,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public void ResumeThreads()
         {
-            lock(m_WakeUpLock)
+            lock (m_WakeUpLock)
             {
                 m_SuspendScriptThreadFlag = false;
                 Monitor.PulseAll(m_WakeUpLock);
@@ -125,19 +125,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             bool didevent;
             m_ScriptThreadTID = tid;
 
-            while(!m_Exiting)
+            while (!m_Exiting)
             {
                 Yengine.UpdateMyThread();
 
-                lock(m_WakeUpLock)
+                lock (m_WakeUpLock)
                 {
                     // Maybe there are some scripts waiting to be migrated in or out.
                     thunk = null;
-                    if(m_ThunkQueue.Count > 0)
+                    if (m_ThunkQueue.Count > 0)
                         thunk = m_ThunkQueue.Dequeue();
 
                     // Handle 'xmr resume/suspend' commands.
-                    else if(m_SuspendScriptThreadFlag && !m_Exiting)
+                    else if (m_SuspendScriptThreadFlag && !m_Exiting)
                     {
                         Monitor.Wait(m_WakeUpLock, Watchdog.DEFAULT_WATCHDOG_TIMEOUT_MS / 2);
                         Yengine.UpdateMyThread();
@@ -145,13 +145,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     }
                 }
 
-                if(thunk != null)
+                if (thunk != null)
                 {
                     thunk();
                     continue;
                 }
 
-                if(m_StartProcessing)
+                if (m_StartProcessing)
                 {
                     // If event just queued to any idle scripts
                     // start them right away.  But only start so
@@ -159,19 +159,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     // queue.
                     int numStarts;
                     didevent = false;
-                    for(numStarts = 5; numStarts >= 0; --numStarts)
+                    for (numStarts = 5; numStarts >= 0; --numStarts)
                     {
-                        lock(m_StartQueue)
+                        lock (m_StartQueue)
                             inst = m_StartQueue.RemoveHead();
 
-                        if(inst == null)
+                        if (inst == null)
                             break;
                         if (inst.m_IState == XMRInstState.SUSPENDED)
                             continue;
                         if (inst.m_IState != XMRInstState.ONSTARTQ)
                             throw new Exception("bad state");
                         RunInstance(inst, tid);
-                        if(m_SuspendScriptThreadFlag || m_Exiting)
+                        if (m_SuspendScriptThreadFlag || m_Exiting)
                             continue;
                         didevent = true;
                     }
@@ -184,10 +184,10 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     // m_StartQueue as they have been taking at
                     // least one quantum of CPU time and event
                     // handlers are supposed to be quick.
-                    lock(m_YieldQueue)
+                    lock (m_YieldQueue)
                         inst = m_YieldQueue.RemoveHead();
 
-                    if(inst != null)
+                    if (inst != null)
                     {
                         if (inst.m_IState == XMRInstState.SUSPENDED)
                             continue;
@@ -198,22 +198,22 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     }
 
                     // If we left something dangling in the m_StartQueue or m_YieldQueue, go back to check it.
-                    if(didevent)
+                    if (didevent)
                         continue;
                 }
 
                 // Nothing to do, sleep.
-                lock(m_WakeUpLock)
+                lock (m_WakeUpLock)
                 {
-                    if(!m_WakeUpThis && (m_WakeUpOne <= 0) && !m_Exiting)
+                    if (!m_WakeUpThis && (m_WakeUpOne <= 0) && !m_Exiting)
                         Monitor.Wait(m_WakeUpLock, Watchdog.DEFAULT_WATCHDOG_TIMEOUT_MS / 2);
 
                     m_WakeUpThis = false;
-                    if((m_WakeUpOne > 0) && (--m_WakeUpOne > 0))
+                    if ((m_WakeUpOne > 0) && (--m_WakeUpOne > 0))
                         Monitor.Pulse(m_WakeUpLock);
                 }
             }
-            lock(m_WakeUpLock)
+            lock (m_WakeUpLock)
                 m_RunningInstances.Remove(tid);
 
             Yengine.MyThreadExiting();
@@ -229,12 +229,12 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             m_ScriptExecTime -= (long)(m_LastRanAt - DateTime.MinValue).TotalMilliseconds;
             inst.m_IState = XMRInstState.RUNNING;
 
-            lock(m_WakeUpLock)
+            lock (m_WakeUpLock)
                 m_RunningInstances[tid] = inst;
 
             XMRInstState newIState = inst.RunOne();
 
-            lock(m_WakeUpLock)
+            lock (m_WakeUpLock)
                 m_RunningInstances[tid] = null;
 
             HandleNewIState(inst, newIState);

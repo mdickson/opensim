@@ -24,29 +24,21 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using Mono.Addins;
-
-using System;
-using System.Reflection;
-using System.Threading;
-using System.Text;
-using System.Net;
-using System.Net.Sockets;
 using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
 {
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "JsonStoreModule")]
 
-    public class JsonStoreModule  : INonSharedRegionModule, IJsonStoreModule
+    public class JsonStoreModule : INonSharedRegionModule, IJsonStoreModule
     {
         private static readonly ILog m_log =
             LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -58,11 +50,11 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
 
         private Scene m_scene = null;
 
-        private Dictionary<UUID,JsonStore> m_JsonValueStore;
+        private Dictionary<UUID, JsonStore> m_JsonValueStore;
 
         private UUID m_sharedStore;
 
-#region Region Module interface
+        #region Region Module interface
 
         // -----------------------------------------------------------------
         /// <summary>
@@ -138,8 +130,8 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
                 m_scene.RegisterModuleInterface<IJsonStoreModule>(this);
 
                 m_sharedStore = UUID.Zero;
-                m_JsonValueStore = new Dictionary<UUID,JsonStore>();
-                m_JsonValueStore.Add(m_sharedStore,new JsonStore(""));
+                m_JsonValueStore = new Dictionary<UUID, JsonStore>();
+                m_JsonValueStore.Add(m_sharedStore, new JsonStore(""));
 
                 scene.EventManager.OnObjectBeingRemovedFromScene += EventManagerOnObjectBeingRemovedFromScene;
             }
@@ -179,9 +171,9 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
             get { return null; }
         }
 
-#endregion
+        #endregion
 
-#region SceneEvents
+        #region SceneEvents
         // -----------------------------------------------------------------
         /// <summary>
         ///
@@ -189,12 +181,12 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         // -----------------------------------------------------------------
         public void EventManagerOnObjectBeingRemovedFromScene(SceneObjectGroup obj)
         {
-            obj.ForEachPart(delegate(SceneObjectPart sop) { DestroyStore(sop.UUID); } );
+            obj.ForEachPart(delegate (SceneObjectPart sop) { DestroyStore(sop.UUID); });
         }
 
-#endregion
+        #endregion
 
-#region ScriptInvocationInteface
+        #region ScriptInvocationInteface
 
 
         // -----------------------------------------------------------------
@@ -221,8 +213,8 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         // -----------------------------------------------------------------
         public bool AttachObjectStore(UUID objectID)
         {
-            if (! m_enabled) return false;
-            if (! m_enableObjectStore) return false;
+            if (!m_enabled) return false;
+            if (!m_enableObjectStore) return false;
 
             SceneObjectPart sop = m_scene.GetSceneObjectPart(objectID);
             if (sop == null)
@@ -236,8 +228,8 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
                 if (m_JsonValueStore.ContainsKey(objectID))
                     return true;
 
-                JsonStore map = new JsonObjectStore(m_scene,objectID);
-                m_JsonValueStore.Add(objectID,map);
+                JsonStore map = new JsonObjectStore(m_scene, objectID);
+                m_JsonValueStore.Add(objectID, map);
             }
 
             return true;
@@ -255,7 +247,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
 
             JsonStore map = null;
 
-            if (! m_enabled) return false;
+            if (!m_enabled) return false;
 
 
             try
@@ -269,7 +261,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
             }
 
             lock (m_JsonValueStore)
-                m_JsonValueStore.Add(result,map);
+                m_JsonValueStore.Add(result, map);
 
             return true;
         }
@@ -281,7 +273,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         // -----------------------------------------------------------------
         public bool DestroyStore(UUID storeID)
         {
-            if (! m_enabled) return false;
+            if (!m_enabled) return false;
 
             lock (m_JsonValueStore)
                 return m_JsonValueStore.Remove(storeID);
@@ -294,7 +286,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         // -----------------------------------------------------------------
         public bool TestStore(UUID storeID)
         {
-            if (! m_enabled) return false;
+            if (!m_enabled) return false;
 
             lock (m_JsonValueStore)
                 return m_JsonValueStore.ContainsKey(storeID);
@@ -307,14 +299,14 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         // -----------------------------------------------------------------
         public JsonStoreNodeType GetNodeType(UUID storeID, string path)
         {
-            if (! m_enabled) return JsonStoreNodeType.Undefined;
+            if (!m_enabled) return JsonStoreNodeType.Undefined;
 
             JsonStore map = null;
             lock (m_JsonValueStore)
             {
-                if (! m_JsonValueStore.TryGetValue(storeID,out map))
+                if (!m_JsonValueStore.TryGetValue(storeID, out map))
                 {
-                    m_log.InfoFormat("[JsonStore] Missing store {0}",storeID);
+                    m_log.InfoFormat("[JsonStore] Missing store {0}", storeID);
                     return JsonStoreNodeType.Undefined;
                 }
             }
@@ -339,14 +331,14 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         // -----------------------------------------------------------------
         public JsonStoreValueType GetValueType(UUID storeID, string path)
         {
-            if (! m_enabled) return JsonStoreValueType.Undefined;
+            if (!m_enabled) return JsonStoreValueType.Undefined;
 
             JsonStore map = null;
             lock (m_JsonValueStore)
             {
-                if (! m_JsonValueStore.TryGetValue(storeID,out map))
+                if (!m_JsonValueStore.TryGetValue(storeID, out map))
                 {
-                    m_log.InfoFormat("[JsonStore] Missing store {0}",storeID);
+                    m_log.InfoFormat("[JsonStore] Missing store {0}", storeID);
                     return JsonStoreValueType.Undefined;
                 }
             }
@@ -371,14 +363,14 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         // -----------------------------------------------------------------
         public bool SetValue(UUID storeID, string path, string value, bool useJson)
         {
-            if (! m_enabled) return false;
+            if (!m_enabled) return false;
 
             JsonStore map = null;
             lock (m_JsonValueStore)
             {
-                if (! m_JsonValueStore.TryGetValue(storeID,out map))
+                if (!m_JsonValueStore.TryGetValue(storeID, out map))
                 {
-                    m_log.InfoFormat("[JsonStore] Missing store {0}",storeID);
+                    m_log.InfoFormat("[JsonStore] Missing store {0}", storeID);
                     return false;
                 }
             }
@@ -390,11 +382,11 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
                     if (map.StringSpace > m_maxStringSpace)
                     {
                         m_log.WarnFormat("[JsonStore] {0} exceeded string size; {1} bytes used of {2} limit",
-                                         storeID,map.StringSpace,m_maxStringSpace);
+                                         storeID, map.StringSpace, m_maxStringSpace);
                         return false;
                     }
 
-                    return map.SetValue(path,value,useJson);
+                    return map.SetValue(path, value, useJson);
                 }
             }
             catch (Exception e)
@@ -412,14 +404,14 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         // -----------------------------------------------------------------
         public bool RemoveValue(UUID storeID, string path)
         {
-            if (! m_enabled) return false;
+            if (!m_enabled) return false;
 
             JsonStore map = null;
             lock (m_JsonValueStore)
             {
-                if (! m_JsonValueStore.TryGetValue(storeID,out map))
+                if (!m_JsonValueStore.TryGetValue(storeID, out map))
                 {
-                    m_log.InfoFormat("[JsonStore] Missing store {0}",storeID);
+                    m_log.InfoFormat("[JsonStore] Missing store {0}", storeID);
                     return false;
                 }
             }
@@ -444,12 +436,12 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         // -----------------------------------------------------------------
         public int GetArrayLength(UUID storeID, string path)
         {
-            if (! m_enabled) return -1;
+            if (!m_enabled) return -1;
 
             JsonStore map = null;
             lock (m_JsonValueStore)
             {
-                if (! m_JsonValueStore.TryGetValue(storeID,out map))
+                if (!m_JsonValueStore.TryGetValue(storeID, out map))
                     return -1;
             }
 
@@ -477,12 +469,12 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         {
             value = String.Empty;
 
-            if (! m_enabled) return false;
+            if (!m_enabled) return false;
 
             JsonStore map = null;
             lock (m_JsonValueStore)
             {
-                if (! m_JsonValueStore.TryGetValue(storeID,out map))
+                if (!m_JsonValueStore.TryGetValue(storeID, out map))
                     return false;
             }
 
@@ -508,7 +500,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         // -----------------------------------------------------------------
         public void TakeValue(UUID storeID, string path, bool useJson, TakeValueCallback cback)
         {
-            if (! m_enabled)
+            if (!m_enabled)
             {
                 cback(String.Empty);
                 return;
@@ -517,7 +509,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
             JsonStore map = null;
             lock (m_JsonValueStore)
             {
-                if (! m_JsonValueStore.TryGetValue(storeID,out map))
+                if (!m_JsonValueStore.TryGetValue(storeID, out map))
                 {
                     cback(String.Empty);
                     return;
@@ -547,7 +539,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         // -----------------------------------------------------------------
         public void ReadValue(UUID storeID, string path, bool useJson, TakeValueCallback cback)
         {
-            if (! m_enabled)
+            if (!m_enabled)
             {
                 cback(String.Empty);
                 return;
@@ -556,7 +548,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
             JsonStore map = null;
             lock (m_JsonValueStore)
             {
-                if (! m_JsonValueStore.TryGetValue(storeID,out map))
+                if (!m_JsonValueStore.TryGetValue(storeID, out map))
                 {
                     cback(String.Empty);
                     return;
@@ -579,6 +571,6 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
             cback(String.Empty);
         }
 
-#endregion
+        #endregion
     }
 }

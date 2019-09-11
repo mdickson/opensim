@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenSim.Framework.ServiceAuth;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,9 +35,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Web;
-using log4net;
-
-using OpenSim.Framework.ServiceAuth;
 
 namespace OpenSim.Framework
 {
@@ -204,7 +203,7 @@ namespace OpenSim.Framework
             }
             catch (Exception e)
             {
-                m_log.Error("[REST]: An exception was raised adding query parameter to dictionary. Exception: {0}",e);
+                m_log.Error("[REST]: An exception was raised adding query parameter to dictionary. Exception: {0}", e);
             }
         }
 
@@ -224,7 +223,7 @@ namespace OpenSim.Framework
             }
             catch (Exception e)
             {
-                m_log.Error("[REST]: An exception was raised adding query parameter to dictionary. Exception: {0}",e);
+                m_log.Error("[REST]: An exception was raised adding query parameter to dictionary. Exception: {0}", e);
             }
         }
 
@@ -295,7 +294,7 @@ namespace OpenSim.Framework
         {
             try
             {
-                Stream s = (Stream) ar.AsyncState;
+                Stream s = (Stream)ar.AsyncState;
                 int read = s.EndRead(ar);
 
                 if (read > 0)
@@ -338,7 +337,7 @@ namespace OpenSim.Framework
         {
             lock (_lock)
             {
-                _request = (HttpWebRequest) WebRequest.Create(buildUri());
+                _request = (HttpWebRequest)WebRequest.Create(buildUri());
                 _request.KeepAlive = false;
                 _request.ContentType = "application/xml";
                 _request.Timeout = 200000;
@@ -351,11 +350,11 @@ namespace OpenSim.Framework
                 if (WebUtil.DebugLevel >= 3)
                     m_log.DebugFormat("[LOGHTTP]: HTTP OUT {0} REST {1} to {2}", reqnum, _request.Method, _request.RequestUri);
 
-//                IAsyncResult responseAsyncResult = _request.BeginGetResponse(new AsyncCallback(ResponseIsReadyDelegate), _request);
+                //                IAsyncResult responseAsyncResult = _request.BeginGetResponse(new AsyncCallback(ResponseIsReadyDelegate), _request);
 
                 try
                 {
-                    using (_response = (HttpWebResponse) _request.GetResponse())
+                    using (_response = (HttpWebResponse)_request.GetResponse())
                     {
                         using (Stream src = _response.GetResponseStream())
                         {
@@ -410,7 +409,7 @@ namespace OpenSim.Framework
 
         public Stream Request(Stream src, IServiceAuth auth)
         {
-            _request = (HttpWebRequest) WebRequest.Create(buildUri());
+            _request = (HttpWebRequest)WebRequest.Create(buildUri());
             _request.KeepAlive = false;
             _request.ContentType = "application/xml";
             _request.Timeout = 90000;
@@ -428,16 +427,16 @@ namespace OpenSim.Framework
             if (WebUtil.DebugLevel >= 5)
                 WebUtil.LogOutgoingDetail(string.Format("SEND {0}: ", reqnum), src);
 
-            
+
             try
             {
                 using (Stream dst = _request.GetRequestStream())
                 {
-//                    m_log.Debug("[REST]: GetRequestStream is ok");
+                    //                    m_log.Debug("[REST]: GetRequestStream is ok");
 
                     byte[] buf = new byte[1024];
                     int length = src.Read(buf, 0, 1024);
-//                    m_log.Debug("[REST]: First Read is ok");
+                    //                    m_log.Debug("[REST]: First Read is ok");
                     while (length > 0)
                     {
                         dst.Write(buf, 0, length);
@@ -476,7 +475,7 @@ namespace OpenSim.Framework
             if (_response != null)
                 _response.Close();
 
-//            IAsyncResult responseAsyncResult = _request.BeginGetResponse(new AsyncCallback(ResponseIsReadyDelegate), _request);
+            //            IAsyncResult responseAsyncResult = _request.BeginGetResponse(new AsyncCallback(ResponseIsReadyDelegate), _request);
 
             // TODO! Implement timeout, without killing the server
             // this line implements the timeout, if there is a timeout, the callback fires and the request becomes aborted
@@ -499,7 +498,7 @@ namespace OpenSim.Framework
 
         public Stream EndRequest(IAsyncResult asyncResult)
         {
-            AsyncResult<Stream> ar = (AsyncResult<Stream>) asyncResult;
+            AsyncResult<Stream> ar = (AsyncResult<Stream>)asyncResult;
 
             // Wait for operation to complete, then return result or
             // throw exception
@@ -509,7 +508,7 @@ namespace OpenSim.Framework
         private void RequestHelper(Object asyncResult)
         {
             // We know that it's really an AsyncResult<DateTime> object
-            AsyncResult<Stream> ar = (AsyncResult<Stream>) asyncResult;
+            AsyncResult<Stream> ar = (AsyncResult<Stream>)asyncResult;
             try
             {
                 // Perform the operation; if sucessful set the result

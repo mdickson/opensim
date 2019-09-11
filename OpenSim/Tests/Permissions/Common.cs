@@ -24,19 +24,19 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.CoreModules.World.Permissions;
 using OpenSim.Region.CoreModules.Avatar.Inventory.Transfer;
 using OpenSim.Region.CoreModules.Framework.InventoryAccess;
+using OpenSim.Region.CoreModules.World.Permissions;
+using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
 using OpenSim.Tests.Common;
+using System;
+using System.Collections.Generic;
+using System.Threading;
 using PermissionMask = OpenSim.Framework.PermissionMask;
 
 namespace OpenSim.Tests.Permissions
@@ -53,7 +53,7 @@ namespace OpenSim.Tests.Permissions
 
         public static ScenePresence[] TheAvatars
         {
-            get { return TheInstance.m_Avatars;  }
+            get { return TheInstance.m_Avatars; }
         }
 
         private static string Perms = "Owner: {0}; Group: {1}; Everyone: {2}; Next: {3}";
@@ -112,7 +112,7 @@ namespace OpenSim.Tests.Permissions
             {
                 UUID id = TestHelpers.ParseTail(i + 1);
 
-                m_Avatars[i] = AddScenePresence("Bot", "Bot_" + (i+1), id);
+                m_Avatars[i] = AddScenePresence("Bot", "Bot_" + (i + 1), id);
                 Assert.That(m_Avatars[i], Is.Not.Null);
                 Assert.That(m_Avatars[i].IsChildAgent, Is.False);
                 Assert.That(m_Avatars[i].UUID, Is.EqualTo(id));
@@ -203,7 +203,7 @@ namespace OpenSim.Tests.Permissions
 
         public void PrintPerms(SceneObjectGroup sog)
         {
-            Console.WriteLine("SOG " + sog.Name + " (" + sog.OwnerID.ToString().Substring(34) + "): " + 
+            Console.WriteLine("SOG " + sog.Name + " (" + sog.OwnerID.ToString().Substring(34) + "): " +
                 String.Format(Perms, (PermissionMask)sog.EffectiveOwnerPerms,
                     (PermissionMask)sog.EffectiveGroupPerms, (PermissionMask)sog.EffectiveEveryOnePerms, (PermissionMask)sog.RootPart.NextOwnerMask));
 
@@ -211,7 +211,7 @@ namespace OpenSim.Tests.Permissions
 
         public void PrintPerms(InventoryItemBase item)
         {
-            Console.WriteLine("Inv " + item.Name + " (" + item.Owner.ToString().Substring(34) + "): " + 
+            Console.WriteLine("Inv " + item.Name + " (" + item.Owner.ToString().Substring(34) + "): " +
                 String.Format(Perms, (PermissionMask)item.BasePermissions,
                     (PermissionMask)item.GroupPermissions, (PermissionMask)item.EveryOnePermissions, (PermissionMask)item.NextPermissions));
 

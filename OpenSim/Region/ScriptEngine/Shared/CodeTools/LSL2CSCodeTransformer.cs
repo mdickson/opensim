@@ -25,17 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using System.Collections.Generic;
-using System.Reflection;
-using log4net;
 using Tools;
 
 namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
 {
     public class LSL2CSCodeTransformer
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private SYMBOL m_astRoot = null;
         private static Dictionary<string, string> m_datatypeLSL2OpenSim = null;
@@ -82,19 +79,19 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
         /// <param name="s">The current node to transform.</param>
         private void TransformNode(SYMBOL s)
         {
-//            m_log.DebugFormat("[LSL2CSCODETRANSFORMER]: Tranforming node {0}", s);
+            //            m_log.DebugFormat("[LSL2CSCODETRANSFORMER]: Tranforming node {0}", s);
 
             // make sure to put type lower in the inheritance hierarchy first
             // ie: since IdentConstant and StringConstant inherit from Constant,
             // put IdentConstant and StringConstant before Constant
             if (s is Declaration)
-                ((Declaration) s).Datatype = m_datatypeLSL2OpenSim[((Declaration) s).Datatype];
+                ((Declaration)s).Datatype = m_datatypeLSL2OpenSim[((Declaration)s).Datatype];
             else if (s is Constant)
-                ((Constant) s).Type = m_datatypeLSL2OpenSim[((Constant) s).Type];
+                ((Constant)s).Type = m_datatypeLSL2OpenSim[((Constant)s).Type];
             else if (s is TypecastExpression)
-                ((TypecastExpression) s).TypecastType = m_datatypeLSL2OpenSim[((TypecastExpression) s).TypecastType];
-            else if (s is GlobalFunctionDefinition && "void" != ((GlobalFunctionDefinition) s).ReturnType) // we don't need to translate "void"
-                ((GlobalFunctionDefinition) s).ReturnType = m_datatypeLSL2OpenSim[((GlobalFunctionDefinition) s).ReturnType];
+                ((TypecastExpression)s).TypecastType = m_datatypeLSL2OpenSim[((TypecastExpression)s).TypecastType];
+            else if (s is GlobalFunctionDefinition && "void" != ((GlobalFunctionDefinition)s).ReturnType) // we don't need to translate "void"
+                ((GlobalFunctionDefinition)s).ReturnType = m_datatypeLSL2OpenSim[((GlobalFunctionDefinition)s).ReturnType];
 
             for (int i = 0; i < s.kids.Count; i++)
             {
@@ -109,14 +106,14 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
                 // We need to check for that here.
                 if (null != s.kids[i])
                 {
-//                    m_log.Debug("[LSL2CSCODETRANSFORMER]: Moving down level");
+                    //                    m_log.Debug("[LSL2CSCODETRANSFORMER]: Moving down level");
 
                     if (!(s is Assignment || s is ArgumentDeclarationList) && s.kids[i] is Declaration)
                         AddImplicitInitialization(s, i);
 
-                    TransformNode((SYMBOL) s.kids[i]);
+                    TransformNode((SYMBOL)s.kids[i]);
 
-//                    m_log.Debug("[LSL2CSCODETRANSFORMER]: Moving up level");
+                    //                    m_log.Debug("[LSL2CSCODETRANSFORMER]: Moving up level");
                 }
             }
         }
@@ -134,12 +131,12 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
         {
             // We take the kids for a while to play with them.
             int sKidSize = s.kids.Count;
-            object [] sKids = new object[sKidSize];
+            object[] sKids = new object[sKidSize];
             for (int i = 0; i < sKidSize; i++)
                 sKids[i] = s.kids.Pop();
 
             // The child to be changed.
-            Declaration currentDeclaration = (Declaration) sKids[didx];
+            Declaration currentDeclaration = (Declaration)sKids[didx];
 
             // We need an assignment node.
             Assignment newAssignment = new Assignment(currentDeclaration.yyps,
@@ -169,36 +166,36 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
         {
             switch (constantType)
             {
-            case "integer":
-                return new Constant(p, constantType, "0");
-            case "float":
-                return new Constant(p, constantType, "0.0");
-            case "string":
-            case "key":
-                return new Constant(p, constantType, "");
-            case "list":
-                ArgumentList al = new ArgumentList(p);
-                return new ListConstant(p, al);
-            case "vector":
-                Constant vca = new Constant(p, "float", "0.0");
-                Constant vcb = new Constant(p, "float", "0.0");
-                Constant vcc = new Constant(p, "float", "0.0");
-                ConstantExpression vcea = new ConstantExpression(p, vca);
-                ConstantExpression vceb = new ConstantExpression(p, vcb);
-                ConstantExpression vcec = new ConstantExpression(p, vcc);
-                return new VectorConstant(p, vcea, vceb, vcec);
-            case "rotation":
-                Constant rca = new Constant(p, "float", "0.0");
-                Constant rcb = new Constant(p, "float", "0.0");
-                Constant rcc = new Constant(p, "float", "0.0");
-                Constant rcd = new Constant(p, "float", "1.0");
-                ConstantExpression rcea = new ConstantExpression(p, rca);
-                ConstantExpression rceb = new ConstantExpression(p, rcb);
-                ConstantExpression rcec = new ConstantExpression(p, rcc);
-                ConstantExpression rced = new ConstantExpression(p, rcd);
-                return new RotationConstant(p, rcea, rceb, rcec, rced);
-            default:
-                return null; // this will probably break stuff
+                case "integer":
+                    return new Constant(p, constantType, "0");
+                case "float":
+                    return new Constant(p, constantType, "0.0");
+                case "string":
+                case "key":
+                    return new Constant(p, constantType, "");
+                case "list":
+                    ArgumentList al = new ArgumentList(p);
+                    return new ListConstant(p, al);
+                case "vector":
+                    Constant vca = new Constant(p, "float", "0.0");
+                    Constant vcb = new Constant(p, "float", "0.0");
+                    Constant vcc = new Constant(p, "float", "0.0");
+                    ConstantExpression vcea = new ConstantExpression(p, vca);
+                    ConstantExpression vceb = new ConstantExpression(p, vcb);
+                    ConstantExpression vcec = new ConstantExpression(p, vcc);
+                    return new VectorConstant(p, vcea, vceb, vcec);
+                case "rotation":
+                    Constant rca = new Constant(p, "float", "0.0");
+                    Constant rcb = new Constant(p, "float", "0.0");
+                    Constant rcc = new Constant(p, "float", "0.0");
+                    Constant rcd = new Constant(p, "float", "1.0");
+                    ConstantExpression rcea = new ConstantExpression(p, rca);
+                    ConstantExpression rceb = new ConstantExpression(p, rcb);
+                    ConstantExpression rcec = new ConstantExpression(p, rcc);
+                    ConstantExpression rced = new ConstantExpression(p, rcd);
+                    return new RotationConstant(p, rcea, rceb, rcec, rced);
+                default:
+                    return null; // this will probably break stuff
             }
         }
     }

@@ -25,19 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using MySql.Data.MySqlClient;
+using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Text;
-using MySql.Data.MySqlClient;
-using OpenMetaverse;
 
 namespace OpenSim.Data.MySQL
 {
-    public class MySQLGenericTableHandler<T> : MySqlFramework where T: class, new()
+    public class MySQLGenericTableHandler<T> : MySqlFramework where T : class, new()
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         protected Dictionary<string, FieldInfo> m_Fields =
                 new Dictionary<string, FieldInfo>();
@@ -88,7 +88,7 @@ namespace OpenSim.Data.MySQL
             if (fields.Length == 0)
                 return;
 
-            foreach (FieldInfo f in  fields)
+            foreach (FieldInfo f in fields)
             {
                 if (f.Name != "Data")
                     m_Fields[f.Name] = f;
@@ -116,7 +116,7 @@ namespace OpenSim.Data.MySQL
         }
 
         public virtual T[] Get(string field, string key)
-        {   
+        {
             using (MySqlCommand cmd = new MySqlCommand())
             {
                 cmd.Parameters.AddWithValue(field, key);
@@ -128,7 +128,7 @@ namespace OpenSim.Data.MySQL
         public virtual T[] Get(string field, string[] keys)
         {
             int flen = keys.Length;
-            if(flen == 0)
+            if (flen == 0)
                 return new T[0];
 
             int flast = flen - 1;
@@ -136,13 +136,13 @@ namespace OpenSim.Data.MySQL
             sb.AppendFormat("select * from {0} where {1} IN (?", m_Realm, field);
             using (MySqlCommand cmd = new MySqlCommand())
             {
-                for (int i = 0 ; i < flen ; i++)
+                for (int i = 0; i < flen; i++)
                 {
                     string fname = field + i.ToString();
                     cmd.Parameters.AddWithValue(fname, keys[i]);
 
                     sb.Append(fname);
-                    if(i < flast)
+                    if (i < flast)
                         sb.Append(",?");
                     else
                         sb.Append(")");
@@ -169,10 +169,10 @@ namespace OpenSim.Data.MySQL
 
             using (MySqlCommand cmd = new MySqlCommand())
             {
-                for (int i = 0 ; i < flen ; i++)
+                for (int i = 0; i < flen; i++)
                 {
                     cmd.Parameters.AddWithValue(fields[i], keys[i]);
-                    if(i < flast)
+                    if (i < flast)
                         sb.AppendFormat("`{0}` = ?{0} and ", fields[i]);
                     else
                         sb.AppendFormat("`{0}` = ?{0} ", fields[i]);
@@ -295,7 +295,7 @@ namespace OpenSim.Data.MySQL
 
         public virtual bool Store(T row)
         {
-//            m_log.DebugFormat("[MYSQL GENERIC TABLE HANDLER]: Store(T row) invoked");
+            //            m_log.DebugFormat("[MYSQL GENERIC TABLE HANDLER]: Store(T row) invoked");
 
             using (MySqlCommand cmd = new MySqlCommand())
             {
@@ -351,9 +351,9 @@ namespace OpenSim.Data.MySQL
 
         public virtual bool Delete(string[] fields, string[] keys)
         {
-//            m_log.DebugFormat(
-//                "[MYSQL GENERIC TABLE HANDLER]: Delete(string[] fields, string[] keys) invoked with {0}:{1}",
-//                string.Join(",", fields), string.Join(",", keys));
+            //            m_log.DebugFormat(
+            //                "[MYSQL GENERIC TABLE HANDLER]: Delete(string[] fields, string[] keys) invoked with {0}:{1}",
+            //                string.Join(",", fields), string.Join(",", keys));
 
             int flen = fields.Length;
             if (flen == 0 || flen != keys.Length)
@@ -365,10 +365,10 @@ namespace OpenSim.Data.MySQL
 
             using (MySqlCommand cmd = new MySqlCommand())
             {
-                for (int i = 0 ; i < flen ; i++)
+                for (int i = 0; i < flen; i++)
                 {
                     cmd.Parameters.AddWithValue(fields[i], keys[i]);
-                    if(i < flast)
+                    if (i < flast)
                         sb.AppendFormat("`{0}` = ?{0} and ", fields[i]);
                     else
                         sb.AppendFormat("`{0}` = ?{0}", fields[i]);
@@ -396,10 +396,10 @@ namespace OpenSim.Data.MySQL
 
             using (MySqlCommand cmd = new MySqlCommand())
             {
-                for (int i = 0 ; i < flen ; i++)
+                for (int i = 0; i < flen; i++)
                 {
                     cmd.Parameters.AddWithValue(fields[i], keys[i]);
-                    if(i < flast)
+                    if (i < flast)
                         sb.AppendFormat("`{0}` = ?{0} and ", fields[i]);
                     else
                         sb.AppendFormat("`{0}` = ?{0}", fields[i]);

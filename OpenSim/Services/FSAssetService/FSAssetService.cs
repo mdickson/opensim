@@ -25,25 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Text;
-using System.Threading;
-using System.Reflection;
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Data;
 using OpenSim.Framework;
 using OpenSim.Framework.Serialization.External;
-using OpenSim.Framework.Console;
-using OpenSim.Server.Base;
 using OpenSim.Services.Base;
 using OpenSim.Services.Interfaces;
-using Nini.Config;
-using log4net;
-using OpenMetaverse;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Reflection;
 using System.Security.Cryptography;
+using System.Threading;
 
 namespace OpenSim.Services.FSAssetService
 {
@@ -198,7 +194,7 @@ namespace OpenSim.Services.FSAssetService
                     string loaderArgs = assetConfig.GetString("AssetLoaderArgs", string.Empty);
                     m_log.InfoFormat("[FSASSETS]: Loading default asset set from {0}", loaderArgs);
                     m_AssetLoader.ForEachDefaultXmlAsset(loaderArgs,
-                            delegate(AssetBase a)
+                            delegate (AssetBase a)
                             {
                                 Store(a, false);
                             });
@@ -228,8 +224,8 @@ namespace OpenSim.Services.FSAssetService
                     if (m_readCount > 0)
                     {
                         double avg = (double)m_readTicks / (double)m_readCount;
-//                        if (avg > 10000)
-//                            Environment.Exit(0);
+                        //                        if (avg > 10000)
+                        //                            Environment.Exit(0);
                         m_log.InfoFormat("[FSASSETS]: Read stats: {0} files, {1} ticks, avg {2:F2}, missing {3}, FS {4}", m_readCount, m_readTicks, (double)m_readTicks / (double)m_readCount, m_missingAssets, m_missingAssetsFS);
                     }
                     m_readCount = 0;
@@ -251,7 +247,7 @@ namespace OpenSim.Services.FSAssetService
                 if (files.Length > 0)
                 {
                     int tickCount = Environment.TickCount;
-                    for (int i = 0 ; i < files.Length ; i++)
+                    for (int i = 0; i < files.Length; i++)
                     {
                         string hash = Path.GetFileNameWithoutExtension(files[i]);
                         string s = HashToFile(hash);
@@ -259,7 +255,7 @@ namespace OpenSim.Services.FSAssetService
                         bool pathOk = false;
 
                         // The cure for chicken bones!
-                        while(true)
+                        while (true)
                         {
                             try
                             {
@@ -333,7 +329,7 @@ namespace OpenSim.Services.FSAssetService
 
                                 //File.Move(files[i], diskFile);
                             }
-                            catch(System.IO.IOException e)
+                            catch (System.IO.IOException e)
                             {
                                 if (e.Message.StartsWith("Win32 IO returned ERROR_ALREADY_EXISTS"))
                                     File.Delete(files[i]);
@@ -699,19 +695,19 @@ namespace OpenSim.Services.FSAssetService
         {
             return false;
 
-//            string oldhash;
-//            AssetMetadata meta = m_DataConnector.Get(id, out oldhash);
-//
-//            if (meta == null)
-//                return false;
-//
-//            AssetBase asset = new AssetBase();
-//            asset.Metadata = meta;
-//            asset.Data = data;
-//
-//            Store(asset);
-//
-//            return true;
+            //            string oldhash;
+            //            AssetMetadata meta = m_DataConnector.Get(id, out oldhash);
+            //
+            //            if (meta == null)
+            //                return false;
+            //
+            //            AssetBase asset = new AssetBase();
+            //            asset.Metadata = meta;
+            //            asset.Data = data;
+            //
+            //            Store(asset);
+            //
+            //            return true;
         }
 
         public virtual bool Delete(string id)
@@ -753,7 +749,7 @@ namespace OpenSim.Services.FSAssetService
             MainConsole.Instance.Output(String.Format("Flags: {0}", asset.Metadata.Flags.ToString()));
             MainConsole.Instance.Output(String.Format("FS file: {0}", HashToFile(hash)));
 
-            for (i = 0 ; i < 5 ; i++)
+            for (i = 0; i < 5; i++)
             {
                 int off = i * 16;
                 if (asset.Data.Length <= off)

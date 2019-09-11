@@ -25,25 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Interfaces;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Reflection;
 using System.Threading;
-
-using Nwc.XmlRpc;
-
-using log4net;
-using Mono.Addins;
-using Nini.Config;
-
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Services.Interfaces;
 
 /***************************************************************************
  * Simian Data Map
@@ -167,7 +160,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
 
         private bool m_debugEnabled = false;
 
-        private Dictionary<string, bool> m_pendingRequests = new Dictionary<string,bool>();
+        private Dictionary<string, bool> m_pendingRequests = new Dictionary<string, bool>();
 
         private ExpiringCache<string, OSDMap> m_memoryCache;
         private int m_cacheTimeout = 30;
@@ -231,7 +224,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
 
 
 
-                m_memoryCache = new ExpiringCache<string,OSDMap>();
+                m_memoryCache = new ExpiringCache<string, OSDMap>();
 
 
                 // If we got all the config options we need, lets start'er'up
@@ -293,7 +286,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
         {
             if (m_debugEnabled) m_log.InfoFormat("[SIMIAN-GROUPS-CONNECTOR]  {0} called", System.Reflection.MethodBase.GetCurrentMethod().Name);
 
-            UUID GroupID     = UUID.Random();
+            UUID GroupID = UUID.Random();
             UUID OwnerRoleID = UUID.Random();
 
             OSDMap GroupInfoMap = new OSDMap();
@@ -488,11 +481,11 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
             MemberGroupProfile.OpenEnrollment = groupProfile["OpenEnrollment"].AsBoolean();
             MemberGroupProfile.AllowPublish = groupProfile["AllowPublish"].AsBoolean();
             MemberGroupProfile.MaturePublish = groupProfile["MaturePublish"].AsBoolean();
-            MemberGroupProfile.FounderID = groupProfile["FounderID"].AsUUID();;
+            MemberGroupProfile.FounderID = groupProfile["FounderID"].AsUUID(); ;
             MemberGroupProfile.OwnerRole = groupProfile["OwnerRoleID"].AsUUID();
 
             Dictionary<UUID, OSDMap> Members;
-            if (SimianGetGenericEntries("GroupMember",groupID.ToString(), out Members))
+            if (SimianGetGenericEntries("GroupMember", groupID.ToString(), out Members))
             {
                 MemberGroupProfile.GroupMembershipCount = Members.Count;
             }
@@ -712,7 +705,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
             if (m_debugEnabled) m_log.InfoFormat("[SIMIAN-GROUPS-CONNECTOR]  {0} called", System.Reflection.MethodBase.GetCurrentMethod().Name);
 
             GroupMembershipData data = null;
-//            bool foundData = false;
+            //            bool foundData = false;
 
             OSDMap UserGroupMemberInfo;
             if (SimianGetGenericEntry(agentID, "GroupMember", groupID.ToString(), out UserGroupMemberInfo))
@@ -786,7 +779,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
 
             List<GroupMembershipData> memberships = new List<GroupMembershipData>();
 
-            Dictionary<string,OSDMap> GroupMemberShips;
+            Dictionary<string, OSDMap> GroupMemberShips;
             if (SimianGetGenericEntries(agentID, "GroupMember", out GroupMemberShips))
             {
                 foreach (string key in GroupMemberShips.Keys)
@@ -882,7 +875,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
             GroupOwnerRoleID = GroupInfo["OwnerRoleID"].AsUUID();
 
             // Locally cache group roles, since we'll be needing this data for each member
-            Dictionary<string,OSDMap> GroupRoles;
+            Dictionary<string, OSDMap> GroupRoles;
             SimianGetGenericEntries(GroupID, "GroupRole", out GroupRoles);
 
             // Locally cache list of group owners
@@ -931,7 +924,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
                 foreach (KeyValuePair<string, OSDMap> Role in GroupRoles)
                 {
                     Dictionary<UUID, OSDMap> GroupRoleMembers;
-                    if (SimianGetGenericEntries("GroupRole"+groupID.ToString(), Role.Key, out GroupRoleMembers))
+                    if (SimianGetGenericEntries("GroupRole" + groupID.ToString(), Role.Key, out GroupRoleMembers))
                     {
                         foreach (KeyValuePair<UUID, OSDMap> GroupRoleMember in GroupRoleMembers)
                         {
@@ -1242,7 +1235,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
 
         private bool SimianGetGenericEntries(UUID ownerID, string type, out Dictionary<string, OSDMap> maps)
         {
-            if (m_debugEnabled) m_log.InfoFormat("[SIMIAN-GROUPS-CONNECTOR]  {0} called ({1},{2})", System.Reflection.MethodBase.GetCurrentMethod().Name,ownerID, type);
+            if (m_debugEnabled) m_log.InfoFormat("[SIMIAN-GROUPS-CONNECTOR]  {0} called ({1},{2})", System.Reflection.MethodBase.GetCurrentMethod().Name, ownerID, type);
 
             NameValueCollection requestArgs = new NameValueCollection
             {
@@ -1384,9 +1377,9 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
                     if (m_memoryCache.TryGetValue(CacheKey, out response))
                         return response;
 
-                    if (! m_pendingRequests.ContainsKey(CacheKey))
+                    if (!m_pendingRequests.ContainsKey(CacheKey))
                     {
-                        m_pendingRequests.Add(CacheKey,true);
+                        m_pendingRequests.Add(CacheKey, true);
                         firstRequest = true;
                     }
                 }

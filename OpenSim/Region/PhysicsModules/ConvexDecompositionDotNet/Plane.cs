@@ -25,8 +25,6 @@
  * THE SOFTWARE.
  */
 
-using System;
-
 namespace OpenSim.Region.PhysicsModules.ConvexDecompositionDotNet
 {
     public class Plane

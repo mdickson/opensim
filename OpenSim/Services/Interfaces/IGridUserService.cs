@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using System;
 using System.Collections.Generic;
-using OpenMetaverse;
 
 namespace OpenSim.Services.Interfaces
 {
@@ -50,7 +50,7 @@ namespace OpenSim.Services.Interfaces
         public DateTime Login;
         public DateTime Logout;
 
-        public GridUserInfo() {}
+        public GridUserInfo() { }
 
         public GridUserInfo(Dictionary<string, object> kvp)
         {

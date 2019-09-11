@@ -25,13 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime;
-using System.Net;
-using System.IO;
-using System.Text;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -41,6 +34,13 @@ using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Reflection;
+using System.Runtime;
+using System.Text;
 
 namespace OpenSim.Region.OptionalModules.Scripting.RegionReady
 {
@@ -79,7 +79,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.RegionReady
                 {
                     m_channelNotify = m_config.GetInt("channel_notify", m_channelNotify);
                     m_disable_logins = m_config.GetBoolean("login_disable", false);
-                    m_uri = m_config.GetString("alert_uri",string.Empty);
+                    m_uri = m_config.GetString("alert_uri", string.Empty);
                 }
             }
         }
@@ -194,7 +194,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.RegionReady
         {
             m_oarFileLoading = true;
 
-            if (message==String.Empty)
+            if (message == String.Empty)
             {
                 m_lastOarLoadedOk = true;
             }
@@ -251,23 +251,23 @@ namespace OpenSim.Region.OptionalModules.Scripting.RegionReady
             // Let's bypass this for now until some better feedback can be established
             //
 
-//            if (msg == "load")
-//            {
-//                m_scene.EventManager.OnEmptyScriptCompileQueue += OnEmptyScriptCompileQueue;
-//                m_scene.EventManager.OnOarFileLoaded += OnOarFileLoaded;
-//                m_scene.EventManager.OnLoginsEnabled += OnLoginsEnabled;
-//                m_scene.EventManager.OnRezScript  += OnRezScript;
-//                m_oarFileLoading = true;
-//                m_firstEmptyCompileQueue = true;
-//
-//                m_scene.LoginsDisabled = true;
-//                m_scene.LoginLock = true;
-//                if ( m_uri != string.Empty )
-//                {
-//                    RRAlert("loading oar");
-//                    RRAlert("disabled");
-//                }
-//            }
+            //            if (msg == "load")
+            //            {
+            //                m_scene.EventManager.OnEmptyScriptCompileQueue += OnEmptyScriptCompileQueue;
+            //                m_scene.EventManager.OnOarFileLoaded += OnOarFileLoaded;
+            //                m_scene.EventManager.OnLoginsEnabled += OnLoginsEnabled;
+            //                m_scene.EventManager.OnRezScript  += OnRezScript;
+            //                m_oarFileLoading = true;
+            //                m_firstEmptyCompileQueue = true;
+            //
+            //                m_scene.LoginsDisabled = true;
+            //                m_scene.LoginLock = true;
+            //                if ( m_uri != string.Empty )
+            //                {
+            //                    RRAlert("loading oar");
+            //                    RRAlert("disabled");
+            //                }
+            //            }
         }
 
         public void RRAlert(string status)
@@ -306,7 +306,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.RegionReady
                 os = request.GetRequestStream();
                 os.Write(buffer, 0, strBuffer.Length);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 m_log.WarnFormat("[RegionReady]: Exception thrown sending alert: {0}", e.Message);
             }

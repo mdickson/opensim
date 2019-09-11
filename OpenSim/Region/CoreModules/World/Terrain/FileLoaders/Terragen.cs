@@ -25,12 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using System;
 using System.IO;
 using System.Text;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Framework;
 
 namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
 {
@@ -222,14 +222,14 @@ namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
             BinaryWriter bs = new BinaryWriter(stream);
 
             //find the max and min heights on the map
-            double heightMax = map[0,0];
-            double heightMin = map[0,0];
+            double heightMax = map[0, 0];
+            double heightMin = map[0, 0];
 
             for (int y = 0; y < map.Height; y++)
             {
                 for (int x = 0; x < map.Width; x++)
                 {
-                    double current = map[x,y];
+                    double current = map[x, y];
                     if (heightMax < current)
                         heightMax = current;
                     if (heightMin > current)
@@ -237,7 +237,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
                 }
             }
 
-            double baseHeight = Math.Floor( (heightMax + heightMin) / 2d );
+            double baseHeight = Math.Floor((heightMax + heightMin) / 2d);
 
             double horizontalScale = Math.Ceiling((heightMax - heightMin));
 
@@ -282,7 +282,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
             {
                 for (int x = 0; x < map.Width; x++)
                 {
-                    float elevation = (float)((map[x,y] - baseHeight) * factor); // see LoadStream for inverse
+                    float elevation = (float)((map[x, y] - baseHeight) * factor); // see LoadStream for inverse
 
                     // clamp rounding issues
                     if (elevation > Int16.MaxValue)
@@ -332,7 +332,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
         /// </summary>
         /// <param name="number"></param>
         /// <returns></returns>
-        private byte[] ToLittleEndian( float number)
+        private byte[] ToLittleEndian(float number)
         {
             byte[] retVal = BitConverter.GetBytes(number);
             if (BitConverter.IsLittleEndian == false)
@@ -345,7 +345,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
                 retVal = tmp;
 
             }
-            return retVal ;
+            return retVal;
         }
 
     }

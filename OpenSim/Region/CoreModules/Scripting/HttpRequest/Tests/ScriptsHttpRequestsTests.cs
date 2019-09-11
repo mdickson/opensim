@@ -25,22 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using NUnit.Framework;
+using OpenSim.Framework;
+using OpenSim.Tests.Common;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
-using log4net.Config;
-using NUnit.Framework;
-using OpenMetaverse;
-using OpenMetaverse.Assets;
-using OpenSim.Framework;
-using OpenSim.Region.CoreModules.Scripting.HttpRequest;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Tests.Common;
 
 namespace OpenSim.Region.CoreModules.Scripting.HttpRequest.Tests
 {
@@ -50,11 +43,11 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest.Tests
 
         public WebRequest Create(Uri uri)
         {
-//            NextRequest.RequestUri = uri;
+            //            NextRequest.RequestUri = uri;
 
             return NextRequest;
 
-//            return new TestWebRequest(new SerializationInfo(typeof(TestWebRequest), new FormatterConverter()), new StreamingContext());
+            //            return new TestWebRequest(new SerializationInfo(typeof(TestWebRequest), new FormatterConverter()), new StreamingContext());
         }
     }
 
@@ -67,18 +60,18 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest.Tests
 
         public TestWebRequest() : base()
         {
-//            Console.WriteLine("created");
+            //            Console.WriteLine("created");
         }
 
-//        public TestWebRequest(SerializationInfo serializationInfo, StreamingContext streamingContext)
-//            : base(serializationInfo, streamingContext)
-//        {
-//            Console.WriteLine("created");
-//        }
+        //        public TestWebRequest(SerializationInfo serializationInfo, StreamingContext streamingContext)
+        //            : base(serializationInfo, streamingContext)
+        //        {
+        //            Console.WriteLine("created");
+        //        }
 
         public override IAsyncResult BeginGetResponse(AsyncCallback callback, object state)
         {
-//            Console.WriteLine("bish");
+            //            Console.WriteLine("bish");
             TestAsyncResult tasr = new TestAsyncResult();
             callback(tasr);
 
@@ -87,7 +80,7 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest.Tests
 
         public override WebResponse EndGetResponse(IAsyncResult asyncResult)
         {
-//            Console.WriteLine("bosh");
+            //            Console.WriteLine("bosh");
             return OnEndGetResponse(asyncResult);
         }
     }
@@ -98,7 +91,7 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest.Tests
 
 #pragma warning disable 0618
         public TestHttpWebResponse(SerializationInfo serializationInfo, StreamingContext streamingContext)
-            : base(serializationInfo, streamingContext) {}
+            : base(serializationInfo, streamingContext) { }
 #pragma warning restore 0618
 
         public override Stream GetResponseStream()
@@ -113,8 +106,9 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest.Tests
 
         object IAsyncResult.AsyncState
         {
-            get {
-                throw new System.NotImplementedException ();
+            get
+            {
+                throw new System.NotImplementedException();
             }
         }
 
@@ -167,10 +161,10 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest.Tests
             {
                 SerializationInfo si = new SerializationInfo(typeof(HttpWebResponse), new FormatterConverter());
                 StreamingContext sc = new StreamingContext();
-//                WebHeaderCollection headers = new WebHeaderCollection();
-//                si.AddValue("m_HttpResponseHeaders", headers);
+                //                WebHeaderCollection headers = new WebHeaderCollection();
+                //                si.AddValue("m_HttpResponseHeaders", headers);
                 si.AddValue("uri", new Uri("test://arrg"));
-//                si.AddValue("m_Certificate", null);
+                //                si.AddValue("m_Certificate", null);
                 si.AddValue("version", HttpVersion.Version11);
                 si.AddValue("statusCode", HttpStatusCode.NotFound);
                 si.AddValue("contentLength", 0);

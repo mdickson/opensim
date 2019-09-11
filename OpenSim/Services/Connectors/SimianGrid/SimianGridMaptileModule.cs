@@ -25,24 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Reflection;
-using System.Net;
-using System.IO;
-using System.Timers;
-using System.Drawing;
-using System.Drawing.Imaging;
-
 using log4net;
 using Mono.Addins;
 using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Reflection;
+using System.Timers;
 
 //namespace OpenSim.Region.OptionalModules.Simian
 namespace OpenSim.Services.Connectors.SimianGrid
@@ -82,7 +80,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
             if (config == null)
                 return;
 
-            if (! config.GetBoolean("Enabled", false))
+            if (!config.GetBoolean("Enabled", false))
                 return;
 
             m_serverUrl = config.GetString("MaptileURL");
@@ -95,7 +93,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
 
             m_refreshtime = refreshseconds * 1000; // convert from seconds to ms
             m_log.InfoFormat("[SIMIAN MAPTILE] enabled with refresh timeout {0} and URL {1}",
-                             m_refreshtime,m_serverUrl);
+                             m_refreshtime, m_serverUrl);
 
             m_enabled = true;
         }
@@ -120,7 +118,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
         ///</summary>
         public void AddRegion(Scene scene)
         {
-            if (! m_enabled)
+            if (!m_enabled)
                 return;
 
             // Every shared region module has to maintain an indepedent list of
@@ -134,7 +132,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
         ///</summary>
         public void RemoveRegion(Scene scene)
         {
-            if (! m_enabled)
+            if (!m_enabled)
                 return;
 
             lock (m_scenes)
@@ -165,7 +163,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
                     }
                     catch (Exception ex)
                     {
-                        m_log.WarnFormat("[SIMIAN MAPTILE] something bad happened {0}",ex.Message);
+                        m_log.WarnFormat("[SIMIAN MAPTILE] something bad happened {0}", ex.Message);
                     }
                 }
             }
@@ -178,7 +176,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
         ///</summary>
         private void UploadMapTile(IScene scene)
         {
-            m_log.DebugFormat("[SIMIAN MAPTILE]: upload maptile for {0}",scene.RegionInfo.RegionName);
+            m_log.DebugFormat("[SIMIAN MAPTILE]: upload maptile for {0}", scene.RegionInfo.RegionName);
 
             // Create a PNG map tile and upload it to the AddMapTile API
             IMapImageGenerator tileGenerator = scene.RequestModuleInterface<IMapImageGenerator>();
@@ -256,10 +254,10 @@ namespace OpenSim.Services.Connectors.SimianGrid
                     { "EncodedData", System.Convert.ToBase64String(pngData) }
                 };
 
-            OSDMap response = SimianGrid.PostToService(m_serverUrl,requestArgs);
-            if (! response["Success"].AsBoolean())
+            OSDMap response = SimianGrid.PostToService(m_serverUrl, requestArgs);
+            if (!response["Success"].AsBoolean())
             {
-                m_log.WarnFormat("[SIMIAN MAPTILE] failed to store map tile; {0}",response["Message"].AsString());
+                m_log.WarnFormat("[SIMIAN MAPTILE] failed to store map tile; {0}", response["Message"].AsString());
             }
         }
     }

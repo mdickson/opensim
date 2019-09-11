@@ -26,19 +26,13 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-
-using OpenSim.Framework;
-using OpenSim.Framework.Client;
-using log4net;
 
 namespace OpenSim.Framework
 {
     public class PriorityQueue
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public delegate bool UpdatePriorityHandler(ref uint priority, ISceneEntity entity);
 
@@ -53,7 +47,7 @@ namespace OpenSim.Framework
         /// </summary.
         public const uint NumberOfImmediateQueues = 2;
         // first queues are immediate, so no counts
-        private static readonly uint[] m_queueCounts = {0, 0, 8, 8, 5, 4, 3, 2, 1, 1, 1, 1, 1 };
+        private static readonly uint[] m_queueCounts = { 0, 0, 8, 8, 5, 4, 3, 2, 1, 1, 1, 1, 1 };
         // this is                     ava, ava, attach, <10m, 20,40,80,160m,320,640,1280, +
 
         private MinHeap<MinHeapItem>[] m_heaps = new MinHeap<MinHeapItem>[NumberOfQueues];
@@ -76,11 +70,12 @@ namespace OpenSim.Framework
         /// Lock for enqueue and dequeue operations on the priority queue
         /// </summary>
         private object m_syncRoot = new object();
-        public object SyncRoot {
+        public object SyncRoot
+        {
             get { return this.m_syncRoot; }
         }
 
-#region constructor
+        #region constructor
         public PriorityQueue() : this(MinHeap<MinHeapItem>.DEFAULT_CAPACITY) { }
 
         public PriorityQueue(int capacity)
@@ -96,9 +91,9 @@ namespace OpenSim.Framework
             m_countFromQueue = m_queueCounts[m_nextQueue];
             m_added = 0;
         }
-#endregion Constructor
+        #endregion Constructor
 
-#region PublicMethods
+        #region PublicMethods
         public void Close()
         {
             for (int i = 0; i < m_heaps.Length; ++i)
@@ -129,7 +124,7 @@ namespace OpenSim.Framework
         public bool Enqueue(uint pqueue, EntityUpdate value)
         {
             LookupItem lookup;
-            IHandle lookupH; 
+            IHandle lookupH;
             UInt64 entry;
 
             uint localid = value.Entity.LocalId;
@@ -141,7 +136,7 @@ namespace OpenSim.Framework
                 value.Update(lookup.Heap[lookupH].Value);
                 lookup.Heap.Remove(lookupH);
 
-                if((up.Flags & PrimUpdateFlags.CancelKill) != 0)
+                if ((up.Flags & PrimUpdateFlags.CancelKill) != 0)
                     entry = m_nextRequest++;
 
                 pqueue = Util.Clamp<uint>(pqueue, 0, NumberOfQueues - 1);
@@ -176,7 +171,7 @@ namespace OpenSim.Framework
                     m_lookupTable.Remove(localid);
                 }
             }
-            if(m_lookupTable.Count == 0 && m_added > 8 * m_capacity)
+            if (m_lookupTable.Count == 0 && m_added > 8 * m_capacity)
             {
                 m_lookupTable = new Dictionary<uint, LookupItem>(m_capacity);
                 m_added = 0;
@@ -192,7 +187,7 @@ namespace OpenSim.Framework
         {
             // If there is anything in immediate queues, return it first no
             // matter what else. Breaks fairness. But very useful.
-            
+
             for (int iq = 0; iq < NumberOfImmediateQueues; iq++)
             {
                 if (m_heaps[iq].Count > 0)
@@ -227,9 +222,9 @@ namespace OpenSim.Framework
             for (uint i = NumberOfImmediateQueues; i < NumberOfQueues; ++i)
             {
                 m_nextQueue++;
-                if(m_nextQueue >= NumberOfQueues)
+                if (m_nextQueue >= NumberOfQueues)
                     m_nextQueue = NumberOfImmediateQueues;
- 
+
                 curheap = m_heaps[m_nextQueue];
                 if (curheap.Count == 0)
                     continue;
@@ -244,7 +239,7 @@ namespace OpenSim.Framework
             }
 
             value = default(EntityUpdate);
-            if(m_lookupTable.Count == 0 && m_added > 8 * m_capacity)
+            if (m_lookupTable.Count == 0 && m_added > 8 * m_capacity)
             {
                 m_lookupTable = new Dictionary<uint, LookupItem>(m_capacity);
                 m_added = 0;
@@ -267,7 +262,7 @@ namespace OpenSim.Framework
             }
 
             value = default(EntityUpdate);
-            if(m_lookupTable.Count == 0 && m_added > 8 * m_capacity)
+            if (m_lookupTable.Count == 0 && m_added > 8 * m_capacity)
             {
                 m_lookupTable = new Dictionary<uint, LookupItem>(m_capacity);
                 m_added = 0;
@@ -322,9 +317,9 @@ namespace OpenSim.Framework
             return s;
         }
 
-#endregion PublicMethods
+        #endregion PublicMethods
 
-#region MinHeapItem
+        #region MinHeapItem
         private struct MinHeapItem : IComparable<MinHeapItem>
         {
             private EntityUpdate value;
@@ -370,7 +365,7 @@ namespace OpenSim.Framework
 
             public override string ToString()
             {
-                return String.Format("[{0},{1},{2}]",pqueue,entryorder,value.Entity.LocalId);
+                return String.Format("[{0},{1},{2}]", pqueue, entryorder, value.Entity.LocalId);
             }
 
             public int CompareTo(MinHeapItem other)
@@ -380,14 +375,14 @@ namespace OpenSim.Framework
                 return Comparer<UInt64>.Default.Compare(this.EntryOrder, other.EntryOrder);
             }
         }
-#endregion
+        #endregion
 
-#region LookupItem
+        #region LookupItem
         private struct LookupItem
         {
             internal MinHeap<MinHeapItem> Heap;
             internal IHandle Handle;
         }
-#endregion
+        #endregion
     }
 }

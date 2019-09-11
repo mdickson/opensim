@@ -25,11 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using log4net;
 
 namespace OpenSim.Framework.Monitoring
 {
@@ -182,25 +182,25 @@ namespace OpenSim.Framework.Monitoring
 
         public static void Stop()
         {
-            if(m_threads == null)
+            if (m_threads == null)
                 return;
 
-            lock(m_threads)
+            lock (m_threads)
             {
-                m_enabled = false;            
-                if(m_watchdogTimer != null)
+                m_enabled = false;
+                if (m_watchdogTimer != null)
                 {
                     m_watchdogTimer.Dispose();
                     m_watchdogTimer = null;
                 }
-                
-                foreach(ThreadWatchdogInfo twi in m_threads.Values)
+
+                foreach (ThreadWatchdogInfo twi in m_threads.Values)
                 {
                     Thread t = twi.Thread;
                     // m_log.DebugFormat(
                     //    "[WATCHDOG]: Stop: Removing thread {0}, ID {1}", twi.Thread.Name, twi.Thread.ManagedThreadId);
 
-                    if(t.IsAlive)
+                    if (t.IsAlive)
                         t.Abort();
                 }
                 m_threads.Clear();
@@ -342,7 +342,7 @@ namespace OpenSim.Framework.Monitoring
         /// <param name="e"></param>
         private static void WatchdogTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if(!m_enabled)
+            if (!m_enabled)
                 return;
             int now = Environment.TickCount & Int32.MaxValue;
             int msElapsed = now - LastWatchdogThreadTick;
@@ -365,30 +365,30 @@ namespace OpenSim.Framework.Monitoring
 
                 lock (m_threads)
                 {
-                    foreach(ThreadWatchdogInfo threadInfo in m_threads.Values)
+                    foreach (ThreadWatchdogInfo threadInfo in m_threads.Values)
                     {
-                        if(!m_enabled)
+                        if (!m_enabled)
                             return;
-                        if((threadInfo.Thread.ThreadState & thgone) != 0)
+                        if ((threadInfo.Thread.ThreadState & thgone) != 0)
                         {
-                            if(threadsToRemove == null)
+                            if (threadsToRemove == null)
                                 threadsToRemove = new List<ThreadWatchdogInfo>();
 
                             threadsToRemove.Add(threadInfo);
-/*
-                            if(callbackInfos == null)
-                                callbackInfos = new List<ThreadWatchdogInfo>();
+                            /*
+                                                        if(callbackInfos == null)
+                                                            callbackInfos = new List<ThreadWatchdogInfo>();
 
-                            callbackInfos.Add(threadInfo);
-*/
+                                                        callbackInfos.Add(threadInfo);
+                            */
                         }
-                        else if(!threadInfo.IsTimedOut && now - threadInfo.LastTick >= threadInfo.Timeout)
+                        else if (!threadInfo.IsTimedOut && now - threadInfo.LastTick >= threadInfo.Timeout)
                         {
                             threadInfo.IsTimedOut = true;
 
-                            if(threadInfo.AlarmIfTimeout)
+                            if (threadInfo.AlarmIfTimeout)
                             {
-                                if(callbackInfos == null)
+                                if (callbackInfos == null)
                                     callbackInfos = new List<ThreadWatchdogInfo>();
 
                                 // Send a copy of the watchdog info to prevent race conditions where the watchdog
@@ -398,12 +398,12 @@ namespace OpenSim.Framework.Monitoring
                         }
                     }
 
-                    if(threadsToRemove != null)
-                        foreach(ThreadWatchdogInfo twi in threadsToRemove)
+                    if (threadsToRemove != null)
+                        foreach (ThreadWatchdogInfo twi in threadsToRemove)
                             RemoveThread(twi.Thread.ManagedThreadId);
                 }
 
-                if(callbackInfos != null)
+                if (callbackInfos != null)
                     foreach (ThreadWatchdogInfo callbackInfo in callbackInfos)
                         callback(callbackInfo);
             }

@@ -25,6 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse.StructuredData;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,10 +35,6 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading;
-using log4net;
-using Nini.Config;
-using OpenMetaverse.StructuredData;
-using OpenSim.Framework;
 
 namespace OpenSim.Framework.Monitoring
 {
@@ -58,7 +57,7 @@ namespace OpenSim.Framework.Monitoring
         public string NetworkInterfaceTypes = "Ethernet";
 
         readonly int performanceCounterSampleInterval = 500;
-//        int lastperformanceCounterSampleTime = 0;
+        //        int lastperformanceCounterSampleTime = 0;
 
         private class PerfCounterControl
         {
@@ -98,7 +97,7 @@ namespace OpenSim.Framework.Monitoring
 
         public void Start()
         {
-            if(!Enabled)
+            if (!Enabled)
                 return;
 
             if (RegisteredStats.Count == 0)
@@ -107,7 +106,7 @@ namespace OpenSim.Framework.Monitoring
 
         public void Close()
         {
-            if(!Enabled)
+            if (!Enabled)
                 return;
 
             if (RegisteredStats.Count > 0)
@@ -138,7 +137,7 @@ namespace OpenSim.Framework.Monitoring
 
         public void RegisterServerStats()
         {
-//            lastperformanceCounterSampleTime = Util.EnvironmentTickCount();
+            //            lastperformanceCounterSampleTime = Util.EnvironmentTickCount();
             PerformanceCounter tempPC;
             Stat tempStat;
             string tempName;

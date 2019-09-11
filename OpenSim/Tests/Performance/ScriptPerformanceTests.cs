@@ -25,21 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Reflection;
-using System.Threading;
-using log4net;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.CoreModules.Scripting.WorldComm;
-using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.ScriptEngine.XEngine;
 using OpenSim.Tests.Common;
+using System;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace OpenSim.Tests.Performance
 {
@@ -65,7 +61,7 @@ namespace OpenSim.Tests.Performance
         public void Init()
         {
             //AppDomain.CurrentDomain.SetData("APPBASE", Environment.CurrentDirectory + "/bin");
-//            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
+            //            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
             m_xEngine = new XEngine();
 
             // Necessary to stop serialization complaining
@@ -117,7 +113,7 @@ namespace OpenSim.Tests.Performance
 
             GC.Collect();
 
-            for (int idTail = startingObjectIdTail;idTail < startingObjectIdTail + scriptsToCreate; idTail++)
+            for (int idTail = startingObjectIdTail; idTail < startingObjectIdTail + scriptsToCreate; idTail++)
             {
                 AddObjectAndScript(idTail, userId);
             }
@@ -136,14 +132,14 @@ namespace OpenSim.Tests.Performance
 
         private void AddObjectAndScript(int objectIdTail, UUID userId)
         {
-//            UUID itemId = TestHelpers.ParseTail(0x3);
+            //            UUID itemId = TestHelpers.ParseTail(0x3);
             string itemName = string.Format("AddObjectAndScript() Item for object {0}", objectIdTail);
 
             SceneObjectGroup so = SceneHelpers.CreateSceneObject(1, userId, "AddObjectAndScriptPart_", objectIdTail);
             m_scene.AddNewSceneObject(so, true);
 
             InventoryItemBase itemTemplate = new InventoryItemBase();
-//            itemTemplate.ID = itemId;
+            //            itemTemplate.ID = itemId;
             itemTemplate.Name = itemName;
             itemTemplate.Folder = so.UUID;
             itemTemplate.InvType = (int)InventoryType.LSL;
@@ -153,7 +149,7 @@ namespace OpenSim.Tests.Performance
 
         private void OnChatFromWorld(object sender, OSChatMessage oscm)
         {
-//            Console.WriteLine("Got chat [{0}]", oscm.Message);
+            //            Console.WriteLine("Got chat [{0}]", oscm.Message);
 
             lock (m_osChatMessagesReceived)
             {

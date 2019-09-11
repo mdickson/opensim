@@ -25,20 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Server.Base;
+using OpenSim.Server.Handlers.Base;
+using OpenSim.Services.Interfaces;
 using System;
-using System.Reflection;
-using System.Text;
-using System.Xml;
 using System.Collections.Generic;
 using System.IO;
-using Nini.Config;
-using OpenSim.Framework;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Server.Handlers.Base;
-using log4net;
-using OpenMetaverse;
+using System.Reflection;
 
 namespace OpenSim.Groups
 {
@@ -65,7 +63,7 @@ namespace OpenSim.Groups
             m_log.DebugFormat("[Groups.RobustHGConnector]: Starting with config name {0}", m_ConfigName);
 
             string homeURI = Util.GetConfigVarFromSections<string>(config, "HomeURI",
-                new string[] { "Startup", "Hypergrid", m_ConfigName}, string.Empty);
+                new string[] { "Startup", "Hypergrid", m_ConfigName }, string.Empty);
             if (homeURI == string.Empty)
                 throw new Exception(String.Format("[Groups.RobustHGConnector]: please provide the HomeURI [Startup] or in section {0}", m_ConfigName));
 
@@ -116,7 +114,7 @@ namespace OpenSim.Groups
                 IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
             string body;
-            using(StreamReader sr = new StreamReader(requestData))
+            using (StreamReader sr = new StreamReader(requestData))
                 body = sr.ReadToEnd();
 
             body = body.Trim();

@@ -25,13 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using OpenMetaverse;
-using OpenSim.Region.PhysicsModules.SharedBase;
-using OpenSim.Region.PhysicsModule.Meshing;
 
 public class Vertex : IComparable<Vertex>
 {
@@ -91,7 +88,7 @@ public class Vertex : IComparable<Vertex>
 
         Vertex v2 = new Vertex(0f, 0f, 0f);
 
-        v2.X =   q.W * q.W * v.X +
+        v2.X = q.W * q.W * v.X +
             2f * q.Y * q.W * v.Z -
             2f * q.Z * q.W * v.Y +
                  q.X * q.X * v.X +
@@ -166,7 +163,7 @@ public class Vertex : IComparable<Vertex>
     {
         if (am == 0f)
         {
-            return new Vertex(0f,0f,0f);
+            return new Vertex(0f, 0f, 0f);
         }
         float mul = 1.0f / am;
         v1.X *= mul;
@@ -194,7 +191,7 @@ public class Vertex : IComparable<Vertex>
 
     public static Vertex FromAngle(double angle)
     {
-        return new Vertex((float) Math.Cos(angle), (float) Math.Sin(angle), 0.0f);
+        return new Vertex((float)Math.Cos(angle), (float)Math.Sin(angle), 0.0f);
     }
 
     public float Length()
@@ -291,7 +288,7 @@ public class Triangle
         dx = x - cx;
         dy = y - cy;
 
-        dd = dx*dx + dy*dy;
+        dd = dx * dx + dy * dy;
         if (dd < radius_square)
             return true;
         else
@@ -343,8 +340,8 @@ public class Triangle
         p3y = v3.Y;
 
         /* calc helping values first */
-        c1 = (p1x*p1x + p1y*p1y - p2x*p2x - p2y*p2y)/2;
-        c2 = (p1x*p1x + p1y*p1y - p3x*p3x - p3y*p3y)/2;
+        c1 = (p1x * p1x + p1y * p1y - p2x * p2x - p2y * p2y) / 2;
+        c2 = (p1x * p1x + p1y * p1y - p3x * p3x - p3y * p3y) / 2;
 
         v1x = p1x - p2x;
         v1y = p1y - p2y;
@@ -352,8 +349,8 @@ public class Triangle
         v2x = p1x - p3x;
         v2y = p1y - p3y;
 
-        z = (c1*v2x - c2*v1x);
-        n = (v1y*v2x - v2y*v1x);
+        z = (c1 * v2x - c2 * v1x);
+        n = (v1y * v2x - v2y * v1x);
 
         if (n == 0.0) // This is no triangle, i.e there are (at least) two points at the same location
         {
@@ -361,15 +358,15 @@ public class Triangle
             return;
         }
 
-        cy = (float) (z/n);
+        cy = (float)(z / n);
 
         if (v2x != 0.0)
         {
-            cx = (float) ((c2 - v2y*cy)/v2x);
+            cx = (float)((c2 - v2y * cy) / v2x);
         }
         else if (v1x != 0.0)
         {
-            cx = (float) ((c1 - v1y*cy)/v1x);
+            cx = (float)((c1 - v1y * cy) / v1x);
         }
         else
         {
@@ -379,7 +376,7 @@ public class Triangle
         rx = (p1x - cx);
         ry = (p1y - cy);
 
-        radius_square = (float) (rx*rx + ry*ry);
+        radius_square = (float)(rx * rx + ry * ry);
     }
 
     public override String ToString()
@@ -413,7 +410,7 @@ public class Triangle
         float l = n.Length();
 
         // Normalized "normal"
-        n = n/l;
+        n = n / l;
 
         return n;
     }

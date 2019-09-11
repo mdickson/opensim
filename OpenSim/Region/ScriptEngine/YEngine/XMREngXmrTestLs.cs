@@ -35,7 +35,6 @@ using System.Threading;
 
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
 using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
-using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
 using LSL_Rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
 using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
@@ -56,48 +55,48 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             string outName = null;
             XMRInstance[] instances;
 
-             // Decode command line options.
-            for(int i = indx; i < args.Length; i++)
+            // Decode command line options.
+            for (int i = indx; i < args.Length; i++)
             {
-                if(args[i] == "-full")
+                if (args[i] == "-full")
                 {
                     flagFull = true;
                     continue;
                 }
-                if(args[i] == "-help")
+                if (args[i] == "-help")
                 {
                     m_log.Info("[YEngine]: yeng ls -full -max=<number> -out=<filename> -queues -topcpu");
                     return;
                 }
-                if(args[i].StartsWith("-max="))
+                if (args[i].StartsWith("-max="))
                 {
                     try
                     {
                         maxScripts = Convert.ToInt32(args[i].Substring(5));
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         m_log.Error("[YEngine]: bad max " + args[i].Substring(5) + ": " + e.Message);
                         return;
                     }
                     continue;
                 }
-                if(args[i].StartsWith("-out="))
+                if (args[i].StartsWith("-out="))
                 {
                     outName = args[i].Substring(5);
                     continue;
                 }
-                if(args[i] == "-queues")
+                if (args[i] == "-queues")
                 {
                     flagQueues = true;
                     continue;
                 }
-                if(args[i] == "-topcpu")
+                if (args[i] == "-topcpu")
                 {
                     flagTopCPU = true;
                     continue;
                 }
-                if(args[i][0] == '-')
+                if (args[i][0] == '-')
                 {
                     m_log.Error("[YEngine]: unknown option " + args[i] + ", try 'yeng ls -help'");
                     return;
@@ -105,13 +104,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
 
             TextWriter outFile = null;
-            if(outName != null)
+            if (outName != null)
             {
                 try
                 {
                     outFile = File.CreateText(outName);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     m_log.Error("[YEngine]: error creating " + outName + ": " + e.Message);
                     return;
@@ -124,8 +123,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
             try
             {
-                 // Scan instance list to find those that match selection criteria.
-                if(!Monitor.TryEnter(m_InstancesDict, 100))
+                // Scan instance list to find those that match selection criteria.
+                if (!Monitor.TryEnter(m_InstancesDict, 100))
                 {
                     m_log.Error("[YEngine]: deadlock m_LockedDict=" + m_LockedDict);
                     return;
@@ -133,9 +132,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 try
                 {
                     instances = new XMRInstance[m_InstancesDict.Count];
-                    foreach(XMRInstance ins in m_InstancesDict.Values)
+                    foreach (XMRInstance ins in m_InstancesDict.Values)
                     {
-                        if(InstanceMatchesArgs(ins, args, indx))
+                        if (InstanceMatchesArgs(ins, args, indx))
                         {
                             instances[numScripts++] = ins;
                         }
@@ -146,14 +145,14 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     Monitor.Exit(m_InstancesDict);
                 }
 
-                 // Maybe sort by descending CPU time.
-                if(flagTopCPU)
+                // Maybe sort by descending CPU time.
+                if (flagTopCPU)
                 {
                     Array.Sort<XMRInstance>(instances, CompareInstancesByCPUTime);
                 }
 
-                 // Print the entries.
-                if(!flagFull)
+                // Print the entries.
+                if (!flagFull)
                 {
                     outFile.WriteLine("                              ItemID" +
                                       "   CPU(ms)" +
@@ -162,17 +161,17 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                                       " World Position                  " +
                                       " <Part>:<Item>");
                 }
-                for(int i = 0; (i < numScripts) && (i < maxScripts); i++)
+                for (int i = 0; (i < numScripts) && (i < maxScripts); i++)
                 {
                     outFile.WriteLine(instances[i].RunTestLs(flagFull));
                 }
 
-                 // Print number of scripts that match selection criteria,
-                 // even if we were told to print fewer.
+                // Print number of scripts that match selection criteria,
+                // even if we were told to print fewer.
                 outFile.WriteLine("total of {0} script(s)", numScripts);
 
-                 // If -queues given, print out queue contents too.
-                if(flagQueues)
+                // If -queues given, print out queue contents too.
+                if (flagQueues)
                 {
                     LsQueue(outFile, "start", m_StartQueue, args, indx);
                     LsQueue(outFile, "sleep", m_SleepQueue, args, indx);
@@ -191,43 +190,43 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             int numScripts = 0;
             XMRInstance[] instances;
 
-             // Decode command line options.
+            // Decode command line options.
             int i, j;
             List<string> selargs = new List<string>(args.Length);
             MethodInfo[] eventmethods = typeof(IEventHandlers).GetMethods();
             MethodInfo eventmethod;
-            for(i = indx; i < args.Length; i++)
+            for (i = indx; i < args.Length; i++)
             {
                 string arg = args[i];
-                if(arg == "-all")
+                if (arg == "-all")
                 {
                     flagAll = true;
                     continue;
                 }
-                if(arg == "-help")
+                if (arg == "-help")
                 {
                     m_log.Info("[YEngine]: yeng pev -all | <part-of-script-name> <event-name> <params...>");
                     return;
                 }
-                if(arg[0] == '-')
+                if (arg[0] == '-')
                 {
                     m_log.Error("[YEngine]: unknown option " + arg + ", try 'yeng pev -help'");
                     return;
                 }
-                for(j = 0; j < eventmethods.Length; j++)
+                for (j = 0; j < eventmethods.Length; j++)
                 {
                     eventmethod = eventmethods[j];
-                    if(eventmethod.Name == arg)
+                    if (eventmethod.Name == arg)
                         goto gotevent;
                 }
                 selargs.Add(arg);
             }
             m_log.Error("[YEngine]: missing <event-name> <params...>, try 'yeng pev -help'");
             return;
-            gotevent:
+        gotevent:
             string eventname = eventmethod.Name;
             StringBuilder sourcesb = new StringBuilder();
-            while(++i < args.Length)
+            while (++i < args.Length)
             {
                 sourcesb.Append(' ');
                 sourcesb.Append(args[i]);
@@ -236,28 +235,28 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             string sourcehash;
             youveanerror = false;
             Token t = TokenBegin.Construct("", null, ErrorMsg, sourcest, out sourcehash);
-            if(youveanerror)
+            if (youveanerror)
                 return;
             ParameterInfo[] paraminfos = eventmethod.GetParameters();
             object[] paramvalues = new object[paraminfos.Length];
             i = 0;
-            while(!((t = t.nextToken) is TokenEnd))
+            while (!((t = t.nextToken) is TokenEnd))
             {
-                if(i >= paramvalues.Length)
+                if (i >= paramvalues.Length)
                 {
                     ErrorMsg(t, "extra parameter(s)");
                     return;
                 }
                 paramvalues[i] = ParseParamValue(ref t);
-                if(paramvalues[i] == null)
+                if (paramvalues[i] == null)
                     return;
                 i++;
             }
             OpenSim.Region.ScriptEngine.Shared.EventParams eps =
                     new OpenSim.Region.ScriptEngine.Shared.EventParams(eventname, paramvalues, zeroDetectParams);
 
-             // Scan instance list to find those that match selection criteria.
-            if(!Monitor.TryEnter(m_InstancesDict, 100))
+            // Scan instance list to find those that match selection criteria.
+            if (!Monitor.TryEnter(m_InstancesDict, 100))
             {
                 m_log.Error("[YEngine]: deadlock m_LockedDict=" + m_LockedDict);
                 return;
@@ -266,9 +265,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             try
             {
                 instances = new XMRInstance[m_InstancesDict.Count];
-                foreach(XMRInstance ins in m_InstancesDict.Values)
+                foreach (XMRInstance ins in m_InstancesDict.Values)
                 {
-                    if(flagAll || InstanceMatchesArgs(ins, selargs.ToArray(), 0))
+                    if (flagAll || InstanceMatchesArgs(ins, selargs.ToArray(), 0))
                     {
                         instances[numScripts++] = ins;
                     }
@@ -279,8 +278,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 Monitor.Exit(m_InstancesDict);
             }
 
-             // Post event to the matching instances.
-            for(i = 0; i < numScripts; i++)
+            // Post event to the matching instances.
+            for (i = 0; i < numScripts; i++)
             {
                 XMRInstance inst = instances[i];
                 m_log.Info("[YEngine]: post " + eventname + " to " + inst.m_DescName);
@@ -290,45 +289,45 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         private object ParseParamValue(ref Token token)
         {
-            if(token is TokenFloat)
+            if (token is TokenFloat)
             {
                 return new LSL_Float(((TokenFloat)token).val);
             }
-            if(token is TokenInt)
+            if (token is TokenInt)
             {
                 return new LSL_Integer(((TokenInt)token).val);
             }
-            if(token is TokenStr)
+            if (token is TokenStr)
             {
                 return new LSL_String(((TokenStr)token).val);
             }
-            if(token is TokenKwCmpLT)
+            if (token is TokenKwCmpLT)
             {
                 List<double> valuelist = new List<double>();
-                while(!((token = token.nextToken) is TokenKwCmpGT))
+                while (!((token = token.nextToken) is TokenKwCmpGT))
                 {
-                    if(!(token is TokenKwComma))
+                    if (!(token is TokenKwComma))
                     {
                         object value = ParseParamValue(ref token);
-                        if(value == null)
+                        if (value == null)
                             return null;
-                        if(value is int)
+                        if (value is int)
                             value = (double)(int)value;
-                        if(!(value is double))
+                        if (!(value is double))
                         {
                             ErrorMsg(token, "must be float or integer constant");
                             return null;
                         }
                         valuelist.Add((double)value);
                     }
-                    else if(token.prevToken is TokenKwComma)
+                    else if (token.prevToken is TokenKwComma)
                     {
                         ErrorMsg(token, "missing constant");
                         return null;
                     }
                 }
                 double[] values = valuelist.ToArray();
-                switch(values.Length)
+                switch (values.Length)
                 {
                     case 3:
                         {
@@ -345,19 +344,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                         }
                 }
             }
-            if(token is TokenKwBrkOpen)
+            if (token is TokenKwBrkOpen)
             {
                 List<object> valuelist = new List<object>();
-                while(!((token = token.nextToken) is TokenKwBrkClose))
+                while (!((token = token.nextToken) is TokenKwBrkClose))
                 {
-                    if(!(token is TokenKwComma))
+                    if (!(token is TokenKwComma))
                     {
                         object value = ParseParamValue(ref token);
-                        if(value == null)
+                        if (value == null)
                             return null;
                         valuelist.Add(value);
                     }
-                    else if(token.prevToken is TokenKwComma)
+                    else if (token.prevToken is TokenKwComma)
                     {
                         ErrorMsg(token, "missing constant");
                         return null;
@@ -365,10 +364,10 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 }
                 return new LSL_List(valuelist.ToArray());
             }
-            if(token is TokenName)
+            if (token is TokenName)
             {
                 FieldInfo field = typeof(OpenSim.Region.ScriptEngine.Shared.ScriptBase.ScriptBaseClass).GetField(((TokenName)token).val);
-                if((field != null) && field.IsPublic && (field.IsLiteral || (field.IsStatic && field.IsInitOnly)))
+                if ((field != null) && field.IsPublic && (field.IsLiteral || (field.IsStatic && field.IsInitOnly)))
                 {
                     return field.GetValue(null);
                 }
@@ -390,34 +389,34 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             int numScripts = 0;
             XMRInstance[] instances;
 
-            if(args.Length <= indx)
+            if (args.Length <= indx)
             {
                 m_log.Error("[YEngine]: must specify part of script name or -all for all scripts");
                 return;
             }
 
-             // Decode command line options.
-            for(int i = indx; i < args.Length; i++)
+            // Decode command line options.
+            for (int i = indx; i < args.Length; i++)
             {
-                if(args[i] == "-all")
+                if (args[i] == "-all")
                 {
                     flagAll = true;
                     continue;
                 }
-                if(args[i] == "-help")
+                if (args[i] == "-help")
                 {
                     m_log.Info("[YEngine]: yeng reset -all | <part-of-script-name>");
                     return;
                 }
-                if(args[i][0] == '-')
+                if (args[i][0] == '-')
                 {
                     m_log.Error("[YEngine]: unknown option " + args[i] + ", try 'yeng reset -help'");
                     return;
                 }
             }
 
-             // Scan instance list to find those that match selection criteria.
-            if(!Monitor.TryEnter(m_InstancesDict, 100))
+            // Scan instance list to find those that match selection criteria.
+            if (!Monitor.TryEnter(m_InstancesDict, 100))
             {
                 m_log.Error("[YEngine]: deadlock m_LockedDict=" + m_LockedDict);
                 return;
@@ -426,9 +425,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             try
             {
                 instances = new XMRInstance[m_InstancesDict.Count];
-                foreach(XMRInstance ins in m_InstancesDict.Values)
+                foreach (XMRInstance ins in m_InstancesDict.Values)
                 {
-                    if(flagAll || InstanceMatchesArgs(ins, args, indx))
+                    if (flagAll || InstanceMatchesArgs(ins, args, indx))
                     {
                         instances[numScripts++] = ins;
                     }
@@ -439,8 +438,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 Monitor.Exit(m_InstancesDict);
             }
 
-             // Reset the instances as if someone clicked their "Reset" button.
-            for(int i = 0; i < numScripts; i++)
+            // Reset the instances as if someone clicked their "Reset" button.
+            for (int i = 0; i < numScripts; i++)
             {
                 XMRInstance inst = instances[i];
                 m_log.Info("[YEngine]: resetting " + inst.m_DescName);
@@ -450,17 +449,17 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         private static int CompareInstancesByCPUTime(XMRInstance a, XMRInstance b)
         {
-            if(a == null)
+            if (a == null)
             {
                 return (b == null) ? 0 : 1;
             }
-            if(b == null)
+            if (b == null)
             {
                 return -1;
             }
-            if(b.m_CPUTime < a.m_CPUTime)
+            if (b.m_CPUTime < a.m_CPUTime)
                 return -1;
-            if(b.m_CPUTime > a.m_CPUTime)
+            if (b.m_CPUTime > a.m_CPUTime)
                 return 1;
             return 0;
         }
@@ -468,21 +467,21 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         private void LsQueue(TextWriter outFile, string name, XMRInstQueue queue, string[] args, int indx)
         {
             outFile.WriteLine("Queue " + name + ":");
-            lock(queue)
+            lock (queue)
             {
-                for(XMRInstance inst = queue.PeekHead(); inst != null; inst = inst.m_NextInst)
+                for (XMRInstance inst = queue.PeekHead(); inst != null; inst = inst.m_NextInst)
                 {
                     try
                     {
-                         // Try to print instance name.
-                        if(InstanceMatchesArgs(inst, args, indx))
+                        // Try to print instance name.
+                        if (InstanceMatchesArgs(inst, args, indx))
                         {
                             outFile.WriteLine("   " + inst.ItemID.ToString() + " " + inst.m_DescName);
                         }
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
-                         // Sometimes there are instances in the queue that are disposed.
+                        // Sometimes there are instances in the queue that are disposed.
                         outFile.WriteLine("   " + inst.ItemID.ToString() + " " + inst.m_DescName + ": " + e.Message);
                     }
                 }
@@ -493,16 +492,16 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             bool hadSomethingToCompare = false;
 
-            for(int i = indx; i < args.Length; i++)
+            for (int i = indx; i < args.Length; i++)
             {
-                if(args[i][0] != '-')
+                if (args[i][0] != '-')
                 {
                     hadSomethingToCompare = true;
-                    if(ins.m_DescName.Contains(args[i]))
+                    if (ins.m_DescName.Contains(args[i]))
                         return true;
-                    if(ins.ItemID.ToString().Contains(args[i]))
+                    if (ins.ItemID.ToString().Contains(args[i]))
                         return true;
-                    if(ins.AssetID.ToString().Contains(args[i]))
+                    if (ins.AssetID.ToString().Contains(args[i]))
                         return true;
                 }
             }
@@ -513,7 +512,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     /**
      * @brief Make m_log.Info look like a text writer.
      */
-    public class LogInfoTextWriter: TextWriter
+    public class LogInfoTextWriter : TextWriter
     {
         private StringBuilder sb = new StringBuilder();
         private ILog m_log;
@@ -523,7 +522,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public override void Write(char c)
         {
-            if(c == '\n')
+            if (c == '\n')
             {
                 m_log.Info("[YEngine]: " + sb.ToString());
                 sb.Remove(0, sb.Length);

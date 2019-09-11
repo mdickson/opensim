@@ -25,13 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
+using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.PhysicsModules.SharedBase;
-using log4net;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.PhysicsModule.ODE
 {
@@ -85,7 +85,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
         private float CAPSULE_RADIUS = 0.37f;
         private float CAPSULE_LENGTH = 2.140599f;
         private float m_tensor = 3800000f;
-//        private float heightFudgeFactor = 0.52f;
+        //        private float heightFudgeFactor = 0.52f;
         private float walkDivisor = 1.3f;
         private float runDivisor = 0.8f;
         private bool flying = false;
@@ -220,7 +220,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
             CAPSULE_RADIUS = capsule_radius;
             m_tensor = tensor;
             m_density = density;
-//            heightFudgeFactor = height_fudge_factor;
+            //            heightFudgeFactor = height_fudge_factor;
             walkDivisor = walk_divisor;
             runDivisor = rundivisor;
 
@@ -243,7 +243,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
 
         public override int PhysicsActorType
         {
-            get { return (int) ActorTypes.Agent; }
+            get { return (int)ActorTypes.Agent; }
             set { return; }
         }
 
@@ -295,7 +295,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
             set
             {
                 flying = value;
-//                m_log.DebugFormat("[ODE CHARACTER]: Set OdeCharacter Flying to {0}", flying);
+                //                m_log.DebugFormat("[ODE CHARACTER]: Set OdeCharacter Flying to {0}", flying);
             }
         }
 
@@ -335,7 +335,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
 
                 // Equal truecounts and false counts means we're colliding with something.
 
-                if (falsecount > 1.2*truecount)
+                if (falsecount > 1.2 * truecount)
                 {
                     m_iscolliding = false;
                 }
@@ -391,7 +391,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
 
                 // Equal truecounts and false counts means we're colliding with something.
 
-                if (falsecount > 1.2*truecount)
+                if (falsecount > 1.2 * truecount)
                 {
                     m_iscollidingGround = false;
                 }
@@ -489,9 +489,9 @@ namespace OpenSim.Region.PhysicsModule.ODE
             {
                 SetTaintedCapsuleLength(value);
 
-                    // If we reset velocity here, then an avatar stalls when it crosses a border for the first time
-                    // (as the height of the new root agent is set).
-//                    Velocity = Vector3.Zero;
+                // If we reset velocity here, then an avatar stalls when it crosses a border for the first time
+                // (as the height of the new root agent is set).
+                //                    Velocity = Vector3.Zero;
 
                 _parent_scene.AddPhysicsActorTaint(this);
             }
@@ -590,34 +590,34 @@ namespace OpenSim.Region.PhysicsModule.ODE
             }
         }
 
-        public override void link(PhysicsActor obj) {}
+        public override void link(PhysicsActor obj) { }
 
-        public override void delink() {}
+        public override void delink() { }
 
-        public override void LockAngularMotion(byte axislocks) {}
+        public override void LockAngularMotion(byte axislocks) { }
 
-//      This code is very useful. Written by DanX0r. We're just not using it right now.
-//      Commented out to prevent a warning.
-//
-//         private void standupStraight()
-//         {
-//             // The purpose of this routine here is to quickly stabilize the Body while it's popped up in the air.
-//             // The amotor needs a few seconds to stabilize so without it, the avatar shoots up sky high when you
-//             // change appearance and when you enter the simulator
-//             // After this routine is done, the amotor stabilizes much quicker
-//             d.Vector3 feet;
-//             d.Vector3 head;
-//             d.BodyGetRelPointPos(Body, 0.0f, 0.0f, -1.0f, out feet);
-//             d.BodyGetRelPointPos(Body, 0.0f, 0.0f, 1.0f, out head);
-//             float posture = head.Z - feet.Z;
+        //      This code is very useful. Written by DanX0r. We're just not using it right now.
+        //      Commented out to prevent a warning.
+        //
+        //         private void standupStraight()
+        //         {
+        //             // The purpose of this routine here is to quickly stabilize the Body while it's popped up in the air.
+        //             // The amotor needs a few seconds to stabilize so without it, the avatar shoots up sky high when you
+        //             // change appearance and when you enter the simulator
+        //             // After this routine is done, the amotor stabilizes much quicker
+        //             d.Vector3 feet;
+        //             d.Vector3 head;
+        //             d.BodyGetRelPointPos(Body, 0.0f, 0.0f, -1.0f, out feet);
+        //             d.BodyGetRelPointPos(Body, 0.0f, 0.0f, 1.0f, out head);
+        //             float posture = head.Z - feet.Z;
 
-//             // restoring force proportional to lack of posture:
-//             float servo = (2.5f - posture) * POSTURE_SERVO;
-//             d.BodyAddForceAtRelPos(Body, 0.0f, 0.0f, servo, 0.0f, 0.0f, 1.0f);
-//             d.BodyAddForceAtRelPos(Body, 0.0f, 0.0f, -servo, 0.0f, 0.0f, -1.0f);
-//             //d.Matrix3 bodyrotation = d.BodyGetRotation(Body);
-//             //m_log.Info("[PHYSICSAV]: Rotation: " + bodyrotation.M00 + " : " + bodyFArotation.M01 + " : " + bodyrotation.M02 + " : " + bodyrotation.M10 + " : " + bodyrotation.M11 + " : " + bodyrotation.M12 + " : " + bodyrotation.M20 + " : " + bodyrotation.M21 + " : " + bodyrotation.M22);
-//         }
+        //             // restoring force proportional to lack of posture:
+        //             float servo = (2.5f - posture) * POSTURE_SERVO;
+        //             d.BodyAddForceAtRelPos(Body, 0.0f, 0.0f, servo, 0.0f, 0.0f, 1.0f);
+        //             d.BodyAddForceAtRelPos(Body, 0.0f, 0.0f, -servo, 0.0f, 0.0f, -1.0f);
+        //             //d.Matrix3 bodyrotation = d.BodyGetRotation(Body);
+        //             //m_log.Info("[PHYSICSAV]: Rotation: " + bodyrotation.M00 + " : " + bodyFArotation.M01 + " : " + bodyrotation.M02 + " : " + bodyrotation.M10 + " : " + bodyrotation.M11 + " : " + bodyrotation.M12 + " : " + bodyrotation.M20 + " : " + bodyrotation.M21 + " : " + bodyrotation.M22);
+        //         }
 
         public override Vector3 Force
         {
@@ -704,7 +704,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
                     m_log.WarnFormat("[ODE CHARACTER]: Got a NaN velocity from Scene for {0}", Name);
                 }
 
-//                m_log.DebugFormat("[PHYSICS]: Set target velocity of {0}", m_taintTargetVelocity);
+                //                m_log.DebugFormat("[PHYSICS]: Set target velocity of {0}", m_taintTargetVelocity);
             }
         }
 
@@ -729,7 +729,8 @@ namespace OpenSim.Region.PhysicsModule.ODE
         public override Quaternion Orientation
         {
             get { return Quaternion.Identity; }
-            set {
+            set
+            {
                 //Matrix3 or = Orientation.ToRotationMatrix();
                 //d.Matrix3 ord = new d.Matrix3(or.m00, or.m10, or.m20, or.m01, or.m11, or.m21, or.m02, or.m12, or.m22);
                 //d.BodySetRotation(Body, ref ord);
@@ -826,9 +827,9 @@ namespace OpenSim.Region.PhysicsModule.ODE
             Vector3 vec = Vector3.Zero;
             SafeNativeMethods.Vector3 vel = SafeNativeMethods.BodyGetLinearVel(Body);
 
-//            m_log.DebugFormat(
-//                "[ODE CHARACTER]: Current velocity in Move() is <{0},{1},{2}>, target {3} for {4}",
-//                vel.X, vel.Y, vel.Z, _target_velocity, Name);
+            //            m_log.DebugFormat(
+            //                "[ODE CHARACTER]: Current velocity in Move() is <{0},{1},{2}>, target {3} for {4}",
+            //                vel.X, vel.Y, vel.Z, _target_velocity, Name);
 
             float movementdivisor = 1f;
 
@@ -860,7 +861,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
 
                     SafeNativeMethods.Vector3 pos = SafeNativeMethods.BodyGetPosition(Body);
                     vec.X = (_target_velocity.X - vel.X) * (PID_D) + (_zeroPosition.X - pos.X) * (PID_P * 2);
-                    vec.Y = (_target_velocity.Y - vel.Y) * (PID_D) + (_zeroPosition.Y - pos.Y)* (PID_P * 2);
+                    vec.Y = (_target_velocity.Y - vel.Y) * (PID_D) + (_zeroPosition.Y - pos.Y) * (PID_P * 2);
                     if (flying)
                     {
                         vec.Z = (_target_velocity.Z - vel.Z) * (PID_D) + (_zeroPosition.Z - pos.Z) * PID_P;
@@ -890,9 +891,9 @@ namespace OpenSim.Region.PhysicsModule.ODE
                     vec.X = ((_target_velocity.X / movementdivisor) - vel.X) * (PID_D / 6);
                     vec.Y = ((_target_velocity.Y / movementdivisor) - vel.Y) * (PID_D / 6);
 
-//                    m_log.DebugFormat(
-//                        "[ODE CHARACTER]: !m_iscolliding && flying, vec {0}, _target_velocity {1}, movementdivisor {2}, vel {3}",
-//                        vec, _target_velocity, movementdivisor, vel);
+                    //                    m_log.DebugFormat(
+                    //                        "[ODE CHARACTER]: !m_iscolliding && flying, vec {0}, _target_velocity {1}, movementdivisor {2}, vel {3}",
+                    //                        vec, _target_velocity, movementdivisor, vel);
                 }
 
                 if (flying)
@@ -959,8 +960,8 @@ namespace OpenSim.Region.PhysicsModule.ODE
             SafeNativeMethods.Vector3 newVel = SafeNativeMethods.BodyGetLinearVel(Body);
             if (newVel.X >= 256 || newVel.X <= 256 || newVel.Y >= 256 || newVel.Y <= 256 || newVel.Z >= 256 || newVel.Z <= 256)
             {
-//                m_log.DebugFormat(
-//                    "[ODE CHARACTER]: Limiting falling velocity from {0} to {1} for {2}", newVel.Z, -9.8, Name);
+                //                m_log.DebugFormat(
+                //                    "[ODE CHARACTER]: Limiting falling velocity from {0} to {1} for {2}", newVel.Z, -9.8, Name);
 
                 newVel.X = Util.Clamp<float>(newVel.X, -255f, 255f);
                 newVel.Y = Util.Clamp<float>(newVel.Y, -255f, 255f);
@@ -1088,7 +1089,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
             }
 
             int dAMotorEuler = 1;
-//            _parent_scene.waitForSpaceUnlock(_parent_scene.space);
+            //            _parent_scene.waitForSpaceUnlock(_parent_scene.space);
             if (CAPSULE_LENGTH <= 0)
             {
                 m_log.Warn("[ODE CHARACTER]: The capsule size you specified in opensim.ini is invalid!  Setting it to the smallest possible size!");
@@ -1101,7 +1102,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
                 CAPSULE_RADIUS = 0.01f;
             }
 
-//          lock (OdeScene.UniversalColliderSyncObject)
+            //          lock (OdeScene.UniversalColliderSyncObject)
             Shell = SafeNativeMethods.CreateCapsule(_parent_scene.space, CAPSULE_RADIUS, CAPSULE_LENGTH);
 
             SafeNativeMethods.GeomSetCategoryBits(Shell, (uint)m_collisionCategories);
@@ -1170,7 +1171,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
                 SafeNativeMethods.JointSetAMotorParam(Amotor, (int)dParam.LowStop, 0.08f);
                 SafeNativeMethods.JointSetAMotorParam(Amotor, (int)dParam.LoStop3, -0f);
                 SafeNativeMethods.JointSetAMotorParam(Amotor, (int)dParam.LoStop2, 0.08f);
-                SafeNativeMethods.JointSetAMotorParam(Amotor, (int)dParam.HiStop,  0.08f); // must be same as lowstop, else a different, spurious tilt is introduced
+                SafeNativeMethods.JointSetAMotorParam(Amotor, (int)dParam.HiStop, 0.08f); // must be same as lowstop, else a different, spurious tilt is introduced
                 SafeNativeMethods.JointSetAMotorParam(Amotor, (int)dParam.HiStop3, 0f); // same as lowstop
                 SafeNativeMethods.JointSetAMotorParam(Amotor, (int)dParam.HiStop2, 0.08f); // same as lowstop
             }
@@ -1222,7 +1223,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
             }
 
             //kill the Geometry
-//            _parent_scene.waitForSpaceUnlock(_parent_scene.space);
+            //            _parent_scene.waitForSpaceUnlock(_parent_scene.space);
 
             if (Body != IntPtr.Zero)
             {
@@ -1233,7 +1234,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
 
             if (Shell != IntPtr.Zero)
             {
-//              lock (OdeScene.UniversalColliderSyncObject)
+                //              lock (OdeScene.UniversalColliderSyncObject)
                 SafeNativeMethods.GeomDestroy(Shell);
 
                 _parent_scene.geom_name_map.Remove(Shell);
@@ -1256,17 +1257,17 @@ namespace OpenSim.Region.PhysicsModule.ODE
         public override float PIDTau { set { return; } }
 
         public override float PIDHoverHeight { set { return; } }
-        public override bool PIDHoverActive {get {return false;} set { return; } }
+        public override bool PIDHoverActive { get { return false; } set { return; } }
         public override PIDHoverType PIDHoverType { set { return; } }
         public override float PIDHoverTau { set { return; } }
 
-        public override Quaternion APIDTarget{ set { return; } }
+        public override Quaternion APIDTarget { set { return; } }
 
-        public override bool APIDActive{ set { return; } }
+        public override bool APIDActive { set { return; } }
 
-        public override float APIDStrength{ set { return; } }
+        public override float APIDStrength { set { return; } }
 
-        public override float APIDDamping{ set { return; } }
+        public override float APIDDamping { set { return; } }
 
         public override void SubscribeEvents(int ms)
         {
@@ -1294,8 +1295,8 @@ namespace OpenSim.Region.PhysicsModule.ODE
         {
             if (m_eventsubscription > 0)
             {
-//                m_log.DebugFormat(
-//                    "[PHYSICS]: Adding collision event for {0}, collidedWith {1}, contact {2}", "", CollidedWith, contact);
+                //                m_log.DebugFormat(
+                //                    "[PHYSICS]: Adding collision event for {0}, collidedWith {1}, contact {2}", "", CollidedWith, contact);
 
                 CollisionEventsThisFrame.AddCollider(CollidedWith, contact);
             }
@@ -1366,9 +1367,9 @@ namespace OpenSim.Region.PhysicsModule.ODE
             {
                 if (Shell != IntPtr.Zero && Body != IntPtr.Zero && Amotor != IntPtr.Zero)
                 {
-//                    m_log.DebugFormat(
-//                        "[ODE CHARACTER]: Changing capsule size from {0} to {1} for {2}",
-//                        CAPSULE_LENGTH, m_tainted_CAPSULE_LENGTH, Name);
+                    //                    m_log.DebugFormat(
+                    //                        "[ODE CHARACTER]: Changing capsule size from {0} to {1} for {2}",
+                    //                        CAPSULE_LENGTH, m_tainted_CAPSULE_LENGTH, Name);
 
                     m_pidControllerActive = true;
 
@@ -1385,14 +1386,14 @@ namespace OpenSim.Region.PhysicsModule.ODE
 
                     // As with Size, we reset velocity.  However, this isn't strictly necessary since it doesn't
                     // appear to stall initial region crossings when done here.  Being done for consistency.
-//                    Velocity = Vector3.Zero;
+                    //                    Velocity = Vector3.Zero;
                 }
                 else
                 {
                     m_log.Warn("[ODE CHARACTER]: trying to change capsule size for " + Name + ", but the following ODE data is missing - "
-                        + (Shell==IntPtr.Zero ? "Shell ":"")
-                        + (Body==IntPtr.Zero ? "Body ":"")
-                        + (Amotor==IntPtr.Zero ? "Amotor ":""));
+                        + (Shell == IntPtr.Zero ? "Shell " : "")
+                        + (Body == IntPtr.Zero ? "Body " : "")
+                        + (Amotor == IntPtr.Zero ? "Amotor " : ""));
                 }
             }
         }

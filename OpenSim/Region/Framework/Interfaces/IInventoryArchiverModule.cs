@@ -25,11 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using OpenSim.Services.Interfaces;
-using OpenMetaverse;
 
 namespace OpenSim.Region.Framework.Interfaces
 {

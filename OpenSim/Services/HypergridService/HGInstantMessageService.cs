@@ -25,23 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Reflection;
-
-using OpenSim.Framework;
-using OpenSim.Services.Connectors.Friends;
-using OpenSim.Services.Connectors.Hypergrid;
-using OpenSim.Services.Interfaces;
-using OpenSim.Services.Connectors.InstantMessage;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using OpenSim.Server.Base;
-using FriendInfo = OpenSim.Services.Interfaces.FriendInfo;
-
-using OpenMetaverse;
 using log4net;
 using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Server.Base;
+using OpenSim.Services.Connectors.InstantMessage;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Services.HypergridService
 {
@@ -131,8 +125,8 @@ namespace OpenSim.Services.HypergridService
 
         public bool IncomingInstantMessage(GridInstantMessage im)
         {
-//            m_log.DebugFormat("[HG IM SERVICE]: Received message from {0} to {1}", im.fromAgentID, im.toAgentID);
-//            UUID toAgentID = new UUID(im.toAgentID);
+            //            m_log.DebugFormat("[HG IM SERVICE]: Received message from {0} to {1}", im.fromAgentID, im.toAgentID);
+            //            UUID toAgentID = new UUID(im.toAgentID);
 
             bool success = false;
             if (m_IMSimConnector != null)
@@ -153,7 +147,7 @@ namespace OpenSim.Services.HypergridService
 
         public bool OutgoingInstantMessage(GridInstantMessage im, string url, bool foreigner)
         {
-//            m_log.DebugFormat("[HG IM SERVICE]: Sending message from {0} to {1}@{2}", im.fromAgentID, im.toAgentID, url);
+            //            m_log.DebugFormat("[HG IM SERVICE]: Sending message from {0} to {1}@{2}", im.fromAgentID, im.toAgentID, url);
             if (url != string.Empty)
                 return TrySendInstantMessage(im, url, true, foreigner);
             else
@@ -368,7 +362,7 @@ namespace OpenSim.Services.HypergridService
                     return false;
             }
 
-//                m_log.DebugFormat("[HG IM SERVICE]: Message saved");
+            //                m_log.DebugFormat("[HG IM SERVICE]: Message saved");
             string reason = string.Empty;
             return m_OfflineIMService.StoreMessage(im, out reason);
         }

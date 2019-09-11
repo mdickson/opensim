@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
 using OpenMetaverse;
 using OpenSim.Framework;
 
@@ -35,13 +34,13 @@ namespace OpenSim.Data
 
     public interface IFSAssetDataPlugin : IPlugin
     {
-        bool[]          AssetsExist(UUID[] uuids);
-        void            Initialise(string connect, string realm, int SkipAccessTimeDays);
-        bool            Delete(string id);
+        bool[] AssetsExist(UUID[] uuids);
+        void Initialise(string connect, string realm, int SkipAccessTimeDays);
+        bool Delete(string id);
 
-        AssetMetadata   Get(string id, out string hash);
-        bool            Store(AssetMetadata metadata, string hash);
-        void            Import(string conn, string table, int start, int count, bool force, FSStoreDelegate store);
-        int             Count();
+        AssetMetadata Get(string id, out string hash);
+        bool Store(AssetMetadata metadata, string hash);
+        void Import(string conn, string table, int start, int count, bool force, FSStoreDelegate store);
+        int Count();
     }
 }

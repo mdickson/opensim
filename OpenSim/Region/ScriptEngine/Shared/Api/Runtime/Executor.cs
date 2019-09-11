@@ -29,10 +29,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics; //for [DebuggerNonUserCode]
 using System.Reflection;
-using System.Runtime.Remoting.Lifetime;
-using OpenSim.Region.ScriptEngine.Shared;
-using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
-using log4net;
 
 namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 {
@@ -104,7 +100,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
                 return eventFlags;
             }
 
-            Type type=m_Script.GetType();
+            Type type = m_Script.GetType();
 
             // Fill in the events for this state, cache the results in the map
             foreach (KeyValuePair<string, scriptEvents> kvp in m_eventFlagsMap)
@@ -120,7 +116,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
                         eventFlags |= kvp.Value;
                     }
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     //m_log.Debug("Exeption in GetMethod:\n"+e.ToString());
                 }
@@ -142,9 +138,9 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 
             string EventName = state + "_event_" + FunctionName;
 
-//#if DEBUG
+            //#if DEBUG
             //m_log.Debug("ScriptEngine: Script event function name: " + EventName);
-//#endif
+            //#endif
 
             if (Events.ContainsKey(EventName) == false)
             {
@@ -173,7 +169,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
                 return;
             }
 
-//cfk 2-7-08 dont need this right now and the default Linux build has DEBUG defined
+            //cfk 2-7-08 dont need this right now and the default Linux build has DEBUG defined
 #if DEBUG
             //m_log.Debug("ScriptEngine: Executing function name: " + EventName);
 #endif

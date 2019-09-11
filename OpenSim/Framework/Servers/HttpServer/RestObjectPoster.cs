@@ -46,7 +46,7 @@ namespace OpenSim.Framework.Servers.HttpServer
 
         public static void BeginPostObject<TRequest>(string verb, string requestUrl, TRequest obj)
         {
-            Type type = typeof (TRequest);
+            Type type = typeof(TRequest);
 
             WebRequest request = WebRequest.Create(requestUrl);
             request.Method = verb;
@@ -77,7 +77,7 @@ namespace OpenSim.Framework.Servers.HttpServer
 
         private static void AsyncCallback(IAsyncResult result)
         {
-            WebRequest request = (WebRequest) result.AsyncState;
+            WebRequest request = (WebRequest)result.AsyncState;
             using (WebResponse resp = request.EndGetResponse(result))
             {
             }

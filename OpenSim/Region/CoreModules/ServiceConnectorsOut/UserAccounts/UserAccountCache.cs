@@ -24,13 +24,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using System.Reflection;
-using System.Collections.Generic;
-using OpenSim.Framework;
-using OpenSim.Services.Interfaces;
 using OpenMetaverse;
-using log4net;
+using OpenSim.Services.Interfaces;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.UserAccounts
 {
@@ -40,9 +35,9 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.UserAccounts
         private const double CACHE_EXPIRATION_SECONDS = 3600.0; // 1 hour!
         private const double CACHE_NULL_EXPIRATION_SECONDS = 600; // 10minutes
 
-//        private static readonly ILog m_log =
-//                LogManager.GetLogger(
-//                MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log =
+        //                LogManager.GetLogger(
+        //                MethodBase.GetCurrentMethod().DeclaringType);
 
         private ExpiringCache<UUID, UserAccount> m_UUIDCache;
         private ExpiringCache<string, UUID> m_NameCache;
@@ -57,11 +52,11 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.UserAccounts
         public void Cache(UUID userID, UserAccount account)
         {
             // Cache even null accounts
-            lock(accessLock)
+            lock (accessLock)
             {
                 if (account == null)
                     m_UUIDCache.AddOrUpdate(userID, null, CACHE_NULL_EXPIRATION_SECONDS);
-                else if(account.LocalToGrid)
+                else if (account.LocalToGrid)
                 {
                     m_UUIDCache.AddOrUpdate(userID, account, CACHE_EXPIRATION_SECONDS);
                     m_NameCache.AddOrUpdate(account.Name, account.PrincipalID, CACHE_EXPIRATION_SECONDS);
@@ -71,7 +66,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.UserAccounts
                     m_UUIDCache.AddOrUpdate(userID, account, CACHE_ALIEN_EXPIRATION_SECONDS);
                     m_NameCache.AddOrUpdate(account.Name, account.PrincipalID, CACHE_ALIEN_EXPIRATION_SECONDS);
                 }
-            //m_log.DebugFormat("[USER CACHE]: cached user {0}", userID);
+                //m_log.DebugFormat("[USER CACHE]: cached user {0}", userID);
             }
         }
 
@@ -80,7 +75,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.UserAccounts
         {
             UserAccount account = null;
             inCache = false;
-            lock(accessLock)
+            lock (accessLock)
             {
                 if (m_UUIDCache.TryGetValue(userID, out account))
                 {
@@ -95,7 +90,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.UserAccounts
         public UserAccount Get(string name, out bool inCache)
         {
             inCache = false;
-            lock(accessLock)
+            lock (accessLock)
             {
                 if (!m_NameCache.Contains(name))
                     return null;
@@ -116,12 +111,12 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.UserAccounts
 
         public void Invalidate(UUID userID)
         {
-                m_UUIDCache.Remove(userID);
+            m_UUIDCache.Remove(userID);
         }
 
         public void Remove(UUID id)
         {
-            lock(accessLock)
+            lock (accessLock)
             {
                 if (!m_UUIDCache.Contains(id))
                     return;
@@ -135,7 +130,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.UserAccounts
 
         public void Remove(string name)
         {
-            lock(accessLock)
+            lock (accessLock)
             {
                 if (!m_NameCache.Contains(name))
                     return;

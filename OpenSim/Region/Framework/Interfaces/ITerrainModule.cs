@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.IO;
-using OpenSim.Framework;
 using OpenMetaverse;
+using OpenSim.Framework;
+using System.IO;
 
 namespace OpenSim.Region.Framework.Interfaces
 {

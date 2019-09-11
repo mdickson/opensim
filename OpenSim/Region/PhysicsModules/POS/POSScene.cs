@@ -25,15 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
-using Mono.Addins;
 using OpenSim.Framework;
-using OpenSim.Region.PhysicsModules.SharedBase;
-using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Region.PhysicsModules.SharedBase;
+using System;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.PhysicsModule.POS
 {
@@ -126,7 +126,7 @@ namespace OpenSim.Region.PhysicsModule.POS
 
         public override void RemovePrim(PhysicsActor prim)
         {
-            POSPrim p = (POSPrim) prim;
+            POSPrim p = (POSPrim)prim;
             if (_prims.Contains(p))
             {
                 _prims.Remove(p);
@@ -135,19 +135,19 @@ namespace OpenSim.Region.PhysicsModule.POS
 
         public override void RemoveAvatar(PhysicsActor character)
         {
-            POSCharacter act = (POSCharacter) character;
+            POSCharacter act = (POSCharacter)character;
             if (_characters.Contains(act))
             {
                 _characters.Remove(act);
             }
         }
 
-/*
-        public override PhysicsActor AddPrim(Vector3 position, Vector3 size, Quaternion rotation)
-        {
-            return null;
-        }
-*/
+        /*
+                public override PhysicsActor AddPrim(Vector3 position, Vector3 size, Quaternion rotation)
+                {
+                    return null;
+                }
+        */
 
         public override PhysicsActor AddPrimShape(string primName, PrimitiveBaseShape pbs, Vector3 position,
                                                   Vector3 size, Quaternion rotation, bool isPhysical, uint localid)
@@ -166,9 +166,9 @@ namespace OpenSim.Region.PhysicsModule.POS
                                              c.Position.Z - p.Position.Z) * Quaternion.Inverse(p.Orientation);
             Vector3 avatarSize = new Vector3(c.Size.X, c.Size.Y, c.Size.Z) * Quaternion.Inverse(p.Orientation);
 
-            return (Math.Abs(rotatedPos.X) < (p.Size.X*0.5 + Math.Abs(avatarSize.X)) &&
-                    Math.Abs(rotatedPos.Y) < (p.Size.Y*0.5 + Math.Abs(avatarSize.Y)) &&
-                    Math.Abs(rotatedPos.Z) < (p.Size.Z*0.5 + Math.Abs(avatarSize.Z)));
+            return (Math.Abs(rotatedPos.X) < (p.Size.X * 0.5 + Math.Abs(avatarSize.X)) &&
+                    Math.Abs(rotatedPos.Y) < (p.Size.Y * 0.5 + Math.Abs(avatarSize.Y)) &&
+                    Math.Abs(rotatedPos.Z) < (p.Size.Z * 0.5 + Math.Abs(avatarSize.Z)));
         }
 
         private bool isCollidingWithPrim(POSCharacter c)
@@ -223,7 +223,7 @@ namespace OpenSim.Region.PhysicsModule.POS
                 }
                 else
                 {
-                    characterPosition.Z += character._target_velocity.Z*timeStep;
+                    characterPosition.Z += character._target_velocity.Z * timeStep;
                 }
 
                 /// this is it -- the magic you've all been waiting for!  Ladies and gentlemen --
@@ -278,8 +278,8 @@ namespace OpenSim.Region.PhysicsModule.POS
 
                 character.Position = characterPosition;
 
-                character._velocity.X = (character.Position.X - oldposX)/timeStep;
-                character._velocity.Y = (character.Position.Y - oldposY)/timeStep;
+                character._velocity.X = (character.Position.X - oldposX) / timeStep;
+                character._velocity.Y = (character.Position.Y - oldposY) / timeStep;
 
                 if (forcedZ)
                 {
@@ -291,7 +291,7 @@ namespace OpenSim.Region.PhysicsModule.POS
                 else
                 {
                     ((PhysicsActor)character).IsColliding = false;
-                    character._velocity.Z = (character.Position.Z - oldposZ)/timeStep;
+                    character._velocity.Z = (character.Position.Z - oldposZ) / timeStep;
                 }
             }
             return 1.0f;

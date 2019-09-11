@@ -25,23 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.IO;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using OpenSim.Framework.Console;
-using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using Caps = OpenSim.Framework.Capabilities.Caps;
-using OpenSim.Capabilities.Handlers;
 
 namespace OpenSim.Region.ClientStack.LindenCaps
 {
@@ -73,18 +69,18 @@ namespace OpenSim.Region.ClientStack.LindenCaps
 
         public void RegionLoaded(Scene scene)
         {
-            scene.EventManager.OnRegisterCaps += delegate(UUID agentID, OpenSim.Framework.Capabilities.Caps caps)
+            scene.EventManager.OnRegisterCaps += delegate (UUID agentID, OpenSim.Framework.Capabilities.Caps caps)
             {
                 RegisterCaps(agentID, caps);
             };
             ISimulatorFeaturesModule simFeatures = scene.RequestModuleInterface<ISimulatorFeaturesModule>();
-            if(simFeatures != null)
-                simFeatures.AddFeature("AvatarHoverHeightEnabled",OSD.FromBoolean(true));
+            if (simFeatures != null)
+                simFeatures.AddFeature("AvatarHoverHeightEnabled", OSD.FromBoolean(true));
         }
 
-        public void PostInitialise() {}
+        public void PostInitialise() { }
 
-        public void Close() {}
+        public void Close() { }
 
         public string Name { get { return "AgentPreferencesModule"; } }
 
@@ -98,21 +94,21 @@ namespace OpenSim.Region.ClientStack.LindenCaps
             UUID capId = UUID.Random();
             caps.RegisterHandler("AgentPreferences",
                 new RestStreamHandler("POST", "/CAPS/" + capId,
-                    delegate(string request, string path, string param,
+                    delegate (string request, string path, string param,
                         IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
                     {
                         return UpdateAgentPreferences(request, path, param, agent);
                     }));
             caps.RegisterHandler("UpdateAgentLanguage",
                 new RestStreamHandler("POST", "/CAPS/" + capId,
-                    delegate(string request, string path, string param,
+                    delegate (string request, string path, string param,
                         IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
                     {
                         return UpdateAgentPreferences(request, path, param, agent);
                     }));
             caps.RegisterHandler("UpdateAgentInformation",
                 new RestStreamHandler("POST", "/CAPS/" + capId,
-                    delegate(string request, string path, string param,
+                    delegate (string request, string path, string param,
                         IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
                     {
                         return UpdateAgentPreferences(request, path, param, agent);

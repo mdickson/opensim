@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Client;
 using OpenSim.Region.Framework.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using Caps = OpenSim.Framework.Capabilities.Caps;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
@@ -1044,15 +1044,15 @@ namespace OpenSim.Region.Framework.Scenes
         /// </remarks>
         public event TeleportFail OnTeleportFail;
 
-//        public delegate void GatherUuids(SceneObjectPart sop, IDictionary<UUID, AssetType> assetUuids);
-//
-//        /// <summary>
-//        /// Triggered when UUIDs referenced by a scene object are being gathered for archiving, hg transfer, etc.
-//        /// </summary>
-//        /// <remarks>
-//        /// The listener should add references to the IDictionary<UUID, AssetType> as appropriate.
-//        /// </remarks>
-//        public event GatherUuids OnGatherUuids;
+        //        public delegate void GatherUuids(SceneObjectPart sop, IDictionary<UUID, AssetType> assetUuids);
+        //
+        //        /// <summary>
+        //        /// Triggered when UUIDs referenced by a scene object are being gathered for archiving, hg transfer, etc.
+        //        /// </summary>
+        //        /// <remarks>
+        //        /// The listener should add references to the IDictionary<UUID, AssetType> as appropriate.
+        //        /// </remarks>
+        //        public event GatherUuids OnGatherUuids;
 
         public class MoneyTransferArgs : EventArgs
         {
@@ -1384,9 +1384,9 @@ namespace OpenSim.Region.Framework.Scenes
                 {
                     try
                     {
-//                        m_log.ErrorFormat("[EVENT MANAGER]: OnRemovePresenceDelegate: {0}",d.Target.ToString());
+                        //                        m_log.ErrorFormat("[EVENT MANAGER]: OnRemovePresenceDelegate: {0}",d.Target.ToString());
                         d(agentId);
-//                        m_log.ErrorFormat("[EVENT MANAGER]: OnRemovePresenceDelegate done ");
+                        //                        m_log.ErrorFormat("[EVENT MANAGER]: OnRemovePresenceDelegate done ");
                     }
                     catch (Exception e)
                     {
@@ -1735,7 +1735,7 @@ namespace OpenSim.Region.Framework.Scenes
                     }
                 }
             }
-         }
+        }
 
         public void TriggerObjectDeGrab(uint localID, uint originalID, IClientAPI remoteClient, SurfaceTouchEventArgs surfaceArgs)
         {
@@ -2124,9 +2124,9 @@ namespace OpenSim.Region.Framework.Scenes
                 {
                     try
                     {
-//                        m_log.ErrorFormat("[EVENT MANAGER]: TriggerClientClosed: {0}", d.Target.ToString());
+                        //                        m_log.ErrorFormat("[EVENT MANAGER]: TriggerClientClosed: {0}", d.Target.ToString());
                         d(ClientID, scene);
-//                        m_log.ErrorFormat("[EVENT MANAGER]: TriggerClientClosed done ");
+                        //                        m_log.ErrorFormat("[EVENT MANAGER]: TriggerClientClosed done ");
 
                     }
                     catch (Exception e)
@@ -2616,7 +2616,7 @@ namespace OpenSim.Region.Framework.Scenes
                 {
                     try
                     {
-                        d(scriptUUID,  avatarID, held, _changed);
+                        d(scriptUUID, avatarID, held, _changed);
                     }
                     catch (Exception e)
                     {
@@ -3375,25 +3375,25 @@ namespace OpenSim.Region.Framework.Scenes
             }
         }
 
-//        public void TriggerGatherUuids(SceneObjectPart sop, IDictionary<UUID, AssetType> assetUuids)
-//        {
-//            GatherUuids handler = OnGatherUuids;
-//
-//            if (handler != null)
-//            {
-//                foreach (GatherUuids d in handler.GetInvocationList())
-//                {
-//                    try
-//                    {
-//                        d(sop, assetUuids);
-//                    }
-//                    catch (Exception e)
-//                    {
-//                        m_log.ErrorFormat("[EVENT MANAGER]: Delegate for TriggerUuidGather failed - continuing {0} - {1}",
-//                            e.Message, e.StackTrace);
-//                    }
-//                }
-//            }
-//        }
+        //        public void TriggerGatherUuids(SceneObjectPart sop, IDictionary<UUID, AssetType> assetUuids)
+        //        {
+        //            GatherUuids handler = OnGatherUuids;
+        //
+        //            if (handler != null)
+        //            {
+        //                foreach (GatherUuids d in handler.GetInvocationList())
+        //                {
+        //                    try
+        //                    {
+        //                        d(sop, assetUuids);
+        //                    }
+        //                    catch (Exception e)
+        //                    {
+        //                        m_log.ErrorFormat("[EVENT MANAGER]: Delegate for TriggerUuidGather failed - continuing {0} - {1}",
+        //                            e.Message, e.StackTrace);
+        //                    }
+        //                }
+        //            }
+        //        }
     }
 }

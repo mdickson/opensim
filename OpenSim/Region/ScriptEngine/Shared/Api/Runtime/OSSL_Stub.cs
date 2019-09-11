@@ -25,25 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Runtime.Remoting.Lifetime;
-using System.Threading;
-using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
 using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.ScriptEngine.Interfaces;
 using OpenSim.Region.ScriptEngine.Shared.Api.Interfaces;
-using integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
-using vector = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Vector3;
-using rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
+using System;
 using key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
-using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
-using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
-using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
 using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
+using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
+using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
+using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
+using rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
+using vector = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Vector3;
 
 namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 {
@@ -123,7 +116,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 
         public void osParcelJoin(vector pos1, vector pos2)
         {
-            m_OSSL_Functions.osParcelJoin(pos1,pos2);
+            m_OSSL_Functions.osParcelJoin(pos1, pos2);
         }
 
         public void osParcelSubdivide(vector pos1, vector pos2)
@@ -138,7 +131,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
         // Deprecated
         public void osParcelSetDetails(vector pos, LSL_List rules)
         {
-            m_OSSL_Functions.osParcelSetDetails(pos,rules);
+            m_OSSL_Functions.osParcelSetDetails(pos, rules);
         }
 
         public string osSetDynamicTextureURL(string dynamicID, string contentType, string url, string extraParams,
@@ -483,12 +476,12 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 
         public string osGetSimulatorVersion()
         {
-           return m_OSSL_Functions.osGetSimulatorVersion();
+            return m_OSSL_Functions.osGetSimulatorVersion();
         }
 
-        public void osMessageObject(key objectUUID,string message)
+        public void osMessageObject(key objectUUID, string message)
         {
-            m_OSSL_Functions.osMessageObject(objectUUID,message);
+            m_OSSL_Functions.osMessageObject(objectUUID, message);
         }
 
         public void osMakeNotecard(string notecardName, LSL_Types.list contents)
@@ -568,7 +561,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 
         public LSL_String osReplaceString(string src, string pattern, string replace, int count, int start)
         {
-            return m_OSSL_Functions.osReplaceString(src,pattern,replace,count,start);
+            return m_OSSL_Functions.osReplaceString(src, pattern, replace, count, start);
         }
 
 
@@ -989,7 +982,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
         {
             m_OSSL_Functions.osSetSpeed(UUID, SpeedModifier);
         }
-        
+
         public void osSetOwnerSpeed(LSL_Float SpeedModifier)
         {
             m_OSSL_Functions.osSetOwnerSpeed(SpeedModifier);
@@ -1117,7 +1110,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 
         public void osSetContentType(LSL_Key id, string type)
         {
-            m_OSSL_Functions.osSetContentType(id,type);
+            m_OSSL_Functions.osSetContentType(id, type);
         }
 
         public void osDropAttachment()
@@ -1175,7 +1168,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
             return m_OSSL_Functions.osGetInertiaData();
         }
 
-        public void osSetInertia(LSL_Float mass, vector centerOfMass, vector principalInertiaScaled,  rotation rot)
+        public void osSetInertia(LSL_Float mass, vector centerOfMass, vector principalInertiaScaled, rotation rot)
         {
             m_OSSL_Functions.osSetInertia(mass, centerOfMass, principalInertiaScaled, rot);
         }
@@ -1185,14 +1178,14 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
             m_OSSL_Functions.osSetInertiaAsBox(mass, boxSize, centerOfMass, rot);
         }
 
-        public void osSetInertiaAsSphere(LSL_Float mass,  LSL_Float radius, vector centerOfMass)
+        public void osSetInertiaAsSphere(LSL_Float mass, LSL_Float radius, vector centerOfMass)
         {
             m_OSSL_Functions.osSetInertiaAsSphere(mass, radius, centerOfMass);
         }
 
-        public void osSetInertiaAsCylinder(LSL_Float mass,  LSL_Float radius, LSL_Float lenght, vector centerOfMass,rotation lslrot)
+        public void osSetInertiaAsCylinder(LSL_Float mass, LSL_Float radius, LSL_Float lenght, vector centerOfMass, rotation lslrot)
         {
-            m_OSSL_Functions.osSetInertiaAsCylinder( mass, radius, lenght, centerOfMass, lslrot);
+            m_OSSL_Functions.osSetInertiaAsCylinder(mass, radius, lenght, centerOfMass, lslrot);
         }
 
         public void osClearInertia()

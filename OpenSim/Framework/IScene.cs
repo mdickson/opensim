@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenMetaverse;
 //using OpenSim.Framework.Console;
 using Nini.Config;
+using OpenMetaverse;
 
 namespace OpenSim.Framework
 {
@@ -133,7 +133,7 @@ namespace OpenSim.Framework
         /// <returns>an empty array if there are no registered modules implementing that interface</returns>
         T[] RequestModuleInterfaces<T>();
 
-//        void AddCommand(object module, string command, string shorthelp, string longhelp, CommandDelegate callback);
+        //        void AddCommand(object module, string command, string shorthelp, string longhelp, CommandDelegate callback);
 
         ISceneObject DeserializeObject(string representation);
 

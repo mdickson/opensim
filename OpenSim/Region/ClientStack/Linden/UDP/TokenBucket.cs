@@ -25,13 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenSim.Framework;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using OpenSim.Framework;
-
-using log4net;
 
 namespace OpenSim.Region.ClientStack.LindenUDP
 {
@@ -71,7 +69,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
         protected Dictionary<TokenBucket, float> m_children = new Dictionary<TokenBucket, float>();
 
-#region Properties
+        #region Properties
 
         /// <summary>
         /// The parent bucket of this bucket, or null if this bucket has no
@@ -101,7 +99,8 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         public float RequestedBurst
         {
             get { return m_burst; }
-            set {
+            set
+            {
                 float rate = (value < 0 ? 0 : value);
                 if (rate < MINBURST)
                     rate = MINBURST;
@@ -109,12 +108,13 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                     rate = MAXBURST;
 
                 m_burst = rate;
-                }
+            }
         }
 
         public float Burst
         {
-            get {
+            get
+            {
                 float rate = RequestedBurst * BurstModifier();
                 if (rate < MINBURST)
                     rate = MINBURST;
@@ -136,19 +136,21 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         public float RequestedDripRate
         {
             get { return (m_dripRate == 0 ? m_totalDripRequest : m_dripRate); }
-            set {
+            set
+            {
                 m_dripRate = (value < 0 ? 0 : value);
                 m_totalDripRequest = m_dripRate;
 
                 if (m_parent != null)
-                    m_parent.RegisterRequest(this,m_dripRate);
+                    m_parent.RegisterRequest(this, m_dripRate);
             }
         }
 
-       public float DripRate
+        public float DripRate
         {
-            get {
-                float rate = Math.Min(RequestedDripRate,TotalDripRequest);
+            get
+            {
+                float rate = Math.Min(RequestedDripRate, TotalDripRequest);
                 if (m_parent == null)
                     return rate;
 
@@ -170,9 +172,9 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             set { m_totalDripRequest = value; }
         }
 
-#endregion Properties
+        #endregion Properties
 
-#region Constructor
+        #region Constructor
 
 
         /// <summary>
@@ -195,7 +197,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             m_lastDrip = Util.GetTimeStampMS() + 100000.0; // skip first drip
         }
 
-#endregion Constructor
+        #endregion Constructor
 
         /// <summary>
         /// Compute a modifier for the MaxBurst rate. This is 1.0, meaning
@@ -257,7 +259,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
             // Pass the new values up to the parent
             if (Parent != null)
-                Parent.RegisterRequest(this,Math.Min(RequestedDripRate, TotalDripRequest));
+                Parent.RegisterRequest(this, Math.Min(RequestedDripRate, TotalDripRequest));
         }
 
         /// <summary>
@@ -285,12 +287,12 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
         public bool CheckTokens(int amount)
         {
-            return  (m_tokenCount - amount >= 0);
+            return (m_tokenCount - amount >= 0);
         }
 
         public int GetCatBytesCanSend(int timeMS)
         {
-//            return (int)(m_tokenCount + timeMS * m_dripRate * 1e-3);
+            //            return (int)(m_tokenCount + timeMS * m_dripRate * 1e-3);
             return (int)(timeMS * DripRate * 1e-3);
         }
 

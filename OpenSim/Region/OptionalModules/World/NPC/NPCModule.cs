@@ -25,21 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Threading;
-using Timer = System.Timers.Timer;
-
-using log4net;
-using Nini.Config;
-using Mono.Addins;
-using OpenMetaverse;
-
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Framework;
-using OpenSim.Services.Interfaces;
 
 namespace OpenSim.Region.OptionalModules.World.NPC
 {
@@ -55,7 +50,7 @@ namespace OpenSim.Region.OptionalModules.World.NPC
 
 
         private NPCOptionsFlags m_NPCOptionFlags;
-        public NPCOptionsFlags NPCOptionFlags {get {return m_NPCOptionFlags;}}
+        public NPCOptionsFlags NPCOptionFlags { get { return m_NPCOptionFlags; } }
 
         public bool Enabled { get; private set; }
 
@@ -65,18 +60,18 @@ namespace OpenSim.Region.OptionalModules.World.NPC
 
             Enabled = (config != null && config.GetBoolean("Enabled", false));
             m_NPCOptionFlags = NPCOptionsFlags.None;
-            if(Enabled)
+            if (Enabled)
             {
-                if(config.GetBoolean("AllowNotOwned", true))
+                if (config.GetBoolean("AllowNotOwned", true))
                     m_NPCOptionFlags |= NPCOptionsFlags.AllowNotOwned;
 
-                if(config.GetBoolean("AllowSenseAsAvatar", true))
+                if (config.GetBoolean("AllowSenseAsAvatar", true))
                     m_NPCOptionFlags |= NPCOptionsFlags.AllowSenseAsAvatar;
 
-                if(config.GetBoolean("AllowCloneOtherAvatars", true))
+                if (config.GetBoolean("AllowCloneOtherAvatars", true))
                     m_NPCOptionFlags |= NPCOptionsFlags.AllowCloneOtherAvatars;
 
-                if(config.GetBoolean("NoNPCGroup", true))
+                if (config.GetBoolean("NoNPCGroup", true))
                     m_NPCOptionFlags |= NPCOptionsFlags.NoNPCGroup;
             }
         }
@@ -136,7 +131,7 @@ namespace OpenSim.Region.OptionalModules.World.NPC
                     return false;
 
             // Delete existing npc attachments
-            if(scene.AttachmentsModule != null)
+            if (scene.AttachmentsModule != null)
                 scene.AttachmentsModule.DeleteAttachmentsFromScene(npc, false);
 
             // XXX: We can't just use IAvatarFactoryModule.SetAppearance() yet
@@ -157,7 +152,7 @@ namespace OpenSim.Region.OptionalModules.World.NPC
         }
 
         public UUID CreateNPC(string firstname, string lastname,
-                Vector3 position, UUID owner,  bool senseAsAgent, Scene scene,
+                Vector3 position, UUID owner, bool senseAsAgent, Scene scene,
                 AvatarAppearance appearance)
         {
             return CreateNPC(firstname, lastname, position, UUID.Zero, owner, "", UUID.Zero, senseAsAgent, scene, appearance);
@@ -188,9 +183,9 @@ namespace OpenSim.Region.OptionalModules.World.NPC
             npcAvatar.CircuitCode = (uint)Util.RandomClass.Next(0,
                     int.MaxValue);
 
-//            m_log.DebugFormat(
-//                "[NPC MODULE]: Creating NPC {0} {1} {2}, owner={3}, senseAsAgent={4} at {5} in {6}",
-//                firstname, lastname, npcAvatar.AgentId, owner, senseAsAgent, position, scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat(
+            //                "[NPC MODULE]: Creating NPC {0} {1} {2}, owner={3}, senseAsAgent={4} at {5} in {6}",
+            //                firstname, lastname, npcAvatar.AgentId, owner, senseAsAgent, position, scene.RegionInfo.RegionName);
 
             AgentCircuitData acd = new AgentCircuitData();
             acd.AgentID = npcAvatar.AgentId;
@@ -212,31 +207,31 @@ namespace OpenSim.Region.OptionalModules.World.NPC
             }
             */
 
-//            ManualResetEvent ev = new ManualResetEvent(false);
+            //            ManualResetEvent ev = new ManualResetEvent(false);
 
-//            Util.FireAndForget(delegate(object x) {
-                lock (m_avatars)
+            //            Util.FireAndForget(delegate(object x) {
+            lock (m_avatars)
+            {
+                scene.AuthenticateHandler.AddNewCircuit(npcAvatar.CircuitCode, acd);
+                scene.AddNewAgent(npcAvatar, PresenceType.Npc);
+
+                ScenePresence sp;
+                if (scene.TryGetScenePresence(npcAvatar.AgentId, out sp))
                 {
-                    scene.AuthenticateHandler.AddNewCircuit(npcAvatar.CircuitCode, acd);
-                    scene.AddNewAgent(npcAvatar, PresenceType.Npc);
-
-                    ScenePresence sp;
-                    if (scene.TryGetScenePresence(npcAvatar.AgentId, out sp))
-                    {
-                        npcAvatar.Born = born;
-                        npcAvatar.ActiveGroupId = groupID;
-                        sp.CompleteMovement(npcAvatar, false);
-                        sp.Grouptitle = groupTitle;
-                        m_avatars.Add(npcAvatar.AgentId, npcAvatar);
-//                        m_log.DebugFormat("[NPC MODULE]: Created NPC {0} {1}", npcAvatar.AgentId, sp.Name);
-                    }
+                    npcAvatar.Born = born;
+                    npcAvatar.ActiveGroupId = groupID;
+                    sp.CompleteMovement(npcAvatar, false);
+                    sp.Grouptitle = groupTitle;
+                    m_avatars.Add(npcAvatar.AgentId, npcAvatar);
+                    //                        m_log.DebugFormat("[NPC MODULE]: Created NPC {0} {1}", npcAvatar.AgentId, sp.Name);
                 }
-//                ev.Set();
-//            });
+            }
+            //                ev.Set();
+            //            });
 
-//            ev.WaitOne();
+            //            ev.WaitOne();
 
-//            m_log.DebugFormat("[NPC MODULE]: Created NPC with id {0}", npcAvatar.AgentId);
+            //            m_log.DebugFormat("[NPC MODULE]: Created NPC with id {0}", npcAvatar.AgentId);
 
             return npcAvatar.AgentId;
         }
@@ -254,10 +249,10 @@ namespace OpenSim.Region.OptionalModules.World.NPC
                         if (sp.IsSatOnObject || sp.SitGround)
                             return false;
 
-//                        m_log.DebugFormat(
-//                                "[NPC MODULE]: Moving {0} to {1} in {2}, noFly {3}, landAtTarget {4}",
-//                                sp.Name, pos, scene.RegionInfo.RegionName,
-//                                noFly, landAtTarget);
+                        //                        m_log.DebugFormat(
+                        //                                "[NPC MODULE]: Moving {0} to {1} in {2}, noFly {3}, landAtTarget {4}",
+                        //                                sp.Name, pos, scene.RegionInfo.RegionName,
+                        //                                noFly, landAtTarget);
 
                         sp.MoveToTarget(pos, noFly, landAtTarget);
                         sp.SetAlwaysRun = running;
@@ -481,7 +476,7 @@ namespace OpenSim.Region.OptionalModules.World.NPC
         private bool CheckPermissions(NPCAvatar av, UUID callerID)
         {
             return callerID == UUID.Zero || av.OwnerID == UUID.Zero ||
-                av.OwnerID == callerID  || av.AgentId == callerID;
+                av.OwnerID == callerID || av.AgentId == callerID;
         }
     }
 }

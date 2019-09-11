@@ -25,15 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using OpenMetaverse;
-using OpenSim.Framework;
-using System.Reflection;
-using System.Text;
 using Npgsql;
+using OpenMetaverse;
+using System;
 
 namespace OpenSim.Data.PGSQL
 {
@@ -86,7 +80,7 @@ namespace OpenSim.Data.PGSQL
             bool ret = UUID.TryParse(principalID, out princUUID);
 
             if (ret)
-               return GetFriends(princUUID);
+                return GetFriends(princUUID);
             else
                 return new FriendsData[0];
         }

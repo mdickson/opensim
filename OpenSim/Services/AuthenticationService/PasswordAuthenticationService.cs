@@ -25,16 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using OpenMetaverse;
-using OpenSim.Services.Interfaces;
 using log4net;
 using Nini.Config;
-using System.Reflection;
+using OpenMetaverse;
 using OpenSim.Data;
 using OpenSim.Framework;
-using OpenSim.Framework.Console;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Services.AuthenticationService
 {
@@ -93,7 +92,7 @@ namespace OpenSim.Services.AuthenticationService
             string hashed = Util.Md5Hash(password + ":" +
                     data.Data["passwordSalt"].ToString());
 
-//            m_log.DebugFormat("[PASS AUTH]: got {0}; hashed = {1}; stored = {2}", password, hashed, data.Data["passwordHash"].ToString());
+            //            m_log.DebugFormat("[PASS AUTH]: got {0}; hashed = {1}; stored = {2}", password, hashed, data.Data["passwordHash"].ToString());
 
             if (data.Data["passwordHash"].ToString() == hashed)
             {
@@ -127,7 +126,7 @@ namespace OpenSim.Services.AuthenticationService
                     continue;
                 }
 
-//                m_log.DebugFormat("[PASS AUTH]: Trying {0}", data.PrincipalID);
+                //                m_log.DebugFormat("[PASS AUTH]: Trying {0}", data.PrincipalID);
 
                 hashed = Util.Md5Hash(password + ":" +
                         data.Data["passwordSalt"].ToString());
@@ -138,12 +137,12 @@ namespace OpenSim.Services.AuthenticationService
                     realID = a.PrincipalID;
                     return GetToken(principalID, lifetime);
                 }
-//                else
-//                {
-//                    m_log.DebugFormat(
-//                        "[AUTH SERVICE]: Salted hash {0} of given password did not match salted hash of {1} for PrincipalID {2}.  Authentication failure.",
-//                        hashed, data.Data["passwordHash"], data.PrincipalID);
-//                }
+                //                else
+                //                {
+                //                    m_log.DebugFormat(
+                //                        "[AUTH SERVICE]: Salted hash {0} of given password did not match salted hash of {1} for PrincipalID {2}.  Authentication failure.",
+                //                        hashed, data.Data["passwordHash"], data.PrincipalID);
+                //                }
             }
 
             m_log.DebugFormat("[PASS AUTH]: Impersonation of {0} failed", principalID);

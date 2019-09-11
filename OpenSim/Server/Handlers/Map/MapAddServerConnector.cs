@@ -25,23 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Framework.ServiceAuth;
+using OpenSim.Server.Base;
+using OpenSim.Server.Handlers.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Xml;
-
-using Nini.Config;
-using log4net;
-using OpenMetaverse;
-
-using OpenSim.Framework;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Framework.ServiceAuth;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Server.Handlers.Base;
-
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Server.Handlers.MapImage
@@ -103,9 +100,9 @@ namespace OpenSim.Server.Handlers.MapImage
 
         protected override byte[] ProcessRequest(string path, Stream requestData, IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
-//            m_log.DebugFormat("[MAP SERVICE IMAGE HANDLER]: Received {0}", path);
+            //            m_log.DebugFormat("[MAP SERVICE IMAGE HANDLER]: Received {0}", path);
             string body;
-            using(StreamReader sr = new StreamReader(requestData))
+            using (StreamReader sr = new StreamReader(requestData))
                 body = sr.ReadToEnd();
             body = body.Trim();
 
@@ -119,7 +116,7 @@ namespace OpenSim.Server.Handlers.MapImage
                     return FailureResult("Bad request.");
                 }
                 int x = 0, y = 0;
-//                UUID scopeID = new UUID("07f8d88e-cd5e-4239-a0ed-843f75d09992");
+                //                UUID scopeID = new UUID("07f8d88e-cd5e-4239-a0ed-843f75d09992");
                 UUID scopeID = UUID.Zero;
                 Int32.TryParse(request["X"].ToString(), out x);
                 Int32.TryParse(request["Y"].ToString(), out y);
@@ -128,10 +125,10 @@ namespace OpenSim.Server.Handlers.MapImage
 
                 m_log.DebugFormat("[MAP ADD SERVER CONNECTOR]: Received map data for region at {0}-{1}", x, y);
 
-//                string type = "image/jpeg";
-//
-//                if (request.ContainsKey("TYPE"))
-//                    type = request["TYPE"].ToString();
+                //                string type = "image/jpeg";
+                //
+                //                if (request.ContainsKey("TYPE"))
+                //                    type = request["TYPE"].ToString();
 
                 if (m_GridService != null)
                 {
@@ -225,8 +222,8 @@ namespace OpenSim.Server.Handlers.MapImage
 
         private System.Net.IPAddress GetCallerIP(IOSHttpRequest request)
         {
-//            if (!m_Proxy)
-//                return request.RemoteIPEndPoint.Address;
+            //            if (!m_Proxy)
+            //                return request.RemoteIPEndPoint.Address;
 
             // We're behind a proxy
             string xff = "X-Forwarded-For";
@@ -236,7 +233,7 @@ namespace OpenSim.Server.Handlers.MapImage
 
             if (xffValue == null || (xffValue != null && xffValue == string.Empty))
             {
-//                m_log.WarnFormat("[MAP IMAGE HANDLER]: No XFF header");
+                //                m_log.WarnFormat("[MAP IMAGE HANDLER]: No XFF header");
                 return request.RemoteIPEndPoint.Address;
             }
 

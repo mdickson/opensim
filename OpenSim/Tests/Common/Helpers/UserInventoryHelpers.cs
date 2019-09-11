@@ -25,13 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.CoreModules.Avatar.Inventory.Archiver;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
 
 namespace OpenSim.Tests.Common
 {
@@ -290,7 +290,7 @@ namespace OpenSim.Tests.Common
 
             if (folder == null)
             {
-//                Console.WriteLine("Creating folder {0} at {1}", components[0], parentFolder.Name);
+                //                Console.WriteLine("Creating folder {0} at {1}", components[0], parentFolder.Name);
 
                 UUID folderIdForCreate;
 
@@ -305,10 +305,10 @@ namespace OpenSim.Tests.Common
 
                 inventoryService.AddFolder(folder);
             }
-//            else
-//            {
-//                Console.WriteLine("Found existing folder {0}", folder.Name);
-//            }
+            //            else
+            //            {
+            //                Console.WriteLine("Found existing folder {0}", folder.Name);
+            //            }
 
             if (components.Length > 1)
                 return CreateInventoryFolder(inventoryService, folderId, folder, components[1], useExistingFolders);

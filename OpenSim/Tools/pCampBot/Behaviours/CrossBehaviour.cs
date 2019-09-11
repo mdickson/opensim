@@ -25,14 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenSim.Framework;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
-using log4net;
-using OpenMetaverse;
-using OpenSim.Framework;
-using pCampBot.Interfaces;
 
 namespace pCampBot
 {
@@ -57,9 +56,9 @@ namespace pCampBot
         {
             GridClient client = Bot.Client;
 
-//            // Fly to make the border cross easier.
-//            client.Self.Movement.Fly = true;
-//            client.Self.Movement.Fly = false;
+            //            // Fly to make the border cross easier.
+            //            client.Self.Movement.Fly = true;
+            //            client.Self.Movement.Fly = false;
 
             // Seek out neighbouring region
             Simulator currentSim = client.Network.CurrentSim;

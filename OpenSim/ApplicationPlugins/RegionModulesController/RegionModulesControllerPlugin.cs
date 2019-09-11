@@ -25,16 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
-using OpenSim;
-using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.ApplicationPlugins.RegionModulesController
 {
@@ -74,9 +72,9 @@ namespace OpenSim.ApplicationPlugins.RegionModulesController
             LoadModulesFromAddins = true;
         }
 
-#region IApplicationPlugin implementation
+        #region IApplicationPlugin implementation
 
-        public void Initialise (OpenSimBase openSim)
+        public void Initialise(OpenSimBase openSim)
         {
             m_openSim = openSim;
             m_openSim.ApplicationRegistry.RegisterInterface<IRegionModulesController>(this);
@@ -166,7 +164,7 @@ namespace OpenSim.ApplicationPlugins.RegionModulesController
             }
         }
 
-        public void PostInitialise ()
+        public void PostInitialise()
         {
             m_log.DebugFormat("[REGIONMODULES]: PostInitializing...");
 
@@ -177,9 +175,9 @@ namespace OpenSim.ApplicationPlugins.RegionModulesController
             }
         }
 
-#endregion
+        #endregion
 
-#region IPlugin implementation
+        #region IPlugin implementation
 
         private void AddNode(
             TypeExtensionNode node, IConfig modulesConfig, Dictionary<RuntimeAddin, IList<int>> loadedModules)
@@ -218,18 +216,18 @@ namespace OpenSim.ApplicationPlugins.RegionModulesController
 
         // We don't do that here
         //
-        public void Initialise ()
+        public void Initialise()
         {
             throw new System.NotImplementedException();
         }
 
-#endregion
+        #endregion
 
-#region IDisposable implementation
+        #region IDisposable implementation
 
         // Cleanup
         //
-        public void Dispose ()
+        public void Dispose()
         {
             // We expect that all regions have been removed already
             while (m_sharedInstances.Count > 0)
@@ -242,7 +240,7 @@ namespace OpenSim.ApplicationPlugins.RegionModulesController
             m_nonSharedModules.Clear();
         }
 
-#endregion
+        #endregion
 
         public string Version
         {
@@ -260,7 +258,7 @@ namespace OpenSim.ApplicationPlugins.RegionModulesController
             }
         }
 
-#region Region Module interfacesController implementation
+        #region Region Module interfacesController implementation
 
         /// <summary>
         /// Check that the given module is no disabled in the [Modules] section of the config files.
@@ -303,7 +301,7 @@ namespace OpenSim.ApplicationPlugins.RegionModulesController
         // load. This means that here we deal with replaceable interfaces,
         // nonshared modules, etc.
         //
-        public void AddRegionToModules (Scene scene)
+        public void AddRegionToModules(Scene scene)
         {
             Dictionary<Type, ISharedRegionModule> deferredSharedModules =
                     new Dictionary<Type, ISharedRegionModule>();
@@ -362,7 +360,7 @@ namespace OpenSim.ApplicationPlugins.RegionModulesController
             List<INonSharedRegionModule> list = new List<INonSharedRegionModule>();
             foreach (TypeExtensionNode node in m_nonSharedModules)
             {
-                Object[] ctorArgs = new Object[] {0};
+                Object[] ctorArgs = new Object[] { 0 };
 
                 // Read the config
                 string moduleString =
@@ -376,7 +374,7 @@ namespace OpenSim.ApplicationPlugins.RegionModulesController
                 if (moduleString != String.Empty)
                 {
                     // Get the port number from the string
-                    string[] moduleParts = moduleString.Split(new char[] {'/'},
+                    string[] moduleParts = moduleString.Split(new char[] { '/' },
                             2);
                     if (moduleParts.Length > 1)
                         ctorArgs[0] = Convert.ToUInt32(moduleParts[0]);
@@ -513,7 +511,7 @@ namespace OpenSim.ApplicationPlugins.RegionModulesController
             scene.AllModulesLoaded();
         }
 
-        public void RemoveRegionFromModules (Scene scene)
+        public void RemoveRegionFromModules(Scene scene)
         {
             foreach (IRegionModuleBase module in scene.RegionModules.Values)
             {
@@ -529,7 +527,7 @@ namespace OpenSim.ApplicationPlugins.RegionModulesController
             scene.RegionModules.Clear();
         }
 
-#endregion
+        #endregion
 
     }
 }

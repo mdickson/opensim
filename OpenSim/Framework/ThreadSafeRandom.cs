@@ -35,9 +35,9 @@ namespace OpenSim.Framework
     /// </summary>
     public class ThreadSafeRandom : Random
     {
-        public ThreadSafeRandom() : base() {}
+        public ThreadSafeRandom() : base() { }
 
-        public ThreadSafeRandom(int seed): base (seed) {}
+        public ThreadSafeRandom(int seed) : base(seed) { }
 
         public override int Next()
         {

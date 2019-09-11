@@ -25,22 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.Imaging;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Net;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.Imaging;
-using OpenSim.Region.CoreModules.Scripting.DynamicTexture;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using log4net;
 using System.Reflection;
-using Mono.Addins;
 
 //using Cairo;
 
@@ -50,9 +48,9 @@ namespace OpenSim.Region.CoreModules.Scripting.VectorRender
     public class VectorRenderModule : ISharedRegionModule, IDynamicTextureRender
     {
         // These fields exist for testing purposes, please do not remove.
-//        private static bool s_flipper;
-//        private static byte[] s_asset1Data;
-//        private static byte[] s_asset2Data;
+        //        private static bool s_flipper;
+        //        private static byte[] s_asset1Data;
+        //        private static byte[] s_asset2Data;
 
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -83,11 +81,11 @@ namespace OpenSim.Region.CoreModules.Scripting.VectorRender
             return true;
         }
 
-//        public bool AlwaysIdenticalConversion(string bodyData, string extraParams)
-//        {
-//            string[] lines = GetLines(bodyData);
-//            return lines.Any((str, r) => str.StartsWith("Image"));
-//        }
+        //        public bool AlwaysIdenticalConversion(string bodyData, string extraParams)
+        //        {
+        //            string[] lines = GetLines(bodyData);
+        //            return lines.Any((str, r) => str.StartsWith("Image"));
+        //        }
 
         public IDynamicTexture ConvertUrl(string url, string extraParams)
         {
@@ -272,71 +270,72 @@ namespace OpenSim.Region.CoreModules.Scripting.VectorRender
                             }
                         }
                         break;
-                     case "alpha":
-                          temp = parseIntParam(value);
-                          if (temp != -1)
-                          {
-                              if (temp < 0)
-                              {
-                                  alpha = 0;
-                              }
-                              else if (temp > 255)
-                              {
-                                  alpha = 255;
-                              }
-                              else
-                              {
-                                  alpha = temp;
-                              }
-                          }
-                          // Allow a bitmap w/o the alpha component to be created
-                          else if (value.ToLower() == "false") {
-                               alpha = 256;
-                          }
-                          break;
-                     case "bgcolor":
-                     case "bgcolour":
-                          int hex = 0;
-                         if (Int32.TryParse(value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out hex))
-                         {
-                             bgColor = Color.FromArgb(hex);
-                         }
-                         else
-                         {
-                             bgColor = Color.FromName(value);
-                         }
-                         break;
-                     case "altdatadelim":
-                         altDataDelim = value.ToCharArray()[0];
-                         break;
-                     case "":
-                         // blank string has been passed do nothing just use defaults
-                     break;
-                     default: // this is all for backwards compat, all a bit ugly hopfully can be removed in future
-                         // could be either set alpha or just an int
-                         if (name == "setalpha")
-                         {
-                             alpha = 0; // set the texture to have transparent background (maintains backwards compat)
-                         }
-                         else
-                         {
-                             // this function used to accept an int on its own that represented both
-                             // width and height, this is to maintain backwards compat, could be removed
-                             // but would break existing scripts
-                             temp = parseIntParam(name);
-                             if (temp != -1)
-                             {
-                                 if (temp > 1024)
+                    case "alpha":
+                        temp = parseIntParam(value);
+                        if (temp != -1)
+                        {
+                            if (temp < 0)
+                            {
+                                alpha = 0;
+                            }
+                            else if (temp > 255)
+                            {
+                                alpha = 255;
+                            }
+                            else
+                            {
+                                alpha = temp;
+                            }
+                        }
+                        // Allow a bitmap w/o the alpha component to be created
+                        else if (value.ToLower() == "false")
+                        {
+                            alpha = 256;
+                        }
+                        break;
+                    case "bgcolor":
+                    case "bgcolour":
+                        int hex = 0;
+                        if (Int32.TryParse(value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out hex))
+                        {
+                            bgColor = Color.FromArgb(hex);
+                        }
+                        else
+                        {
+                            bgColor = Color.FromName(value);
+                        }
+                        break;
+                    case "altdatadelim":
+                        altDataDelim = value.ToCharArray()[0];
+                        break;
+                    case "":
+                        // blank string has been passed do nothing just use defaults
+                        break;
+                    default: // this is all for backwards compat, all a bit ugly hopfully can be removed in future
+                             // could be either set alpha or just an int
+                        if (name == "setalpha")
+                        {
+                            alpha = 0; // set the texture to have transparent background (maintains backwards compat)
+                        }
+                        else
+                        {
+                            // this function used to accept an int on its own that represented both
+                            // width and height, this is to maintain backwards compat, could be removed
+                            // but would break existing scripts
+                            temp = parseIntParam(name);
+                            if (temp != -1)
+                            {
+                                if (temp > 1024)
                                     temp = 1024;
 
-                                 if (temp < 128)
-                                     temp = 128;
+                                if (temp < 128)
+                                    temp = 128;
 
-                                 width = temp;
-                                 height = temp;
-                             }
-                         }
-                     break;
+                                width = temp;
+                                height = temp;
+                            }
+                        }
+                        break;
                 }
             }
 
@@ -376,12 +375,12 @@ namespace OpenSim.Region.CoreModules.Scripting.VectorRender
                 byte[] imageJ2000 = new byte[0];
 
                 // This code exists for testing purposes, please do not remove.
-//                if (s_flipper)
-//                    imageJ2000 = s_asset1Data;
-//                else
-//                    imageJ2000 = s_asset2Data;
-//
-//                s_flipper = !s_flipper;
+                //                if (s_flipper)
+                //                    imageJ2000 = s_asset1Data;
+                //                else
+                //                    imageJ2000 = s_asset2Data;
+                //
+                //                s_flipper = !s_flipper;
 
                 try
                 {
@@ -432,43 +431,43 @@ namespace OpenSim.Region.CoreModules.Scripting.VectorRender
             return parsed;
         }
 
-/*
-        private void CairoDraw(string data, System.Drawing.Graphics graph)
-        {
-            using (Win32Surface draw = new Win32Surface(graph.GetHdc()))
-            {
-                Context contex = new Context(draw);
-
-                contex.Antialias = Antialias.None;    //fastest method but low quality
-                contex.LineWidth = 7;
-                char[] lineDelimiter = { ';' };
-                char[] partsDelimiter = { ',' };
-                string[] lines = data.Split(lineDelimiter);
-
-                foreach (string line in lines)
+        /*
+                private void CairoDraw(string data, System.Drawing.Graphics graph)
                 {
-                    string nextLine = line.Trim();
+                    using (Win32Surface draw = new Win32Surface(graph.GetHdc()))
+                    {
+                        Context contex = new Context(draw);
 
-                    if (nextLine.StartsWith("MoveTO"))
-                    {
-                        float x = 0;
-                        float y = 0;
-                        GetParams(partsDelimiter, ref nextLine, ref x, ref y);
-                        contex.MoveTo(x, y);
+                        contex.Antialias = Antialias.None;    //fastest method but low quality
+                        contex.LineWidth = 7;
+                        char[] lineDelimiter = { ';' };
+                        char[] partsDelimiter = { ',' };
+                        string[] lines = data.Split(lineDelimiter);
+
+                        foreach (string line in lines)
+                        {
+                            string nextLine = line.Trim();
+
+                            if (nextLine.StartsWith("MoveTO"))
+                            {
+                                float x = 0;
+                                float y = 0;
+                                GetParams(partsDelimiter, ref nextLine, ref x, ref y);
+                                contex.MoveTo(x, y);
+                            }
+                            else if (nextLine.StartsWith("LineTo"))
+                            {
+                                float x = 0;
+                                float y = 0;
+                                GetParams(partsDelimiter, ref nextLine, ref x, ref y);
+                                contex.LineTo(x, y);
+                                contex.Stroke();
+                            }
+                        }
                     }
-                    else if (nextLine.StartsWith("LineTo"))
-                    {
-                        float x = 0;
-                        float y = 0;
-                        GetParams(partsDelimiter, ref nextLine, ref x, ref y);
-                        contex.LineTo(x, y);
-                        contex.Stroke();
-                    }
+                    graph.ReleaseHdc();
                 }
-            }
-            graph.ReleaseHdc();
-        }
-*/
+        */
 
         /// <summary>
         /// Split input data into discrete command lines.
@@ -499,13 +498,13 @@ namespace OpenSim.Region.CoreModules.Scripting.VectorRender
                 myFont = new Font(fontName, fontSize);
                 myBrush = new SolidBrush(Color.Black);
 
-                char[] partsDelimiter = {','};
+                char[] partsDelimiter = { ',' };
 
                 foreach (string line in GetLines(data, dataDelim))
                 {
                     string nextLine = line.TrimStart();
 
-//                    m_log.DebugFormat("[VECTOR RENDER MODULE]: Processing line '{0}'", nextLine);
+                    //                    m_log.DebugFormat("[VECTOR RENDER MODULE]: Processing line '{0}'", nextLine);
 
                     if (nextLine.StartsWith("Text") && nextLine.Length > 5)
                     {
@@ -551,16 +550,16 @@ namespace OpenSim.Region.CoreModules.Scripting.VectorRender
                         float x = 0;
                         float y = 0;
                         GetParams(partsDelimiter, ref nextLine, 6, ref x, ref y);
-                        startPoint.X = (int) x;
-                        startPoint.Y = (int) y;
+                        startPoint.X = (int)x;
+                        startPoint.Y = (int)y;
                     }
                     else if (nextLine.StartsWith("LineTo"))
                     {
                         float x = 0;
                         float y = 0;
                         GetParams(partsDelimiter, ref nextLine, 6, ref x, ref y);
-                        endPoint.X = (int) x;
-                        endPoint.Y = (int) y;
+                        endPoint.X = (int)x;
+                        endPoint.Y = (int)y;
                         graph.DrawLine(drawPen, startPoint, endPoint);
                         startPoint.X = endPoint.X;
                         startPoint.Y = endPoint.Y;
@@ -574,8 +573,8 @@ namespace OpenSim.Region.CoreModules.Scripting.VectorRender
                         float x = 0;
                         float y = 0;
                         GetParams(partsDelimiter, ref nextLine, 5, ref x, ref y);
-                        endPoint.X = (int) x;
-                        endPoint.Y = (int) y;
+                        endPoint.X = (int)x;
+                        endPoint.Y = (int)y;
 
                         using (Image image = ImageHttpRequest(nextLine))
                         {
@@ -585,7 +584,7 @@ namespace OpenSim.Region.CoreModules.Scripting.VectorRender
                             }
                             else
                             {
-                                using (Font errorFont = new Font(m_fontName,6))
+                                using (Font errorFont = new Font(m_fontName, 6))
                                 {
                                     graph.DrawString("URL couldn't be resolved or is", errorFont,
                                                      myBrush, startPoint);
@@ -605,8 +604,8 @@ namespace OpenSim.Region.CoreModules.Scripting.VectorRender
                         float x = 0;
                         float y = 0;
                         GetParams(partsDelimiter, ref nextLine, 9, ref x, ref y);
-                        endPoint.X = (int) x;
-                        endPoint.Y = (int) y;
+                        endPoint.X = (int)x;
+                        endPoint.Y = (int)y;
                         graph.DrawRectangle(drawPen, startPoint.X, startPoint.Y, endPoint.X, endPoint.Y);
                         startPoint.X += endPoint.X;
                         startPoint.Y += endPoint.Y;
@@ -616,8 +615,8 @@ namespace OpenSim.Region.CoreModules.Scripting.VectorRender
                         float x = 0;
                         float y = 0;
                         GetParams(partsDelimiter, ref nextLine, 13, ref x, ref y);
-                        endPoint.X = (int) x;
-                        endPoint.Y = (int) y;
+                        endPoint.X = (int)x;
+                        endPoint.Y = (int)y;
                         graph.FillRectangle(myBrush, startPoint.X, startPoint.Y, endPoint.X, endPoint.Y);
                         startPoint.X += endPoint.X;
                         startPoint.Y += endPoint.Y;
@@ -849,13 +848,13 @@ namespace OpenSim.Region.CoreModules.Scripting.VectorRender
                 for (int i = 0; i < parts.Length; i = i + 2)
                 {
                     string xVal = parts[i].Trim();
-                    string yVal = parts[i+1].Trim();
+                    string yVal = parts[i + 1].Trim();
                     float x = Convert.ToSingle(xVal, CultureInfo.InvariantCulture);
                     float y = Convert.ToSingle(yVal, CultureInfo.InvariantCulture);
                     PointF point = new PointF(x, y);
                     points[i / 2] = point;
 
-//                    m_log.DebugFormat("[VECTOR RENDER MODULE]: Got point {0}", points[i / 2]);
+                    //                    m_log.DebugFormat("[VECTOR RENDER MODULE]: Got point {0}", points[i / 2]);
                 }
             }
         }

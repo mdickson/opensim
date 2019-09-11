@@ -25,19 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Data;
-using System.Reflection;
-using OpenSim.Data;
-using OpenSim.Framework;
+using log4net;
 using MySql.Data.MySqlClient;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using log4net;
+using OpenSim.Framework;
+using System;
+using System.Data;
+using System.Reflection;
 
 namespace OpenSim.Data.MySQL
 {
-    public class UserProfilesData: IProfilesData
+    public class UserProfilesData : IProfilesData
     {
         static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -95,9 +94,9 @@ namespace OpenSim.Data.MySQL
                 using (MySqlCommand cmd = new MySqlCommand(query, dbcon))
                 {
                     cmd.Parameters.AddWithValue("?Id", creatorId);
-                    using( MySqlDataReader reader = cmd.ExecuteReader(CommandBehavior.Default))
+                    using (MySqlDataReader reader = cmd.ExecuteReader(CommandBehavior.Default))
                     {
-                        if(reader.HasRows)
+                        if (reader.HasRows)
                         {
                             while (reader.Read())
                             {
@@ -107,7 +106,7 @@ namespace OpenSim.Data.MySQL
                                 string Name = null;
                                 try
                                 {
-                                    UUID.TryParse(Convert.ToString( reader["classifieduuid"]), out Id);
+                                    UUID.TryParse(Convert.ToString(reader["classifieduuid"]), out Id);
                                     Name = Convert.ToString(reader["name"]);
                                 }
                                 catch (Exception e)
@@ -128,57 +127,57 @@ namespace OpenSim.Data.MySQL
 
         public bool UpdateClassifiedRecord(UserClassifiedAdd ad, ref string result)
         {
-             const string query = 
-                "INSERT INTO classifieds ("
-                + "`classifieduuid`,"
-                +  "`creatoruuid`,"
-                +  "`creationdate`,"
-                +  "`expirationdate`,"
-                +  "`category`,"
-                +  "`name`,"
-                +  "`description`,"
-                +  "`parceluuid`,"
-                +  "`parentestate`,"
-                +  "`snapshotuuid`,"
-                +  "`simname`,"
-                +  "`posglobal`,"
-                +  "`parcelname`,"
-                + "`classifiedflags`,"
-                + "`priceforlisting`) "
-                + "VALUES ("
-                + "?ClassifiedId,"
-                + "?CreatorId,"
-                + "?CreatedDate,"
-                + "?ExpirationDate,"
-                + "?Category,"
-                + "?Name,"
-                + "?Description,"
-                + "?ParcelId,"
-                + "?ParentEstate,"
-                + "?SnapshotId,"
-                + "?SimName,"
-                + "?GlobalPos,"
-                + "?ParcelName,"
-                + "?Flags,"
-                + "?ListingPrice ) "
-                + "ON DUPLICATE KEY UPDATE "
-                + "category=?Category, "
-                + "expirationdate=?ExpirationDate, "
-                + "name=?Name, "
-                + "description=?Description, "
-                + "parentestate=?ParentEstate, "
-                + "posglobal=?GlobalPos, "
-                + "parcelname=?ParcelName, "
-                + "classifiedflags=?Flags, "
-                + "priceforlisting=?ListingPrice, "
-                + "snapshotuuid=?SnapshotId"
-                ;
+            const string query =
+               "INSERT INTO classifieds ("
+               + "`classifieduuid`,"
+               + "`creatoruuid`,"
+               + "`creationdate`,"
+               + "`expirationdate`,"
+               + "`category`,"
+               + "`name`,"
+               + "`description`,"
+               + "`parceluuid`,"
+               + "`parentestate`,"
+               + "`snapshotuuid`,"
+               + "`simname`,"
+               + "`posglobal`,"
+               + "`parcelname`,"
+               + "`classifiedflags`,"
+               + "`priceforlisting`) "
+               + "VALUES ("
+               + "?ClassifiedId,"
+               + "?CreatorId,"
+               + "?CreatedDate,"
+               + "?ExpirationDate,"
+               + "?Category,"
+               + "?Name,"
+               + "?Description,"
+               + "?ParcelId,"
+               + "?ParentEstate,"
+               + "?SnapshotId,"
+               + "?SimName,"
+               + "?GlobalPos,"
+               + "?ParcelName,"
+               + "?Flags,"
+               + "?ListingPrice ) "
+               + "ON DUPLICATE KEY UPDATE "
+               + "category=?Category, "
+               + "expirationdate=?ExpirationDate, "
+               + "name=?Name, "
+               + "description=?Description, "
+               + "parentestate=?ParentEstate, "
+               + "posglobal=?GlobalPos, "
+               + "parcelname=?ParcelName, "
+               + "classifiedflags=?Flags, "
+               + "priceforlisting=?ListingPrice, "
+               + "snapshotuuid=?SnapshotId"
+               ;
 
-            if(string.IsNullOrEmpty(ad.ParcelName))
+            if (string.IsNullOrEmpty(ad.ParcelName))
                 ad.ParcelName = "Unknown";
-            if(ad.ParcelId == null)
+            if (ad.ParcelId == null)
                 ad.ParcelId = UUID.Zero;
-            if(string.IsNullOrEmpty(ad.Description))
+            if (string.IsNullOrEmpty(ad.Description))
                 ad.Description = "No Description";
 
             DateTime epoch = new DateTime(1970, 1, 1);
@@ -188,15 +187,15 @@ namespace OpenSim.Data.MySQL
             DateTime expiration;
             TimeSpan epochexp;
 
-            if(ad.Flags == 2)
+            if (ad.Flags == 2)
             {
-                duration = new TimeSpan(7,0,0,0);
+                duration = new TimeSpan(7, 0, 0, 0);
                 expiration = now.Add(duration);
                 epochexp = expiration - epoch;
             }
             else
             {
-                duration = new TimeSpan(365,0,0,0);
+                duration = new TimeSpan(365, 0, 0, 0);
                 expiration = now.Add(duration);
                 epochexp = expiration - epoch;
             }
@@ -219,12 +218,12 @@ namespace OpenSim.Data.MySQL
                         cmd.Parameters.AddWithValue("?Description", ad.Description.ToString());
                         cmd.Parameters.AddWithValue("?ParcelId", ad.ParcelId.ToString());
                         cmd.Parameters.AddWithValue("?ParentEstate", ad.ParentEstate.ToString());
-                        cmd.Parameters.AddWithValue("?SnapshotId", ad.SnapshotId.ToString ());
+                        cmd.Parameters.AddWithValue("?SnapshotId", ad.SnapshotId.ToString());
                         cmd.Parameters.AddWithValue("?SimName", ad.SimName.ToString());
                         cmd.Parameters.AddWithValue("?GlobalPos", ad.GlobalPos.ToString());
                         cmd.Parameters.AddWithValue("?ParcelName", ad.ParcelName.ToString());
                         cmd.Parameters.AddWithValue("?Flags", ad.Flags.ToString());
-                        cmd.Parameters.AddWithValue("?ListingPrice", ad.Price.ToString ());
+                        cmd.Parameters.AddWithValue("?ListingPrice", ad.Price.ToString());
 
                         cmd.ExecuteNonQuery();
                     }
@@ -282,7 +281,7 @@ namespace OpenSim.Data.MySQL
 
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            if(reader.Read ())
+                            if (reader.Read())
                             {
                                 ad.CreatorId = new UUID(reader.GetGuid("creatoruuid"));
                                 ad.ParcelId = new UUID(reader.GetGuid("parceluuid"));
@@ -331,14 +330,14 @@ namespace OpenSim.Data.MySQL
 
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            if(reader.HasRows)
+                            if (reader.HasRows)
                             {
                                 while (reader.Read())
                                 {
                                     OSDMap record = new OSDMap();
 
-                                    record.Add("pickuuid",OSD.FromString((string)reader["pickuuid"]));
-                                    record.Add("name",OSD.FromString((string)reader["name"]));
+                                    record.Add("pickuuid", OSD.FromString((string)reader["pickuuid"]));
+                                    record.Add("name", OSD.FromString((string)reader["name"]));
                                     data.Add(record);
                                 }
                             }
@@ -371,7 +370,7 @@ namespace OpenSim.Data.MySQL
 
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            if(reader.HasRows)
+                            if (reader.HasRows)
                             {
                                 reader.Read();
 
@@ -453,10 +452,10 @@ namespace OpenSim.Data.MySQL
                         cmd.Parameters.AddWithValue("?SnapshotId", pick.SnapshotId.ToString());
                         cmd.Parameters.AddWithValue("?User", pick.ParcelName.ToString());
                         cmd.Parameters.AddWithValue("?Original", pick.OriginalName.ToString());
-                        cmd.Parameters.AddWithValue("?SimName",pick.SimName.ToString());
+                        cmd.Parameters.AddWithValue("?SimName", pick.SimName.ToString());
                         cmd.Parameters.AddWithValue("?GlobalPos", pick.GlobalPos);
-                        cmd.Parameters.AddWithValue("?Gatekeeper",pick.Gatekeeper);
-                        cmd.Parameters.AddWithValue("?SortOrder", pick.SortOrder.ToString ());
+                        cmd.Parameters.AddWithValue("?Gatekeeper", pick.Gatekeeper);
+                        cmd.Parameters.AddWithValue("?SortOrder", pick.SortOrder.ToString());
                         cmd.Parameters.AddWithValue("?Enabled", pick.Enabled.ToString());
 
                         cmd.ExecuteNonQuery();
@@ -517,7 +516,7 @@ namespace OpenSim.Data.MySQL
 
                         using (MySqlDataReader reader = cmd.ExecuteReader(CommandBehavior.SingleRow))
                         {
-                            if(reader.HasRows)
+                            if (reader.HasRows)
                             {
                                 reader.Read();
                                 notes.Notes = OSD.FromString((string)reader["notes"]);
@@ -543,7 +542,7 @@ namespace OpenSim.Data.MySQL
             string query;
             bool remove;
 
-            if(string.IsNullOrEmpty(note.Notes))
+            if (string.IsNullOrEmpty(note.Notes))
             {
                 remove = true;
                 query = "DELETE FROM usernotes WHERE useruuid=?UserId AND targetuuid=?TargetId";
@@ -551,7 +550,7 @@ namespace OpenSim.Data.MySQL
             else
             {
                 remove = false;
-                query = "INSERT INTO usernotes VALUES (" 
+                query = "INSERT INTO usernotes VALUES ("
                     + "?UserId,"
                     + "?TargetId,"
                     + "?Notes )"
@@ -568,9 +567,9 @@ namespace OpenSim.Data.MySQL
                     dbcon.Open();
                     using (MySqlCommand cmd = new MySqlCommand(query, dbcon))
                     {
-                        if(!remove)
+                        if (!remove)
                             cmd.Parameters.AddWithValue("?Notes", note.Notes);
-                        cmd.Parameters.AddWithValue("?TargetId", note.TargetId.ToString ());
+                        cmd.Parameters.AddWithValue("?TargetId", note.TargetId.ToString());
                         cmd.Parameters.AddWithValue("?UserId", note.UserId.ToString());
 
                         cmd.ExecuteNonQuery();
@@ -604,7 +603,7 @@ namespace OpenSim.Data.MySQL
 
                         using (MySqlDataReader reader = cmd.ExecuteReader(CommandBehavior.SingleRow))
                         {
-                            if(reader.HasRows)
+                            if (reader.HasRows)
                             {
                                 m_log.DebugFormat("[PROFILES_DATA]" +
                                                   ": Getting data for {0}.", props.UserId);
@@ -796,17 +795,17 @@ namespace OpenSim.Data.MySQL
                 {
                     dbcon.Open();
 
-                    using (MySqlCommand cmd = new MySqlCommand(string.Format (queryA,"`classifieds`"), dbcon))
+                    using (MySqlCommand cmd = new MySqlCommand(string.Format(queryA, "`classifieds`"), dbcon))
                     {
                         cmd.Parameters.AddWithValue("?Id", avatarId.ToString());
 
                         using (MySqlDataReader reader = cmd.ExecuteReader(CommandBehavior.SingleRow))
                         {
-                            if(reader.HasRows)
+                            if (reader.HasRows)
                             {
                                 while (reader.Read())
                                 {
-                                    data.Add(new OSDString((string)reader["snapshotuuid"].ToString ()));
+                                    data.Add(new OSDString((string)reader["snapshotuuid"].ToString()));
                                 }
                             }
                         }
@@ -815,17 +814,17 @@ namespace OpenSim.Data.MySQL
                     dbcon.Close();
                     dbcon.Open();
 
-                    using (MySqlCommand cmd = new MySqlCommand(string.Format (queryA,"`userpicks`"), dbcon))
+                    using (MySqlCommand cmd = new MySqlCommand(string.Format(queryA, "`userpicks`"), dbcon))
                     {
                         cmd.Parameters.AddWithValue("?Id", avatarId.ToString());
 
                         using (MySqlDataReader reader = cmd.ExecuteReader(CommandBehavior.SingleRow))
                         {
-                            if(reader.HasRows)
+                            if (reader.HasRows)
                             {
                                 while (reader.Read())
                                 {
-                                    data.Add(new OSDString((string)reader["snapshotuuid"].ToString ()));
+                                    data.Add(new OSDString((string)reader["snapshotuuid"].ToString()));
                                 }
                             }
                         }
@@ -842,12 +841,12 @@ namespace OpenSim.Data.MySQL
 
                         using (MySqlDataReader reader = cmd.ExecuteReader(CommandBehavior.SingleRow))
                         {
-                            if(reader.HasRows)
+                            if (reader.HasRows)
                             {
                                 while (reader.Read())
                                 {
-                                    data.Add(new OSDString((string)reader["profileImage"].ToString ()));
-                                    data.Add(new OSDString((string)reader["profileFirstImage"].ToString ()));
+                                    data.Add(new OSDString((string)reader["profileImage"].ToString()));
+                                    data.Add(new OSDString((string)reader["profileFirstImage"].ToString()));
                                 }
                             }
                         }
@@ -916,7 +915,7 @@ namespace OpenSim.Data.MySQL
 
         public bool UpdateUserPreferences(ref UserPreferences pref, ref string result)
         {
-            const string query = "UPDATE usersettings SET imviaemail=?ImViaEmail," 
+            const string query = "UPDATE usersettings SET imviaemail=?ImViaEmail,"
                 + "visible=?Visible, email=?EMail "
                 + "WHERE useruuid=?uuid";
 
@@ -960,11 +959,11 @@ namespace OpenSim.Data.MySQL
                     using (MySqlCommand cmd = new MySqlCommand(query, dbcon))
                     {
                         cmd.Parameters.AddWithValue("?Id", props.UserId.ToString());
-                        cmd.Parameters.AddWithValue ("?TagId", props.TagId.ToString());
+                        cmd.Parameters.AddWithValue("?TagId", props.TagId.ToString());
 
                         using (MySqlDataReader reader = cmd.ExecuteReader(CommandBehavior.SingleRow))
                         {
-                            if(reader.HasRows)
+                            if (reader.HasRows)
                             {
                                 reader.Read();
                                 props.DataKey = (string)reader["DataKey"];

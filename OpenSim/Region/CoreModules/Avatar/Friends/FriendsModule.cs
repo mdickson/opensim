@@ -25,28 +25,24 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
 using log4net;
-using Nini.Config;
-using Nwc.XmlRpc;
-using OpenMetaverse;
 using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Framework.Servers;
+using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
-using OpenSim.Services.Connectors.Friends;
 using OpenSim.Server.Base;
+using OpenSim.Services.Connectors.Friends;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using FriendInfo = OpenSim.Services.Interfaces.FriendInfo;
-using PresenceInfo = OpenSim.Services.Interfaces.PresenceInfo;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
+using PresenceInfo = OpenSim.Services.Interfaces.PresenceInfo;
 
 namespace OpenSim.Region.CoreModules.Avatar.Friends
 {
@@ -210,7 +206,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
             if (!m_Enabled)
                 return;
 
-//            m_log.DebugFormat("[FRIENDS MODULE]: AddRegion on {0}", Name);
+            //            m_log.DebugFormat("[FRIENDS MODULE]: AddRegion on {0}", Name);
 
             m_Scenes.Add(scene);
             scene.RegisterModuleInterface<IFriendsModule>(this);
@@ -221,7 +217,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
             scene.EventManager.OnClientLogin += OnClientLogin;
         }
 
-        public virtual void RegionLoaded(Scene scene) {}
+        public virtual void RegionLoaded(Scene scene) { }
 
         public void RemoveRegion(Scene scene)
         {
@@ -254,9 +250,9 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
             return 0;
         }
 
-       private void OnMakeRootAgent(ScenePresence sp)
+        private void OnMakeRootAgent(ScenePresence sp)
         {
-            if(sp.m_gotCrossUpdate)
+            if (sp.m_gotCrossUpdate)
                 return;
 
             RecacheFriends(sp.ControllingClient);
@@ -457,16 +453,16 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
             if (friendList.Count > 0)
                 GetOnlineFriends(userID, friendList, online);
 
-//            m_log.DebugFormat(
-//                "[FRIENDS MODULE]: User {0} has {1} friends online", userID, online.Count);
+            //            m_log.DebugFormat(
+            //                "[FRIENDS MODULE]: User {0} has {1} friends online", userID, online.Count);
 
             return online;
         }
 
         protected virtual void GetOnlineFriends(UUID userID, List<string> friendList, /*collector*/ List<UUID> online)
         {
-//            m_log.DebugFormat(
-//                "[FRIENDS MODULE]: Looking for online presence of {0} users for {1}", friendList.Count, userID);
+            //            m_log.DebugFormat(
+            //                "[FRIENDS MODULE]: Looking for online presence of {0} users for {1}", friendList.Count, userID);
 
             PresenceInfo[] presence = PresenceService.GetAgents(friendList.ToArray());
             foreach (PresenceInfo pi in presence)
@@ -511,14 +507,14 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
                     if (((fi.MyFlags & (int)FriendRights.CanSeeOnline) != 0) && (fi.TheirFlags != -1))
                         friendList.Add(fi);
                 }
-                if(friendList.Count > 0)
+                if (friendList.Count > 0)
                 {
                     Util.FireAndForget(
                         delegate
                         {
-//                            m_log.DebugFormat(
-//                                "[FRIENDS MODULE]: Notifying {0} friends of {1} of online status {2}",
-//                                friendList.Count, agentID, online);
+                            //                            m_log.DebugFormat(
+                            //                                "[FRIENDS MODULE]: Notifying {0} friends of {1} of online status {2}",
+                            //                                friendList.Count, agentID, online);
 
                             // Notify about this user status
                             StatusNotify(friendList, agentID, online);
@@ -553,7 +549,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
             // We do this regrouping so that we can efficiently send a single request rather than one for each
             // friend in what may be a very large friends list.
             PresenceInfo[] friendSessions = PresenceService.GetAgents(remoteFriendStringIds.ToArray());
-            if(friendSessions == null)
+            if (friendSessions == null)
                 return;
 
             foreach (PresenceInfo friendSession in friendSessions)
@@ -741,10 +737,10 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
             }
         }
 
-        public void FindFriend(IClientAPI remoteClient,UUID HunterID ,UUID PreyID)
+        public void FindFriend(IClientAPI remoteClient, UUID HunterID, UUID PreyID)
         {
             UUID requester = remoteClient.AgentId;
-            if(requester != HunterID) // only allow client agent to be the hunter (?)
+            if (requester != HunterID) // only allow client agent to be the hunter (?)
                 return;
 
             FriendInfo[] friends = GetFriendsFromCache(requester);
@@ -755,21 +751,21 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
             if (friend == null)
                 return;
 
-            if(friend.TheirFlags == -1 || (friend.TheirFlags & (int)FriendRights.CanSeeOnMap) == 0)
+            if (friend.TheirFlags == -1 || (friend.TheirFlags & (int)FriendRights.CanSeeOnMap) == 0)
                 return;
 
             Scene hunterScene = (Scene)remoteClient.Scene;
 
-            if(hunterScene == null)
+            if (hunterScene == null)
                 return;
 
             // check local
             ScenePresence sp;
             double px;
             double py;
-            if(hunterScene.TryGetScenePresence(PreyID, out sp))
+            if (hunterScene.TryGetScenePresence(PreyID, out sp))
             {
-                if(sp == null)
+                if (sp == null)
                     return;
                 px = hunterScene.RegionInfo.WorldLocX + sp.AbsolutePosition.X;
                 py = hunterScene.RegionInfo.WorldLocY + sp.AbsolutePosition.Y;
@@ -789,7 +785,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
 
             GridRegion region = GridService.GetRegionByUUID(hunterScene.RegionInfo.ScopeID, friendSession.RegionID);
 
-            if(region == null)
+            if (region == null)
                 return;
 
             // we don't have presence location so point to a standard region center for now
@@ -957,7 +953,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
                         friendClient.SendAgentOffline(new UUID[] { userID });
                 }
 
-                if(changedRights != 0)
+                if (changedRights != 0)
                     friendClient.SendChangeUserRights(userID, friendID, newRights);
 
                 // Update local cache
@@ -1017,10 +1013,10 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
             lock (m_Friends)
             {
                 FriendInfo[] friends = GetFriendsFromCache(friendID);
-                if(friends != EMPTY_FRIENDS)
+                if (friends != EMPTY_FRIENDS)
                 {
                     FriendInfo finfo = GetFriend(friends, userID);
-                    if(finfo!= null)
+                    if (finfo != null)
                         finfo.TheirFlags = rights;
                 }
             }

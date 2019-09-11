@@ -25,10 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -38,6 +34,10 @@ using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using PresenceInfo = OpenSim.Services.Interfaces.PresenceInfo;
 
 namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
@@ -111,7 +111,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
                 m_messageOnlineAgentsOnly = groupsConfig.GetBoolean("MessageOnlineUsersOnly", false);
 
                 if (m_messageOnlineAgentsOnly)
-                     m_usersOnlineCache = new ExpiringCache<UUID, PresenceInfo[]>();
+                    m_usersOnlineCache = new ExpiringCache<UUID, PresenceInfo[]>();
 
                 m_debugEnabled = groupsConfig.GetBoolean("MessagingDebugEnabled", m_debugEnabled);
             }
@@ -358,7 +358,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
                         int startTick = Environment.TickCount;
 
                         // If they're not local, forward across the grid
-                        m_msgTransferModule.SendInstantMessage(msg, delegate(bool success) { });
+                        m_msgTransferModule.SendInstantMessage(msg, delegate (bool success) { });
 
                         if (m_debugEnabled)
                             m_log.DebugFormat(
@@ -378,12 +378,12 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
                                 member.AgentID, Environment.TickCount - startTick);
                     }
                 }
-                else if(im.dialog != (byte)InstantMessageDialog.SessionAdd &&
+                else if (im.dialog != (byte)InstantMessageDialog.SessionAdd &&
                         im.dialog != (byte)InstantMessageDialog.SessionDrop)
                 {
                     int startTick = Environment.TickCount;
 
-                    m_msgTransferModule.HandleUndeliverableMessage(msg, delegate(bool success) { });
+                    m_msgTransferModule.HandleUndeliverableMessage(msg, delegate (bool success) { });
 
                     if (m_debugEnabled)
                         m_log.DebugFormat(
@@ -463,7 +463,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
             {
                 case (byte)InstantMessageDialog.SessionAdd:
                     m_groupData.AgentInvitedToGroupChatSession(fromAgentID, GroupID);
-                    if(eq != null)
+                    if (eq != null)
                         eq.ChatterBoxSessionAgentListUpdates(
                             GroupID
                             , fromAgentID
@@ -477,7 +477,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
 
                 case (byte)InstantMessageDialog.SessionDrop:
                     m_groupData.AgentDroppedFromGroupChatSession(fromAgentID, GroupID);
-                    if(eq != null)
+                    if (eq != null)
                         eq.ChatterBoxSessionAgentListUpdates(
                                 GroupID
                                 , fromAgentID
@@ -492,7 +492,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
                 case (byte)InstantMessageDialog.SessionSend:
                     if (!m_groupData.hasAgentDroppedGroupChatSession(client.AgentId, GroupID))
                     {
-                        if(!m_groupData.hasAgentBeenInvitedToGroupChatSession(client.AgentId, GroupID))
+                        if (!m_groupData.hasAgentBeenInvitedToGroupChatSession(client.AgentId, GroupID))
                         {
 
                             GroupRecord groupInfo = m_groupData.GetGroupRecord(UUID.Zero, GroupID, null);
@@ -500,7 +500,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
                             {
                                 if (m_debugEnabled) m_log.DebugFormat("[GROUPS-MESSAGING]: Sending chatterbox invite instant message");
 
-                                if(eq != null)
+                                if (eq != null)
                                 {
                                     eq.ChatterboxInvitation(
                                         GroupID
@@ -527,25 +527,25 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
                             client.SendInstantMessage(msg);
                         }
 
-//                        if (!m_groupData.hasAgentBeenInvitedToGroupChatSession(fromAgentID, GroupID))
+                        //                        if (!m_groupData.hasAgentBeenInvitedToGroupChatSession(fromAgentID, GroupID))
                         {
-                             m_groupData.AgentInvitedToGroupChatSession(fromAgentID, GroupID);
-                             eq.ChatterBoxSessionAgentListUpdates(
-                                    GroupID
-                                    , fromAgentID
-                                    , client.AgentId
-                                    , false //canVoiceChat
-                                    , false //isModerator
-                                    , false //text mute
-                                    , true // enter
-                                    );
+                            m_groupData.AgentInvitedToGroupChatSession(fromAgentID, GroupID);
+                            eq.ChatterBoxSessionAgentListUpdates(
+                                   GroupID
+                                   , fromAgentID
+                                   , client.AgentId
+                                   , false //canVoiceChat
+                                   , false //isModerator
+                                   , false //text mute
+                                   , true // enter
+                                   );
                         }
                     }
                     break;
 
                 default:
                     client.SendInstantMessage(msg);
-                    break;;
+                    break; ;
             }
         }
 

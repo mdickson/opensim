@@ -25,33 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Threading;
-using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.Remoting.Lifetime;
-using System.Security.Policy;
-using System.IO;
-using System.Xml;
-using System.Text;
+using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
+using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.ScriptEngine.Interfaces;
 using OpenSim.Region.ScriptEngine.Shared;
-using OpenSim.Region.ScriptEngine.Shared.Api;
-using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
-using OpenSim.Region.ScriptEngine.Yengine;
-using OpenSim.Region.Framework.Scenes;
-using log4net;
-
-using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
-using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
-using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
-using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
-using LSL_Rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
-using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
-using LSL_Vector = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Vector3;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading;
 
 // This class exists in the main app domain
 //
@@ -90,7 +74,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         DISPOSED       // has been disposed
     }
 
-    public partial class XMRInstance: XMRInstAbstract, IDisposable
+    public partial class XMRInstance : XMRInstAbstract, IDisposable
     {
         /******************************************************************\
          *  This module contains the instance variables for XMRInstance.  *

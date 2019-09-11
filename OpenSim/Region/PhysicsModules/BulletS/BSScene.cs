@@ -24,22 +24,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Monitoring;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Region.PhysicsModules.SharedBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using OpenSim.Framework;
-using OpenSim.Framework.Monitoring;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.PhysicsModules.SharedBase;
-using Nini.Config;
-using log4net;
-using OpenMetaverse;
-using Mono.Addins;
 
 namespace OpenSim.Region.PhysicsModule.BulletS
 {
@@ -770,8 +768,8 @@ namespace OpenSim.Region.PhysicsModule.BulletS
             // The physics engine returns the number of milliseconds it simulated this call.
             // These are summed and normalized to one second and divided by 1000 to give the reported physics FPS.
             // Multiply by a fixed nominal frame rate to give a rate similar to the simulator (usually 55).
-//            m_simulatedTime +=  (float)numSubSteps * m_fixedTimeStep * 1000f * NominalFrameRate;
-            m_simulatedTime +=  (float)numSubSteps * m_fixedTimeStep;
+            //            m_simulatedTime +=  (float)numSubSteps * m_fixedTimeStep * 1000f * NominalFrameRate;
+            m_simulatedTime += (float)numSubSteps * m_fixedTimeStep;
         }
 
         // Called by a BSPhysObject to note that it has changed properties and this information
@@ -913,13 +911,13 @@ namespace OpenSim.Region.PhysicsModule.BulletS
                     DoPhysicsStep(BSParam.PhysicsTimeStep);
 
                 int simulationRealtimeMS = Util.EnvironmentTickCountSubtract(beginSimulationRealtimeMS);
-                int simulationTimeVsRealtimeDifferenceMS = ((int)(BSParam.PhysicsTimeStep*1000f)) - simulationRealtimeMS;
+                int simulationTimeVsRealtimeDifferenceMS = ((int)(BSParam.PhysicsTimeStep * 1000f)) - simulationRealtimeMS;
 
                 if (simulationTimeVsRealtimeDifferenceMS > 0)
                 {
                     // The simulation of the time interval took less than realtime.
                     // Do a wait for the rest of realtime.
-                     m_updateWaitEvent.WaitOne(simulationTimeVsRealtimeDifferenceMS);
+                    m_updateWaitEvent.WaitOne(simulationTimeVsRealtimeDifferenceMS);
                     //Thread.Sleep(simulationTimeVsRealtimeDifferenceMS);
                 }
                 else
@@ -940,7 +938,8 @@ namespace OpenSim.Region.PhysicsModule.BulletS
 
         #region Terrain
 
-        public override void SetTerrain(float[] heightMap) {
+        public override void SetTerrain(float[] heightMap)
+        {
             TerrainManager.SetTerrain(heightMap);
         }
 
@@ -1229,23 +1228,23 @@ namespace OpenSim.Region.PhysicsModule.BulletS
         {
             if (!m_initialized) return;
 
-/* mantis 8397 ??? avoid out of order operations ???
+            /* mantis 8397 ??? avoid out of order operations ???
 
-            if (Monitor.TryEnter(PhysicsEngineLock))
+                        if (Monitor.TryEnter(PhysicsEngineLock))
+                        {
+                            // If we can get exclusive access to the physics engine, just do the operation
+                            pCallback();
+                            Monitor.Exit(PhysicsEngineLock);
+                        }
+                        else
+                        {
+            */
+            // The physics engine is busy, queue the operation
+            lock (_taintLock)
             {
-                // If we can get exclusive access to the physics engine, just do the operation
-                pCallback();
-                Monitor.Exit(PhysicsEngineLock);
+                _taintOperations.Add(new TaintCallbackEntry(pOriginator, pIdent, pCallback));
             }
-            else
-            {
-*/
-                // The physics engine is busy, queue the operation
-                lock (_taintLock)
-                {
-                    _taintOperations.Add(new TaintCallbackEntry(pOriginator, pIdent, pCallback));
-                }
-//            }
+            //            }
         }
 
         private void TriggerPreStepEvent(float timeStep)
@@ -1340,7 +1339,7 @@ namespace OpenSim.Region.PhysicsModule.BulletS
                     _postTaintOperations = new Dictionary<string, TaintCallbackEntry>();
                 }
 
-                foreach (KeyValuePair<string,TaintCallbackEntry> kvp in oldList)
+                foreach (KeyValuePair<string, TaintCallbackEntry> kvp in oldList)
                 {
                     try
                     {
@@ -1421,7 +1420,8 @@ namespace OpenSim.Region.PhysicsModule.BulletS
             string xval = val;
             List<uint> xlIDs = lIDs;
             string xparm = parm;
-            TaintedObject(DetailLogZero, "BSScene.UpdateParameterSet", delegate() {
+            TaintedObject(DetailLogZero, "BSScene.UpdateParameterSet", delegate ()
+            {
                 BSParam.ParameterDefnBase thisParam;
                 if (BSParam.TryGetParameter(xparm, out thisParam))
                 {

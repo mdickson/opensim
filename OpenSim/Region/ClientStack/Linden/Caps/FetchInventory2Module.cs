@@ -44,7 +44,7 @@ namespace OpenSim.Region.ClientStack.Linden
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "FetchInventory2Module")]
     public class FetchInventory2Module : INonSharedRegionModule
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public bool Enabled { get; private set; }
 
@@ -95,9 +95,9 @@ namespace OpenSim.Region.ClientStack.Linden
             m_scene.EventManager.OnRegisterCaps += RegisterCaps;
         }
 
-        public void PostInitialise() {}
+        public void PostInitialise() { }
 
-        public void Close() {}
+        public void Close() { }
 
         public string Name { get { return "FetchInventory2Module"; } }
 
@@ -136,9 +136,9 @@ namespace OpenSim.Region.ClientStack.Linden
                 caps.RegisterHandler(capName, capUrl);
             }
 
-//            m_log.DebugFormat(
-//                "[FETCH INVENTORY2 MODULE]: Registered capability {0} at {1} in region {2} for {3}",
-//                capName, capUrl, m_scene.RegionInfo.RegionName, agentID);
+            //            m_log.DebugFormat(
+            //                "[FETCH INVENTORY2 MODULE]: Registered capability {0} at {1} in region {2} for {3}",
+            //                capName, capUrl, m_scene.RegionInfo.RegionName, agentID);
         }
     }
 }

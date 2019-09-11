@@ -25,25 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Xml;
 
-using OpenSim.Framework;
-using OpenSim.Server.Base;
-using OpenSim.Framework.Servers.HttpServer;
-using FriendInfo = OpenSim.Services.Interfaces.FriendInfo;
-using OpenSim.Services.Interfaces;
-
-using OpenMetaverse;
-using log4net;
-
 namespace OpenSim.Region.CoreModules.Avatar.Friends
 {
-    
-//    public class FriendsRequestHandler : BaseStreamHandlerBasicDOSProtector
+
+    //    public class FriendsRequestHandler : BaseStreamHandlerBasicDOSProtector
     public class FriendsRequestHandler : BaseStreamHandler
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -71,7 +68,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
             string path, Stream requestData, IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
             string body;
-            using(StreamReader sr = new StreamReader(requestData))
+            using (StreamReader sr = new StreamReader(requestData))
                 body = sr.ReadToEnd();
 
             body = body.Trim();

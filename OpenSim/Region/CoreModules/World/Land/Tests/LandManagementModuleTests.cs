@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Framework;
@@ -40,7 +39,7 @@ namespace OpenSim.Region.CoreModules.World.Land.Tests
         public void TestAddLandObject()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID userId = TestHelpers.ParseTail(0x1);
 
@@ -84,7 +83,7 @@ namespace OpenSim.Region.CoreModules.World.Land.Tests
         public void TestLoadWithNoParcels()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             SceneHelpers sh = new SceneHelpers();
             LandManagementModule lmm = new LandManagementModule();
@@ -109,7 +108,7 @@ namespace OpenSim.Region.CoreModules.World.Land.Tests
         public void TestLoadWithSinglePartialCoveringParcel()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID userId = TestHelpers.ParseTail(0x1);
 
@@ -143,7 +142,7 @@ namespace OpenSim.Region.CoreModules.World.Land.Tests
         public void TestLoadWithMultiplePartialCoveringParcels()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID userId = TestHelpers.ParseTail(0x1);
 
@@ -192,7 +191,7 @@ namespace OpenSim.Region.CoreModules.World.Land.Tests
         public void TestLoad()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID userId = TestHelpers.ParseTail(0x1);
 
@@ -234,7 +233,7 @@ namespace OpenSim.Region.CoreModules.World.Land.Tests
         public void TestSubdivide()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID userId = TestHelpers.ParseTail(0x1);
 

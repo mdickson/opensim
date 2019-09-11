@@ -26,12 +26,12 @@
  */
 
 using log4net;
+using Nini.Config;
+using OpenSim.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using Nini.Config;
-using OpenSim.Framework;
 
 namespace OpenSim.ApplicationPlugins.LoadRegions
 {

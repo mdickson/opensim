@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using OpenSim.Region.Framework.Interfaces;
+using System;
 
 namespace OpenSim.Region.CoreModules.World.Terrain.PaintBrushes
 {
@@ -38,9 +38,9 @@ namespace OpenSim.Region.CoreModules.World.Terrain.PaintBrushes
         public void PaintEffect(ITerrainChannel map, bool[,] mask, double rx, double ry, double rz,
             double strength, double duration, int startX, int endX, int startY, int endY)
         {
-            int s = (int) (Math.Pow(2, strength) + 0.5);
+            int s = (int)(Math.Pow(2, strength) + 0.5);
 
-            int x,y;
+            int x, y;
 
             for (x = startX; x <= endX; x++)
             {

@@ -25,14 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Data;
-using OpenMetaverse;
-using OpenSim.Framework;
 using MySql.Data.MySqlClient;
+using OpenMetaverse;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Reflection;
 
 namespace OpenSim.Data.MySQL
 {
@@ -77,17 +75,17 @@ namespace OpenSim.Data.MySQL
                 {
                     cmd.Parameters.AddWithValue("?principalID", principalID.ToString());
 
-                    using(IDataReader result = cmd.ExecuteReader())
+                    using (IDataReader result = cmd.ExecuteReader())
                     {
-                         if(result.Read())
+                        if (result.Read())
                         {
                             ret.PrincipalID = principalID;
 
                             CheckColumnNames(result);
 
-                            foreach(string s in m_ColumnNames)
+                            foreach (string s in m_ColumnNames)
                             {
-                                if(s == "UUID")
+                                if (s == "UUID")
                                     continue;
 
                                 ret.Data[s] = result[s].ToString();
@@ -129,17 +127,17 @@ namespace OpenSim.Data.MySQL
 
             using (MySqlCommand cmd = new MySqlCommand())
             {
-                string update = "update `"+m_Realm+"` set ";
+                string update = "update `" + m_Realm + "` set ";
                 bool first = true;
                 foreach (string field in fields)
                 {
                     if (!first)
                         update += ", ";
-                    update += "`" + field + "` = ?"+field;
+                    update += "`" + field + "` = ?" + field;
 
                     first = false;
 
-                    cmd.Parameters.AddWithValue("?"+field, data.Data[field]);
+                    cmd.Parameters.AddWithValue("?" + field, data.Data[field]);
                 }
 
                 update += " where UUID = ?principalID";
@@ -168,7 +166,7 @@ namespace OpenSim.Data.MySQL
             using (MySqlCommand cmd
                 = new MySqlCommand("update `" + m_Realm + "` set `" + item + "` = ?" + item + " where UUID = ?UUID"))
             {
-                cmd.Parameters.AddWithValue("?"+item, value);
+                cmd.Parameters.AddWithValue("?" + item, value);
                 cmd.Parameters.AddWithValue("?UUID", principalID.ToString());
 
                 if (ExecuteNonQuery(cmd) > 0)

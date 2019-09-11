@@ -25,22 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
+using Mono.Addins;
 using Nini.Config;
-using Nwc.XmlRpc;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
-using OpenSim.Server.Base;
 using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
-using Mono.Addins;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.World.Estate
 {
@@ -90,8 +86,8 @@ namespace OpenSim.Region.CoreModules.World.Estate
 
             m_EstateConnector = new EstateConnector(this, token, port);
 
-            if(port == 0)
-                 port = MainServer.Instance.Port;
+            if (port == 0)
+                port = MainServer.Instance.Port;
 
             // Instantiate the request handler
             IHttpServer server = MainServer.GetHttpServer(port);
@@ -265,7 +261,7 @@ namespace OpenSim.Region.CoreModules.World.Estate
                 if (s.RegionInfo.EstateSettings.EstateID != estateID)
                     continue;
 
-                scene.ForEachScenePresence(delegate(ScenePresence p)
+                scene.ForEachScenePresence(delegate (ScenePresence p)
                     {
                         if (p != null && !p.IsChildAgent && !p.IsDeleted && !p.IsInTransit)
                         {

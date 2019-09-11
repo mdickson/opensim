@@ -25,12 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
+using OpenSim.Framework;
 using System;
 using System.IO;
 using System.Threading;
-using OpenMetaverse;
-using OpenSim.Framework;
-using pCampBot.Interfaces;
 
 namespace pCampBot
 {

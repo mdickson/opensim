@@ -25,12 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
-using System.Text;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
 using OpenSim.Tests.Common;
 
@@ -88,7 +85,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public void TestNotecardAsset()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID ownerId = TestHelpers.ParseTail(0x10);
             UUID embeddedId = TestHelpers.ParseTail(0x20);
@@ -112,8 +109,8 @@ namespace OpenSim.Region.Framework.Scenes.Tests
             m_uuidGatherer.AddForInspection(ncAssetId);
             m_uuidGatherer.GatherAll();
 
-//            foreach (UUID key in m_uuidGatherer.GatheredUuids.Keys)
-//                System.Console.WriteLine("key : {0}", key);
+            //            foreach (UUID key in m_uuidGatherer.GatheredUuids.Keys)
+            //                System.Console.WriteLine("key : {0}", key);
 
             Assert.That(m_uuidGatherer.GatheredUuids.Count, Is.EqualTo(3));
             Assert.That(m_uuidGatherer.GatheredUuids.ContainsKey(ncAssetId));
@@ -125,7 +122,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public void TestTaskItems()
         {
             TestHelpers.InMethod();
-//                        TestHelpers.EnableLogging();
+            //                        TestHelpers.EnableLogging();
 
             UUID ownerId = TestHelpers.ParseTail(0x10);
 
@@ -144,8 +141,8 @@ namespace OpenSim.Region.Framework.Scenes.Tests
             m_uuidGatherer.AddForInspection(soL0);
             m_uuidGatherer.GatherAll();
 
-//                        foreach (UUID key in m_uuidGatherer.GatheredUuids.Keys)
-//                            System.Console.WriteLine("key : {0}", key);
+            //                        foreach (UUID key in m_uuidGatherer.GatheredUuids.Keys)
+            //                            System.Console.WriteLine("key : {0}", key);
 
             // We expect to see the default prim texture and the assets of the contained task items
             Assert.That(m_uuidGatherer.GatheredUuids.Count, Is.EqualTo(4));

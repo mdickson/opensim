@@ -1,10 +1,7 @@
-﻿using System;
+﻿using OpenMetaverse;
+using OpenSim.Data;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-
-using OpenMetaverse;
-using OpenSim.Data;
 
 namespace OpenSim.Tests.Common.Mock
 {
@@ -15,7 +12,7 @@ namespace OpenSim.Tests.Common.Mock
             private readonly string _key;
             public string Key
             {
-                get { return _key;  }
+                get { return _key; }
             }
 
             public CompositeKey(UUID _k1, string _k2)

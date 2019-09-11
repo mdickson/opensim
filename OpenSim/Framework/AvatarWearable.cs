@@ -25,10 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using System.Collections.Generic;
 
 namespace OpenSim.Framework
 {
@@ -69,8 +68,8 @@ namespace OpenSim.Framework
         public static readonly int TATTOO = 14;
 
         public static readonly int LEGACY_VERSION_MAX_WEARABLES = 15;
-//        public static readonly int PHYSICS = 15;
-//        public static int MAX_WEARABLES = 16;
+        //        public static readonly int PHYSICS = 15;
+        //        public static int MAX_WEARABLES = 16;
 
 
         public static readonly UUID DEFAULT_BODY_ITEM = new UUID("66c41e39-38f9-f75a-024e-585989bfaba9");
@@ -208,7 +207,7 @@ namespace OpenSim.Framework
             }
         }
 
-        public WearableItem this [int idx]
+        public WearableItem this[int idx]
         {
             get
             {
@@ -255,8 +254,8 @@ namespace OpenSim.Framework
                 // Pants
                 defaultWearables[PANTS].Add(DEFAULT_PANTS_ITEM, DEFAULT_PANTS_ASSET);
 
-//                // Alpha
-//                defaultWearables[ALPHA].Add(DEFAULT_ALPHA_ITEM, DEFAULT_ALPHA_ASSET);
+                //                // Alpha
+                //                defaultWearables[ALPHA].Add(DEFAULT_ALPHA_ITEM, DEFAULT_ALPHA_ASSET);
 
                 //                // Tattoo
                 //                defaultWearables[TATTOO].Add(DEFAULT_TATTOO_ITEM, DEFAULT_TATTOO_ASSET);

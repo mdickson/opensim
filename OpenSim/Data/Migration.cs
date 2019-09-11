@@ -25,14 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Common;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using log4net;
 
 namespace OpenSim.Data
 {
@@ -105,7 +104,7 @@ namespace OpenSim.Data
         /// <param name="assem"></param>
         /// <param name="subtype"></param>
         /// <param name="type"></param>
-        public void Initialize (DbConnection conn, Assembly assem, string type, string subtype)
+        public void Initialize(DbConnection conn, Assembly assem, string type, string subtype)
         {
             _type = type;
             _conn = conn;
@@ -149,7 +148,7 @@ namespace OpenSim.Data
                     {
                         cmd.ExecuteNonQuery();
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         throw new Exception(e.Message + " in SQL: " + sql);
                     }
@@ -159,7 +158,7 @@ namespace OpenSim.Data
 
         protected void ExecuteScript(DbConnection conn, string sql)
         {
-            ExecuteScript(conn, new string[]{sql});
+            ExecuteScript(conn, new string[] { sql });
         }
 
         protected void ExecuteScript(string sql)
@@ -223,7 +222,8 @@ namespace OpenSim.Data
         public int Version
         {
             get { return FindVersion(_conn, _type); }
-            set {
+            set
+            {
                 if (Version < 1)
                 {
                     InsertVersion(_type, value);
@@ -321,7 +321,7 @@ namespace OpenSim.Data
 
                 List<string> script = new List<string>();
 
-                FlushProc flush = delegate()
+                FlushProc flush = delegate ()
                 {
                     if (sb.Length > 0)     // last SQL stmt to script list
                     {
@@ -384,7 +384,7 @@ namespace OpenSim.Data
                 }
             }
 
-scan_old_style:
+        scan_old_style:
             // scan "old style" migration pieces anyway, ignore any versions already filled from the single file
             foreach (string s in names)
             {
@@ -399,7 +399,7 @@ scan_old_style:
                             using (StreamReader resourceReader = new StreamReader(resource))
                             {
                                 string sql = resourceReader.ReadToEnd();
-                                migrations.Add(version, new string[]{sql});
+                                migrations.Add(version, new string[] { sql });
                             }
                         }
                     }

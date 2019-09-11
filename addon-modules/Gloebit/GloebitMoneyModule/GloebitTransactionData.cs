@@ -16,28 +16,28 @@
  * along with OpenSim-MoneyModule-Gloebit.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlTypes;
-using System.Reflection;
-using System.Xml;
 using log4net;
 using MySql.Data.MySqlClient;
-using Nini.Config;
 using OpenSim.Data.MySQL;
 using OpenSim.Data.PGSQL;
 using OpenSim.Data.SQLite;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlTypes;
+using System.Reflection;
 
 
 namespace Gloebit.GloebitMoneyModule
 {
-    class GloebitTransactionData {
+    class GloebitTransactionData
+    {
 
         private static IGloebitTransactionData m_impl;
 
-        public static void Initialise(string storageProvider, string connectionString) {
-            switch(storageProvider) {
+        public static void Initialise(string storageProvider, string connectionString)
+        {
+            switch (storageProvider)
+            {
                 case "OpenSim.Data.SQLite.dll":
                     m_impl = new SQLiteImpl(connectionString);
                     break;
@@ -52,11 +52,13 @@ namespace Gloebit.GloebitMoneyModule
             }
         }
 
-        public static IGloebitTransactionData Instance {
+        public static IGloebitTransactionData Instance
+        {
             get { return m_impl; }
         }
 
-        public interface IGloebitTransactionData {
+        public interface IGloebitTransactionData
+        {
             GloebitTransaction[] Get(string field, string key);
 
             GloebitTransaction[] Get(string[] fields, string[] keys);
@@ -64,19 +66,22 @@ namespace Gloebit.GloebitMoneyModule
             bool Store(GloebitTransaction txn);
         }
 
-        private class SQLiteImpl : SQLiteGenericTableHandler<GloebitTransaction>, IGloebitTransactionData {
+        private class SQLiteImpl : SQLiteGenericTableHandler<GloebitTransaction>, IGloebitTransactionData
+        {
             public SQLiteImpl(string connectionString)
                 : base(connectionString, "GloebitTransactions", "GloebitTransactionsSQLite")
             {
             }
-            
+
             public override bool Store(GloebitTransaction txn)
             {
                 // remove null datetimes as pgsql throws exceptions on null fields
-                if (txn.enactedTime == null) {
+                if (txn.enactedTime == null)
+                {
                     txn.enactedTime = SqlDateTime.MinValue.Value;
                 }
-                if (txn.finishedTime == null) {
+                if (txn.finishedTime == null)
+                {
                     txn.finishedTime = SqlDateTime.MinValue.Value;
                 }
                 // call parent
@@ -84,27 +89,28 @@ namespace Gloebit.GloebitMoneyModule
             }
         }
 
-        private class MySQLImpl : MySQLGenericTableHandler<GloebitTransaction>, IGloebitTransactionData {
+        private class MySQLImpl : MySQLGenericTableHandler<GloebitTransaction>, IGloebitTransactionData
+        {
             public MySQLImpl(string connectionString)
                 : base(connectionString, "GloebitTransactions", "GloebitTransactionsMySQL")
             {
             }
-            
+
             public override bool Store(GloebitTransaction txn)
             {
                 //            m_log.DebugFormat("[MYSQL GENERIC TABLE HANDLER]: Store(T row) invoked");
-                
+
                 using (MySqlCommand cmd = new MySqlCommand())
                 {
                     string query = "";
                     List<String> names = new List<String>();
                     List<String> values = new List<String>();
-                    
+
                     foreach (FieldInfo fi in m_Fields.Values)
                     {
                         names.Add(fi.Name);
                         values.Add("?" + fi.Name);
-                        
+
                         // Temporarily return more information about what field is unexpectedly null for
                         // http://opensimulator.org/mantis/view.php?id=5403.  This might be due to a bug in the
                         // InventoryTransferModule or we may be required to substitute a DBNull here.
@@ -113,10 +119,10 @@ namespace Gloebit.GloebitMoneyModule
                                                              string.Format(
                                                                            "[MYSQL GENERIC TABLE HANDLER]: Trying to store field {0} for {1} which is unexpectedly null",
                                                                            fi.Name, asset));*/
-                        
+
                         cmd.Parameters.AddWithValue(fi.Name, fi.GetValue(txn));
                     }
-                    
+
                     /*if (m_DataField != null)
                     {
                         Dictionary<string, string> data =
@@ -129,46 +135,52 @@ namespace Gloebit.GloebitMoneyModule
                             cmd.Parameters.AddWithValue("?" + kvp.Key, kvp.Value);
                         }
                     }*/
-                    
+
                     query = String.Format("replace into {0} (`", m_Realm) + String.Join("`,`", names.ToArray()) + "`) values (" + String.Join(",", values.ToArray()) + ")";
-                    
+
                     cmd.CommandText = query;
-                    
+
                     if (ExecuteNonQuery(cmd) > 0)
                         return true;
-                    
+
                     return false;
                 }
             }
         }
 
-        private class PGSQLImpl : PGSQLGenericTableHandler<GloebitTransaction>, IGloebitTransactionData {
+        private class PGSQLImpl : PGSQLGenericTableHandler<GloebitTransaction>, IGloebitTransactionData
+        {
             private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
             public PGSQLImpl(string connectionString)
                 : base(connectionString, "GloebitTransactions", "GloebitTransactionsPGSQL")
             {
             }
-            
+
             public override bool Store(GloebitTransaction txn)
             {
-		try {
+                try
+                {
                     // remove null datetimes as pgsql throws exceptions on null fields
-                    if (txn.enactedTime == null) {
+                    if (txn.enactedTime == null)
+                    {
                         txn.enactedTime = SqlDateTime.MinValue.Value;
                     }
-                    if (txn.finishedTime == null) {
+                    if (txn.finishedTime == null)
+                    {
                         txn.finishedTime = SqlDateTime.MinValue.Value;
                     }
                     //m_log.InfoFormat("GloebitTransactionData.PGSQLImpl: storing transaction type:{0}, SaleType:{2}, PayerEndingBalance:{3}, cTime:{4}, enactedTime:{5}, finishedTime:{6}", txn.TransactionType, txn.SaleType, txn.PayerEndingBalance, txn.cTime, txn.enactedTime, txn.finishedTime);
                     // call parent
                     return base.Store(txn);
-		} catch(System.OverflowException e) {
+                }
+                catch (System.OverflowException e)
+                {
                     m_log.ErrorFormat("GloebitTransactionData.PGSQLImpl: Failure storing transaction type:{0}, SaleType:{1}, PayerEndingBalance:{2}, cTime:{3}, enactedTime:{4}, finishedTime:{5}, stacktrace:{6}", txn.TransactionType, txn.SaleType, txn.PayerEndingBalance, txn.cTime, txn.enactedTime, txn.finishedTime, e);
-		    throw;
-		}
+                    throw;
+                }
             }
         }
-        
+
     }
 }

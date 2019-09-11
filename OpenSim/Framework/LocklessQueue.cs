@@ -24,7 +24,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using System.Threading;
 
 namespace OpenSim.Framework
@@ -121,7 +120,7 @@ namespace OpenSim.Framework
         {
             // ugly
             T item;
-            while(Dequeue(out item));
+            while (Dequeue(out item)) ;
             Init();
         }
 

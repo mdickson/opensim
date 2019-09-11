@@ -25,23 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nwc.XmlRpc;
+using OpenMetaverse;
+using OpenMetaverse.Imaging;
+using OpenSim.Framework;
+using OpenSim.Services.Connectors.Simulation;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Reflection;
-using OpenSim.Framework;
-using OpenSim.Services.Interfaces;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using OpenMetaverse;
-using OpenMetaverse.Imaging;
-using OpenMetaverse.StructuredData;
-using Nwc.XmlRpc;
-using log4net;
-
-using OpenSim.Services.Connectors.Simulation;
 
 namespace OpenSim.Services.Connectors.Hypergrid
 {
@@ -176,7 +173,7 @@ namespace OpenSim.Services.Connectors.Hypergrid
                 if (!File.Exists(filename))
                 {
                     m_log.DebugFormat("[GATEKEEPER SERVICE CONNECTOR]: downloading...");
-                    using(WebClient c = new WebClient())
+                    using (WebClient c = new WebClient())
                         c.DownloadFile(imageURL, filename);
                 }
                 else

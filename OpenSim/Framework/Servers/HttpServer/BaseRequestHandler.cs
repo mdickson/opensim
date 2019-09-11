@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using OpenSim.Framework.Monitoring;
+using System;
 
 namespace OpenSim.Framework.Servers.HttpServer
 {
@@ -54,7 +54,7 @@ namespace OpenSim.Framework.Servers.HttpServer
 
         public string Description { get; private set; }
 
-        protected BaseRequestHandler(string httpMethod, string path) : this(httpMethod, path, null, null) {}
+        protected BaseRequestHandler(string httpMethod, string path) : this(httpMethod, path, null, null) { }
 
         protected BaseRequestHandler(string httpMethod, string path, string name, string description)
         {

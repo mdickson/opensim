@@ -25,13 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
+using MySql.Data.MySqlClient;
 using OpenMetaverse;
 using OpenSim.Framework;
-using MySql.Data.MySqlClient;
 
 namespace OpenSim.Data.MySQL
 {
@@ -50,7 +46,7 @@ namespace OpenSim.Data.MySQL
 
         public bool Delete(UUID agentID, UUID muteID, string muteName)
         {
-            string cmnd ="delete from MuteList where AgentID = ?AgentID and MuteID = ?MuteID and MuteName = ?MuteName";
+            string cmnd = "delete from MuteList where AgentID = ?AgentID and MuteID = ?MuteID and MuteName = ?MuteName";
 
             using (MySqlCommand cmd = new MySqlCommand(cmnd))
             {

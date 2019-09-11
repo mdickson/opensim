@@ -25,26 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Server.Base;
+using OpenSim.Server.Handlers.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.IO;
 using System.Net;
-using System.Reflection;
 using System.Threading;
-
-using Nini.Config;
-using log4net;
-
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Server.Handlers.Base;
-using OpenMetaverse;
 
 namespace OpenSim.Server.Handlers.MapImage
 {
     public class MapGetServiceConnector : ServiceConnector
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private IMapImageService m_MapService;
 
@@ -74,7 +70,7 @@ namespace OpenSim.Server.Handlers.MapImage
     {
         public static ManualResetEvent ev = new ManualResetEvent(true);
 
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private IMapImageService m_MapService;
 
@@ -95,12 +91,12 @@ namespace OpenSim.Server.Handlers.MapImage
             byte[] result = new byte[0];
             string format = string.Empty;
 
-//            UUID scopeID = new UUID("07f8d88e-cd5e-4239-a0ed-843f75d09992");
+            //            UUID scopeID = new UUID("07f8d88e-cd5e-4239-a0ed-843f75d09992");
             UUID scopeID = UUID.Zero;
 
             // This will be map/tilefile.ext, but on multitenancy it will be
             // map/scope/teilefile.ext
-            string[] bits = path.Trim('/').Split(new char[] {'/'});
+            string[] bits = path.Trim('/').Split(new char[] { '/' });
             if (bits.Length > 2)
             {
                 try

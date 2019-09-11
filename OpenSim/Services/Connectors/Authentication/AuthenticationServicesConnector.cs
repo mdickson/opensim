@@ -26,16 +26,14 @@
  */
 
 using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
-using Nini.Config;
-using OpenSim.Framework;
-using OpenSim.Framework.ServiceAuth;
-using OpenSim.Services.Interfaces;
-using OpenSim.Server.Base;
-using OpenMetaverse;
 
 namespace OpenSim.Services.Connectors
 {
@@ -115,7 +113,7 @@ namespace OpenSim.Services.Connectors
 
         public bool Verify(UUID principalID, string token, int lifetime)
         {
-//            m_log.Error("[XXX]: Verify");
+            //            m_log.Error("[XXX]: Verify");
             Dictionary<string, object> sendData = new Dictionary<string, object>();
             sendData["LIFETIME"] = lifetime.ToString();
             sendData["PRINCIPAL"] = principalID.ToString();

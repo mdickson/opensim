@@ -25,13 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
 using NUnit.Framework;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using OpenSim.Framework;
 using OpenSim.Tests.Common;
+using System;
 
 namespace OpenSim.Framework.Tests
 {
@@ -43,7 +39,7 @@ namespace OpenSim.Framework.Tests
         {
             int prime1 = PrimeNumberHelper.GetPrime(7919);
             Assert.That(prime1 == 8419, "Prime Number Get Prime Failed, 7919 is prime");
-            Assert.That(PrimeNumberHelper.IsPrime(prime1),"Prime1 should be prime");
+            Assert.That(PrimeNumberHelper.IsPrime(prime1), "Prime1 should be prime");
             Assert.That(PrimeNumberHelper.IsPrime(7919), "7919 is prime but is falsely failing the prime test");
             prime1 = PrimeNumberHelper.GetPrime(Int32.MaxValue - 1);
             Assert.That(prime1 == -1, "prime1 should have been -1 since there are no primes between Int32.MaxValue-1 and Int32.MaxValue");
@@ -122,7 +118,7 @@ namespace OpenSim.Framework.Tests
                            };
             for (int i = 0; i < primes.Length; i++)
             {
-                Assert.That(PrimeNumberHelper.IsPrime(primes[i]),primes[i] + " is prime but is erroniously failing the prime test");
+                Assert.That(PrimeNumberHelper.IsPrime(primes[i]), primes[i] + " is prime but is erroniously failing the prime test");
             }
 
             int[] nonprimes = {

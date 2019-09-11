@@ -25,20 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using OpenMetaverse;
-using OpenSim.Framework;
-using System.Text;
-using Npgsql;
 using log4net;
+using Npgsql;
+using OpenMetaverse;
+using System;
 using System.Reflection;
 
 namespace OpenSim.Data.PGSQL
 {
-    public class PGSQLUserAccountData : PGSQLGenericTableHandler<UserAccountData>,IUserAccountData
+    public class PGSQLUserAccountData : PGSQLGenericTableHandler<UserAccountData>, IUserAccountData
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -308,7 +303,7 @@ namespace OpenSim.Data.PGSQL
                 {
                     sql = String.Format(@"select * from {0} where (""ScopeID""=:ScopeID or ""ScopeID""=:UUIDZero) and (""FirstName"" ilike :search or ""LastName"" ilike :search)", m_Realm);
                     cmd.Parameters.Add(m_database.CreateParameter("scopeID", (UUID)scope_id));
-                    cmd.Parameters.Add (m_database.CreateParameter("UUIDZero", (UUID)UUID.Zero));
+                    cmd.Parameters.Add(m_database.CreateParameter("UUIDZero", (UUID)UUID.Zero));
                     cmd.Parameters.Add(m_database.CreateParameter("search", "%" + words[0] + "%"));
                 }
                 else
@@ -316,7 +311,7 @@ namespace OpenSim.Data.PGSQL
                     sql = String.Format(@"select * from {0} where (""ScopeID""=:ScopeID or ""ScopeID""=:UUIDZero) and (""FirstName"" ilike :searchFirst or ""LastName"" ilike :searchLast)", m_Realm);
                     cmd.Parameters.Add(m_database.CreateParameter("searchFirst", "%" + words[0] + "%"));
                     cmd.Parameters.Add(m_database.CreateParameter("searchLast", "%" + words[1] + "%"));
-                    cmd.Parameters.Add (m_database.CreateParameter("UUIDZero", (UUID)UUID.Zero));
+                    cmd.Parameters.Add(m_database.CreateParameter("UUIDZero", (UUID)UUID.Zero));
                     cmd.Parameters.Add(m_database.CreateParameter("ScopeID", (UUID)scope_id));
                 }
                 cmd.Connection = conn;

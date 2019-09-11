@@ -25,15 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Net;
-using System.Reflection;
 using log4net;
+using Mono.Addins;
 using Nini.Config;
 using Nwc.XmlRpc;
-using Mono.Addins;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Servers;
@@ -41,6 +36,11 @@ using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Net;
+using System.Reflection;
 
 namespace OpenSim.Region.OptionalModules.World.MoneyModule
 {
@@ -241,27 +241,27 @@ namespace OpenSim.Region.OptionalModules.World.MoneyModule
 
             IConfig startupConfig = m_gConfig.Configs["Startup"];
 
-            if(startupConfig == null) // should not happen
+            if (startupConfig == null) // should not happen
                 return;
 
             IConfig economyConfig = m_gConfig.Configs["Economy"];
 
             // economymodule may be at startup or Economy (legacy)
-            string mmodule = startupConfig.GetString("economymodule","");
-            if(String.IsNullOrEmpty(mmodule))
+            string mmodule = startupConfig.GetString("economymodule", "");
+            if (String.IsNullOrEmpty(mmodule))
             {
-                if(economyConfig != null)
-                    mmodule = economyConfig.GetString("economymodule","");
+                if (economyConfig != null)
+                    mmodule = economyConfig.GetString("economymodule", "");
             }
 
-            if(!String.IsNullOrEmpty(mmodule) && mmodule != Name)
+            if (!String.IsNullOrEmpty(mmodule) && mmodule != Name)
             {
                 // some other money module selected
                 m_enabled = false;
                 return;
             }
-            
-            if(economyConfig == null)
+
+            if (economyConfig == null)
                 return;
 
             PriceEnergyUnit = economyConfig.GetInt("PriceEnergyUnit", 0);
@@ -420,17 +420,17 @@ namespace OpenSim.Region.OptionalModules.World.MoneyModule
         {
             XmlRpcResponse ret = new XmlRpcResponse();
             Hashtable retparam = new Hashtable();
-            Hashtable requestData = (Hashtable) request.Params[0];
+            Hashtable requestData = (Hashtable)request.Params[0];
 
             UUID agentId;
             UUID soundId;
             UUID regionId;
 
-            UUID.TryParse((string) requestData["agentId"], out agentId);
-            UUID.TryParse((string) requestData["soundId"], out soundId);
-            UUID.TryParse((string) requestData["regionId"], out regionId);
-            string text = (string) requestData["text"];
-            string secret = (string) requestData["secret"];
+            UUID.TryParse((string)requestData["agentId"], out agentId);
+            UUID.TryParse((string)requestData["soundId"], out soundId);
+            UUID.TryParse((string)requestData["regionId"], out regionId);
+            string text = (string)requestData["text"];
+            string secret = (string)requestData["secret"];
 
             Scene userScene = GetSceneByUUID(regionId);
             if (userScene != null)
@@ -439,16 +439,16 @@ namespace OpenSim.Region.OptionalModules.World.MoneyModule
                 {
 
                     IClientAPI client = LocateClientObject(agentId);
-                       if (client != null)
-                       {
+                    if (client != null)
+                    {
 
-                           if (soundId != UUID.Zero)
-                               client.SendPlayAttachedSound(soundId, UUID.Zero, UUID.Zero, 1.0f, 0);
+                        if (soundId != UUID.Zero)
+                            client.SendPlayAttachedSound(soundId, UUID.Zero, UUID.Zero, 1.0f, 0);
 
-                           client.SendBlueBoxMessage(UUID.Zero, "", text);
+                        client.SendBlueBoxMessage(UUID.Zero, "", text);
 
-                           retparam.Add("success", true);
-                       }
+                        retparam.Add("success", true);
+                    }
                     else
                     {
                         retparam.Add("success", false);

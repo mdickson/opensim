@@ -25,18 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Reflection;
-using System.Text;
+using log4net;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
-using OpenSim.Framework.Capabilities;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Services.Interfaces;
+using System.Reflection;
+using System.Text;
 using OSDArray = OpenMetaverse.StructuredData.OSDArray;
 using OSDMap = OpenMetaverse.StructuredData.OSDMap;
-
-using log4net;
 
 namespace OpenSim.Capabilities.Handlers
 {
@@ -84,12 +82,12 @@ namespace OpenSim.Capabilities.Handlers
             StringBuilder lsl = LLSDxmlEncode.Start(4096);
             LLSDxmlEncode.AddMap(lsl);
 
-            if(m_agentID == UUID.Zero && items.Length > 0)
+            if (m_agentID == UUID.Zero && items.Length > 0)
                 LLSDxmlEncode.AddElem("agent_id", items[0].Owner, lsl);
             else
                 LLSDxmlEncode.AddElem("agent_id", m_agentID, lsl);
 
-            if(items == null || items.Length == 0)
+            if (items == null || items.Length == 0)
             {
                 LLSDxmlEncode.AddEmptyArray("items", lsl);
             }
@@ -102,10 +100,10 @@ namespace OpenSim.Capabilities.Handlers
                         item.ToLLSDxml(lsl, 0xff);
                 }
                 LLSDxmlEncode.AddEndArray(lsl);
-            }            
+            }
 
             LLSDxmlEncode.AddEndMap(lsl);
-            return LLSDxmlEncode.End(lsl);;
+            return LLSDxmlEncode.End(lsl); ;
         }
     }
 }

@@ -25,6 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Server.Base;
+using OpenSim.Services.Connectors.Hypergrid;
+using OpenSim.Services.Connectors.InstantMessage;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,19 +40,8 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
-
-using log4net;
-using Nini.Config;
-using OpenMetaverse;
-
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Server.Base;
-using OpenSim.Services.Connectors.InstantMessage;
-using OpenSim.Services.Interfaces;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 using FriendInfo = OpenSim.Services.Interfaces.FriendInfo;
-using OpenSim.Services.Connectors.Hypergrid;
+using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Services.LLLoginService
 {
@@ -94,7 +91,7 @@ namespace OpenSim.Services.LLLoginService
         protected bool m_allowDuplicatePresences = false;
 
         IConfig m_LoginServerConfig;
-//        IConfig m_ClientsConfig;
+        //        IConfig m_ClientsConfig;
 
         public LLLoginService(IConfigSource config, ISimulationService simService, ILibraryService libraryService)
         {
@@ -127,8 +124,8 @@ namespace OpenSim.Services.LLLoginService
             m_SearchURL = m_LoginServerConfig.GetString("SearchURL", string.Empty);
             m_Currency = m_LoginServerConfig.GetString("Currency", string.Empty);
             m_ClassifiedFee = m_LoginServerConfig.GetString("ClassifiedFee", string.Empty);
-            m_DestinationGuide = m_LoginServerConfig.GetString ("DestinationGuide", string.Empty);
-            m_AvatarPicker = m_LoginServerConfig.GetString ("AvatarPicker", string.Empty);
+            m_DestinationGuide = m_LoginServerConfig.GetString("DestinationGuide", string.Empty);
+            m_AvatarPicker = m_LoginServerConfig.GetString("AvatarPicker", string.Empty);
 
             string[] possibleAccessControlConfigSections = new string[] { "AccessControl", "LoginService" };
             m_AllowedClients = Util.GetConfigVarFromSections<string>(
@@ -302,7 +299,7 @@ namespace OpenSim.Services.LLLoginService
                 // Check client
                 //
                 string clientNameToCheck;
-                if(clientVersion.Contains(" "))
+                if (clientVersion.Contains(" "))
                     clientNameToCheck = clientVersion;
                 else
                     clientNameToCheck = channel + " " + clientVersion;
@@ -398,7 +395,7 @@ namespace OpenSim.Services.LLLoginService
                     return LLFailedLoginResponse.UserProblem;
                 }
 
-                if(account.PrincipalID == new UUID("6571e388-6218-4574-87db-f9379718315e"))
+                if (account.PrincipalID == new UUID("6571e388-6218-4574-87db-f9379718315e"))
                 {
                     // really?
                     return LLFailedLoginResponse.UserProblem;
@@ -407,11 +404,11 @@ namespace OpenSim.Services.LLLoginService
                 string PrincipalIDstr = account.PrincipalID.ToString();
                 GridUserInfo guinfo = m_GridUserService.GetGridUserInfo(PrincipalIDstr);
 
-                if(!m_allowDuplicatePresences)
+                if (!m_allowDuplicatePresences)
                 {
-                    if(guinfo != null && guinfo.Online && guinfo.LastRegionID != UUID.Zero)
+                    if (guinfo != null && guinfo.Online && guinfo.LastRegionID != UUID.Zero)
                     {
-                        if(SendAgentGodKillToRegion(scopeID, account.PrincipalID, guinfo))
+                        if (SendAgentGodKillToRegion(scopeID, account.PrincipalID, guinfo))
                         {
                             m_log.InfoFormat(
                                 "[LLOGIN SERVICE]: Login failed for {0} {1}, reason: already logged in",
@@ -450,7 +447,7 @@ namespace OpenSim.Services.LLLoginService
 
                 // Get active gestures
                 List<InventoryItemBase> gestures = m_InventoryService.GetActiveGestures(account.PrincipalID);
-//                m_log.DebugFormat("[LLOGIN SERVICE]: {0} active gestures", gestures.Count);
+                //                m_log.DebugFormat("[LLOGIN SERVICE]: {0} active gestures", gestures.Count);
 
                 //
                 // Login the presence
@@ -563,7 +560,7 @@ namespace OpenSim.Services.LLLoginService
                 if (m_FriendsService != null)
                 {
                     friendsList = m_FriendsService.GetFriends(account.PrincipalID);
-//                    m_log.DebugFormat("[LLOGIN SERVICE]: Retrieved {0} friends", friendsList.Length);
+                    //                    m_log.DebugFormat("[LLOGIN SERVICE]: Retrieved {0} friends", friendsList.Length);
                 }
 
                 //
@@ -571,7 +568,7 @@ namespace OpenSim.Services.LLLoginService
                 //
                 if (m_MessageUrl != String.Empty)
                 {
-                    using(WebClient client = new WebClient())
+                    using (WebClient client = new WebClient())
                         processedMessage = client.DownloadString(m_MessageUrl);
                 }
                 else
@@ -585,12 +582,12 @@ namespace OpenSim.Services.LLLoginService
                         account, aCircuit, guinfo, destination, inventorySkel, friendsList, m_LibraryService,
                         where, startLocation, position, lookAt, gestures, processedMessage, home, clientIP,
                         m_MapTileURL, m_ProfileURL, m_OpenIDURL, m_SearchURL, m_Currency, m_DSTZone,
-                        m_DestinationGuide, m_AvatarPicker, realID, m_ClassifiedFee,m_MaxAgentGroups);
+                        m_DestinationGuide, m_AvatarPicker, realID, m_ClassifiedFee, m_MaxAgentGroups);
 
-                    m_log.DebugFormat("[LLOGIN SERVICE]: All clear. Sending login response to {0} {1}", firstName, lastName);
+                m_log.DebugFormat("[LLOGIN SERVICE]: All clear. Sending login response to {0} {1}", firstName, lastName);
 
-                    return response;
-               }
+                return response;
+            }
             catch (Exception e)
             {
                 m_log.WarnFormat("[LLOGIN SERVICE]: Exception processing login for {0} {1}: {2} {3}", firstName, lastName, e.ToString(), e.StackTrace);
@@ -759,9 +756,9 @@ namespace OpenSim.Services.LLLoginService
                             }
 
                             //find a exact match
-                            foreach(GridRegion r in regions)
+                            foreach (GridRegion r in regions)
                             {
-                                if(string.Equals(regionName, r.RegionName, StringComparison.InvariantCultureIgnoreCase))
+                                if (string.Equals(regionName, r.RegionName, StringComparison.InvariantCultureIgnoreCase))
                                     return r;
                             }
                             // else, whatever
@@ -784,7 +781,7 @@ namespace OpenSim.Services.LLLoginService
 
                             regionName = parts[0];
                             string domainLocator = parts[1];
-                            parts = domainLocator.Split(new char[] {':'});
+                            parts = domainLocator.Split(new char[] { ':' });
                             string domainName = parts[0];
                             uint regionport = 0;
                             if (parts.Length > 1)
@@ -907,7 +904,7 @@ namespace OpenSim.Services.LLLoginService
                 else if (m_RemoteSimulationService != null)
                     simConnector = m_RemoteSimulationService;
 
-                if(simConnector == null)
+                if (simConnector == null)
                     return null;
 
                 circuitCode = (uint)Util.RandomClass.Next(); ;
@@ -1051,7 +1048,7 @@ namespace OpenSim.Services.LLLoginService
                     }
                     aCircuit.ServiceURLs[keyName] = keyValue;
 
-//                    m_log.DebugFormat("[LLLOGIN SERVICE]: found new key {0} {1}", keyName, aCircuit.ServiceURLs[keyName]);
+                    //                    m_log.DebugFormat("[LLLOGIN SERVICE]: found new key {0} {1}", keyName, aCircuit.ServiceURLs[keyName]);
                 }
 
                 if (!account.ServiceURLs.ContainsKey("GatekeeperURI") && !string.IsNullOrEmpty(m_GatekeeperURL))
@@ -1143,17 +1140,17 @@ namespace OpenSim.Services.LLLoginService
             }
         }
 
-        private bool SendAgentGodKillToRegion(UUID scopeID, UUID agentID , GridUserInfo guinfo)
+        private bool SendAgentGodKillToRegion(UUID scopeID, UUID agentID, GridUserInfo guinfo)
         {
             UUID regionID = guinfo.LastRegionID;
             GridRegion regInfo = m_GridService.GetRegionByUUID(scopeID, regionID);
-            if(regInfo == null)
+            if (regInfo == null)
                 return false;
 
             string regURL = regInfo.ServerURI;
-            if(String.IsNullOrEmpty(regURL))
+            if (String.IsNullOrEmpty(regURL))
                 return false;
-            
+
             UUID guuid = new UUID("6571e388-6218-4574-87db-f9379718315e");
 
             GridInstantMessage msg = new GridInstantMessage();
@@ -1169,8 +1166,8 @@ namespace OpenSim.Services.LLLoginService
             msg.ParentEstateID = 0;
             msg.Position = Vector3.Zero;
             msg.RegionID = scopeID.Guid;
-            msg.binaryBucket = new byte[1] {0};
-            InstantMessageServiceConnector.SendInstantMessage(regURL,msg);
+            msg.binaryBucket = new byte[1] { 0 };
+            InstantMessageServiceConnector.SendInstantMessage(regURL, msg);
 
             m_GridUserService.LoggedOut(agentID.ToString(),
                 UUID.Zero, guinfo.LastRegionID, guinfo.LastPosition, guinfo.LastLookAt);

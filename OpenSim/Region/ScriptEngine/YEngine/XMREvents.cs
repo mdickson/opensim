@@ -25,24 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.ScriptEngine.Shared;
-using OpenSim.Region.ScriptEngine.Interfaces;
-using log4net;
-
-using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
+using System;
 using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
-using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
-using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
 using LSL_Rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
-using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_Vector = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Vector3;
 
 namespace OpenSim.Region.ScriptEngine.Yengine
@@ -77,7 +66,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             this.World.EventManager.OnScriptLandColliding += land_collision;
             this.World.EventManager.OnScriptLandColliderEnd += land_collision_end;
             IMoneyModule money = this.World.RequestModuleInterface<IMoneyModule>();
-            if(money != null)
+            if (money != null)
             {
                 money.OnObjectPaid += HandleObjectPaid;
             }
@@ -106,15 +95,15 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             SceneObjectPart part =
                     this.World.GetSceneObjectPart(objectID);
 
-            if(part == null)
+            if (part == null)
                 return;
 
-            if((part.ScriptEvents & scriptEvents.money) == 0)
+            if ((part.ScriptEvents & scriptEvents.money) == 0)
                 part = part.ParentGroup.RootPart;
 
             Verbose("Paid: " + objectID + " from " + agentID + ", amount " + amount);
 
-            if(part != null)
+            if (part != null)
             {
                 money(part.LocalId, agentID, amount, det);
             }
@@ -152,10 +141,10 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 IClientAPI remoteClient, SurfaceTouchEventArgs surfaceArgs, string eventname)
         {
             SceneObjectPart part;
-            if(originalID == 0)
+            if (originalID == 0)
             {
                 part = this.World.GetSceneObjectPart(localID);
-                if(part == null)
+                if (part == null)
                     return;
             }
             else
@@ -171,7 +160,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                                            offsetPos.Z);
             det.LinkNum = part.LinkNum;
 
-            if(surfaceArgs != null)
+            if (surfaceArgs != null)
             {
                 det.SurfaceTouchArgs = surfaceArgs;
             }
@@ -186,14 +175,14 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             int ch = (int)change;
             // Add to queue for all scripts in localID, Object pass change.
-            if(parameter == null)
+            if (parameter == null)
             {
                 PostObjectEvent(localID, new EventParams(
                     "changed", new object[] { ch },
                     zeroDetectParams));
                 return;
             }
-            if ( parameter is UUID)
+            if (parameter is UUID)
             {
                 DetectParams det = new DetectParams();
                 det.Key = (UUID)parameter;
@@ -234,11 +223,11 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         private void collisions(uint localID, ColliderArgs col, string eventname)
         {
             int dc = col.Colliders.Count;
-            if(dc > 0)
+            if (dc > 0)
             {
                 DetectParams[] det = new DetectParams[dc];
                 int i = 0;
-                foreach(DetectedObject detobj in col.Colliders)
+                foreach (DetectedObject detobj in col.Colliders)
                 {
                     DetectParams d = new DetectParams();
                     det[i++] = d;
@@ -271,7 +260,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         private void land_collisions(uint localID, ColliderArgs col, string eventname)
         {
-            foreach(DetectedObject detobj in col.Colliders)
+            foreach (DetectedObject detobj in col.Colliders)
             {
                 LSL_Vector vec = new LSL_Vector(detobj.posVector.X,
                                                 detobj.posVector.Y,

@@ -25,14 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Data.Null;
 using OpenSim.Framework;
-using OpenSim.Region.CoreModules.Avatar.Friends;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Tests.Common;
 
@@ -86,7 +83,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends.Tests
         public void TestLoginWithNoFriends()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             UUID userId = TestHelpers.ParseTail(0x1);
 
@@ -100,15 +97,15 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends.Tests
         public void TestLoginWithOfflineFriends()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             UUID user1Id = TestHelpers.ParseTail(0x1);
             UUID user2Id = TestHelpers.ParseTail(0x2);
 
-//            UserAccountHelpers.CreateUserWithInventory(m_scene, user1Id);
-//            UserAccountHelpers.CreateUserWithInventory(m_scene, user2Id);
-//
-//            m_fm.AddFriendship(user1Id, user2Id);
+            //            UserAccountHelpers.CreateUserWithInventory(m_scene, user1Id);
+            //            UserAccountHelpers.CreateUserWithInventory(m_scene, user2Id);
+            //
+            //            m_fm.AddFriendship(user1Id, user2Id);
 
             ScenePresence sp1 = SceneHelpers.AddScenePresence(m_scene, user1Id);
             ScenePresence sp2 = SceneHelpers.AddScenePresence(m_scene, user2Id);
@@ -116,14 +113,14 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends.Tests
             m_fm.AddFriendship(sp1.ControllingClient, user2Id);
 
             // Not necessary for this test.  CanSeeOnline is automatically granted.
-//            m_fm.GrantRights(sp1.ControllingClient, user2Id, (int)FriendRights.CanSeeOnline);
+            //            m_fm.GrantRights(sp1.ControllingClient, user2Id, (int)FriendRights.CanSeeOnline);
 
             // We must logout from the client end so that the presence service is correctly updated by the presence
             // detector.  This is listening to the OnConnectionClosed event on the client.
             ((TestClient)sp1.ControllingClient).Logout();
             ((TestClient)sp2.ControllingClient).Logout();
-//            m_scene.RemoveClient(sp1.UUID, true);
-//            m_scene.RemoveClient(sp2.UUID, true);
+            //            m_scene.RemoveClient(sp1.UUID, true);
+            //            m_scene.RemoveClient(sp2.UUID, true);
 
             ScenePresence sp1Redux = SceneHelpers.AddScenePresence(m_scene, user1Id);
 
@@ -136,15 +133,15 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends.Tests
         public void TestLoginWithOnlineFriends()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             UUID user1Id = TestHelpers.ParseTail(0x1);
             UUID user2Id = TestHelpers.ParseTail(0x2);
 
-//            UserAccountHelpers.CreateUserWithInventory(m_scene, user1Id);
-//            UserAccountHelpers.CreateUserWithInventory(m_scene, user2Id);
-//
-//            m_fm.AddFriendship(user1Id, user2Id);
+            //            UserAccountHelpers.CreateUserWithInventory(m_scene, user1Id);
+            //            UserAccountHelpers.CreateUserWithInventory(m_scene, user2Id);
+            //
+            //            m_fm.AddFriendship(user1Id, user2Id);
 
             ScenePresence sp1 = SceneHelpers.AddScenePresence(m_scene, user1Id);
             ScenePresence sp2 = SceneHelpers.AddScenePresence(m_scene, user2Id);
@@ -152,13 +149,13 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends.Tests
             m_fm.AddFriendship(sp1.ControllingClient, user2Id);
 
             // Not necessary for this test.  CanSeeOnline is automatically granted.
-//            m_fm.GrantRights(sp1.ControllingClient, user2Id, (int)FriendRights.CanSeeOnline);
+            //            m_fm.GrantRights(sp1.ControllingClient, user2Id, (int)FriendRights.CanSeeOnline);
 
             // We must logout from the client end so that the presence service is correctly updated by the presence
             // detector.  This is listening to the OnConnectionClosed event on the client.
-//            ((TestClient)sp1.ControllingClient).Logout();
+            //            ((TestClient)sp1.ControllingClient).Logout();
             ((TestClient)sp2.ControllingClient).Logout();
-//            m_scene.RemoveClient(user2Id, true);
+            //            m_scene.RemoveClient(user2Id, true);
 
             ScenePresence sp2Redux = SceneHelpers.AddScenePresence(m_scene, user2Id);
 
@@ -170,7 +167,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends.Tests
         public void TestAddFriendshipWhileOnline()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             UUID userId = TestHelpers.ParseTail(0x1);
             UUID user2Id = TestHelpers.ParseTail(0x2);
@@ -190,7 +187,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends.Tests
         public void TestRemoveFriendshipWhileOnline()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             UUID user1Id = TestHelpers.ParseTail(0x1);
             UUID user2Id = TestHelpers.ParseTail(0x2);

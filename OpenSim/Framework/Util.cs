@@ -25,9 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using Amib.Threading;
+using log4net;
+using log4net.Appender;
+using Nini.Config;
+using Nwc.XmlRpc;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -44,18 +53,9 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml;
 using System.Threading;
-using log4net;
-using log4net.Appender;
-using Nini.Config;
-using Nwc.XmlRpc;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using Amib.Threading;
-using System.Collections.Concurrent;
-using System.Collections.Specialized;
 using System.Web;
+using System.Xml;
 
 namespace OpenSim.Framework
 {
@@ -81,8 +81,8 @@ namespace OpenSim.Framework
 
         FoldedMask = 0x0f,
 
-        FoldingShift = 13 ,  // number of bit shifts from normal perm to folded or back (same as Transfer shift below)
-                             // when doing as a block
+        FoldingShift = 13,  // number of bit shifts from normal perm to folded or back (same as Transfer shift below)
+                            // when doing as a block
 
         Transfer = 1 << 13, // 0x02000
         Modify = 1 << 14,   // 0x04000
@@ -163,9 +163,9 @@ namespace OpenSim.Framework
         {
             LogThreadPool = 0;
             LogOverloads = true;
-            TimeStampClockPeriod = 1.0D/ (double)Stopwatch.Frequency;
+            TimeStampClockPeriod = 1.0D / (double)Stopwatch.Frequency;
             TimeStampClockPeriodMS = 1e3 * TimeStampClockPeriod;
-            m_log.InfoFormat("[UTIL] TimeStamp clock with period of {0}ms", Math.Round(TimeStampClockPeriodMS,6,MidpointRounding.AwayFromZero));
+            m_log.InfoFormat("[UTIL] TimeStamp clock with period of {0}ms", Math.Round(TimeStampClockPeriodMS, 6, MidpointRounding.AwayFromZero));
         }
 
         private static uint nextXferID = 5000;
@@ -221,7 +221,7 @@ namespace OpenSim.Framework
         /// <returns></returns>
         public static double lerp(double a, double b, double c)
         {
-            return (b*a) + (c*(1 - a));
+            return (b * a) + (c * (1 - a));
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace OpenSim.Framework
         /// <returns>The distance between the two vectors</returns>
         public static double GetDistanceTo(Vector3 a, Vector3 b)
         {
-            return Vector3.Distance(a,b);
+            return Vector3.Distance(a, b);
         }
 
         /// <summary>
@@ -274,7 +274,7 @@ namespace OpenSim.Framework
         /// <returns></returns>
         public static bool DistanceLessThan(Vector3 a, Vector3 b, double amount)
         {
-            return Vector3.DistanceSquared(a,b) < (amount * amount);
+            return Vector3.DistanceSquared(a, b) < (amount * amount);
         }
 
         /// <summary>
@@ -319,16 +319,16 @@ namespace OpenSim.Framework
         public static Quaternion Axes2Rot(Vector3 fwd, Vector3 left, Vector3 up)
         {
             float s;
-            float tr = (float) (fwd.X + left.Y + up.Z + 1.0);
+            float tr = (float)(fwd.X + left.Y + up.Z + 1.0);
 
             if (tr >= 1.0)
             {
-                s = (float) (0.5 / Math.Sqrt(tr));
+                s = (float)(0.5 / Math.Sqrt(tr));
                 return new Quaternion(
                         (left.Z - up.Y) * s,
                         (up.X - fwd.Z) * s,
                         (fwd.Y - left.X) * s,
-                        (float) 0.25 / s);
+                        (float)0.25 / s);
             }
             else
             {
@@ -336,9 +336,9 @@ namespace OpenSim.Framework
 
                 if (max < fwd.X)
                 {
-                    s = (float) (Math.Sqrt(fwd.X - (left.Y + up.Z) + 1.0));
-                    float x = (float) (s * 0.5);
-                    s = (float) (0.5 / s);
+                    s = (float)(Math.Sqrt(fwd.X - (left.Y + up.Z) + 1.0));
+                    float x = (float)(s * 0.5);
+                    s = (float)(0.5 / s);
                     return new Quaternion(
                             x,
                             (fwd.Y + left.X) * s,
@@ -347,9 +347,9 @@ namespace OpenSim.Framework
                 }
                 else if (max == left.Y)
                 {
-                    s = (float) (Math.Sqrt(left.Y - (up.Z + fwd.X) + 1.0));
-                    float y = (float) (s * 0.5);
-                    s = (float) (0.5 / s);
+                    s = (float)(Math.Sqrt(left.Y - (up.Z + fwd.X) + 1.0));
+                    float y = (float)(s * 0.5);
+                    s = (float)(0.5 / s);
                     return new Quaternion(
                             (fwd.Y + left.X) * s,
                             y,
@@ -358,9 +358,9 @@ namespace OpenSim.Framework
                 }
                 else
                 {
-                    s = (float) (Math.Sqrt(up.Z - (fwd.X + left.Y) + 1.0));
-                    float z = (float) (s * 0.5);
-                    s = (float) (0.5 / s);
+                    s = (float)(Math.Sqrt(up.Z - (fwd.X + left.Y) + 1.0));
+                    float z = (float)(s * 0.5);
+                    s = (float)(0.5 / s);
                     return new Quaternion(
                             (up.X + fwd.Z) * s,
                             (left.Z + up.Y) * s,
@@ -388,10 +388,10 @@ namespace OpenSim.Framework
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public static ulong RegionWorldLocToHandle(uint X, uint Y)
         {
-           ulong handle = X & 0xffffff00; // make sure it matchs grid coord points.
-           handle <<= 32; // to higher half
-           handle |= (Y & 0xffffff00);
-           return handle;
+            ulong handle = X & 0xffffff00; // make sure it matchs grid coord points.
+            handle <<= 32; // to higher half
+            handle |= (Y & 0xffffff00);
+            return handle;
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -439,12 +439,12 @@ namespace OpenSim.Framework
             serviceURI = string.Empty;
             try
             {
-                Uri  uri = new Uri(uristr);
+                Uri uri = new Uri(uristr);
                 serviceURI = uri.AbsoluteUri;
-                if(uri.Port == 80)
-                    serviceURI = serviceURI.Trim(new char[] { '/', ' ' }) +":80/";
-                else if(uri.Port == 443)
-                    serviceURI = serviceURI.Trim(new char[] { '/', ' ' }) +":443/";
+                if (uri.Port == 80)
+                    serviceURI = serviceURI.Trim(new char[] { '/', ' ' }) + ":80/";
+                else if (uri.Port == 443)
+                    serviceURI = serviceURI.Trim(new char[] { '/', ' ' }) + ":443/";
                 return true;
             }
             catch
@@ -473,17 +473,17 @@ namespace OpenSim.Framework
 
                 string[] parts = inputName.Split(new char[] { ':' });
                 int indx;
-                if(parts.Length == 0)
+                if (parts.Length == 0)
                     return false;
                 if (parts.Length == 1)
                 {
                     indx = inputName.IndexOf('/');
                     if (indx < 0)
-                        serverURI = "http://"+ inputName + "/";
+                        serverURI = "http://" + inputName + "/";
                     else
                     {
-                        serverURI = "http://"+ inputName.Substring(0,indx + 1);
-                        if(indx + 2 < inputName.Length)
+                        serverURI = "http://" + inputName.Substring(0, indx + 1);
+                        if (indx + 2 < inputName.Length)
                             regionName = inputName.Substring(indx + 1);
                     }
                 }
@@ -494,7 +494,7 @@ namespace OpenSim.Framework
                     if (parts.Length >= 2)
                     {
                         indx = parts[1].IndexOf('/');
-                        if(indx < 0)
+                        if (indx < 0)
                         {
                             // If it's a number then assume it's a port. Otherwise, it's a region name.
                             if (!UInt32.TryParse(parts[1], out port))
@@ -506,7 +506,7 @@ namespace OpenSim.Framework
                         else
                         {
                             string portstr = parts[1].Substring(0, indx);
-                            if(indx + 2 < parts[1].Length)
+                            if (indx + 2 < parts[1].Length)
                                 regionName = parts[1].Substring(indx + 1);
                             if (!UInt32.TryParse(portstr, out port))
                                 port = 80;
@@ -515,10 +515,10 @@ namespace OpenSim.Framework
                     // always take the last one
                     if (parts.Length >= 3)
                     {
-                       regionName = parts[2];
+                        regionName = parts[2];
                     }
 
-                    serverURI = "http://"+ host +":"+ port.ToString() + "/";
+                    serverURI = "http://" + host + ":" + port.ToString() + "/";
                 }
             }
             else
@@ -535,9 +535,9 @@ namespace OpenSim.Framework
                 serverURI = parts[0];
 
                 int indx = serverURI.LastIndexOf('/');
-                if(indx > 10)
+                if (indx > 10)
                 {
-                    if(indx + 2 < inputName.Length)
+                    if (indx + 2 < inputName.Length)
                         regionName = inputName.Substring(indx + 1);
                     serverURI = inputName.Substring(0, indx + 1);
                 }
@@ -551,20 +551,20 @@ namespace OpenSim.Framework
             Uri uri;
             try
             {
-                    uri = new Uri(serverURI);
+                uri = new Uri(serverURI);
             }
             catch
             {
                 return false;
             }
 
-            if(!string.IsNullOrEmpty(regionName))
+            if (!string.IsNullOrEmpty(regionName))
                 regionName = regionName.Trim(new char[] { '"', ' ' });
             serverURI = uri.AbsoluteUri;
-            if(uri.Port == 80)
-                serverURI = serverURI.Trim(new char[] { '/', ' ' }) +":80/";
-            else if(uri.Port == 443)
-                serverURI = serverURI.Trim(new char[] { '/', ' ' }) +":443/";
+            if (uri.Port == 80)
+                serverURI = serverURI.Trim(new char[] { '/', ' ' }) + ":80/";
+            else if (uri.Port == 443)
+                serverURI = serverURI.Trim(new char[] { '/', ' ' }) + ":443/";
             return true;
         }
 
@@ -828,7 +828,7 @@ namespace OpenSim.Framework
 
         private static byte[] ComputeMD5Hash(string data, Encoding encoding)
         {
-            using(MD5 md5 = MD5.Create())
+            using (MD5 md5 = MD5.Create())
                 return md5.ComputeHash(encoding.GetBytes(data));
         }
 
@@ -1000,7 +1000,7 @@ namespace OpenSim.Framework
                     for (int j = 0; j < 16 && (i + j) < bytes.Length; j++)
                     {
                         if (bytes[i + j] >= 0x20 && bytes[i + j] < 0x7E)
-                            output.Append((char) bytes[i + j]);
+                            output.Append((char)bytes[i + j]);
                         else
                             output.Append(".");
                     }
@@ -1010,7 +1010,7 @@ namespace OpenSim.Framework
             return output.ToString();
         }
 
-        private static ExpiringCache<string,IPAddress> dnscache = new ExpiringCache<string, IPAddress>();
+        private static ExpiringCache<string, IPAddress> dnscache = new ExpiringCache<string, IPAddress>();
 
         /// <summary>
         /// Converts a URL to a IPAddress
@@ -1019,7 +1019,7 @@ namespace OpenSim.Framework
         /// <returns>A resolved IP Address</returns>
         public static IPAddress GetHostFromURL(string url)
         {
-            return GetHostFromDNS(url.Split(new char[] {'/', ':'})[3]);
+            return GetHostFromDNS(url.Split(new char[] { '/', ':' })[3]);
         }
 
         /// <summary>
@@ -1029,11 +1029,11 @@ namespace OpenSim.Framework
         /// <returns>An IP address, or null</returns>
         public static IPAddress GetHostFromDNS(string dnsAddress)
         {
-            if(String.IsNullOrWhiteSpace(dnsAddress))
+            if (String.IsNullOrWhiteSpace(dnsAddress))
                 return null;
 
             IPAddress ia = null;
-            if(dnscache.TryGetValue(dnsAddress, out ia) && ia != null)
+            if (dnscache.TryGetValue(dnsAddress, out ia) && ia != null)
             {
                 dnscache.AddOrUpdate(dnsAddress, ia, 300);
                 return ia;
@@ -1059,7 +1059,7 @@ namespace OpenSim.Framework
                 return null;
             }
 
-            if(IPH == null || IPH.AddressList.Length == 0)
+            if (IPH == null || IPH.AddressList.Length == 0)
                 return null;
 
             ia = null;
@@ -1074,14 +1074,14 @@ namespace OpenSim.Framework
                     break;
                 }
             }
-            if(ia != null)
+            if (ia != null)
                 dnscache.AddOrUpdate(dnsAddress, ia, 300);
             return ia;
         }
 
         public static IPEndPoint getEndPoint(IPAddress ia, int port)
         {
-            if(ia == null)
+            if (ia == null)
                 return null;
 
             IPEndPoint newEP = null;
@@ -1098,11 +1098,11 @@ namespace OpenSim.Framework
 
         public static IPEndPoint getEndPoint(string hostname, int port)
         {
-            if(String.IsNullOrWhiteSpace(hostname))
+            if (String.IsNullOrWhiteSpace(hostname))
                 return null;
-            
+
             IPAddress ia = null;
-            if(dnscache.TryGetValue(hostname, out ia) && ia != null)
+            if (dnscache.TryGetValue(hostname, out ia) && ia != null)
             {
                 dnscache.AddOrUpdate(hostname, ia, 300);
                 return getEndPoint(ia, port);
@@ -1131,7 +1131,7 @@ namespace OpenSim.Framework
                 return null;
             }
 
-            if(IPH == null || IPH.AddressList.Length == 0)
+            if (IPH == null || IPH.AddressList.Length == 0)
                 return null;
 
             ia = null;
@@ -1147,10 +1147,10 @@ namespace OpenSim.Framework
                 }
             }
 
-            if(ia != null)
+            if (ia != null)
                 dnscache.AddOrUpdate(hostname, ia, 300);
 
-            return getEndPoint(ia,port);
+            return getEndPoint(ia, port);
         }
 
         public static Uri GetURI(string protocol, string hostname, int port, string path)
@@ -1379,10 +1379,10 @@ namespace OpenSim.Framework
 
         public static void AddDataRowToConfig(IConfigSource config, DataRow row)
         {
-            config.Configs.Add((string) row[0]);
+            config.Configs.Add((string)row[0]);
             for (int i = 0; i < row.Table.Columns.Count; i++)
             {
-                config.Configs[(string) row[0]].Set(row.Table.Columns[i].ColumnName, row[i]);
+                config.Configs[(string)row[0]].Set(row.Table.Columns[i].ColumnName, row[i]);
             }
         }
 
@@ -1461,13 +1461,13 @@ namespace OpenSim.Framework
         {
             IConfig enVars = ConfigSource.Configs["Environment"];
             // if section does not exist then user isn't expecting them, so don't bother.
-            if( enVars != null )
+            if (enVars != null)
             {
                 // load the values from the environment
                 EnvConfigSource envConfigSource = new EnvConfigSource();
                 // add the requested keys
                 string[] env_keys = enVars.GetKeys();
-                foreach ( string key in env_keys )
+                foreach (string key in env_keys)
                 {
                     envConfigSource.AddEnv(key, string.Empty);
                 }
@@ -1872,7 +1872,7 @@ namespace OpenSim.Framework
             x = Utils.BytesToUInt(bytes, 8) & 0xffff;
             y = Utils.BytesToUInt(bytes, 12) & 0xffff;
             // validation may fail, just reducing the odds of using a real UUID as encoded parcel
-            return  ( bytes[0] == 0 && bytes[4] == 0 && // handler x,y multiples of 256
+            return (bytes[0] == 0 && bytes[4] == 0 && // handler x,y multiples of 256
                          bytes[9] < 64 && bytes[13] < 64 && // positions < 16km
                          bytes[14] == 0 && bytes[15] == 0);
         }
@@ -1908,19 +1908,19 @@ namespace OpenSim.Framework
         {
             string os = String.Empty;
 
-//            if (Environment.OSVersion.Platform != PlatformID.Unix)
-//            {
-//                os = Environment.OSVersion.ToString();
-//            }
-//            else
-//            {
-//                os = ReadEtcIssue();
-//            }
-//
-//            if (os.Length > 45)
-//            {
-//                os = os.Substring(0, 45);
-//            }
+            //            if (Environment.OSVersion.Platform != PlatformID.Unix)
+            //            {
+            //                os = Environment.OSVersion.ToString();
+            //            }
+            //            else
+            //            {
+            //                os = ReadEtcIssue();
+            //            }
+            //
+            //            if (os.Length > 45)
+            //            {
+            //                os = os.Substring(0, 45);
+            //            }
 
             return os;
         }
@@ -1931,18 +1931,18 @@ namespace OpenSim.Framework
 
             if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
-               ru = "Unix/Mono";
+                ru = "Unix/Mono";
             }
             else
                 if (Environment.OSVersion.Platform == PlatformID.MacOSX)
-                    ru = "OSX/Mono";
+                ru = "OSX/Mono";
+            else
+            {
+                if (IsPlatformMono)
+                    ru = "Win/Mono";
                 else
-                {
-                    if (IsPlatformMono)
-                        ru = "Win/Mono";
-                    else
-                        ru = "Win/.NET";
-                }
+                    ru = "Win/.NET";
+            }
 
             return ru;
         }
@@ -2123,11 +2123,11 @@ namespace OpenSim.Framework
 
         public static string[] Glob(string path)
         {
-            string vol=String.Empty;
+            string vol = String.Empty;
 
             if (Path.VolumeSeparatorChar != Path.DirectorySeparatorChar)
             {
-                string[] vcomps = path.Split(new char[] {Path.VolumeSeparatorChar}, 2, StringSplitOptions.RemoveEmptyEntries);
+                string[] vcomps = path.Split(new char[] { Path.VolumeSeparatorChar }, 2, StringSplitOptions.RemoveEmptyEntries);
 
                 if (vcomps.Length > 1)
                 {
@@ -2136,15 +2136,15 @@ namespace OpenSim.Framework
                 }
             }
 
-            string[] comps = path.Split(new char[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar}, StringSplitOptions.RemoveEmptyEntries);
+            string[] comps = path.Split(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
 
             // Glob
 
             path = vol;
             if (vol != String.Empty)
-                path += new String(new char[] {Path.VolumeSeparatorChar, Path.DirectorySeparatorChar});
+                path += new String(new char[] { Path.VolumeSeparatorChar, Path.DirectorySeparatorChar });
             else
-                path = new String(new char[] {Path.DirectorySeparatorChar});
+                path = new String(new char[] { Path.DirectorySeparatorChar });
 
             List<string> paths = new List<string>();
             List<string> found = new List<string>();
@@ -2245,11 +2245,11 @@ namespace OpenSim.Framework
             if (data.Length > 255) //play safe
             {
                 int cut = 254;
-                if((data[cut] & 0x80 ) != 0 )
-                    {
-                    while(cut > 0 && (data[cut] & 0xc0) != 0xc0)
+                if ((data[cut] & 0x80) != 0)
+                {
+                    while (cut > 0 && (data[cut] & 0xc0) != 0xc0)
                         cut--;
-                    }
+                }
                 Array.Resize<byte>(ref data, cut + 1);
                 data[cut] = 0;
             }
@@ -2287,7 +2287,7 @@ namespace OpenSim.Framework
                 return Utils.EmptyBytes;
 
             if (!str.EndsWith("\0"))
-                 str += "\0";
+                str += "\0";
 
             // Because this is UTF-8 encoding and not ASCII, it's possible we
             // might have gotten an oversized array even after the string trim
@@ -2296,11 +2296,11 @@ namespace OpenSim.Framework
             if (data.Length > 1024)
             {
                 int cut = 1023;
-                if((data[cut] & 0x80 ) != 0 )
-                    {
-                    while(cut > 0 && (data[cut] & 0xc0) != 0xc0)
+                if ((data[cut] & 0x80) != 0)
+                {
+                    while (cut > 0 && (data[cut] & 0xc0) != 0xc0)
                         cut--;
-                    }
+                }
                 Array.Resize<byte>(ref data, cut + 1);
                 data[cut] = 0;
             }
@@ -2338,7 +2338,7 @@ namespace OpenSim.Framework
                 return Utils.EmptyBytes;
 
             if (!str.EndsWith("\0"))
-                 str += "\0";
+                str += "\0";
 
             // Because this is UTF-8 encoding and not ASCII, it's possible we
             // might have gotten an oversized array even after the string trim
@@ -2346,12 +2346,12 @@ namespace OpenSim.Framework
 
             if (data.Length > MaxLength)
             {
-                int cut = MaxLength - 1 ;
-                if((data[cut] & 0x80 ) != 0 )
-                    {
-                    while(cut > 0 && (data[cut] & 0xc0) != 0xc0)
+                int cut = MaxLength - 1;
+                if ((data[cut] & 0x80) != 0)
+                {
+                    while (cut > 0 && (data[cut] & 0xc0) != 0xc0)
                         cut--;
-                    }
+                }
                 Array.Resize<byte>(ref data, cut + 1);
                 data[cut] = 0;
             }
@@ -2587,7 +2587,7 @@ namespace OpenSim.Framework
 
                     // It's possible that the thread won't abort. To make sure the thread pool isn't
                     // depleted, increase the pool size.
-//                    m_ThreadPool.MaxThreads++;
+                    //                    m_ThreadPool.MaxThreads++;
                 }
             }
         }
@@ -2697,7 +2697,7 @@ namespace OpenSim.Framework
                         threadInfo.WorkItem = m_ThreadPool.QueueWorkItem((cb, o) => cb(o), realCallback, obj);
                         break;
                     case FireAndForgetMethod.Thread:
-                        Thread thread = new Thread(delegate(object o) { realCallback(o); });
+                        Thread thread = new Thread(delegate (object o) { realCallback(o); });
                         thread.Start(obj);
                         break;
                     default:
@@ -2795,73 +2795,73 @@ namespace OpenSim.Framework
         {
 
             return null;
-/*
-        not only this does not work on mono but it is not longer recomended on windows.
-        can cause deadlocks etc.
+            /*
+                    not only this does not work on mono but it is not longer recomended on windows.
+                    can cause deadlocks etc.
 
-            if (IsPlatformMono)
-            {
-                // This doesn't work in Mono
-                return null;
-            }
+                        if (IsPlatformMono)
+                        {
+                            // This doesn't work in Mono
+                            return null;
+                        }
 
-            ManualResetEventSlim fallbackThreadReady = new ManualResetEventSlim();
-            ManualResetEventSlim exitedSafely = new ManualResetEventSlim();
+                        ManualResetEventSlim fallbackThreadReady = new ManualResetEventSlim();
+                        ManualResetEventSlim exitedSafely = new ManualResetEventSlim();
 
-            try
-            {
-                new Thread(delegate()
-                {
-                    fallbackThreadReady.Set();
-                    while (!exitedSafely.Wait(200))
-                    {
                         try
                         {
-                            targetThread.Resume();
+                            new Thread(delegate()
+                            {
+                                fallbackThreadReady.Set();
+                                while (!exitedSafely.Wait(200))
+                                {
+                                    try
+                                    {
+                                        targetThread.Resume();
+                                    }
+                                    catch (Exception)
+                                    {
+                                        // Whatever happens, do never stop to resume the main-thread regularly until the main-thread has exited safely.
+                                    }
+                                }
+                            }).Start();
+
+                            fallbackThreadReady.Wait();
+                            // From here, you have about 200ms to get the stack-trace
+
+                            targetThread.Suspend();
+
+                            StackTrace trace = null;
+                            try
+                            {
+                                trace = new StackTrace(targetThread, true);
+                            }
+                            catch (ThreadStateException)
+                            {
+                                //failed to get stack trace, since the fallback-thread resumed the thread
+                                //possible reasons:
+                                //1.) This thread was just too slow
+                                //2.) A deadlock ocurred
+                                //Automatic retry seems too risky here, so just return null.
+                            }
+
+                            try
+                            {
+                                targetThread.Resume();
+                            }
+                            catch (ThreadStateException)
+                            {
+                                // Thread is running again already
+                            }
+
+                            return trace;
                         }
-                        catch (Exception)
+                        finally
                         {
-                            // Whatever happens, do never stop to resume the main-thread regularly until the main-thread has exited safely.
+                            // Signal the fallack-thread to stop
+                            exitedSafely.Set();
                         }
-                    }
-                }).Start();
-
-                fallbackThreadReady.Wait();
-                // From here, you have about 200ms to get the stack-trace
-
-                targetThread.Suspend();
-
-                StackTrace trace = null;
-                try
-                {
-                    trace = new StackTrace(targetThread, true);
-                }
-                catch (ThreadStateException)
-                {
-                    //failed to get stack trace, since the fallback-thread resumed the thread
-                    //possible reasons:
-                    //1.) This thread was just too slow
-                    //2.) A deadlock ocurred
-                    //Automatic retry seems too risky here, so just return null.
-                }
-
-                try
-                {
-                    targetThread.Resume();
-                }
-                catch (ThreadStateException)
-                {
-                    // Thread is running again already
-                }
-
-                return trace;
-            }
-            finally
-            {
-                // Signal the fallack-thread to stop
-                exitedSafely.Set();
-            }
-*/
+            */
         }
 #pragma warning restore 0618
 
@@ -2898,7 +2898,7 @@ namespace OpenSim.Framework
             SmartThreadPool pool = m_ThreadPool;
             m_ThreadPool = null;
 
-            try { pool.Shutdown(); } catch {}          
+            try { pool.Shutdown(); } catch { }
         }
 
         #endregion FireAndForget Threading Pattern
@@ -2966,7 +2966,7 @@ namespace OpenSim.Framework
 
         // returns a timestamp in ms as double
         // using the time resolution avaiable to StopWatch
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]  
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public static double GetTimeStamp()
         {
             return Stopwatch.GetTimestamp() * TimeStampClockPeriod;
@@ -3369,7 +3369,7 @@ namespace OpenSim.Framework
             if (length > 2000)
                 xml = xml.Substring(0, 2000) + "...";
 
-            for (int i = 0 ; i < xml.Length ; i++)
+            for (int i = 0; i < xml.Length; i++)
             {
                 if (xml[i] < 0x20)
                 {
@@ -3402,7 +3402,7 @@ namespace OpenSim.Framework
                 graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
                 graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
 
-                graphics.DrawImage(image,new Rectangle(0,0, result.Width, result.Height),
+                graphics.DrawImage(image, new Rectangle(0, 0, result.Width, result.Height),
                     0, 0, image.Width, image.Height, GraphicsUnit.Pixel, atrib);
             }
 
@@ -3411,119 +3411,119 @@ namespace OpenSim.Framework
 
     }
 
-/*  don't like this code
-    public class DoubleQueue<T> where T:class
-    {
-        private Queue<T> m_lowQueue = new Queue<T>();
-        private Queue<T> m_highQueue = new Queue<T>();
-
-        private object m_syncRoot = new object();
-        private Semaphore m_s = new Semaphore(0, 1);
-
-        public DoubleQueue()
+    /*  don't like this code
+        public class DoubleQueue<T> where T:class
         {
-        }
+            private Queue<T> m_lowQueue = new Queue<T>();
+            private Queue<T> m_highQueue = new Queue<T>();
 
-        public virtual int Count
-        {
-            get
+            private object m_syncRoot = new object();
+            private Semaphore m_s = new Semaphore(0, 1);
+
+            public DoubleQueue()
+            {
+            }
+
+            public virtual int Count
+            {
+                get
+                {
+                    lock (m_syncRoot)
+                        return m_highQueue.Count + m_lowQueue.Count;
+                }
+            }
+
+            public virtual void Enqueue(T data)
+            {
+                Enqueue(m_lowQueue, data);
+            }
+
+            public virtual void EnqueueLow(T data)
+            {
+                Enqueue(m_lowQueue, data);
+            }
+
+            public virtual void EnqueueHigh(T data)
+            {
+                Enqueue(m_highQueue, data);
+            }
+
+            private void Enqueue(Queue<T> q, T data)
             {
                 lock (m_syncRoot)
-                    return m_highQueue.Count + m_lowQueue.Count;
-            }
-        }
-
-        public virtual void Enqueue(T data)
-        {
-            Enqueue(m_lowQueue, data);
-        }
-
-        public virtual void EnqueueLow(T data)
-        {
-            Enqueue(m_lowQueue, data);
-        }
-
-        public virtual void EnqueueHigh(T data)
-        {
-            Enqueue(m_highQueue, data);
-        }
-
-        private void Enqueue(Queue<T> q, T data)
-        {
-            lock (m_syncRoot)
-            {
-                q.Enqueue(data);
-                m_s.WaitOne(0);
-                m_s.Release();
-            }
-        }
-
-        public virtual T Dequeue()
-        {
-            return Dequeue(Timeout.Infinite);
-        }
-
-        public virtual T Dequeue(int tmo)
-        {
-            return Dequeue(TimeSpan.FromMilliseconds(tmo));
-        }
-
-        public virtual T Dequeue(TimeSpan wait)
-        {
-            T res = null;
-
-            if (!Dequeue(wait, ref res))
-                return null;
-
-            return res;
-        }
-
-        public bool Dequeue(int timeout, ref T res)
-        {
-            return Dequeue(TimeSpan.FromMilliseconds(timeout), ref res);
-        }
-
-        public bool Dequeue(TimeSpan wait, ref T res)
-        {
-            if (!m_s.WaitOne(wait))
-                return false;
-
-            lock (m_syncRoot)
-            {
-                if (m_highQueue.Count > 0)
-                    res = m_highQueue.Dequeue();
-                else if (m_lowQueue.Count > 0)
-                    res = m_lowQueue.Dequeue();
-
-                if (m_highQueue.Count == 0 && m_lowQueue.Count == 0)
-                    return true;
-
-                try
                 {
+                    q.Enqueue(data);
+                    m_s.WaitOne(0);
                     m_s.Release();
                 }
-                catch
-                {
-                }
-
-                return true;
             }
-        }
 
-        public virtual void Clear()
-        {
-
-            lock (m_syncRoot)
+            public virtual T Dequeue()
             {
-                // Make sure sem count is 0
-                m_s.WaitOne(0);
+                return Dequeue(Timeout.Infinite);
+            }
 
-                m_lowQueue.Clear();
-                m_highQueue.Clear();
+            public virtual T Dequeue(int tmo)
+            {
+                return Dequeue(TimeSpan.FromMilliseconds(tmo));
+            }
+
+            public virtual T Dequeue(TimeSpan wait)
+            {
+                T res = null;
+
+                if (!Dequeue(wait, ref res))
+                    return null;
+
+                return res;
+            }
+
+            public bool Dequeue(int timeout, ref T res)
+            {
+                return Dequeue(TimeSpan.FromMilliseconds(timeout), ref res);
+            }
+
+            public bool Dequeue(TimeSpan wait, ref T res)
+            {
+                if (!m_s.WaitOne(wait))
+                    return false;
+
+                lock (m_syncRoot)
+                {
+                    if (m_highQueue.Count > 0)
+                        res = m_highQueue.Dequeue();
+                    else if (m_lowQueue.Count > 0)
+                        res = m_lowQueue.Dequeue();
+
+                    if (m_highQueue.Count == 0 && m_lowQueue.Count == 0)
+                        return true;
+
+                    try
+                    {
+                        m_s.Release();
+                    }
+                    catch
+                    {
+                    }
+
+                    return true;
+                }
+            }
+
+            public virtual void Clear()
+            {
+
+                lock (m_syncRoot)
+                {
+                    // Make sure sem count is 0
+                    m_s.WaitOne(0);
+
+                    m_lowQueue.Clear();
+                    m_highQueue.Clear();
+                }
             }
         }
-    }
-*/
+    */
     public class BetterRandom
     {
         private const int BufferSize = 1024;  // must be a multiple of 4

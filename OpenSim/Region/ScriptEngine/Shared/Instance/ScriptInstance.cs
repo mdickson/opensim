@@ -25,34 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Region.ScriptEngine.Interfaces;
+using OpenSim.Region.ScriptEngine.Shared.Api;
+using OpenSim.Region.ScriptEngine.Shared.CodeTools;
+using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Diagnostics; //for [DebuggerNonUserCode]
 using System.IO;
 using System.Reflection;
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Lifetime;
-using System.Security.Policy;
 using System.Text;
 using System.Threading;
-using System.Xml;
-using OpenMetaverse;
-using log4net;
-using Nini.Config;
-using Amib.Threading;
-using OpenSim.Framework;
-using OpenSim.Region.CoreModules;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.ScriptEngine.Shared;
-using OpenSim.Region.ScriptEngine.Shared.Api;
-using OpenSim.Region.ScriptEngine.Shared.Api.Runtime;
-using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
-using OpenSim.Region.ScriptEngine.Shared.CodeTools;
-using OpenSim.Region.ScriptEngine.Interfaces;
-
-using System.Diagnostics; //for [DebuggerNonUserCode]
 
 namespace OpenSim.Region.ScriptEngine.Shared.Instance
 {
@@ -106,7 +94,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
 
         public Dictionary<KeyValuePair<int, int>, KeyValuePair<int, int>> LineMap { get; set; }
 
-        private Dictionary<string,IScriptApi> m_Apis = new Dictionary<string,IScriptApi>();
+        private Dictionary<string, IScriptApi> m_Apis = new Dictionary<string, IScriptApi>();
 
         public Object[] PluginData = new Object[0];
 
@@ -264,9 +252,9 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
 
             ExecutionTime = new MetricsCollectorTime(MeasurementWindow, 10);
 
-//            m_log.DebugFormat(
-//                "[SCRIPT INSTANCE]: Instantiated script instance {0} (id {1}) in part {2} (id {3}) in object {4} attached avatar {5} in {6}",
-//                ScriptTask.Name, ScriptTask.ItemID, Part.Name, Part.UUID, Part.ParentGroup.Name, m_AttachedAvatar, Engine.World.Name);
+            //            m_log.DebugFormat(
+            //                "[SCRIPT INSTANCE]: Instantiated script instance {0} (id {1}) in part {2} (id {3}) in object {4} attached avatar {5} in {6}",
+            //                ScriptTask.Name, ScriptTask.ItemID, Part.Name, Part.UUID, Part.ParentGroup.Name, m_AttachedAvatar, Engine.World.Name);
         }
 
         /// <summary>
@@ -306,7 +294,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
 
             try
             {
-                foreach (KeyValuePair<string,IScriptApi> kv in m_Apis)
+                foreach (KeyValuePair<string, IScriptApi> kv in m_Apis)
                 {
                     m_Script.InitApi(kv.Key, kv.Value);
                 }
@@ -414,7 +402,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
                 if (m_postOnRez)
                 {
                     PostEvent(new EventParams("on_rez",
-                        new Object[] {new LSL_Types.LSLInteger(StartParam)}, new DetectParams[0]));
+                        new Object[] { new LSL_Types.LSLInteger(StartParam) }, new DetectParams[0]));
                 }
                 if (m_stateSource == StateSource.AttachedRez)
                 {
@@ -448,7 +436,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
                 if (m_postOnRez)
                 {
                     PostEvent(new EventParams("on_rez",
-                        new Object[] {new LSL_Types.LSLInteger(StartParam)}, new DetectParams[0]));
+                        new Object[] { new LSL_Types.LSLInteger(StartParam) }, new DetectParams[0]));
                 }
 
                 if (m_stateSource == StateSource.AttachedRez)
@@ -499,9 +487,9 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
         {
             string savedState = Path.Combine(m_dataPath, ItemID.ToString() + ".state");
 
-//            m_log.DebugFormat(
-//                "[SCRIPT INSTANCE]: Deleting state {0} for script {1} (id {2}) in part {3} (id {4}) in object {5} in {6}.",
-//                savedState, ScriptTask.Name, ScriptTask.ItemID, Part.Name, Part.UUID, Part.ParentGroup.Name, Engine.World.Name);
+            //            m_log.DebugFormat(
+            //                "[SCRIPT INSTANCE]: Deleting state {0} for script {1} (id {2}) in part {3} (id {4}) in object {5} in {6}.",
+            //                savedState, ScriptTask.Name, ScriptTask.ItemID, Part.Name, Part.UUID, Part.ParentGroup.Name, Engine.World.Name);
 
             try
             {
@@ -522,7 +510,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
             // m_log.Info("Variable dump for script "+ ItemID.ToString());
             // foreach (KeyValuePair<string, object> v in vars)
             // {
-                // m_log.Info("Variable: "+v.Key+" = "+v.Value.ToString());
+            // m_log.Info("Variable: "+v.Key+" = "+v.Value.ToString());
             // }
         }
 
@@ -546,7 +534,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
                     if (m_CurrentWorkItem == null)
                         m_CurrentWorkItem = Engine.QueueEventHandler(this);
                     // else
-                        // m_log.Error("[Script] Tried to start a script that was already queued");
+                    // m_log.Error("[Script] Tried to start a script that was already queued");
                 }
             }
         }
@@ -693,8 +681,8 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
         /// <param name="data"></param>
         public void PostEvent(EventParams data)
         {
-//            m_log.DebugFormat("[Script] Posted event {2} in state {3} to {0}.{1}",
-//                        PrimName, ScriptName, data.EventName, State);
+            //            m_log.DebugFormat("[Script] Posted event {2} in state {3} to {0}.{1}",
+            //                        PrimName, ScriptName, data.EventName, State);
 
             if (!Running)
                 return;
@@ -702,7 +690,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
             // If min event delay is set then ignore any events untill the time has expired
             // This currently only allows 1 event of any type in the given time period.
             // This may need extending to allow for a time for each individual event type.
-            if (m_eventDelayTicks != 0 && 
+            if (m_eventDelayTicks != 0 &&
                     data.EventName != "state" && data.EventName != "state_entry" && data.EventName != "state_exit"
                     && data.EventName != "run_time_permissions" && data.EventName != "http_request" && data.EventName != "link_message")
             {
@@ -782,7 +770,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
 
             lock (m_Script)
             {
-//                m_log.DebugFormat("[XEngine]: EventProcessor() invoked for {0}.{1}", PrimName, ScriptName);
+                //                m_log.DebugFormat("[XEngine]: EventProcessor() invoked for {0}.{1}", PrimName, ScriptName);
 
                 if (Suspended)
                     return 0;
@@ -914,7 +902,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
                         e = exx;
                     }
 
-                    if(e != null)
+                    if (e != null)
                     {
                         //                            m_log.DebugFormat(
                         //                                "[SCRIPT] Exception in script {0} {1}: {2}{3}",
@@ -929,7 +917,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
                             try
                             {
 
-                                if(e.InnerException != null && e.InnerException is ScriptException)
+                                if (e.InnerException != null && e.InnerException is ScriptException)
                                 {
                                     string text = e.InnerException.Message +
                                                 "(script: " + ScriptName +
@@ -1123,8 +1111,8 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
 
         public void SetVars(Dictionary<string, object> vars)
         {
-//            foreach (KeyValuePair<string, object> kvp in vars)
-//                m_log.DebugFormat("[SCRIPT INSTANCE]: Setting var {0}={1}", kvp.Key, kvp.Value);
+            //            foreach (KeyValuePair<string, object> kvp in vars)
+            //                m_log.DebugFormat("[SCRIPT INSTANCE]: Setting var {0}={1}", kvp.Key, kvp.Value);
 
             m_Script.SetVars(vars);
         }
@@ -1174,9 +1162,9 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
                     return;
                 }
 
-    //            m_log.DebugFormat(
-    //                "[SCRIPT INSTANCE]: Saving state for script {0} (id {1}) in part {2} (id {3}) in object {4} in {5}",
-    //                ScriptTask.Name, ScriptTask.ItemID, Part.Name, Part.UUID, Part.ParentGroup.Name, Engine.World.Name);
+                //            m_log.DebugFormat(
+                //                "[SCRIPT INSTANCE]: Saving state for script {0} (id {1}) in part {2} (id {3}) in object {4} in {5}",
+                //                ScriptTask.Name, ScriptTask.ItemID, Part.Name, Part.UUID, Part.ParentGroup.Name, Engine.World.Name);
 
                 string xml = ScriptSerializer.Serialize(this);
 
@@ -1194,7 +1182,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
                             fs.Write(buf, 0, buf.Length);
                         }
                     }
-                    catch(Exception)
+                    catch (Exception)
                     {
                         // m_log.Error("Unable to save xml\n"+e.ToString());
                     }
@@ -1213,12 +1201,12 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
         {
             if (m_Apis.ContainsKey(name))
             {
-//                m_log.DebugFormat("[SCRIPT INSTANCE]: Found api {0} in {1}@{2}", name, ScriptName, PrimName);
+                //                m_log.DebugFormat("[SCRIPT INSTANCE]: Found api {0} in {1}@{2}", name, ScriptName, PrimName);
 
                 return m_Apis[name];
             }
 
-//            m_log.DebugFormat("[SCRIPT INSTANCE]: Did not find api {0} in {1}@{2}", name, ScriptName, PrimName);
+            //            m_log.DebugFormat("[SCRIPT INSTANCE]: Did not find api {0} in {1}@{2}", name, ScriptName, PrimName);
 
             return null;
         }
@@ -1234,7 +1222,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
                 return e.ToString();
 
             string message = "Runtime error:\n" + e.InnerException.StackTrace;
-            string[] lines = message.Split(new char[] {'\n'});
+            string[] lines = message.Split(new char[] { '\n' });
 
             foreach (string line in lines)
             {
@@ -1243,7 +1231,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
                     int idx = line.IndexOf(':');
                     if (idx != -1)
                     {
-                        string val = line.Substring(idx+1);
+                        string val = line.Substring(idx + 1);
                         int lineNum = 0;
                         if (int.TryParse(val, out lineNum))
                         {
@@ -1324,7 +1312,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
     /// </remarks>
     public class XEngineEventWaitHandle : EventWaitHandle
     {
-        public XEngineEventWaitHandle(bool initialState, EventResetMode mode) : base(initialState, mode) {}
+        public XEngineEventWaitHandle(bool initialState, EventResetMode mode) : base(initialState, mode) { }
 
         public override Object InitializeLifetimeService()
         {

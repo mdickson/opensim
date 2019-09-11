@@ -25,12 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.IO;
-
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.IO;
 
 namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
 {
@@ -164,7 +163,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
                 int x;
                 for (x = 0; x < map.Width; x++)
                 {
-                    bs.Write((float) map[x, y]);
+                    bs.Write((float)map[x, y]);
                 }
             }
 

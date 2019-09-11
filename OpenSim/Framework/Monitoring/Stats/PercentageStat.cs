@@ -25,11 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 using OpenMetaverse.StructuredData;
+using System;
+using System.Text;
 
 namespace OpenSim.Framework.Monitoring
 {
@@ -72,7 +70,7 @@ namespace OpenSim.Framework.Monitoring
             StatType type,
             Action<Stat> pullAction,
             StatVerbosity verbosity)
-            : base(shortName, name, description, "%", category, container, type, pullAction, verbosity) {}
+            : base(shortName, name, description, "%", category, container, type, pullAction, verbosity) { }
 
         public override string ToConsoleString()
         {

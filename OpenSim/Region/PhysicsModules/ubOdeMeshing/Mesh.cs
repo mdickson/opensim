@@ -25,15 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
+using OpenSim.Region.PhysicsModules.SharedBase;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using OpenSim.Region.PhysicsModules.SharedBase;
-using PrimMesher;
-using OpenMetaverse;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace OpenSim.Region.PhysicsModule.ubODEMeshing
 {
@@ -68,7 +65,7 @@ namespace OpenSim.Region.PhysicsModule.ubODEMeshing
         public Vector3 m_centroid;
         public int m_centroidDiv;
 
-        public  MeshBuildingData()
+        public MeshBuildingData()
         {
             vertexcomp vcomp = new vertexcomp();
             m_vertices = new Dictionary<Vertex, int>(vcomp);
@@ -111,7 +108,7 @@ namespace OpenSim.Region.PhysicsModule.ubODEMeshing
 
         public Mesh(bool forbuild)
         {
-            if(forbuild)
+            if (forbuild)
                 m_bdata = new MeshBuildingData();
             m_obb = new Vector3(0.5f, 0.5f, 0.5f);
             m_obboffset = Vector3.Zero;
@@ -130,17 +127,17 @@ namespace OpenSim.Region.PhysicsModule.ubODEMeshing
 
             float tmp;
             tmp = m_obb.X * x;
-            if(tmp < 0.0005f)
+            if (tmp < 0.0005f)
                 tmp = 0.0005f;
             result.m_obb.X = tmp;
 
-            tmp =  m_obb.Y * y;
-            if(tmp < 0.0005f)
+            tmp = m_obb.Y * y;
+            if (tmp < 0.0005f)
                 tmp = 0.0005f;
             result.m_obb.Y = tmp;
 
-            tmp =  m_obb.Z * z;
-            if(tmp < 0.0005f)
+            tmp = m_obb.Z * z;
+            if (tmp < 0.0005f)
                 tmp = 0.0005f;
             result.m_obb.Z = tmp;
 
@@ -161,7 +158,7 @@ namespace OpenSim.Region.PhysicsModule.ubODEMeshing
             }
 
             result.indexes = new int[indexes.Length];
-            indexes.CopyTo(result.indexes,0);
+            indexes.CopyTo(result.indexes, 0);
 
             result.pinMemory();
 
@@ -280,22 +277,22 @@ namespace OpenSim.Region.PhysicsModule.ubODEMeshing
         public Vector3 GetOBB()
         {
             return m_obb;
-/*
-            float x, y, z;
-            if (m_bdata.m_centroidDiv > 0)
-            {
-                x = (m_bdata.m_obbXmax - m_bdata.m_obbXmin) * 0.5f;
-                y = (m_bdata.m_obbYmax - m_bdata.m_obbYmin) * 0.5f;
-                z = (m_bdata.m_obbZmax - m_bdata.m_obbZmin) * 0.5f;
-            }
-            else // ??
-            {
-                x = 0.5f;
-                y = 0.5f;
-                z = 0.5f;
-            }
-            return new Vector3(x, y, z);
-*/
+            /*
+                        float x, y, z;
+                        if (m_bdata.m_centroidDiv > 0)
+                        {
+                            x = (m_bdata.m_obbXmax - m_bdata.m_obbXmin) * 0.5f;
+                            y = (m_bdata.m_obbYmax - m_bdata.m_obbYmin) * 0.5f;
+                            z = (m_bdata.m_obbZmax - m_bdata.m_obbZmin) * 0.5f;
+                        }
+                        else // ??
+                        {
+                            x = 0.5f;
+                            y = 0.5f;
+                            z = 0.5f;
+                        }
+                        return new Vector3(x, y, z);
+            */
         }
 
         public int numberVertices()
@@ -368,7 +365,7 @@ namespace OpenSim.Region.PhysicsModule.ubODEMeshing
             int k;
             for (int i = 0; i < m_bdata.m_triangles.Count; i++)
             {
-                k= 3 * i;
+                k = 3 * i;
                 Triangle t = m_bdata.m_triangles[i];
                 result[k] = m_bdata.m_vertices[t.v1];
                 result[k + 1] = m_bdata.m_vertices[t.v2];
@@ -526,13 +523,13 @@ namespace OpenSim.Region.PhysicsModule.ubODEMeshing
             {
                 m_obboffset = new Vector3(m_bdata.m_centroid.X / m_bdata.m_centroidDiv, m_bdata.m_centroid.Y / m_bdata.m_centroidDiv, m_bdata.m_centroid.Z / m_bdata.m_centroidDiv);
                 x = (m_bdata.m_obbXmax - m_bdata.m_obbXmin) * 0.5f;
-                if(x < 0.0005f)
+                if (x < 0.0005f)
                     x = 0.0005f;
                 y = (m_bdata.m_obbYmax - m_bdata.m_obbYmin) * 0.5f;
-                if(y < 0.0005f)
+                if (y < 0.0005f)
                     y = 0.0005f;
                 z = (m_bdata.m_obbZmax - m_bdata.m_obbZmin) * 0.5f;
-                if(z < 0.0005f)
+                if (z < 0.0005f)
                     z = 0.0005f;
             }
 
@@ -559,7 +556,7 @@ namespace OpenSim.Region.PhysicsModule.ubODEMeshing
 
             try
             {
-                using(BinaryWriter bw = new BinaryWriter(st))
+                using (BinaryWriter bw = new BinaryWriter(st))
                 {
                     bw.Write(m_vertexCount);
                     bw.Write(m_indexCount);
@@ -576,7 +573,7 @@ namespace OpenSim.Region.PhysicsModule.ubODEMeshing
                     bw.Write(m_obboffset.Z);
                     bw.Flush();
                     bw.Close();
-               }
+                }
             }
             catch
             {
@@ -593,7 +590,7 @@ namespace OpenSim.Region.PhysicsModule.ubODEMeshing
             bool ok = true;
             try
             {
-                using(BinaryReader br = new BinaryReader(st))
+                using (BinaryReader br = new BinaryReader(st))
                 {
                     mesh.m_vertexCount = br.ReadInt32();
                     mesh.m_indexCount = br.ReadInt32();

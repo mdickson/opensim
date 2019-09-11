@@ -25,12 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using NUnit.Framework;
 using OpenSim.Region.ScriptEngine.Shared.CodeTools;
 using OpenSim.Tests.Common;
+using System;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Tests
 {
@@ -42,7 +40,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestBadEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestCompile("default { bad() {} }", true);
         }
@@ -51,7 +49,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestAttachEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestKeyArgEvent("attach");
         }
@@ -60,7 +58,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestObjectRezEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestKeyArgEvent("object_rez");
         }
@@ -69,7 +67,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestMovingEndEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestVoidArgEvent("moving_end");
         }
@@ -78,7 +76,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestMovingStartEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestVoidArgEvent("moving_start");
         }
@@ -87,7 +85,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestNoSensorEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestVoidArgEvent("no_sensor");
         }
@@ -96,7 +94,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestNotAtRotTargetEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestVoidArgEvent("not_at_rot_target");
         }
@@ -105,7 +103,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestNotAtTargetEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestVoidArgEvent("not_at_target");
         }
@@ -114,7 +112,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestStateEntryEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestVoidArgEvent("state_entry");
         }
@@ -123,7 +121,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestStateExitEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestVoidArgEvent("state_exit");
         }
@@ -132,7 +130,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestTimerEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestVoidArgEvent("timer");
         }
@@ -147,7 +145,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestChangedEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestIntArgEvent("changed");
         }
@@ -156,7 +154,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestCollisionEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestIntArgEvent("collision");
         }
@@ -165,7 +163,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestCollisionStartEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestIntArgEvent("collision_start");
         }
@@ -174,7 +172,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestCollisionEndEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestIntArgEvent("collision_end");
         }
@@ -183,7 +181,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestOnRezEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestIntArgEvent("on_rez");
         }
@@ -192,7 +190,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestRunTimePermissionsEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestIntArgEvent("run_time_permissions");
         }
@@ -201,7 +199,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestSensorEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestIntArgEvent("sensor");
         }
@@ -210,7 +208,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestTouchEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestIntArgEvent("touch");
         }
@@ -219,7 +217,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestTouchStartEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestIntArgEvent("touch_start");
         }
@@ -228,7 +226,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestTouchEndEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestIntArgEvent("touch_end");
         }
@@ -237,7 +235,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestLandCollisionEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestVectorArgEvent("land_collision");
         }
@@ -246,7 +244,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestLandCollisionStartEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestVectorArgEvent("land_collision_start");
         }
@@ -255,7 +253,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestLandCollisionEndEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestVectorArgEvent("land_collision_end");
         }
@@ -264,7 +262,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestAtRotTargetEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestIntRotRotArgEvent("at_rot_target");
         }
@@ -273,7 +271,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestAtTargetEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestIntVecVecArgEvent("at_target");
         }
@@ -282,7 +280,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestControlEvent()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestKeyIntIntArgEvent("control");
         }

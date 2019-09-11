@@ -25,27 +25,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Net;
-using System.Reflection;
-using System.Text;
-using System.Xml;
 using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Monitoring;
 using OpenSim.Framework.Serialization;
 using OpenSim.Framework.Serialization.External;
-using OpenSim.Region.CoreModules.World.Terrain;
 using OpenSim.Region.CoreModules.World.Land;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.Framework.Scenes.Serialization;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Reflection;
+using System.Text;
 using System.Threading;
+using System.Xml;
 
 namespace OpenSim.Region.CoreModules.World.Archiver
 {
@@ -127,7 +125,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
         /// </value>
         protected float m_rotation = 0f;
 
-       /// <value>
+        /// <value>
         /// original oar region size. not using Constants.RegionSize
         /// </value>
         protected Vector3 m_incomingRegionSize = new Vector3(256f, 256f, float.MaxValue);
@@ -487,7 +485,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
 
                     // Find which scenes are available in the simulator
                     ArchiveScenesGroup simulatorScenes = new ArchiveScenesGroup();
-                    SceneManager.Instance.ForEachScene(delegate(Scene scene2)
+                    SceneManager.Instance.ForEachScene(delegate (Scene scene2)
                     {
                         simulatorScenes.AddScene(scene2);
                     });
@@ -687,11 +685,11 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                 // being no copy/no mod for everyone
                 lock (part.TaskInventory)
                 {
-/* avination code disabled for opensim
-                    // And zap any troublesome sit target information
-                    part.SitTargetOrientation = new Quaternion(0, 0, 0, 1);
-                    part.SitTargetPosition = new Vector3(0, 0, 0);
-*/
+                    /* avination code disabled for opensim
+                                        // And zap any troublesome sit target information
+                                        part.SitTargetOrientation = new Quaternion(0, 0, 0, 1);
+                                        part.SitTargetPosition = new Vector3(0, 0, 0);
+                    */
                     // Fix ownership/creator of inventory items
                     // Not doing so results in inventory items
                     // being no copy/no mod for everyone
@@ -1169,7 +1167,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                     {
                         string id = xtr.ReadElementContentAsString();
                         dearchivedScenes.DefaultOriginalID = id;
-                        if(multiRegion)
+                        if (multiRegion)
                             dearchivedScenes.SetRegionOriginalID(id);
                     }
                     else if (xtr.Name.ToString() == "dir")
@@ -1183,7 +1181,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                         if (Vector3.TryParse(size, out value))
                         {
                             m_incomingRegionSize = value;
-                            if(multiRegion)
+                            if (multiRegion)
                                 dearchivedScenes.SetRegionSize(m_incomingRegionSize);
                             m_log.DebugFormat("[ARCHIVER]: Found region_size info {0}",
                                         m_incomingRegionSize.ToString());
@@ -1204,7 +1202,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
             }
 
             ControlFileLoaded = true;
-            if(xtr != null)
+            if (xtr != null)
                 xtr.Close();
 
             return dearchivedScenes;

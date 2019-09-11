@@ -25,14 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.Reflection;
-using System.Text;
-using System.Threading;
 using log4net;
 using OpenMetaverse;
 using OpenMetaverse.Packets;
@@ -40,6 +32,13 @@ using OpenSim.Framework;
 using OpenSim.Framework.Client;
 using OpenSim.Framework.Monitoring;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Reflection;
+using System.Threading;
 
 namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
 {
@@ -68,7 +67,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
 
         private bool m_connected = true;
 
-        public List<uint> SelectedObjects {get; private set;}
+        public List<uint> SelectedObjects { get; private set; }
 
         public IRCClientView(TcpClient client, Scene scene)
         {
@@ -227,7 +226,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
                         if (userhostArgs[0] == ":" + m_nick)
                         {
                             SendServerCommand("302 :" + m_nick + "=+" + m_nick + "@" +
-                                        ((IPEndPoint) m_client.Client.RemoteEndPoint).Address);
+                                        ((IPEndPoint)m_client.Client.RemoteEndPoint).Address);
                         }
                         break;
                     case "NICK":
@@ -341,7 +340,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
         private void IRC_ProcessNick(string message)
         {
             string[] nickArgs = ExtractParameters(message);
-            string nickname = nickArgs[0].Replace(":","");
+            string nickname = nickArgs[0].Replace(":", "");
             m_nick = nickname;
             m_hasNick = true;
         }
@@ -436,7 +435,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
                 char[] term = "terminal_".ToCharArray();
                 char[] host = "hostname".ToCharArray();
 
-                string userName = user.Name.Replace(" ","");
+                string userName = user.Name.Replace(" ", "");
                 for (int i = 0; i < nom.Length; i++)
                 {
                     if (userName.Length < i)
@@ -488,7 +487,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
             string command = ExtractCommand(msg);
 
 
-            for (int i=0;i<msgs.Length;i++)
+            for (int i = 0; i < msgs.Length; i++)
             {
                 if (msgs[i] == command)
                 {
@@ -502,7 +501,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
                 if (i != 0 && msgs[i].StartsWith(":"))
                 {
                     List<string> tmp = new List<string>();
-                    for (int j=i;j<msgs.Length;j++)
+                    for (int j = i; j < msgs.Length; j++)
                     {
                         tmp.Add(msgs[j]);
                     }
@@ -574,19 +573,19 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
         public UUID ActiveGroupId
         {
             get { return UUID.Zero; }
-            set {}
+            set { }
         }
 
         public string ActiveGroupName
         {
             get { return "IRCd User"; }
-            set {}
+            set { }
         }
 
         public ulong ActiveGroupPowers
         {
             get { return 0; }
-            set {}
+            set { }
         }
 
         public Dictionary<UUID, ulong> GetGroupPowers()
@@ -661,7 +660,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
 
         public uint CircuitCode
         {
-            get { return (uint)Util.RandomClass.Next(0,int.MaxValue); }
+            get { return (uint)Util.RandomClass.Next(0, int.MaxValue); }
         }
 
         public IPEndPoint RemoteEndPoint
@@ -933,7 +932,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
             // Mimicking LLClientView which gets always set appearance from client.
             AvatarAppearance appearance;
             m_scene.GetAvatarAppearance(this, out appearance);
-            OnSetAppearance(this, appearance.Texture, (byte[])appearance.VisualParams.Clone(),appearance.AvatarSize, new WearableCacheItem[0]);
+            OnSetAppearance(this, appearance.Texture, (byte[])appearance.VisualParams.Clone(), appearance.AvatarSize, new WearableCacheItem[0]);
         }
 
         public void SendRegionHandshake()
@@ -1159,7 +1158,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
 
         }
 
-        public void SendXferPacket(ulong xferID, uint packet, 
+        public void SendXferPacket(ulong xferID, uint packet,
                 byte[] XferData, int XferDataOffset, int XferDatapktLen, bool isTaskInventory)
         {
 
@@ -1212,7 +1211,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
 
         public void SendAlertMessage(string message)
         {
-            IRC_SendChannelPrivmsg("Alert",message);
+            IRC_SendChannelPrivmsg("Alert", message);
         }
 
         public void SendAgentAlertMessage(string message, bool modal)
@@ -1227,7 +1226,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
 
         public void SendLoadURL(string objectname, UUID objectID, UUID ownerID, bool groupOwned, string message, string url)
         {
-            IRC_SendChannelPrivmsg(objectname,url);
+            IRC_SendChannelPrivmsg(objectname, url);
         }
 
         public void SendDialog(string objectname, UUID objectID, UUID ownerID, string ownerFirstName, string ownerLastName, string msg, UUID textureID, int ch, string[] buttonlabels)
@@ -1463,7 +1462,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
 
         }
 
-        public virtual void SetChildAgentThrottle(byte[] throttle,float factor)
+        public virtual void SetChildAgentThrottle(byte[] throttle, float factor)
         {
 
         }
@@ -1654,7 +1653,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
 
         }
 
-        public void GroupMembershipAddReplace(UUID GroupID,ulong GroupPowers)
+        public void GroupMembershipAddReplace(UUID GroupID, ulong GroupPowers)
         {
 
         }
@@ -1725,15 +1724,15 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
         {
         }
 
-        public void SendGroupAccountingDetails(IClientAPI sender,UUID groupID, UUID transactionID, UUID sessionID, int amt)
+        public void SendGroupAccountingDetails(IClientAPI sender, UUID groupID, UUID transactionID, UUID sessionID, int amt)
         {
         }
 
-        public void SendGroupAccountingSummary(IClientAPI sender,UUID groupID, uint moneyAmt, int totalTier, int usedTier)
+        public void SendGroupAccountingSummary(IClientAPI sender, UUID groupID, uint moneyAmt, int totalTier, int usedTier)
         {
         }
 
-        public void SendGroupTransactionsSummaryDetails(IClientAPI sender,UUID groupID, UUID transactionID, UUID sessionID,int amt)
+        public void SendGroupTransactionsSummaryDetails(IClientAPI sender, UUID groupID, UUID transactionID, UUID sessionID, int amt)
         {
         }
 

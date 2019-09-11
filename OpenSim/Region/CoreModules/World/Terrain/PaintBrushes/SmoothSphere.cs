@@ -40,7 +40,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain.PaintBrushes
             strength = TerrainUtil.MetersToSphericalStrength(strength);
 
             int x, y;
-            double[,] tweak = new double[map.Width,map.Height];
+            double[,] tweak = new double[map.Width, map.Height];
 
             double area = strength;
             double step = strength / 4.0;

@@ -25,22 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.IO;
-using System.Reflection;
-using System.Threading;
 using log4net;
 using log4net.Config;
 using Nini.Config;
 using OpenSim.Framework;
-using OpenSim.Framework.Console;
+using System;
+using System.IO;
+using System.Reflection;
 
 namespace pCampBot
 {
     /// <summary>
     /// Event Types from the BOT.  Add new events here
     /// </summary>
-    public enum EventType:int
+    public enum EventType : int
     {
         NONE = 0,
         CONNECTED = 1,
@@ -65,7 +63,7 @@ namespace pCampBot
             }
             else if (
                 commandLineConfig.Get("firstname") == null
-                    ||  commandLineConfig.Get("lastname") == null
+                    || commandLineConfig.Get("lastname") == null
                     || commandLineConfig.Get("password") == null)
             {
                 Console.WriteLine("ERROR: You must supply a firstname, lastname and password for the bots.");
@@ -167,7 +165,7 @@ namespace pCampBot
                     + "       g (grab     - bots randomly click prims whether set clickable or not)\n"
                     + "       n (none     - bots do nothing)\n"
                     + "       t (teleport - bots regularly teleport between regions on the grid)\n"
-//                "       c (cross)\n" +
+                    //                "       c (cross)\n" +
                     + "  -wear              folder from which to load appearance data, \"no\" if there is no such folder (default: no) (optional)\n"
                     + "  -h, -help          show this message.\n");
         }

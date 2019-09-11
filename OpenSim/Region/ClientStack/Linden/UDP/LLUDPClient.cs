@@ -25,17 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading;
 using log4net;
-using OpenSim.Framework;
-using OpenSim.Framework.Monitoring;
 using OpenMetaverse;
-using OpenMetaverse.Packets;
-
-using TokenBucket = OpenSim.Region.ClientStack.LindenUDP.TokenBucket;
+using OpenSim.Framework;
+using System;
+using System.Net;
 
 namespace OpenSim.Region.ClientStack.LindenUDP
 {
@@ -96,11 +90,11 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             set
             {
                 m_throttleDebugLevel = value;
-/*
-                m_throttleClient.DebugLevel = m_throttleDebugLevel;
-                foreach (TokenBucket tb in m_throttleCategories)
-                    tb.DebugLevel = m_throttleDebugLevel;
- */
+                /*
+                                m_throttleClient.DebugLevel = m_throttleDebugLevel;
+                                foreach (TokenBucket tb in m_throttleCategories)
+                                    tb.DebugLevel = m_throttleDebugLevel;
+                 */
             }
         }
         private int m_throttleDebugLevel;
@@ -204,7 +198,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             {
                 if (m_pingMS < 10)
                     return 10;
-                if(m_pingMS > 2000)
+                if (m_pingMS > 2000)
                     return 2000;
                 return m_pingMS;
             }
@@ -263,7 +257,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 //m_throttleCategories[i] = new TokenBucket(m_throttleClient, rates.GetRate(type), m_burst);
                 float rate = rates.GetRate(type);
                 float burst = rate * rates.BurstTime;
-                m_throttleCategories[i] = new TokenBucket(m_throttleClient, rate , burst);
+                m_throttleCategories[i] = new TokenBucket(m_throttleClient, rate, burst);
             }
 
             // Default the retransmission timeout to one second
@@ -290,7 +284,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             m_throttleClient.Parent.UnregisterRequest(m_throttleClient);
             PendingAcks.Clear();
             NeedAcks.Clear();
-         }
+        }
 
         /// <summary>
         /// Gets information about this client connection
@@ -434,15 +428,15 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             // Make sure none of the throttles are set below our packet MTU,
             // otherwise a throttle could become permanently clogged
 
-/* now using floats
-            resend = Math.Max(resend, LLUDPServer.MTU);
-            land = Math.Max(land, LLUDPServer.MTU);
-            wind = Math.Max(wind, LLUDPServer.MTU);
-            cloud = Math.Max(cloud, LLUDPServer.MTU);
-            task = Math.Max(task, LLUDPServer.MTU);
-            texture = Math.Max(texture, LLUDPServer.MTU);
-            asset = Math.Max(asset, LLUDPServer.MTU);
-*/
+            /* now using floats
+                        resend = Math.Max(resend, LLUDPServer.MTU);
+                        land = Math.Max(land, LLUDPServer.MTU);
+                        wind = Math.Max(wind, LLUDPServer.MTU);
+                        cloud = Math.Max(cloud, LLUDPServer.MTU);
+                        task = Math.Max(task, LLUDPServer.MTU);
+                        texture = Math.Max(texture, LLUDPServer.MTU);
+                        asset = Math.Max(asset, LLUDPServer.MTU);
+            */
 
             int total = resend + land + wind + cloud + task + texture + asset;
 
@@ -645,7 +639,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         /// <returns>True if any packets were sent, otherwise false</returns>
         public bool DequeueOutgoing()
         {
-//            if (m_deliverPackets == false) return false;
+            //            if (m_deliverPackets == false) return false;
 
             OutgoingPacket packet = null;
             DoubleLocklessQueue<OutgoingPacket> queue;
@@ -666,7 +660,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                     // leaving a dequeued packet still waiting to be sent out. Try to
                     // send it again
                     OutgoingPacket nextPacket = m_nextPackets[i];
-                    if(nextPacket.Buffer == null)
+                    if (nextPacket.Buffer == null)
                     {
                         if (m_packetOutboxes[i].Count < 5)
                             emptyCategories |= CategoryToFlag(i);
@@ -703,7 +697,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         {
                             // A packet was pulled off the queue. See if we have
                             // enough tokens in the bucket to send it out
-                            if(packet.Buffer == null)
+                            if (packet.Buffer == null)
                             {
                                 // packet canceled elsewhere (by a ack for example)
                                 if (queue.Count < 5)
@@ -757,9 +751,9 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         public void UpdateRoundTrip(int p)
         {
             p *= 5;
-            if( p> m_maxRTO)
+            if (p > m_maxRTO)
                 p = m_maxRTO;
-            else if(p < m_defaultRTO)
+            else if (p < m_defaultRTO)
                 p = m_defaultRTO;
 
             m_RTO = p;

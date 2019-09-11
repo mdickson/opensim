@@ -25,21 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using log4net;
 using Mono.Addins;
 using Nini.Config;
-using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Console;
-using OpenSim.Framework.Monitoring;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.OptionalModules.Avatar.Attachments
 {
@@ -49,7 +42,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.Attachments
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "SceneCommandsModule")]
     public class SceneCommandsModule : ISceneCommandsModule, INonSharedRegionModule
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private Scene m_scene;
 
@@ -59,22 +52,22 @@ namespace OpenSim.Region.OptionalModules.Avatar.Attachments
 
         public void Initialise(IConfigSource source)
         {
-//            m_log.DebugFormat("[SCENE COMMANDS MODULE]: INITIALIZED MODULE");
+            //            m_log.DebugFormat("[SCENE COMMANDS MODULE]: INITIALIZED MODULE");
         }
 
         public void PostInitialise()
         {
-//            m_log.DebugFormat("[SCENE COMMANDS MODULE]: POST INITIALIZED MODULE");
+            //            m_log.DebugFormat("[SCENE COMMANDS MODULE]: POST INITIALIZED MODULE");
         }
 
         public void Close()
         {
-//            m_log.DebugFormat("[SCENE COMMANDS MODULE]: CLOSED MODULE");
+            //            m_log.DebugFormat("[SCENE COMMANDS MODULE]: CLOSED MODULE");
         }
 
         public void AddRegion(Scene scene)
         {
-//            m_log.DebugFormat("[SCENE COMMANDS MODULE]: REGION {0} ADDED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[SCENE COMMANDS MODULE]: REGION {0} ADDED", scene.RegionInfo.RegionName);
 
             m_scene = scene;
 
@@ -83,12 +76,12 @@ namespace OpenSim.Region.OptionalModules.Avatar.Attachments
 
         public void RemoveRegion(Scene scene)
         {
-//            m_log.DebugFormat("[SCENE COMMANDS MODULE]: REGION {0} REMOVED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[SCENE COMMANDS MODULE]: REGION {0} REMOVED", scene.RegionInfo.RegionName);
         }
 
         public void RegionLoaded(Scene scene)
         {
-//            m_log.DebugFormat("[ATTACHMENTS COMMAND MODULE]: REGION {0} LOADED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[ATTACHMENTS COMMAND MODULE]: REGION {0} LOADED", scene.RegionInfo.RegionName);
 
             scene.AddCommand(
                 "Debug", this, "debug scene get",
@@ -208,11 +201,11 @@ namespace OpenSim.Region.OptionalModules.Avatar.Attachments
                     m_scene.PhysicsEnabled = enablePhysics;
             }
 
-//            if (options.ContainsKey("collisions"))
-//            {
-//                // TODO: Implement.  If false, should stop objects colliding, though possibly should still allow
-//                // the avatar themselves to collide with the ground.
-//            }
+            //            if (options.ContainsKey("collisions"))
+            //            {
+            //                // TODO: Implement.  If false, should stop objects colliding, though possibly should still allow
+            //                // the avatar themselves to collide with the ground.
+            //            }
 
             if (options.ContainsKey("teleport"))
             {

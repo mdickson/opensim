@@ -25,18 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using OpenSim.Region.ScriptEngine.Interfaces;
-
 using key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
-using rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
-using vector = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Vector3;
+using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
+using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
+using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
 using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
-using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
-using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
-using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
+using rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
+using vector = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Vector3;
 
 
 namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
@@ -272,7 +268,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         string osGetPhysicsEngineType();
         string osGetPhysicsEngineName();
 
-        void osMessageObject(key objectUUID,string message);
+        void osMessageObject(key objectUUID, string message);
 
         void osMakeNotecard(string notecardName, LSL_Types.list contents);
 
@@ -336,13 +332,13 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         /// <returns>TRUE if the key belongs to an npc in the scene.  FALSE otherwise.</returns>
         LSL_Integer osIsNpc(LSL_Key npc);
 
-        key         osNpcCreate(string user, string name, vector position, string notecard);
-        key         osNpcCreate(string user, string name, vector position, string notecard, int options);
-        LSL_Key     osNpcSaveAppearance(key npc, string notecard);
-        void        osNpcLoadAppearance(key npc, string notecard);
-        vector      osNpcGetPos(key npc);
-        void        osNpcMoveTo(key npc, vector position);
-        void        osNpcMoveToTarget(key npc, vector target, int options);
+        key osNpcCreate(string user, string name, vector position, string notecard);
+        key osNpcCreate(string user, string name, vector position, string notecard, int options);
+        LSL_Key osNpcSaveAppearance(key npc, string notecard);
+        void osNpcLoadAppearance(key npc, string notecard);
+        vector osNpcGetPos(key npc);
+        void osNpcMoveTo(key npc, vector position);
+        void osNpcMoveToTarget(key npc, vector target, int options);
 
         /// <summary>
         /// Get the owner of the NPC
@@ -351,27 +347,27 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         /// <returns>
         /// The owner of the NPC for an owned NPC.  The NPC's agent id for an unowned NPC.  UUID.Zero if the key is not an npc.
         /// </returns>
-        LSL_Key     osNpcGetOwner(key npc);
+        LSL_Key osNpcGetOwner(key npc);
 
-        rotation    osNpcGetRot(key npc);
-        void        osNpcSetRot(LSL_Key npc, rotation rot);
-        void        osNpcStopMoveToTarget(LSL_Key npc);
-        void        osNpcSetProfileAbout(LSL_Key npc, string about);
-        void        osNpcSetProfileImage(LSL_Key npc, string image);
-        void        osNpcSay(key npc, string message);
-        void        osNpcSay(key npc, int channel, string message);
-        void        osNpcSayTo(LSL_Key npc, LSL_Key target, int channel, string msg);
-        void        osNpcShout(key npc, int channel, string message);
-        void        osNpcSit(key npc, key target, int options);
-        void        osNpcStand(LSL_Key npc);
-        void        osNpcRemove(key npc);
-        void        osNpcPlayAnimation(LSL_Key npc, string animation);
-        void        osNpcStopAnimation(LSL_Key npc, string animation);
-        void        osNpcTouch(LSL_Key npcLSL_Key, LSL_Key object_key, LSL_Integer link_num);
-        void        osNpcWhisper(key npc, int channel, string message);
+        rotation osNpcGetRot(key npc);
+        void osNpcSetRot(LSL_Key npc, rotation rot);
+        void osNpcStopMoveToTarget(LSL_Key npc);
+        void osNpcSetProfileAbout(LSL_Key npc, string about);
+        void osNpcSetProfileImage(LSL_Key npc, string image);
+        void osNpcSay(key npc, string message);
+        void osNpcSay(key npc, int channel, string message);
+        void osNpcSayTo(LSL_Key npc, LSL_Key target, int channel, string msg);
+        void osNpcShout(key npc, int channel, string message);
+        void osNpcSit(key npc, key target, int options);
+        void osNpcStand(LSL_Key npc);
+        void osNpcRemove(key npc);
+        void osNpcPlayAnimation(LSL_Key npc, string animation);
+        void osNpcStopAnimation(LSL_Key npc, string animation);
+        void osNpcTouch(LSL_Key npcLSL_Key, LSL_Key object_key, LSL_Integer link_num);
+        void osNpcWhisper(key npc, int channel, string message);
 
-        LSL_Key     osOwnerSaveAppearance(string notecard);
-        LSL_Key     osAgentSaveAppearance(key agentId, string notecard);
+        LSL_Key osOwnerSaveAppearance(string notecard);
+        LSL_Key osAgentSaveAppearance(key agentId, string notecard);
 
         key osGetGender(LSL_Key rawAvatarId);
         key osGetMapTexture();
@@ -501,10 +497,10 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
 
         LSL_List osGetInertiaData();
         void osClearInertia();
-        void osSetInertia(LSL_Float mass, vector centerOfMass, vector principalInertiaScaled,  rotation rot);
+        void osSetInertia(LSL_Float mass, vector centerOfMass, vector principalInertiaScaled, rotation rot);
         void osSetInertiaAsBox(LSL_Float mass, vector boxSize, vector centerOfMass, rotation rot);
-        void osSetInertiaAsSphere(LSL_Float mass,  LSL_Float radius, vector centerOfMass);
-        void osSetInertiaAsCylinder(LSL_Float mass,  LSL_Float radius, LSL_Float lenght, vector centerOfMass,rotation lslrot);
+        void osSetInertiaAsSphere(LSL_Float mass, LSL_Float radius, vector centerOfMass);
+        void osSetInertiaAsCylinder(LSL_Float mass, LSL_Float radius, LSL_Float lenght, vector centerOfMass, rotation lslrot);
 
         LSL_Integer osTeleportObject(LSL_Key objectUUID, vector targetPos, rotation targetrotation, LSL_Integer flags);
         LSL_Integer osGetLinkNumber(LSL_String name);

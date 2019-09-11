@@ -42,7 +42,7 @@ namespace OpenSim.Framework
         public CircularBuffer(int capacity, bool allowOverflow)
         {
             if (capacity < 0)
-                throw new ArgumentException("Needs to have at least 1","capacity");
+                throw new ArgumentException("Needs to have at least 1", "capacity");
 
             this.capacity = capacity;
             size = 0;
@@ -67,7 +67,7 @@ namespace OpenSim.Framework
                     return;
 
                 if (value < size)
-                    throw new ArgumentOutOfRangeException("value","Capacity is too small.");
+                    throw new ArgumentOutOfRangeException("value", "Capacity is too small.");
 
                 var dst = new T[value];
                 if (size > 0)

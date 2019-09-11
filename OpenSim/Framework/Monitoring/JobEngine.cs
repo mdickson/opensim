@@ -25,12 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
 using System;
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Threading;
-using log4net;
-using OpenSim.Framework;
 
 namespace OpenSim.Framework.Monitoring
 {
@@ -58,7 +57,7 @@ namespace OpenSim.Framework.Monitoring
         /// Will be null if no job is currently running.
         /// </remarks>
         private Job m_currentJob;
-        public Job CurrentJob { get { return m_currentJob;} }
+        public Job CurrentJob { get { return m_currentJob; } }
 
         /// <summary>
         /// Number of jobs waiting to be processed.
@@ -122,7 +121,7 @@ namespace OpenSim.Framework.Monitoring
                     m_log.DebugFormat("[JobEngine] Stopping {0}", Name);
 
                     IsRunning = false;
-                    if(m_threadRunnig)
+                    if (m_threadRunnig)
                     {
                         m_cancelSource.Cancel();
                         m_threadRunnig = false;
@@ -130,7 +129,7 @@ namespace OpenSim.Framework.Monitoring
                 }
                 finally
                 {
-                    if(m_cancelSource != null)
+                    if (m_cancelSource != null)
                         m_cancelSource.Dispose();
                 }
             }
@@ -190,15 +189,15 @@ namespace OpenSim.Framework.Monitoring
         /// </param>
         public bool QueueJob(Job job)
         {
-            lock(JobLock)
+            lock (JobLock)
             {
-                if(!IsRunning)
+                if (!IsRunning)
                     return false;
-                
-                if(!m_threadRunnig)
+
+                if (!m_threadRunnig)
                 {
-                     WorkManager.RunInThreadPool(ProcessRequests, null, Name, false);
-                     m_threadRunnig = true;
+                    WorkManager.RunInThreadPool(ProcessRequests, null, Name, false);
+                    m_threadRunnig = true;
                 }
             }
 
@@ -227,44 +226,44 @@ namespace OpenSim.Framework.Monitoring
 
         private void ProcessRequests(Object o)
         {
-            while(IsRunning)
+            while (IsRunning)
             {
                 try
                 {
-                    if(!m_jobQueue.TryTake(out m_currentJob, m_timeout, m_cancelSource.Token))
+                    if (!m_jobQueue.TryTake(out m_currentJob, m_timeout, m_cancelSource.Token))
                     {
-                        lock(JobLock)
+                        lock (JobLock)
                             m_threadRunnig = false;
                         break;
                     }
                 }
-                catch(ObjectDisposedException)
+                catch (ObjectDisposedException)
                 {
                     m_log.DebugFormat("[JobEngine] {0} stopping ignoring {1} jobs in queue",
-                        Name,m_jobQueue.Count);
+                        Name, m_jobQueue.Count);
                     break;
                 }
-                catch(OperationCanceledException)
+                catch (OperationCanceledException)
                 {
                     break;
                 }
 
-                if(LogLevel >= 1)
-                    m_log.DebugFormat("[{0}]: Processing job {1}",LoggingName,m_currentJob.Name);
+                if (LogLevel >= 1)
+                    m_log.DebugFormat("[{0}]: Processing job {1}", LoggingName, m_currentJob.Name);
 
                 try
                 {
                     m_currentJob.Action();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     m_log.Error(
                         string.Format(
-                        "[{0}]: Job {1} failed, continuing.  Exception  ",LoggingName,m_currentJob.Name),e);
+                        "[{0}]: Job {1} failed, continuing.  Exception  ", LoggingName, m_currentJob.Name), e);
                 }
 
-                if(LogLevel >= 1)
-                    m_log.DebugFormat("[{0}]: Processed job {1}",LoggingName,m_currentJob.Name);
+                if (LogLevel >= 1)
+                    m_log.DebugFormat("[{0}]: Processed job {1}", LoggingName, m_currentJob.Name);
 
                 m_currentJob = null;
             }

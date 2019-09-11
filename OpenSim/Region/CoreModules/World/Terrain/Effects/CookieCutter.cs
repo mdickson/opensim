@@ -24,11 +24,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
+using log4net;
 using OpenSim.Region.CoreModules.World.Terrain.PaintBrushes;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using log4net;
+using System;
 using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.World.Terrain.Effects
@@ -43,10 +43,10 @@ namespace OpenSim.Region.CoreModules.World.Terrain.Effects
         {
             ITerrainPaintableEffect eroder = new WeatherSphere();
 
-            bool[,] cliffMask = new bool[map.Width,map.Height];
-            bool[,] channelMask = new bool[map.Width,map.Height];
-            bool[,] smoothMask = new bool[map.Width,map.Height];
-            bool[,] allowMask = new bool[map.Width,map.Height];
+            bool[,] cliffMask = new bool[map.Width, map.Height];
+            bool[,] channelMask = new bool[map.Width, map.Height];
+            bool[,] smoothMask = new bool[map.Width, map.Height];
+            bool[,] allowMask = new bool[map.Width, map.Height];
 
             m_log.Info("S1");
 
@@ -58,7 +58,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain.Effects
                 {
                     m_log.Info(".");
                     smoothMask[x, y] = true;
-                    allowMask[x,y] = true;
+                    allowMask[x, y] = true;
 
                     // Start underwater
                     map[x, y] = TerrainUtil.PerlinNoise2D(x, y, 3, 0.25) * 5;
@@ -84,7 +84,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain.Effects
                 for (y = 0; y < map.Height; y++)
                 {
                     if (cliffMask[x, y])
-                        eroder.PaintEffect(map, allowMask, x, y, -1, 4, 0.1,0,map.Width - 1,0,map.Height - 1);
+                        eroder.PaintEffect(map, allowMask, x, y, -1, 4, 0.1, 0, map.Width - 1, 0, map.Height - 1);
                 }
             }
 

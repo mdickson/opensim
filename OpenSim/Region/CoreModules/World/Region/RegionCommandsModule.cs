@@ -25,21 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using log4net;
 using Mono.Addins;
-using NDesk.Options;
 using Nini.Config;
-using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Console;
-using OpenSim.Framework.Monitoring;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Text;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Region.CoreModules.World.Objects.Commands
@@ -59,22 +53,22 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
 
         public void Initialise(IConfigSource source)
         {
-//            m_log.DebugFormat("[REGION COMMANDS MODULE]: INITIALIZED MODULE");
+            //            m_log.DebugFormat("[REGION COMMANDS MODULE]: INITIALIZED MODULE");
         }
 
         public void PostInitialise()
         {
-//            m_log.DebugFormat("[REGION COMMANDS MODULE]: POST INITIALIZED MODULE");
+            //            m_log.DebugFormat("[REGION COMMANDS MODULE]: POST INITIALIZED MODULE");
         }
 
         public void Close()
         {
-//            m_log.DebugFormat("[REGION COMMANDS MODULE]: CLOSED MODULE");
+            //            m_log.DebugFormat("[REGION COMMANDS MODULE]: CLOSED MODULE");
         }
 
         public void AddRegion(Scene scene)
         {
-//            m_log.DebugFormat("[REGION COMMANDS MODULE]: REGION {0} ADDED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[REGION COMMANDS MODULE]: REGION {0} ADDED", scene.RegionInfo.RegionName);
 
             m_scene = scene;
             m_console = MainConsole.Instance;
@@ -121,12 +115,12 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
 
         public void RemoveRegion(Scene scene)
         {
-//            m_log.DebugFormat("[REGION COMMANDS MODULE]: REGION {0} REMOVED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[REGION COMMANDS MODULE]: REGION {0} REMOVED", scene.RegionInfo.RegionName);
         }
 
         public void RegionLoaded(Scene scene)
         {
-//            m_log.DebugFormat("[REGION COMMANDS MODULE]: REGION {0} LOADED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[REGION COMMANDS MODULE]: REGION {0} LOADED", scene.RegionInfo.RegionName);
         }
 
         private void HandleShowRegion(string module, string[] cmd)
@@ -271,27 +265,27 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
             SimStatsReporter r = m_scene.StatsReporter;
             float[] stats = r.LastReportedSimStats;
 
-            float timeDilation            = stats[0];
-            float simFps                  = stats[1];
-            float physicsFps              = stats[2];
-            float agentUpdates            = stats[3];
-            float rootAgents              = stats[4];
-            float childAgents             = stats[5];
-            float totalPrims              = stats[6];
-            float activePrims             = stats[7];
-            float totalFrameTime          = stats[8];
-//            float netFrameTime            = stats.StatsBlock[9].StatValue; // Ignored - not used by OpenSimulator
-            float physicsFrameTime        = stats[10];
-            float otherFrameTime          = stats[12];
-//            float imageFrameTime          = stats.StatsBlock[11].StatValue; // Ignored
-            float inPacketsPerSecond      = stats[13];
-            float outPacketsPerSecond     = stats[14];
-            float unackedBytes            = stats[15];
-//            float agentFrameTime          = stats.StatsBlock[16].StatValue; // Not really used
-            float pendingDownloads        = stats[17];
-            float pendingUploads          = stats[18];
-            float activeScripts           = stats[19];
-            float scriptLinesPerSecond    = stats[23];
+            float timeDilation = stats[0];
+            float simFps = stats[1];
+            float physicsFps = stats[2];
+            float agentUpdates = stats[3];
+            float rootAgents = stats[4];
+            float childAgents = stats[5];
+            float totalPrims = stats[6];
+            float activePrims = stats[7];
+            float totalFrameTime = stats[8];
+            //            float netFrameTime            = stats.StatsBlock[9].StatValue; // Ignored - not used by OpenSimulator
+            float physicsFrameTime = stats[10];
+            float otherFrameTime = stats[12];
+            //            float imageFrameTime          = stats.StatsBlock[11].StatValue; // Ignored
+            float inPacketsPerSecond = stats[13];
+            float outPacketsPerSecond = stats[14];
+            float unackedBytes = stats[15];
+            //            float agentFrameTime          = stats.StatsBlock[16].StatValue; // Not really used
+            float pendingDownloads = stats[17];
+            float pendingUploads = stats[18];
+            float activeScripts = stats[19];
+            float scriptLinesPerSecond = stats[23];
 
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat("Scene statistics for {0}\n", m_scene.RegionInfo.RegionName);
@@ -323,7 +317,7 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
 
         public void HandleShowNeighboursCommand(string module, string[] cmdparams)
         {
-            if(m_scene == null)
+            if (m_scene == null)
                 return;
 
             if (!(MainConsole.Instance.ConsoleScene == null || MainConsole.Instance.ConsoleScene == m_scene))
@@ -334,15 +328,15 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
             RegionInfo sr = m_scene.RegionInfo;
             caps.AppendFormat("*** Neighbours of {0} ({1}) ***\n", sr.RegionName, sr.RegionID);
             List<GridRegion> regions = m_scene.GridService.GetNeighbours(sr.ScopeID, sr.RegionID);
-                foreach (GridRegion r in regions)
-                    caps.AppendFormat("    {0} @ {1}-{2}\n", r.RegionName, Util.WorldToRegionLoc((uint)r.RegionLocX), Util.WorldToRegionLoc((uint)r.RegionLocY));
+            foreach (GridRegion r in regions)
+                caps.AppendFormat("    {0} @ {1}-{2}\n", r.RegionName, Util.WorldToRegionLoc((uint)r.RegionLocX), Util.WorldToRegionLoc((uint)r.RegionLocY));
 
             MainConsole.Instance.Output(caps.ToString());
         }
 
         public void HandleShowRegionsInViewCommand(string module, string[] cmdparams)
         {
-            if(m_scene == null)
+            if (m_scene == null)
                 return;
 
             if (!(MainConsole.Instance.ConsoleScene == null || MainConsole.Instance.ConsoleScene == m_scene))
@@ -357,10 +351,10 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
             int startY = (int)sr.WorldLocY;
             int endY = startY + (int)sr.RegionSizeY;
             startX -= maxview;
-            if(startX < 0 )
+            if (startX < 0)
                 startX = 0;
             startY -= maxview;
-            if(startY < 0)
+            if (startY < 0)
                 startY = 0;
             endX += maxview;
             endY += maxview;
@@ -368,7 +362,7 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
             List<GridRegion> regions = m_scene.GridService.GetRegionRange(sr.ScopeID, startX, endX, startY, endY);
             foreach (GridRegion r in regions)
             {
-                if(r.RegionHandle == sr.RegionHandle)
+                if (r.RegionHandle == sr.RegionHandle)
                     continue;
                 caps.AppendFormat("    {0} @ {1}-{2}\n", r.RegionName, Util.WorldToRegionLoc((uint)r.RegionLocX), Util.WorldToRegionLoc((uint)r.RegionLocY));
             }

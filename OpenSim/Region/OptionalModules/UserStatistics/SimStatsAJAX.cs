@@ -25,16 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using Mono.Data.SqliteClient;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Framework.Monitoring;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
 
 namespace OpenSim.Region.UserStatistics
 {
@@ -60,8 +56,8 @@ namespace OpenSim.Region.UserStatistics
         public string RenderView(Hashtable pModelResult)
         {
             StringBuilder output = new StringBuilder();
-            List<Scene> all_scenes = (List<Scene>) pModelResult["hdata"];
-            Dictionary<UUID, USimStatsData> sdatadic = (Dictionary<UUID,USimStatsData>)pModelResult["simstats"];
+            List<Scene> all_scenes = (List<Scene>)pModelResult["hdata"];
+            Dictionary<UUID, USimStatsData> sdatadic = (Dictionary<UUID, USimStatsData>)pModelResult["simstats"];
 
             const string TableClass = "defaultr";
             const string TRClass = "defaultr";
@@ -229,8 +225,8 @@ namespace OpenSim.Region.UserStatistics
         /// <returns></returns>
         public string RenderJson(Hashtable pModelResult)
         {
-            List<Scene> all_scenes = (List<Scene>) pModelResult["hdata"];
-            Dictionary<UUID, USimStatsData> sdatadic = (Dictionary<UUID,USimStatsData>)pModelResult["simstats"];
+            List<Scene> all_scenes = (List<Scene>)pModelResult["hdata"];
+            Dictionary<UUID, USimStatsData> sdatadic = (Dictionary<UUID, USimStatsData>)pModelResult["simstats"];
 
             OSDMap allStatsInfo = new OpenMetaverse.StructuredData.OSDMap();
             foreach (USimStatsData sdata in sdatadic.Values)

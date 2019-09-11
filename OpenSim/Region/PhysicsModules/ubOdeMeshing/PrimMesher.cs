@@ -27,7 +27,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
 
 namespace PrimMesher
@@ -188,7 +187,7 @@ namespace PrimMesher
 
         public override string ToString()
         {
-            return "<"+X.ToString() + "," + Y.ToString() + "," + Z.ToString()+ ">";
+            return "<" + X.ToString() + "," + Y.ToString() + "," + Z.ToString() + ">";
         }
 
         public static Coord Cross(Coord c1, Coord c2)
@@ -550,7 +549,7 @@ namespace PrimMesher
             float startAngle = profileStart * twoPi;
             float stopAngle = profileEnd * twoPi;
 
-            try { angles.makeAngles(sides, startAngle, stopAngle,hasProfileCut); }
+            try { angles.makeAngles(sides, startAngle, stopAngle, hasProfileCut); }
             catch (Exception ex)
             {
                 errorMessage = "makeAngles failed: Exception: " + ex.ToString()
@@ -791,7 +790,7 @@ namespace PrimMesher
                 }
                 else
                 {
-                    for (int i = 1; i < numAngles ; i++)
+                    for (int i = 1; i < numAngles; i++)
                     {
                         Face newFace = new Face();
                         newFace.v1 = 0;
@@ -874,13 +873,13 @@ namespace PrimMesher
             {
                 vert = coords[i];
                 vert.X *= x;
-                vert.X = (float)Math.Round(vert.X,5);
+                vert.X = (float)Math.Round(vert.X, 5);
                 vert.Y *= y;
-                vert.Y = (float)Math.Round(vert.Y,5);
+                vert.Y = (float)Math.Round(vert.Y, 5);
                 coords[i] = vert;
             }
 
-            if(x == 0f || y == 0f)
+            if (x == 0f || y == 0f)
                 faces = new List<Face>();
         }
 
@@ -890,7 +889,7 @@ namespace PrimMesher
         public void FlipNormals()
         {
             int numFaces = faces.Count;
-            if(numFaces == 0)
+            if (numFaces == 0)
                 return;
 
             int i;
@@ -910,7 +909,7 @@ namespace PrimMesher
         public void AddValue2FaceVertexIndices(int num)
         {
             int numFaces = faces.Count;
-            if(numFaces == 0)
+            if (numFaces == 0)
                 return;
 
             Face tmpFace;
@@ -926,7 +925,7 @@ namespace PrimMesher
             }
         }
 
-         public void DumpRaw(String path, String name, String title)
+        public void DumpRaw(String path, String name, String title)
         {
             if (path == null)
                 return;
@@ -1025,13 +1024,13 @@ namespace PrimMesher
                     newNode.xScale = 1.0f;
                     if (taperX > 0.0f)
                         newNode.xScale -= percentOfPath * taperX;
-                    else if(taperX < 0.0f)
+                    else if (taperX < 0.0f)
                         newNode.xScale += (1.0f - percentOfPath) * taperX;
 
                     newNode.yScale = 1.0f;
                     if (taperY > 0.0f)
                         newNode.yScale -= percentOfPath * taperY;
-                    else if(taperY < 0.0f)
+                    else if (taperY < 0.0f)
                         newNode.yScale += (1.0f - percentOfPath) * taperY;
 
                     float twist = twistBegin + twistTotal * percentOfPath;
@@ -1171,7 +1170,7 @@ namespace PrimMesher
         private const float twoPi = 2.0f * (float)Math.PI;
 
         public List<Coord> coords;
-//        public List<Coord> normals;
+        //        public List<Coord> normals;
         public List<Face> faces;
 
         private int sides = 4;
@@ -1379,7 +1378,7 @@ namespace PrimMesher
             }
 
             Profile profile = new Profile(sides, profileStart, profileEnd, hollow, hollowSides,
-                                HasProfileCut,true);
+                                HasProfileCut, true);
             errorMessage = profile.errorMessage;
 
             numPrimFaces = profile.numPrimFaces;
@@ -1444,7 +1443,7 @@ namespace PrimMesher
                     int endVert = coords.Count;
                     if (!hasProfileCut)
                     {
-                        if(numVerts > 5 && !hasHollow)
+                        if (numVerts > 5 && !hasHollow)
                             startVert++;
                         int i = startVert;
                         for (int l = 0; l < profile.numOuterVerts - 1; l++)
@@ -1520,7 +1519,7 @@ namespace PrimMesher
                     }
                 }
 
-                if(linkfaces.Count > 0)
+                if (linkfaces.Count > 0)
                     faces.AddRange(linkfaces);
 
                 if (needEndFaces && nodeIndex == lastNode && newLayer.faces.Count > 0)
@@ -1530,7 +1529,7 @@ namespace PrimMesher
                 }
 
             } // for (int nodeIndex = 0; nodeIndex < path.pathNodes.Count; nodeIndex++)
-        // more cleanup will be done at Meshmerizer.cs
+              // more cleanup will be done at Meshmerizer.cs
         }
 
         private Coord SurfaceNormal(Coord c1, Coord c2, Coord c3)

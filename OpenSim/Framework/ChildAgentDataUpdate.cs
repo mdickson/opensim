@@ -25,13 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using log4net;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 
 namespace OpenSim.Framework
 {
@@ -119,7 +119,7 @@ namespace OpenSim.Framework
             args["far"] = OSD.FromReal(Far);
             args["changed_grid"] = OSD.FromBoolean(ChangedGrid);
             //args["god_level"] = OSD.FromString(GodLevel.ToString());
-            if(GodData != null)
+            if (GodData != null)
             {
                 args["god_data"] = GodData;
                 OSDMap g = (OSDMap)GodData;
@@ -389,11 +389,11 @@ namespace OpenSim.Framework
         // Appearance
         public AvatarAppearance Appearance;
 
-// DEBUG ON
+        // DEBUG ON
         private static readonly ILog m_log =
                 LogManager.GetLogger(
                 MethodBase.GetCurrentMethod().DeclaringType);
-// DEBUG OFF
+        // DEBUG OFF
 
         // Scripted
         public ControllerData[] Controllers;
@@ -409,7 +409,7 @@ namespace OpenSim.Framework
 
         public virtual OSDMap Pack(EntityTransferContext ctx)
         {
-//            m_log.InfoFormat("[CHILDAGENTDATAUPDATE] Pack data");
+            //            m_log.InfoFormat("[CHILDAGENTDATAUPDATE] Pack data");
 
             OSDMap args = new OSDMap();
             args["message_type"] = OSD.FromString("AgentData");
@@ -443,12 +443,12 @@ namespace OpenSim.Framework
 
             args["energy_level"] = OSD.FromReal(EnergyLevel);
             //args["god_level"] = OSD.FromString(GodLevel.ToString());
-            if(GodData != null)
+            if (GodData != null)
             {
                 args["god_data"] = GodData;
                 OSDMap g = (OSDMap)GodData;
                 if (g.ContainsKey("ViewerUiIsGod"))
-                    args["god_level"] = g["ViewerUiIsGod"].AsBoolean() ? 200 : 0;;
+                    args["god_level"] = g["ViewerUiIsGod"].AsBoolean() ? 200 : 0; ;
             }
             args["always_run"] = OSD.FromBoolean(AlwaysRun);
             args["prey_agent"] = OSD.FromUUID(PreyAgent);
@@ -456,12 +456,12 @@ namespace OpenSim.Framework
 
             args["agent_cof"] = OSD.FromUUID(agentCOF);
             args["crossingflags"] = OSD.FromInteger(CrossingFlags);
-            if(CrossingFlags != 0)
+            if (CrossingFlags != 0)
                 args["crossExtraFlags"] = OSD.FromInteger(CrossExtraFlags);
 
             args["active_group_id"] = OSD.FromUUID(ActiveGroupID);
             args["active_group_name"] = OSD.FromString(ActiveGroupName);
-            if(ActiveGroupTitle != null)
+            if (ActiveGroupTitle != null)
                 args["active_group_title"] = OSD.FromString(ActiveGroupTitle);
 
             if (ChildrenCapSeeds != null && ChildrenCapSeeds.Count > 0)
@@ -653,7 +653,7 @@ namespace OpenSim.Framework
             if (args.ContainsKey("crossingflags") && args["crossingflags"] != null)
                 CrossingFlags = (byte)args["crossingflags"].AsInteger();
 
-            if(CrossingFlags != 0)
+            if (CrossingFlags != 0)
             {
                 if (args.ContainsKey("crossExtraFlags") && args["crossExtraFlags"] != null)
                     CrossExtraFlags = (byte)args["crossExtraFlags"].AsInteger();
@@ -665,7 +665,7 @@ namespace OpenSim.Framework
             if (args.ContainsKey("active_group_name") && args["active_group_name"] != null)
                 ActiveGroupName = args["active_group_name"].AsString();
 
-            if(args.ContainsKey("active_group_title") && args["active_group_title"] != null)
+            if (args.ContainsKey("active_group_title") && args["active_group_title"] != null)
                 ActiveGroupTitle = args["active_group_title"].AsString();
 
             if (args.ContainsKey("children_seeds") && (args["children_seeds"] != null) &&

@@ -25,11 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
+using OpenSim.Framework;
 using System;
 using System.Collections.Generic;
-
-using OpenSim.Framework;
-using OpenMetaverse;
 
 namespace OpenSim.Groups
 {
@@ -120,7 +119,7 @@ namespace OpenSim.Groups
             dict["OwnerRoleID"] = grec.OwnerRoleID.ToString();
             dict["ServiceLocation"] = Sanitize(grec.ServiceLocation);
             dict["ShownInList"] = grec.ShowInList.ToString();
-            dict["MemberCount"] =  grec.MemberCount.ToString();
+            dict["MemberCount"] = grec.MemberCount.ToString();
             dict["RoleCount"] = grec.RoleCount.ToString();
 
             return dict;

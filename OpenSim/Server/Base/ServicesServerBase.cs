@@ -25,23 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Threading;
-using System.Text;
-using System.Xml;
+using log4net;
+using log4net.Config;
+using Nini.Config;
 using OpenSim.Framework;
 using OpenSim.Framework.Console;
 using OpenSim.Framework.Monitoring;
 using OpenSim.Framework.Servers;
-using log4net;
-using log4net.Config;
-using log4net.Appender;
-using log4net.Core;
-using log4net.Repository;
-using Nini.Config;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Xml;
 
 namespace OpenSim.Server.Base
 {
@@ -78,7 +73,7 @@ namespace OpenSim.Server.Base
             argvConfig.AddSwitch("Startup", "console", "c");
             argvConfig.AddSwitch("Startup", "logfile", "l");
             argvConfig.AddSwitch("Startup", "inifile", "i");
-            argvConfig.AddSwitch("Startup", "prompt",  "p");
+            argvConfig.AddSwitch("Startup", "prompt", "p");
             argvConfig.AddSwitch("Startup", "logconfig", "g");
 
             // Automagically create the ini file name
@@ -98,7 +93,7 @@ namespace OpenSim.Server.Base
                 prompt = startupConfig.GetString("prompt", prompt);
 
                 // Check for a Log4Net config file on the command line
-                logConfig =startupConfig.GetString("logconfig", logConfig);
+                logConfig = startupConfig.GetString("logconfig", logConfig);
             }
 
             Config = ReadConfigSource(iniFile);
@@ -110,7 +105,7 @@ namespace OpenSim.Server.Base
 
             while (AddIncludes(Config, sources))
             {
-                for ( ; sourceIndex < sources.Count ; ++sourceIndex)
+                for (; sourceIndex < sources.Count; ++sourceIndex)
                 {
                     IConfigSource s = ReadConfigSource(sources[sourceIndex]);
                     Config.Merge(s);
@@ -254,7 +249,7 @@ namespace OpenSim.Server.Base
 
         protected override void ShutdownSpecific()
         {
-            if(!m_Running)
+            if (!m_Running)
                 return;
             m_Running = false;
             m_log.Info("[CONSOLE] Quitting");

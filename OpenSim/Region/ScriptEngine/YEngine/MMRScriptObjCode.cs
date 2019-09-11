@@ -25,11 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenSim.Region.ScriptEngine.Yengine;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Reflection.Emit;
 
 namespace OpenSim.Region.ScriptEngine.Yengine
@@ -87,13 +85,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public ScriptObjCode(BinaryReader objFileReader, TextWriter asmFileWriter, TextWriter srcFileWriter)
         {
-             // Check version number to make sure we know how to process file contents.
+            // Check version number to make sure we know how to process file contents.
             char[] ocm = objFileReader.ReadChars(ScriptCodeGen.OBJECT_CODE_MAGIC.Length);
-            if(new String(ocm) != ScriptCodeGen.OBJECT_CODE_MAGIC)
+            if (new String(ocm) != ScriptCodeGen.OBJECT_CODE_MAGIC)
                 throw new CVVMismatchException("Not an Yengine object file (bad magic)");
 
             int cvv = objFileReader.ReadInt32();
-            if(cvv != ScriptCodeGen.COMPILED_VERSION_VALUE)
+            if (cvv != ScriptCodeGen.COMPILED_VERSION_VALUE)
                 throw new CVVMismatchException(
                     "Object version is " + cvv.ToString() + " but accept only " + ScriptCodeGen.COMPILED_VERSION_VALUE.ToString());
             // Fill in simple parts of scriptObjCode object.
@@ -102,29 +100,29 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             int nStates = objFileReader.ReadInt32();
 
             stateNames = new string[nStates];
-            for(int i = 0; i < nStates; i++)
+            for (int i = 0; i < nStates; i++)
             {
                 stateNames[i] = objFileReader.ReadString();
-                if(asmFileWriter != null)
+                if (asmFileWriter != null)
                     asmFileWriter.WriteLine("  state[{0}] = {1}", i, stateNames[i]);
             }
 
-            if(asmFileWriter != null)
+            if (asmFileWriter != null)
                 glblSizes.WriteAsmFile(asmFileWriter, "numGbl");
 
             string gblName;
-            while((gblName = objFileReader.ReadString()) != "")
+            while ((gblName = objFileReader.ReadString()) != "")
             {
                 string gblType = objFileReader.ReadString();
                 int gblIndex = objFileReader.ReadInt32();
                 Dictionary<int, string> names;
-                if(!globalVarNames.TryGetValue(gblType, out names))
+                if (!globalVarNames.TryGetValue(gblType, out names))
                 {
                     names = new Dictionary<int, string>();
                     globalVarNames.Add(gblType, names);
                 }
                 names.Add(gblIndex, gblName);
-                if(asmFileWriter != null)
+                if (asmFileWriter != null)
                     asmFileWriter.WriteLine("  {0} = {1}[{2}]", gblName, gblType, gblIndex);
             }
 
@@ -132,18 +130,18 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             sdObjTypesName = new Dictionary<string, TokenDeclSDType>();
             sdDelTypes = new Dictionary<Type, string>();
             int maxIndex = -1;
-            while((gblName = objFileReader.ReadString()) != "")
+            while ((gblName = objFileReader.ReadString()) != "")
             {
                 TokenDeclSDType sdt = TokenDeclSDType.ReadFromFile(sdObjTypesName,
                                                       gblName, objFileReader, asmFileWriter);
                 sdObjTypesName.Add(gblName, sdt);
-                if(maxIndex < sdt.sdTypeIndex)
+                if (maxIndex < sdt.sdTypeIndex)
                     maxIndex = sdt.sdTypeIndex;
-                if(sdt is TokenDeclSDTypeDelegate)
+                if (sdt is TokenDeclSDTypeDelegate)
                     sdDelTypes.Add(sdt.GetSysType(), gblName);
             }
             sdObjTypesIndx = new TokenDeclSDType[maxIndex + 1];
-            foreach(TokenDeclSDType sdt in sdObjTypesName.Values)
+            foreach (TokenDeclSDType sdt in sdObjTypesName.Values)
                 sdObjTypesIndx[sdt.sdTypeIndex] = sdt;
 
             // Now fill in the methods (the hard part).
@@ -152,9 +150,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             scriptSrcLocss = new Dictionary<string, KeyValuePair<int, ScriptSrcLoc>[]>();
 
             ObjectTokens objectTokens = null;
-            if(asmFileWriter != null)
+            if (asmFileWriter != null)
                 objectTokens = new OTDisassemble(this, asmFileWriter);
-            else if(srcFileWriter != null)
+            else if (srcFileWriter != null)
                 objectTokens = new OTDecompile(this, srcFileWriter);
 
             try
@@ -163,23 +161,23 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
             finally
             {
-                if(objectTokens != null)
+                if (objectTokens != null)
                     objectTokens.Close();
             }
 
             // We enter all script event handler methods in the ScriptEventHandler table.
             // They are named:  <statename> <eventname>
-            foreach(KeyValuePair<string, DynamicMethod> kvp in dynamicMethods)
+            foreach (KeyValuePair<string, DynamicMethod> kvp in dynamicMethods)
             {
                 string methName = kvp.Key;
                 int i = methName.IndexOf(' ');
-                if(i < 0)
+                if (i < 0)
                     continue;
                 string stateName = methName.Substring(0, i);
                 string eventName = methName.Substring(++i);
                 int stateCode;
-                for(stateCode = stateNames.Length; --stateCode >= 0;)
-                    if(stateNames[stateCode] == stateName)
+                for (stateCode = stateNames.Length; --stateCode >= 0;)
+                    if (stateNames[stateCode] == stateName)
                         break;
 
                 int eventCode = (int)Enum.Parse(typeof(ScriptEventCode), eventName);
@@ -188,9 +186,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
 
             // Fill in all script-defined class vtables.
-            foreach(TokenDeclSDType sdt in sdObjTypesIndx)
+            foreach (TokenDeclSDType sdt in sdObjTypesIndx)
             {
-                if((sdt != null) && (sdt is TokenDeclSDTypeClass))
+                if ((sdt != null) && (sdt is TokenDeclSDTypeClass))
                 {
                     TokenDeclSDTypeClass sdtc = (TokenDeclSDTypeClass)sdt;
                     sdtc.FillVTables(this);
@@ -204,18 +202,18 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public void EndMethod(DynamicMethod method, Dictionary<int, ScriptSrcLoc> srcLocs)
         {
-             // Save method object code pointer.
+            // Save method object code pointer.
             dynamicMethods.Add(method.Name, method);
 
-             // Build and sort iloffset -> source code location array.
+            // Build and sort iloffset -> source code location array.
             int n = srcLocs.Count;
             KeyValuePair<int, ScriptSrcLoc>[] srcLocArray = new KeyValuePair<int, ScriptSrcLoc>[n];
             n = 0;
-            foreach(KeyValuePair<int, ScriptSrcLoc> kvp in srcLocs)
+            foreach (KeyValuePair<int, ScriptSrcLoc> kvp in srcLocs)
                 srcLocArray[n++] = kvp;
             Array.Sort(srcLocArray, endMethodWrapper);
 
-             // Save sorted array.
+            // Save sorted array.
             scriptSrcLocss.Add(method.Name, srcLocArray);
         }
 
@@ -224,7 +222,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          *        It enters the method in the ScriptObjCode object table so it can be called.
          */
         private static EndMethodWrapper endMethodWrapper = new EndMethodWrapper();
-        private class EndMethodWrapper: System.Collections.IComparer
+        private class EndMethodWrapper : System.Collections.IComparer
         {
             public int Compare(object x, object y)
             {

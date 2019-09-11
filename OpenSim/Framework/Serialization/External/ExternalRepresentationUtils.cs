@@ -25,15 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Xml;
-using log4net;
-using OpenMetaverse;
-using OpenSim.Services.Interfaces;
 
 namespace OpenSim.Framework.Serialization.External
 {
@@ -58,7 +58,8 @@ namespace OpenSim.Framework.Serialization.External
                 nodeToFill,
                 processors,
                 xtr,
-                (o, nodeName, e) => {
+                (o, nodeName, e) =>
+                {
                     m_log.Debug(string.Format("[ExternalRepresentationUtils]: Error while parsing element {0} ",
                         nodeName), e);
                 });
@@ -221,7 +222,7 @@ namespace OpenSim.Framework.Serialization.External
             using (StringWriter sw = new StringWriter())
             using (XmlTextWriter writer = new XmlTextWriter(sw))
             using (XmlTextReader wrappedReader = new XmlTextReader(xmlData, XmlNodeType.Element, null))
-            using (XmlReader reader = XmlReader.Create(wrappedReader, new XmlReaderSettings() { IgnoreWhitespace = true, ConformanceLevel = ConformanceLevel.Fragment}))
+            using (XmlReader reader = XmlReader.Create(wrappedReader, new XmlReaderSettings() { IgnoreWhitespace = true, ConformanceLevel = ConformanceLevel.Fragment }))
             {
                 TransformXml(reader, writer, sceneName, homeURL, userService, scopeID);
 

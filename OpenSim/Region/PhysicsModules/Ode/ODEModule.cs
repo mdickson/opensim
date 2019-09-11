@@ -1,11 +1,11 @@
-﻿using System;
-using System.Reflection;
-using log4net;
-using Nini.Config;
+﻿using log4net;
 using Mono.Addins;
+using Nini.Config;
 using OpenSim.Framework;
-using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Region.PhysicsModule.ODE
 {
@@ -16,9 +16,9 @@ namespace OpenSim.Region.PhysicsModule.ODE
 
         private bool m_Enabled = false;
         private IConfigSource m_config;
-        private OdeScene  m_scene;
+        private OdeScene m_scene;
 
-       #region INonSharedRegionModule
+        #region INonSharedRegionModule
 
         public string Name
         {

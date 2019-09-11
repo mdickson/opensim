@@ -27,11 +27,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
-
 using System.Drawing;
-using System.Drawing.Imaging;
+using System.IO;
 
 namespace PrimMesher
 {
@@ -154,16 +151,16 @@ namespace PrimMesher
                     {
                         Face f1, f2;
 
-                            if (invert)
-                            {
-                                f1 = new Face(p1, p4, p3);
-                                f2 = new Face(p1, p2, p4);
-                            }
-                            else
-                            {
-                                f1 = new Face(p1, p3, p4);
-                                f2 = new Face(p1, p4, p2);
-                            }
+                        if (invert)
+                        {
+                            f1 = new Face(p1, p4, p3);
+                            f2 = new Face(p1, p2, p4);
+                        }
+                        else
+                        {
+                            f1 = new Face(p1, p3, p4);
+                            f2 = new Face(p1, p4, p2);
+                        }
 
                         faces.Add(f1);
                         faces.Add(f2);
@@ -203,7 +200,7 @@ namespace PrimMesher
                 return;
             String fileName = name + "_" + title + ".raw";
             String completePath = System.IO.Path.Combine(path, fileName);
-            using(StreamWriter sw = new StreamWriter(completePath))
+            using (StreamWriter sw = new StreamWriter(completePath))
             {
                 for (int i = 0; i < faces.Count; i++)
                 {

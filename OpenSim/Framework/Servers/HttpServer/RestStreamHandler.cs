@@ -40,7 +40,7 @@ namespace OpenSim.Framework.Servers.HttpServer
         }
 
         public RestStreamHandler(string httpMethod, string path, RestMethod restMethod)
-            : this(httpMethod, path, restMethod, null, null) {}
+            : this(httpMethod, path, restMethod, null, null) { }
 
         public RestStreamHandler(string httpMethod, string path, RestMethod restMethod, string name, string description)
             : base(httpMethod, path, name, description)
@@ -52,7 +52,7 @@ namespace OpenSim.Framework.Servers.HttpServer
         {
             string requestBody;
             Encoding encoding = Encoding.UTF8;
-            using(StreamReader streamReader = new StreamReader(request,encoding))
+            using (StreamReader streamReader = new StreamReader(request, encoding))
                 requestBody = streamReader.ReadToEnd();
 
             string param = GetParam(path);

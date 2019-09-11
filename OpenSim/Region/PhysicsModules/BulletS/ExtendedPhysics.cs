@@ -24,23 +24,16 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-
-using OpenSim.Framework;
-using OpenSim.Region.Framework;
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.PhysicsModules.SharedBase;
-
-using Mono.Addins;
-using Nini.Config;
-using log4net;
-using OpenMetaverse;
+using System;
+using System.Reflection;
+using System.Threading;
 
 namespace OpenSim.Region.PhysicsModule.BulletS
 {
@@ -161,7 +154,7 @@ namespace OpenSim.Region.PhysicsModule.BulletS
         }
 
         [ScriptConstant]
-        public const int PHYS_CENTER_OF_MASS =     1 << 0;
+        public const int PHYS_CENTER_OF_MASS = 1 << 0;
 
         [ScriptInvocation]
         public string physGetEngineType(UUID hostID, UUID scriptID)
@@ -179,35 +172,35 @@ namespace OpenSim.Region.PhysicsModule.BulletS
         // Code for specifying params.
         // The choice if 14700 is arbitrary and only serves to catch parameter code misuse.
         [ScriptConstant]
-        public const int PHYS_AXIS_LOCK_LINEAR     = 14700;
+        public const int PHYS_AXIS_LOCK_LINEAR = 14700;
         [ScriptConstant]
-        public const int PHYS_AXIS_LOCK_LINEAR_X   = 14701;
+        public const int PHYS_AXIS_LOCK_LINEAR_X = 14701;
         [ScriptConstant]
-        public const int PHYS_AXIS_LIMIT_LINEAR_X  = 14702;
+        public const int PHYS_AXIS_LIMIT_LINEAR_X = 14702;
         [ScriptConstant]
-        public const int PHYS_AXIS_LOCK_LINEAR_Y   = 14703;
+        public const int PHYS_AXIS_LOCK_LINEAR_Y = 14703;
         [ScriptConstant]
-        public const int PHYS_AXIS_LIMIT_LINEAR_Y  = 14704;
+        public const int PHYS_AXIS_LIMIT_LINEAR_Y = 14704;
         [ScriptConstant]
-        public const int PHYS_AXIS_LOCK_LINEAR_Z   = 14705;
+        public const int PHYS_AXIS_LOCK_LINEAR_Z = 14705;
         [ScriptConstant]
-        public const int PHYS_AXIS_LIMIT_LINEAR_Z  = 14706;
+        public const int PHYS_AXIS_LIMIT_LINEAR_Z = 14706;
         [ScriptConstant]
-        public const int PHYS_AXIS_LOCK_ANGULAR    = 14707;
+        public const int PHYS_AXIS_LOCK_ANGULAR = 14707;
         [ScriptConstant]
-        public const int PHYS_AXIS_LOCK_ANGULAR_X  = 14708;
+        public const int PHYS_AXIS_LOCK_ANGULAR_X = 14708;
         [ScriptConstant]
         public const int PHYS_AXIS_LIMIT_ANGULAR_X = 14709;
         [ScriptConstant]
-        public const int PHYS_AXIS_LOCK_ANGULAR_Y  = 14710;
+        public const int PHYS_AXIS_LOCK_ANGULAR_Y = 14710;
         [ScriptConstant]
         public const int PHYS_AXIS_LIMIT_ANGULAR_Y = 14711;
         [ScriptConstant]
-        public const int PHYS_AXIS_LOCK_ANGULAR_Z  = 14712;
+        public const int PHYS_AXIS_LOCK_ANGULAR_Z = 14712;
         [ScriptConstant]
         public const int PHYS_AXIS_LIMIT_ANGULAR_Z = 14713;
         [ScriptConstant]
-        public const int PHYS_AXIS_UNLOCK_LINEAR   = 14714;
+        public const int PHYS_AXIS_UNLOCK_LINEAR = 14714;
         [ScriptConstant]
         public const int PHYS_AXIS_UNLOCK_LINEAR_X = 14715;
         [ScriptConstant]
@@ -215,7 +208,7 @@ namespace OpenSim.Region.PhysicsModule.BulletS
         [ScriptConstant]
         public const int PHYS_AXIS_UNLOCK_LINEAR_Z = 14717;
         [ScriptConstant]
-        public const int PHYS_AXIS_UNLOCK_ANGULAR  = 14718;
+        public const int PHYS_AXIS_UNLOCK_ANGULAR = 14718;
         [ScriptConstant]
         public const int PHYS_AXIS_UNLOCK_ANGULAR_X = 14719;
         [ScriptConstant]
@@ -223,7 +216,7 @@ namespace OpenSim.Region.PhysicsModule.BulletS
         [ScriptConstant]
         public const int PHYS_AXIS_UNLOCK_ANGULAR_Z = 14721;
         [ScriptConstant]
-        public const int PHYS_AXIS_UNLOCK           = 14722;
+        public const int PHYS_AXIS_UNLOCK = 14722;
         // physAxisLockLimits()
         [ScriptInvocation]
         public int physAxisLock(UUID hostID, UUID scriptID, object[] parms)
@@ -242,11 +235,11 @@ namespace OpenSim.Region.PhysicsModule.BulletS
         }
 
         [ScriptConstant]
-        public const int PHYS_LINKSET_TYPE_CONSTRAINT  = 0;
+        public const int PHYS_LINKSET_TYPE_CONSTRAINT = 0;
         [ScriptConstant]
-        public const int PHYS_LINKSET_TYPE_COMPOUND    = 1;
+        public const int PHYS_LINKSET_TYPE_COMPOUND = 1;
         [ScriptConstant]
-        public const int PHYS_LINKSET_TYPE_MANUAL      = 2;
+        public const int PHYS_LINKSET_TYPE_MANUAL = 2;
 
         [ScriptInvocation]
         public int physSetLinksetType(UUID hostID, UUID scriptID, int linksetType)
@@ -337,13 +330,13 @@ namespace OpenSim.Region.PhysicsModule.BulletS
         }
 
         [ScriptConstant]
-        public const int PHYS_LINK_TYPE_FIXED  = 1234;
+        public const int PHYS_LINK_TYPE_FIXED = 1234;
         [ScriptConstant]
-        public const int PHYS_LINK_TYPE_HINGE  = 4;
+        public const int PHYS_LINK_TYPE_HINGE = 4;
         [ScriptConstant]
         public const int PHYS_LINK_TYPE_SPRING = 9;
         [ScriptConstant]
-        public const int PHYS_LINK_TYPE_6DOF   = 6;
+        public const int PHYS_LINK_TYPE_6DOF = 6;
         [ScriptConstant]
         public const int PHYS_LINK_TYPE_SLIDER = 7;
 
@@ -398,7 +391,7 @@ namespace OpenSim.Region.PhysicsModule.BulletS
 
             if (GetRootAndChildPhysActors(hostID, linkNum, out rootPhysActor, out childPhysActor))
             {
-                object[] parms2 = { rootPhysActor, childPhysActor , PHYS_LINK_TYPE_FIXED };
+                object[] parms2 = { rootPhysActor, childPhysActor, PHYS_LINK_TYPE_FIXED };
                 ret = MakeIntError(rootPhysActor.Extension(PhysFunctChangeLinkType, parms2));
             }
 
@@ -407,52 +400,52 @@ namespace OpenSim.Region.PhysicsModule.BulletS
 
         // Code for specifying params.
         // The choice if 14400 is arbitrary and only serves to catch parameter code misuse.
-        public const int PHYS_PARAM_MIN                    = 14401;
+        public const int PHYS_PARAM_MIN = 14401;
 
         [ScriptConstant]
-        public const int PHYS_PARAM_FRAMEINA_LOC           = 14401;
+        public const int PHYS_PARAM_FRAMEINA_LOC = 14401;
         [ScriptConstant]
-        public const int PHYS_PARAM_FRAMEINA_ROT           = 14402;
+        public const int PHYS_PARAM_FRAMEINA_ROT = 14402;
         [ScriptConstant]
-        public const int PHYS_PARAM_FRAMEINB_LOC           = 14403;
+        public const int PHYS_PARAM_FRAMEINB_LOC = 14403;
         [ScriptConstant]
-        public const int PHYS_PARAM_FRAMEINB_ROT           = 14404;
+        public const int PHYS_PARAM_FRAMEINB_ROT = 14404;
         [ScriptConstant]
-        public const int PHYS_PARAM_LINEAR_LIMIT_LOW       = 14405;
+        public const int PHYS_PARAM_LINEAR_LIMIT_LOW = 14405;
         [ScriptConstant]
-        public const int PHYS_PARAM_LINEAR_LIMIT_HIGH      = 14406;
+        public const int PHYS_PARAM_LINEAR_LIMIT_HIGH = 14406;
         [ScriptConstant]
-        public const int PHYS_PARAM_ANGULAR_LIMIT_LOW      = 14407;
+        public const int PHYS_PARAM_ANGULAR_LIMIT_LOW = 14407;
         [ScriptConstant]
-        public const int PHYS_PARAM_ANGULAR_LIMIT_HIGH     = 14408;
+        public const int PHYS_PARAM_ANGULAR_LIMIT_HIGH = 14408;
         [ScriptConstant]
-        public const int PHYS_PARAM_USE_FRAME_OFFSET       = 14409;
+        public const int PHYS_PARAM_USE_FRAME_OFFSET = 14409;
         [ScriptConstant]
-        public const int PHYS_PARAM_ENABLE_TRANSMOTOR      = 14410;
+        public const int PHYS_PARAM_ENABLE_TRANSMOTOR = 14410;
         [ScriptConstant]
-        public const int PHYS_PARAM_TRANSMOTOR_MAXVEL      = 14411;
+        public const int PHYS_PARAM_TRANSMOTOR_MAXVEL = 14411;
         [ScriptConstant]
-        public const int PHYS_PARAM_TRANSMOTOR_MAXFORCE    = 14412;
+        public const int PHYS_PARAM_TRANSMOTOR_MAXFORCE = 14412;
         [ScriptConstant]
-        public const int PHYS_PARAM_CFM                    = 14413;
+        public const int PHYS_PARAM_CFM = 14413;
         [ScriptConstant]
-        public const int PHYS_PARAM_ERP                    = 14414;
+        public const int PHYS_PARAM_ERP = 14414;
         [ScriptConstant]
-        public const int PHYS_PARAM_SOLVER_ITERATIONS      = 14415;
+        public const int PHYS_PARAM_SOLVER_ITERATIONS = 14415;
         [ScriptConstant]
-        public const int PHYS_PARAM_SPRING_AXIS_ENABLE     = 14416;
+        public const int PHYS_PARAM_SPRING_AXIS_ENABLE = 14416;
         [ScriptConstant]
-        public const int PHYS_PARAM_SPRING_DAMPING         = 14417;
+        public const int PHYS_PARAM_SPRING_DAMPING = 14417;
         [ScriptConstant]
-        public const int PHYS_PARAM_SPRING_STIFFNESS       = 14418;
+        public const int PHYS_PARAM_SPRING_STIFFNESS = 14418;
         [ScriptConstant]
-        public const int PHYS_PARAM_LINK_TYPE              = 14419;
+        public const int PHYS_PARAM_LINK_TYPE = 14419;
         [ScriptConstant]
-        public const int PHYS_PARAM_USE_LINEAR_FRAMEA      = 14420;
+        public const int PHYS_PARAM_USE_LINEAR_FRAMEA = 14420;
         [ScriptConstant]
         public const int PHYS_PARAM_SPRING_EQUILIBRIUM_POINT = 14421;
 
-        public const int PHYS_PARAM_MAX                    = 14421;
+        public const int PHYS_PARAM_MAX = 14421;
 
         // Used when specifying a parameter that has settings for the three linear and three angular axis
         [ScriptConstant]
@@ -462,11 +455,11 @@ namespace OpenSim.Region.PhysicsModule.BulletS
         [ScriptConstant]
         public const int PHYS_AXIS_ANGULAR_ALL = -3;
         [ScriptConstant]
-        public const int PHYS_AXIS_LINEAR_X  = 0;
+        public const int PHYS_AXIS_LINEAR_X = 0;
         [ScriptConstant]
-        public const int PHYS_AXIS_LINEAR_Y  = 1;
+        public const int PHYS_AXIS_LINEAR_Y = 1;
         [ScriptConstant]
-        public const int PHYS_AXIS_LINEAR_Z  = 2;
+        public const int PHYS_AXIS_LINEAR_Z = 2;
         [ScriptConstant]
         public const int PHYS_AXIS_ANGULAR_X = 3;
         [ScriptConstant]

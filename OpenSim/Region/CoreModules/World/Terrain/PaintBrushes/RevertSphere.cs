@@ -52,7 +52,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain.PaintBrushes
             if (duration < 0)
                 return;
 
-            int x,y;
+            int x, y;
             for (x = startX; x <= endX; x++)
             {
                 for (y = startY; y <= endY; y++)

@@ -25,14 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using MySql.Data.MySqlClient;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Data;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Data.MySQL
 {
@@ -52,7 +51,7 @@ namespace OpenSim.Data.MySQL
         public void Initialise()
         {
             m_log.Info("[MySQLInventoryData]: " + Name + " cannot be default-initialized!");
-            throw new PluginNotInitialisedException (Name);
+            throw new PluginNotInitialisedException(Name);
         }
 
         /// <summary>
@@ -306,21 +305,21 @@ namespace OpenSim.Data.MySQL
                 // Rest of the parsing.  If these UUID's fail, we're dead anyway
                 item.ID = DBGuid.FromDB(reader["inventoryID"]);
                 item.AssetID = DBGuid.FromDB(reader["assetID"]);
-                item.AssetType = (int) reader["assetType"];
+                item.AssetType = (int)reader["assetType"];
                 item.Folder = DBGuid.FromDB(reader["parentFolderID"]);
                 item.Name = (string)(reader["inventoryName"] ?? String.Empty);
                 item.Description = (string)(reader["inventoryDescription"] ?? String.Empty);
-                item.NextPermissions = (uint) reader["inventoryNextPermissions"];
-                item.CurrentPermissions = (uint) reader["inventoryCurrentPermissions"];
-                item.InvType = (int) reader["invType"];
-                item.BasePermissions = (uint) reader["inventoryBasePermissions"];
-                item.EveryOnePermissions = (uint) reader["inventoryEveryOnePermissions"];
-                item.GroupPermissions = (uint) reader["inventoryGroupPermissions"];
-                item.SalePrice = (int) reader["salePrice"];
+                item.NextPermissions = (uint)reader["inventoryNextPermissions"];
+                item.CurrentPermissions = (uint)reader["inventoryCurrentPermissions"];
+                item.InvType = (int)reader["invType"];
+                item.BasePermissions = (uint)reader["inventoryBasePermissions"];
+                item.EveryOnePermissions = (uint)reader["inventoryEveryOnePermissions"];
+                item.GroupPermissions = (uint)reader["inventoryGroupPermissions"];
+                item.SalePrice = (int)reader["salePrice"];
                 item.SaleType = unchecked((byte)(Convert.ToSByte(reader["saleType"])));
-                item.CreationDate = (int) reader["creationDate"];
+                item.CreationDate = (int)reader["creationDate"];
                 item.GroupOwned = Convert.ToBoolean(reader["groupOwned"]);
-                item.Flags = (uint) reader["flags"];
+                item.Flags = (uint)reader["flags"];
 
                 return item;
             }
@@ -384,9 +383,9 @@ namespace OpenSim.Data.MySQL
                 folder.Owner = DBGuid.FromDB(reader["agentID"]);
                 folder.ParentID = DBGuid.FromDB(reader["parentFolderID"]);
                 folder.ID = DBGuid.FromDB(reader["folderID"]);
-                folder.Name = (string) reader["folderName"];
-                folder.Type = (short) reader["type"];
-                folder.Version = (ushort) ((int) reader["version"]);
+                folder.Name = (string)reader["folderName"];
+                folder.Type = (short)reader["type"];
+                folder.Version = (ushort)((int)reader["version"]);
                 return folder;
             }
             catch (Exception e)

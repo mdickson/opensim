@@ -50,9 +50,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public static Type GetType(System.Type ret, System.Type[] args, string sig)
         {
             DelegateCommon dc;
-            lock(delegateCommons)
+            lock (delegateCommons)
             {
-                if(!delegateCommons.TryGetValue(sig, out dc))
+                if (!delegateCommons.TryGetValue(sig, out dc))
                 {
                     dc = new DelegateCommon();
                     dc.sig = sig;
@@ -67,9 +67,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public static Type TryGetType(string sig)
         {
             DelegateCommon dc;
-            lock(delegateCommons)
+            lock (delegateCommons)
             {
-                if(!delegateCommons.TryGetValue(sig, out dc))
+                if (!delegateCommons.TryGetValue(sig, out dc))
                     dc = null;
             }
             return (dc == null) ? null : dc.type;
@@ -78,9 +78,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public static string TryGetName(Type t)
         {
             DelegateCommon dc;
-            lock(delegateCommons)
+            lock (delegateCommons)
             {
-                if(!delegateCommonsBySysType.TryGetValue(t, out dc))
+                if (!delegateCommonsBySysType.TryGetValue(t, out dc))
                     dc = null;
             }
             return (dc == null) ? null : dc.sig;
@@ -89,7 +89,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         // http://blog.bittercoder.com/PermaLink,guid,a770377a-b1ad-4590-9145-36381757a52b.aspx
         private static Type CreateDelegateType(string name, Type retType, Type[] argTypes)
         {
-            if(delegateModuleBuilder == null)
+            if (delegateModuleBuilder == null)
             {
                 AssemblyName assembly = new AssemblyName();
                 assembly.Name = "CustomDelegateAssembly";

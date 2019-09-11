@@ -25,18 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse.StructuredData;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using log4net;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 
 namespace OpenSim.Framework
 {
@@ -52,7 +46,7 @@ namespace OpenSim.Framework
     /// </remarks>
     public class DAMap : IXmlSerializable
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static readonly int MIN_NAMESPACE_LENGTH = 4;
 
@@ -136,7 +130,7 @@ namespace OpenSim.Framework
 
             foreach (string key in namespacesMap.Keys)
             {
-//                Console.WriteLine("Processing ns {0}", key);
+                //                Console.WriteLine("Processing ns {0}", key);
                 if (!(namespacesMap[key] is OSDMap))
                 {
                     if (keysToRemove == null)
@@ -150,7 +144,7 @@ namespace OpenSim.Framework
             {
                 foreach (string key in keysToRemove)
                 {
-//                    Console.WriteLine ("Removing bad ns {0}", key);
+                    //                    Console.WriteLine ("Removing bad ns {0}", key);
                     namespacesMap.Remove(key);
                 }
             }
@@ -248,7 +242,7 @@ namespace OpenSim.Framework
 
                 nsMap = (OSDMap)m_map[ns];
 
-//                m_log.DebugFormat("[DA MAP]: Setting store to {0}:{1}", ns, storeName);
+                //                m_log.DebugFormat("[DA MAP]: Setting store to {0}:{1}", ns, storeName);
                 nsMap[storeName] = store;
             }
         }

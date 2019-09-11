@@ -25,17 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using System.Reflection;
-using System.Text;
-using System.Xml;
-using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
+using System;
+using System.Collections;
 
 namespace OpenSim.Services.UserProfilesService
 {
@@ -48,7 +41,7 @@ namespace OpenSim.Services.UserProfilesService
     /// </remarks>
     public class OpenProfileClient
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private string m_serverURI;
 

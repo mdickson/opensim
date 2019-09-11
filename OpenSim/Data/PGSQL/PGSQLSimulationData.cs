@@ -25,20 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Reflection;
-using System.Threading;
 using log4net;
+using Npgsql;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Data;
-using Npgsql;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Drawing;
+using System.Reflection;
 
 namespace OpenSim.Data.PGSQL
 {
@@ -831,7 +828,7 @@ namespace OpenSim.Data.PGSQL
             using (NpgsqlConnection conn = new NpgsqlConnection(m_connectionString))
             using (NpgsqlCommand cmd = new NpgsqlCommand(sql, conn))
             {
-                cmd.Parameters.Add(_Database.CreateParameter("regionID", regionUUID.ToString() ));
+                cmd.Parameters.Add(_Database.CreateParameter("regionID", regionUUID.ToString()));
                 conn.Open();
                 using (NpgsqlDataReader result = cmd.ExecuteReader())
                 {
@@ -935,7 +932,7 @@ namespace OpenSim.Data.PGSQL
                 conn.Open();
                 using (NpgsqlCommand cmd = new NpgsqlCommand(sql, conn))
                 {
-                    cmd.Parameters.Add(_Database.CreateParameter("region_id", wl.regionID.ToString() ));
+                    cmd.Parameters.Add(_Database.CreateParameter("region_id", wl.regionID.ToString()));
                     NpgsqlDataReader dr = cmd.ExecuteReader();
                     exists = dr.Read();
                 }
@@ -1679,12 +1676,12 @@ namespace OpenSim.Data.PGSQL
             prim.OwnerID = new UUID((Guid)primRow["OwnerID"]);
             prim.GroupID = new UUID((Guid)primRow["GroupID"]);
             prim.LastOwnerID = new UUID((Guid)primRow["LastOwnerID"]);
-            
+
             if (primRow["RezzerID"] != DBNull.Value)
                 prim.RezzerID = new UUID((Guid)primRow["RezzerID"]);
             else
                 prim.RezzerID = UUID.Zero;
-                
+
             prim.OwnerMask = Convert.ToUInt32(primRow["OwnerMask"]);
             prim.NextOwnerMask = Convert.ToUInt32(primRow["NextOwnerMask"]);
             prim.GroupMask = Convert.ToUInt32(primRow["GroupMask"]);
@@ -2041,8 +2038,8 @@ namespace OpenSim.Data.PGSQL
             parameters.Add(_Database.CreateParameter("SalePrice", land.SalePrice));
             parameters.Add(_Database.CreateParameter("LandStatus", (int)land.Status)); //Enum. libsecondlife.Parcel.ParcelStatus
             parameters.Add(_Database.CreateParameter("LandFlags", land.Flags));
-            parameters.Add(_Database.CreateParameter("LandingType", Convert.ToInt32( land.LandingType) ));
-            parameters.Add(_Database.CreateParameter("MediaAutoScale", Convert.ToInt32( land.MediaAutoScale )));
+            parameters.Add(_Database.CreateParameter("LandingType", Convert.ToInt32(land.LandingType)));
+            parameters.Add(_Database.CreateParameter("MediaAutoScale", Convert.ToInt32(land.MediaAutoScale)));
             parameters.Add(_Database.CreateParameter("MediaTextureUUID", land.MediaID));
             parameters.Add(_Database.CreateParameter("MediaURL", land.MediaURL));
             parameters.Add(_Database.CreateParameter("MusicURL", land.MusicURL));

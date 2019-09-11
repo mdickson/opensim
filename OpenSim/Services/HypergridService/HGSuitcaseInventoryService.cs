@@ -25,19 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using OpenMetaverse;
 using log4net;
 using Nini.Config;
-using System.Reflection;
-using OpenSim.Services.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Services.InventoryService;
+using OpenMetaverse;
 using OpenSim.Data;
 using OpenSim.Framework;
 using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
+using OpenSim.Services.InventoryService;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Services.HypergridService
 {
@@ -54,11 +52,11 @@ namespace OpenSim.Services.HypergridService
                 LogManager.GetLogger(
                 MethodBase.GetCurrentMethod().DeclaringType);
 
-//        private string m_HomeURL;
+        //        private string m_HomeURL;
         private IUserAccountService m_UserAccountService;
         private IAvatarService m_AvatarService;
 
-//        private UserAccountCache m_Cache;
+        //        private UserAccountCache m_Cache;
 
         private ExpiringCache<UUID, List<XInventoryFolder>> m_SuitcaseTrees = new ExpiringCache<UUID, List<XInventoryFolder>>();
         private ExpiringCache<UUID, AvatarAppearance> m_Appearances = new ExpiringCache<UUID, AvatarAppearance>();
@@ -96,10 +94,10 @@ namespace OpenSim.Services.HypergridService
                 if (m_AvatarService == null)
                     throw new Exception(String.Format("Unable to create m_AvatarService from {0}", avatarDll));
 
-//                m_HomeURL = Util.GetConfigVarFromSections<string>(config, "HomeURI",
-//                    new string[] { "Startup", "Hypergrid", m_ConfigName }, String.Empty);
+                //                m_HomeURL = Util.GetConfigVarFromSections<string>(config, "HomeURI",
+                //                    new string[] { "Startup", "Hypergrid", m_ConfigName }, String.Empty);
 
-//                m_Cache = UserAccountCache.CreateUserAccountCache(m_UserAccountService);
+                //                m_Cache = UserAccountCache.CreateUserAccountCache(m_UserAccountService);
             }
 
             m_log.Debug("[HG SUITCASE INVENTORY SERVICE]: Starting...");
@@ -178,37 +176,37 @@ namespace OpenSim.Services.HypergridService
             m_log.Debug("[HG SUITCASE INVENTORY SERVICE]: Creating System folders under Suitcase...");
             XInventoryFolder[] sysFolders = GetSystemFolders(principalID, rootID);
 
-            if (!Array.Exists(sysFolders, delegate(XInventoryFolder f) { if (f.type == (int)FolderType.Animation) return true; return false; }))
+            if (!Array.Exists(sysFolders, delegate (XInventoryFolder f) { if (f.type == (int)FolderType.Animation) return true; return false; }))
                 CreateFolder(principalID, rootID, (int)FolderType.Animation, "Animations");
-            if (!Array.Exists(sysFolders, delegate(XInventoryFolder f) { if (f.type == (int)FolderType.BodyPart) return true; return false; }))
+            if (!Array.Exists(sysFolders, delegate (XInventoryFolder f) { if (f.type == (int)FolderType.BodyPart) return true; return false; }))
                 CreateFolder(principalID, rootID, (int)FolderType.BodyPart, "Body Parts");
-            if (!Array.Exists(sysFolders, delegate(XInventoryFolder f) { if (f.type == (int)FolderType.CallingCard) return true; return false; }))
+            if (!Array.Exists(sysFolders, delegate (XInventoryFolder f) { if (f.type == (int)FolderType.CallingCard) return true; return false; }))
                 CreateFolder(principalID, rootID, (int)FolderType.CallingCard, "Calling Cards");
-            if (!Array.Exists(sysFolders, delegate(XInventoryFolder f) { if (f.type == (int)FolderType.Clothing) return true; return false; }))
+            if (!Array.Exists(sysFolders, delegate (XInventoryFolder f) { if (f.type == (int)FolderType.Clothing) return true; return false; }))
                 CreateFolder(principalID, rootID, (int)FolderType.Clothing, "Clothing");
-            if (!Array.Exists(sysFolders, delegate(XInventoryFolder f) { if (f.type == (int)FolderType.CurrentOutfit) return true; return false; }))
+            if (!Array.Exists(sysFolders, delegate (XInventoryFolder f) { if (f.type == (int)FolderType.CurrentOutfit) return true; return false; }))
                 CreateFolder(principalID, rootID, (int)FolderType.CurrentOutfit, "Current Outfit");
-            if (!Array.Exists(sysFolders, delegate(XInventoryFolder f) { if (f.type == (int)FolderType.Favorites) return true; return false; }))
+            if (!Array.Exists(sysFolders, delegate (XInventoryFolder f) { if (f.type == (int)FolderType.Favorites) return true; return false; }))
                 CreateFolder(principalID, rootID, (int)FolderType.Favorites, "Favorites");
-            if (!Array.Exists(sysFolders, delegate(XInventoryFolder f) { if (f.type == (int)FolderType.Gesture) return true; return false; }))
+            if (!Array.Exists(sysFolders, delegate (XInventoryFolder f) { if (f.type == (int)FolderType.Gesture) return true; return false; }))
                 CreateFolder(principalID, rootID, (int)FolderType.Gesture, "Gestures");
-            if (!Array.Exists(sysFolders, delegate(XInventoryFolder f) { if (f.type == (int)FolderType.Landmark) return true; return false; }))
+            if (!Array.Exists(sysFolders, delegate (XInventoryFolder f) { if (f.type == (int)FolderType.Landmark) return true; return false; }))
                 CreateFolder(principalID, rootID, (int)FolderType.Landmark, "Landmarks");
-            if (!Array.Exists(sysFolders, delegate(XInventoryFolder f) { if (f.type == (int)FolderType.LostAndFound) return true; return false; }))
+            if (!Array.Exists(sysFolders, delegate (XInventoryFolder f) { if (f.type == (int)FolderType.LostAndFound) return true; return false; }))
                 CreateFolder(principalID, rootID, (int)FolderType.LostAndFound, "Lost And Found");
-            if (!Array.Exists(sysFolders, delegate(XInventoryFolder f) { if (f.type == (int)FolderType.Notecard) return true; return false; }))
+            if (!Array.Exists(sysFolders, delegate (XInventoryFolder f) { if (f.type == (int)FolderType.Notecard) return true; return false; }))
                 CreateFolder(principalID, rootID, (int)FolderType.Notecard, "Notecards");
-            if (!Array.Exists(sysFolders, delegate(XInventoryFolder f) { if (f.type == (int)FolderType.Object) return true; return false; }))
+            if (!Array.Exists(sysFolders, delegate (XInventoryFolder f) { if (f.type == (int)FolderType.Object) return true; return false; }))
                 CreateFolder(principalID, rootID, (int)FolderType.Object, "Objects");
-            if (!Array.Exists(sysFolders, delegate(XInventoryFolder f) { if (f.type == (int)FolderType.Snapshot) return true; return false; }))
+            if (!Array.Exists(sysFolders, delegate (XInventoryFolder f) { if (f.type == (int)FolderType.Snapshot) return true; return false; }))
                 CreateFolder(principalID, rootID, (int)FolderType.Snapshot, "Photo Album");
-            if (!Array.Exists(sysFolders, delegate(XInventoryFolder f) { if (f.type == (int)FolderType.LSLText) return true; return false; }))
+            if (!Array.Exists(sysFolders, delegate (XInventoryFolder f) { if (f.type == (int)FolderType.LSLText) return true; return false; }))
                 CreateFolder(principalID, rootID, (int)FolderType.LSLText, "Scripts");
-            if (!Array.Exists(sysFolders, delegate(XInventoryFolder f) { if (f.type == (int)FolderType.Sound) return true; return false; }))
+            if (!Array.Exists(sysFolders, delegate (XInventoryFolder f) { if (f.type == (int)FolderType.Sound) return true; return false; }))
                 CreateFolder(principalID, rootID, (int)FolderType.Sound, "Sounds");
-            if (!Array.Exists(sysFolders, delegate(XInventoryFolder f) { if (f.type == (int)FolderType.Texture) return true; return false; }))
+            if (!Array.Exists(sysFolders, delegate (XInventoryFolder f) { if (f.type == (int)FolderType.Texture) return true; return false; }))
                 CreateFolder(principalID, rootID, (int)FolderType.Texture, "Textures");
-            if (!Array.Exists(sysFolders, delegate(XInventoryFolder f) { if (f.type == (int)FolderType.Trash) return true; return false; }))
+            if (!Array.Exists(sysFolders, delegate (XInventoryFolder f) { if (f.type == (int)FolderType.Trash) return true; return false; }))
                 CreateFolder(principalID, rootID, (int)FolderType.Trash, "Trash");
         }
 
@@ -540,7 +538,7 @@ namespace OpenSim.Services.HypergridService
 
             // Get the tree of the suitcase folder
             t = GetFolderTreeRecursive(folder);
-            m_SuitcaseTrees.AddOrUpdate(principalID, t, 5*60); // 5 minutes
+            m_SuitcaseTrees.AddOrUpdate(principalID, t, 5 * 60); // 5 minutes
             return t;
         }
 
@@ -593,7 +591,7 @@ namespace OpenSim.Services.HypergridService
             if (folder != null)
                 tree.Add(folder);
 
-            XInventoryFolder f = tree.Find(delegate(XInventoryFolder fl)
+            XInventoryFolder f = tree.Find(delegate (XInventoryFolder fl)
             {
                 return (fl.folderID == folderID);
             });

@@ -25,20 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
-using System.Net;
-using System.Reflection;
 using log4net;
-using Nini.Config;
-using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Region.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.PhysicsModules.SharedBase;
 using OpenSim.Services.Interfaces;
+using System.Collections.Generic;
+using System.Net;
+using System.Reflection;
 
 namespace OpenSim
 {
@@ -77,7 +73,7 @@ namespace OpenSim
                 m_log.Error("[REGION SERVER]: HTTP Server config failed.   HTTP Server and HTTPS server must be on different ports");
             }
 
-            if(m_networkServersInfo.HttpUsesSSL)
+            if (m_networkServersInfo.HttpUsesSSL)
             {
                 m_httpServer = new BaseHttpServer(
                         mainSSLport, m_networkServersInfo.HttpUsesSSL,
@@ -89,7 +85,7 @@ namespace OpenSim
 
             // unsecure main server
             BaseHttpServer server = new BaseHttpServer(mainport);
-            if(!m_networkServersInfo.HttpUsesSSL)
+            if (!m_networkServersInfo.HttpUsesSSL)
             {
                 m_httpServer = server;
                 server.Start();

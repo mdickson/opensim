@@ -24,21 +24,16 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
-
-using log4net;
-
-using OpenMetaverse;
-using Nini.Config;
-
-using OpenSim.Framework;
-using OpenSim.Framework.ServiceAuth;
-using OpenSim.Services.Connectors;
-using OpenSim.Services.Interfaces;
-using OpenSim.Server.Base;
 
 namespace OpenSim.Services.Connectors
 {
@@ -195,7 +190,7 @@ namespace OpenSim.Services.Connectors
             string uri = m_ServerURI + string.Format("/estates/estate/?region={0}&create={1}", regionID, create);
 
             reply = MakeRequest("GET", uri, string.Empty);
-            if(reply == null)
+            if (reply == null)
             {
                 // this is a fatal error
                 m_log.DebugFormat("[ESTATE CONNECTOR] connection to remote estates service failed");

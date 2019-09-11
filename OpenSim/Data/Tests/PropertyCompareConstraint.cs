@@ -25,6 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using NUnit.Framework;
+using NUnit.Framework.Constraints;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Tests.Common;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,11 +37,6 @@ using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using NUnit.Framework;
-using NUnit.Framework.Constraints;
-using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Tests.Common;
 
 namespace OpenSim.Data.Tests
 {
@@ -103,8 +103,8 @@ namespace OpenSim.Data.Tests
 
             if (actual.GetType() == typeof(Color))
             {
-                Color actualColor = (Color) actual;
-                Color expectedColor = (Color) expected;
+                Color actualColor = (Color)actual;
+                Color expectedColor = (Color)expected;
                 if (actualColor.R != expectedColor.R)
                 {
                     propertyNames.Push("R");

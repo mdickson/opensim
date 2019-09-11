@@ -25,15 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.IO;
-using System.Net;
-using System.Reflection;
 using log4net;
 using log4net.Config;
 using Nini.Config;
 using OpenSim.Framework;
-using OpenSim.Framework.Console;
+using System;
+using System.IO;
+using System.Net;
+using System.Reflection;
 
 namespace OpenSim
 {
@@ -77,7 +76,7 @@ namespace OpenSim
             Culture.SetCurrentCulture();
             Culture.SetDefaultCurrentCulture();
 
-            if(Util.IsWindows())
+            if (Util.IsWindows())
                 ServicePointManager.DefaultConnectionLimit = 32;
             else
             {
@@ -141,12 +140,12 @@ namespace OpenSim
             if (workerThreads < workerThreadsMin)
             {
                 workerThreads = workerThreadsMin;
-                m_log.InfoFormat("[OPENSIM MAIN]: Bumping up max worker threads to {0}",workerThreads);
+                m_log.InfoFormat("[OPENSIM MAIN]: Bumping up max worker threads to {0}", workerThreads);
             }
             if (workerThreads > workerThreadsMax)
             {
                 workerThreads = workerThreadsMax;
-                m_log.InfoFormat("[OPENSIM MAIN]: Limiting max worker threads to {0}",workerThreads);
+                m_log.InfoFormat("[OPENSIM MAIN]: Limiting max worker threads to {0}", workerThreads);
             }
 
             // Increase the number of IOCP threads available.
@@ -154,16 +153,16 @@ namespace OpenSim
             if (iocpThreads < iocpThreadsMin)
             {
                 iocpThreads = iocpThreadsMin;
-                m_log.InfoFormat("[OPENSIM MAIN]: Bumping up max IOCP threads to {0}",iocpThreads);
+                m_log.InfoFormat("[OPENSIM MAIN]: Bumping up max IOCP threads to {0}", iocpThreads);
             }
             // Make sure we don't overallocate IOCP threads and thrash system resources
-            if ( iocpThreads > iocpThreadsMax )
+            if (iocpThreads > iocpThreadsMax)
             {
                 iocpThreads = iocpThreadsMax;
-                m_log.InfoFormat("[OPENSIM MAIN]: Limiting max IOCP completion threads to {0}",iocpThreads);
+                m_log.InfoFormat("[OPENSIM MAIN]: Limiting max IOCP completion threads to {0}", iocpThreads);
             }
             // set the resulting worker and IO completion thread counts back to ThreadPool
-            if ( System.Threading.ThreadPool.SetMaxThreads(workerThreads, iocpThreads) )
+            if (System.Threading.ThreadPool.SetMaxThreads(workerThreads, iocpThreads))
             {
                 m_log.InfoFormat(
                     "[OPENSIM MAIN]: Threadpool set to {0} max worker threads and {1} max IOCP threads",
@@ -186,7 +185,7 @@ namespace OpenSim
                 m_log.Warn("[OPENSIM MAIN]: Environment is not supported by OpenSimulator (" + supported + ")\n");
             }
 
-            m_log.InfoFormat("Default culture changed to {0}",Culture.GetDefaultCurrentCulture().DisplayName);
+            m_log.InfoFormat("Default culture changed to {0}", Culture.GetDefaultCurrentCulture().DisplayName);
 
             // Configure nIni aliases and localles
 
@@ -376,7 +375,7 @@ namespace OpenSim
             msg += "\r\n";
 
             msg += "Exception: " + e.ExceptionObject.ToString() + "\r\n";
-            Exception ex = (Exception) e.ExceptionObject;
+            Exception ex = (Exception)e.ExceptionObject;
             if (ex.InnerException != null)
             {
                 msg += "InnerException: " + ex.InnerException.ToString() + "\r\n";

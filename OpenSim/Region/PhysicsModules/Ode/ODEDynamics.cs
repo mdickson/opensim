@@ -38,14 +38,9 @@
  * settings use.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using log4net;
 using OpenMetaverse;
-using OpenSim.Framework;
 using OpenSim.Region.PhysicsModules.SharedBase;
+using System;
 
 
 namespace OpenSim.Region.PhysicsModule.ODE
@@ -67,21 +62,21 @@ namespace OpenSim.Region.PhysicsModule.ODE
 
         // private OdeScene m_parentScene = null;
         private IntPtr m_body = IntPtr.Zero;
-//        private IntPtr m_jointGroup = IntPtr.Zero;
-//        private IntPtr m_aMotor = IntPtr.Zero;
+        //        private IntPtr m_jointGroup = IntPtr.Zero;
+        //        private IntPtr m_aMotor = IntPtr.Zero;
 
 
         // Vehicle properties
         private Vehicle m_type = Vehicle.TYPE_NONE;                     // If a 'VEHICLE', and what kind
         // private Quaternion m_referenceFrame = Quaternion.Identity;   // Axis modifier
-        private VehicleFlag m_flags = (VehicleFlag) 0;                  // Boolean settings:
-                                                                        // HOVER_TERRAIN_ONLY
-                                                                        // HOVER_GLOBAL_HEIGHT
-                                                                        // NO_DEFLECTION_UP
-                                                                        // HOVER_WATER_ONLY
-                                                                        // HOVER_UP_ONLY
-                                                                        // LIMIT_MOTOR_UP
-                                                                        // LIMIT_ROLL_ONLY
+        private VehicleFlag m_flags = (VehicleFlag)0;                  // Boolean settings:
+                                                                       // HOVER_TERRAIN_ONLY
+                                                                       // HOVER_GLOBAL_HEIGHT
+                                                                       // NO_DEFLECTION_UP
+                                                                       // HOVER_WATER_ONLY
+                                                                       // HOVER_UP_ONLY
+                                                                       // LIMIT_MOTOR_UP
+                                                                       // LIMIT_ROLL_ONLY
         private VehicleFlag m_Hoverflags = (VehicleFlag)0;
         private Vector3 m_BlockingEndPoint = Vector3.Zero;
         private Quaternion m_RollreferenceFrame = Quaternion.Identity;
@@ -105,7 +100,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
         private float m_angularMotorDecayTimescale = 0;                 // motor angular velocity decay rate
         private Vector3 m_angularFrictionTimescale = Vector3.Zero;      // body angular velocity  decay rate
         private Vector3 m_lastAngularVelocity = Vector3.Zero;           // what was last applied to body
- //       private Vector3 m_lastVertAttractor = Vector3.Zero;             // what VA was last applied to body
+                                                                        //       private Vector3 m_lastVertAttractor = Vector3.Zero;             // what VA was last applied to body
 
         //Deflection properties
         // private float m_angularDeflectionEfficiency = 0;
@@ -120,13 +115,13 @@ namespace OpenSim.Region.PhysicsModule.ODE
 
         //Hover and Buoyancy properties
         private float m_VhoverHeight = 0f;
-//        private float m_VhoverEfficiency = 0f;
+        //        private float m_VhoverEfficiency = 0f;
         private float m_VhoverTimescale = 0f;
         private float m_VhoverTargetHeight = -1.0f;     // if <0 then no hover, else its the current target height
         private float m_VehicleBuoyancy = 0f;           //KF: m_VehicleBuoyancy is set by VEHICLE_BUOYANCY for a vehicle.
-                    // Modifies gravity. Slider between -1 (double-gravity) and 1 (full anti-gravity)
-                    // KF: So far I have found no good method to combine a script-requested .Z velocity and gravity.
-                    // Therefore only m_VehicleBuoyancy=1 (0g) will use the script-requested .Z velocity.
+                                                        // Modifies gravity. Slider between -1 (double-gravity) and 1 (full anti-gravity)
+                                                        // KF: So far I have found no good method to combine a script-requested .Z velocity and gravity.
+                                                        // Therefore only m_VehicleBuoyancy=1 (0g) will use the script-requested .Z velocity.
 
         //Attractor properties
         private float m_verticalAttractionEfficiency = 1.0f;        // damped
@@ -169,11 +164,11 @@ namespace OpenSim.Region.PhysicsModule.ODE
                     if (pValue > 1f) pValue = 1f;
                     m_VehicleBuoyancy = pValue;
                     break;
-//                case Vehicle.HOVER_EFFICIENCY:
-//                    if (pValue < 0f) pValue = 0f;
-//                    if (pValue > 1f) pValue = 1f;
-//                    m_VhoverEfficiency = pValue;
-//                    break;
+                //                case Vehicle.HOVER_EFFICIENCY:
+                //                    if (pValue < 0f) pValue = 0f;
+                //                    if (pValue > 1f) pValue = 1f;
+                //                    m_VhoverEfficiency = pValue;
+                //                    break;
                 case Vehicle.HOVER_HEIGHT:
                     m_VhoverHeight = pValue;
                     break;
@@ -241,11 +236,11 @@ namespace OpenSim.Region.PhysicsModule.ODE
                     m_angularMotorDirection = new Vector3(pValue.X, pValue.Y, pValue.Z);
                     // Limit requested angular speed to 2 rps= 4 pi rads/sec
                     if (m_angularMotorDirection.X > 12.56f) m_angularMotorDirection.X = 12.56f;
-                    if (m_angularMotorDirection.X < - 12.56f) m_angularMotorDirection.X = - 12.56f;
+                    if (m_angularMotorDirection.X < -12.56f) m_angularMotorDirection.X = -12.56f;
                     if (m_angularMotorDirection.Y > 12.56f) m_angularMotorDirection.Y = 12.56f;
-                    if (m_angularMotorDirection.Y < - 12.56f) m_angularMotorDirection.Y = - 12.56f;
+                    if (m_angularMotorDirection.Y < -12.56f) m_angularMotorDirection.Y = -12.56f;
                     if (m_angularMotorDirection.Z > 12.56f) m_angularMotorDirection.Z = 12.56f;
-                    if (m_angularMotorDirection.Z < - 12.56f) m_angularMotorDirection.Z = - 12.56f;
+                    if (m_angularMotorDirection.Z < -12.56f) m_angularMotorDirection.Z = -12.56f;
                     m_angularMotorApply = 10;
                     break;
                 case Vehicle.LINEAR_FRICTION_TIMESCALE:
@@ -439,7 +434,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
             m_type = pType;
             switch (pType)
             {
-                    case Vehicle.TYPE_NONE:
+                case Vehicle.TYPE_NONE:
                     m_linearFrictionTimescale = new Vector3(0, 0, 0);
                     m_angularFrictionTimescale = new Vector3(0, 0, 0);
                     m_linearMotorDirection = Vector3.Zero;
@@ -464,7 +459,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
                     m_angularMotorTimescale = 1000;
                     m_angularMotorDecayTimescale = 120;
                     m_VhoverHeight = 0;
-//                    m_VhoverEfficiency = 1;
+                    //                    m_VhoverEfficiency = 1;
                     m_VhoverTimescale = 10;
                     m_VehicleBuoyancy = 0;
                     // m_linearDeflectionEfficiency = 1;
@@ -490,7 +485,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
                     m_angularMotorTimescale = 1;
                     m_angularMotorDecayTimescale = 0.8f;
                     m_VhoverHeight = 0;
-//                    m_VhoverEfficiency = 0;
+                    //                    m_VhoverEfficiency = 0;
                     m_VhoverTimescale = 1000;
                     m_VehicleBuoyancy = 0;
                     // // m_linearDeflectionEfficiency = 1;
@@ -510,7 +505,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
                     break;
                 case Vehicle.TYPE_BOAT:
                     m_linearFrictionTimescale = new Vector3(10, 3, 2);
-                    m_angularFrictionTimescale = new Vector3(10,10,10);
+                    m_angularFrictionTimescale = new Vector3(10, 10, 10);
                     m_linearMotorDirection = Vector3.Zero;
                     m_linearMotorTimescale = 5;
                     m_linearMotorDecayTimescale = 60;
@@ -518,7 +513,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
                     m_angularMotorTimescale = 4;
                     m_angularMotorDecayTimescale = 4;
                     m_VhoverHeight = 0;
-//                    m_VhoverEfficiency = 0.5f;
+                    //                    m_VhoverEfficiency = 0.5f;
                     m_VhoverTimescale = 2;
                     m_VehicleBuoyancy = 1;
                     // m_linearDeflectionEfficiency = 0.5f;
@@ -548,7 +543,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
                     m_angularMotorTimescale = 4;
                     m_angularMotorDecayTimescale = 4;
                     m_VhoverHeight = 0;
-//                    m_VhoverEfficiency = 0.5f;
+                    //                    m_VhoverEfficiency = 0.5f;
                     m_VhoverTimescale = 1000;
                     m_VehicleBuoyancy = 0;
                     // m_linearDeflectionEfficiency = 0.5f;
@@ -576,7 +571,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
                     m_angularMotorTimescale = 6;
                     m_angularMotorDecayTimescale = 10;
                     m_VhoverHeight = 5;
-//                    m_VhoverEfficiency = 0.8f;
+                    //                    m_VhoverEfficiency = 0.8f;
                     m_VhoverTimescale = 10;
                     m_VehicleBuoyancy = 1;
                     // m_linearDeflectionEfficiency = 0;
@@ -614,7 +609,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
             m_lastPositionVector = SafeNativeMethods.BodyGetPosition(Body);
         }
 
-        internal void Step(float pTimestep,  OdeScene pParentScene)
+        internal void Step(float pTimestep, OdeScene pParentScene)
         {
             if (m_body == IntPtr.Zero || m_type == Vehicle.TYPE_NONE)
                 return;
@@ -631,12 +626,12 @@ namespace OpenSim.Region.PhysicsModule.ODE
         {
             if (!m_linearMotorDirection.ApproxEquals(Vector3.Zero, 0.01f))  // requested m_linearMotorDirection is significant
             {
-                 if (!SafeNativeMethods.BodyIsEnabled(Body))
-                     SafeNativeMethods.BodyEnable(Body);
+                if (!SafeNativeMethods.BodyIsEnabled(Body))
+                    SafeNativeMethods.BodyEnable(Body);
 
                 // add drive to body
-                Vector3 addAmount = m_linearMotorDirection/(m_linearMotorTimescale/pTimestep);
-                m_lastLinearVelocityVector += (addAmount*10);  // lastLinearVelocityVector is the current body velocity vector?
+                Vector3 addAmount = m_linearMotorDirection / (m_linearMotorTimescale / pTimestep);
+                m_lastLinearVelocityVector += (addAmount * 10);  // lastLinearVelocityVector is the current body velocity vector?
 
                 // This will work temporarily, but we really need to compare speed on an axis
                 // KF: Limit body velocity to applied velocity?
@@ -648,14 +643,14 @@ namespace OpenSim.Region.PhysicsModule.ODE
                     m_lastLinearVelocityVector.Z = m_linearMotorDirectionLASTSET.Z;
 
                 // decay applied velocity
-                Vector3 decayfraction = ((Vector3.One/(m_linearMotorDecayTimescale/pTimestep)));
+                Vector3 decayfraction = ((Vector3.One / (m_linearMotorDecayTimescale / pTimestep)));
                 //Console.WriteLine("decay: " + decayfraction);
                 m_linearMotorDirection -= m_linearMotorDirection * decayfraction * 0.5f;
                 //Console.WriteLine("actual: " + m_linearMotorDirection);
             }
             else
             {        // requested is not significant
-                    // if what remains of applied is small, zero it.
+                     // if what remains of applied is small, zero it.
                 if (m_lastLinearVelocityVector.ApproxEquals(Vector3.Zero, 0.01f))
                     m_lastLinearVelocityVector = Vector3.Zero;
             }
@@ -682,7 +677,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
             m_dir.Z = vel_now.Z;        // Preserve the accumulated falling velocity
 
             SafeNativeMethods.Vector3 pos = SafeNativeMethods.BodyGetPosition(Body);
-//            Vector3 accel = new Vector3(-(m_dir.X - m_lastLinearVelocityVector.X / 0.1f), -(m_dir.Y - m_lastLinearVelocityVector.Y / 0.1f), m_dir.Z - m_lastLinearVelocityVector.Z / 0.1f);
+            //            Vector3 accel = new Vector3(-(m_dir.X - m_lastLinearVelocityVector.X / 0.1f), -(m_dir.Y - m_lastLinearVelocityVector.Y / 0.1f), m_dir.Z - m_lastLinearVelocityVector.Z / 0.1f);
             Vector3 posChange = new Vector3();
             posChange.X = pos.X - m_lastPositionVector.X;
             posChange.Y = pos.Y - m_lastPositionVector.Y;
@@ -766,9 +761,9 @@ namespace OpenSim.Region.PhysicsModule.ODE
                     }
                 }
 
-//                m_VhoverEfficiency = 0f;    // 0=boucy, 1=Crit.damped
-//                m_VhoverTimescale = 0f;        // time to acheive height
-//                pTimestep  is time since last frame,in secs
+                //                m_VhoverEfficiency = 0f;    // 0=boucy, 1=Crit.damped
+                //                m_VhoverTimescale = 0f;        // time to acheive height
+                //                pTimestep  is time since last frame,in secs
             }
 
             if ((m_flags & (VehicleFlag.LIMIT_MOTOR_UP)) != 0)
@@ -842,29 +837,29 @@ namespace OpenSim.Region.PhysicsModule.ODE
 
             // Get what the body is doing, this includes 'external' influences
             SafeNativeMethods.Vector3 angularVelocity = SafeNativeMethods.BodyGetAngularVel(Body);
-   //         Vector3 angularVelocity = Vector3.Zero;
+            //         Vector3 angularVelocity = Vector3.Zero;
 
             if (m_angularMotorApply > 0)
             {
                 // ramp up to new value
                 //   current velocity  +=                         error                       /    (time to get there / step interval)
                 //                               requested speed            -  last motor speed
-                m_angularMotorVelocity.X += (m_angularMotorDirection.X - m_angularMotorVelocity.X) /  (m_angularMotorTimescale / pTimestep);
-                m_angularMotorVelocity.Y += (m_angularMotorDirection.Y - m_angularMotorVelocity.Y) /  (m_angularMotorTimescale / pTimestep);
-                m_angularMotorVelocity.Z += (m_angularMotorDirection.Z - m_angularMotorVelocity.Z) /  (m_angularMotorTimescale / pTimestep);
+                m_angularMotorVelocity.X += (m_angularMotorDirection.X - m_angularMotorVelocity.X) / (m_angularMotorTimescale / pTimestep);
+                m_angularMotorVelocity.Y += (m_angularMotorDirection.Y - m_angularMotorVelocity.Y) / (m_angularMotorTimescale / pTimestep);
+                m_angularMotorVelocity.Z += (m_angularMotorDirection.Z - m_angularMotorVelocity.Z) / (m_angularMotorTimescale / pTimestep);
 
                 m_angularMotorApply--;        // This is done so that if script request rate is less than phys frame rate the expected
-                                            // velocity may still be acheived.
+                                              // velocity may still be acheived.
             }
             else
             {
                 // no motor recently applied, keep the body velocity
-        /*        m_angularMotorVelocity.X = angularVelocity.X;
-                m_angularMotorVelocity.Y = angularVelocity.Y;
-                m_angularMotorVelocity.Z = angularVelocity.Z; */
+                /*        m_angularMotorVelocity.X = angularVelocity.X;
+                        m_angularMotorVelocity.Y = angularVelocity.Y;
+                        m_angularMotorVelocity.Z = angularVelocity.Z; */
 
                 // and decay the velocity
-                m_angularMotorVelocity -= m_angularMotorVelocity /  (m_angularMotorDecayTimescale / pTimestep);
+                m_angularMotorVelocity -= m_angularMotorVelocity / (m_angularMotorDecayTimescale / pTimestep);
             } // end motor section
 
             // Vertical attractor section
@@ -892,12 +887,12 @@ namespace OpenSim.Region.PhysicsModule.ODE
                 // Error is 0 (no error) to +/- 2 (max error)
                 // scale it by VAservo
                 verterr = verterr * VAservo;
-//if (frcount == 0) Console.WriteLine("VAerr=" + verterr);
+                //if (frcount == 0) Console.WriteLine("VAerr=" + verterr);
 
                 // As the body rotates around the X axis, then verterr.Y increases; Rotated around Y then .X increases, so
                 // Change  Body angular velocity  X based on Y, and Y based on X. Z is not changed.
-                vertattr.X =    verterr.Y;
-                vertattr.Y =  - verterr.X;
+                vertattr.X = verterr.Y;
+                vertattr.Y = -verterr.X;
                 vertattr.Z = 0f;
 
                 // scaling appears better usingsquare-law
@@ -907,7 +902,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
 
             } // else vertical attractor is off
 
-    //        m_lastVertAttractor = vertattr;
+            //        m_lastVertAttractor = vertattr;
 
             // Bank section tba
             // Deflection section tba
@@ -923,19 +918,19 @@ namespace OpenSim.Region.PhysicsModule.ODE
 
             if (!m_lastAngularVelocity.ApproxEquals(Vector3.Zero, 0.01f))
             {
-                if (!SafeNativeMethods.BodyIsEnabled (Body))  SafeNativeMethods.BodyEnable (Body);
+                if (!SafeNativeMethods.BodyIsEnabled(Body)) SafeNativeMethods.BodyEnable(Body);
             }
             else
             {
                 m_lastAngularVelocity = Vector3.Zero; // Reduce small value to zero.
             }
 
-             // apply friction
+            // apply friction
             Vector3 decayamount = Vector3.One / (m_angularFrictionTimescale / pTimestep);
             m_lastAngularVelocity -= m_lastAngularVelocity * decayamount;
 
             // Apply to the body
-            SafeNativeMethods.BodySetAngularVel (Body, m_lastAngularVelocity.X, m_lastAngularVelocity.Y, m_lastAngularVelocity.Z);
+            SafeNativeMethods.BodySetAngularVel(Body, m_lastAngularVelocity.X, m_lastAngularVelocity.Y, m_lastAngularVelocity.Z);
 
         } //end MoveAngular
         internal void LimitRotation(float timestep)

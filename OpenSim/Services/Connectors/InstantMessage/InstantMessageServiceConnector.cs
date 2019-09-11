@@ -24,17 +24,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using log4net;
+using Nwc.XmlRpc;
+using OpenMetaverse;
+using OpenSim.Framework;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
-
-using OpenMetaverse;
-using Nwc.XmlRpc;
-using log4net;
-
-using OpenSim.Framework;
 
 namespace OpenSim.Services.Connectors.InstantMessage
 {

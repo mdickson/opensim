@@ -25,13 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenMetaverse.Packets;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using OpenMetaverse;
-using OpenMetaverse.Packets;
-using log4net;
-using OpenSim.Framework.Monitoring;
 
 namespace OpenSim.Region.ClientStack.LindenUDP
 {
@@ -123,14 +122,14 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             {
                 if (!pool.ContainsKey(type) || pool[type] == null || (pool[type]).Count == 0)
                 {
-//                    m_log.DebugFormat("[PACKETPOOL]: Building {0} packet", type);
+                    //                    m_log.DebugFormat("[PACKETPOOL]: Building {0} packet", type);
 
                     // Creating a new packet if we cannot reuse an old package
                     packet = Packet.BuildPacket(type);
                 }
                 else
                 {
-//                    m_log.DebugFormat("[PACKETPOOL]: Pulling {0} packet", type);
+                    //                    m_log.DebugFormat("[PACKETPOOL]: Pulling {0} packet", type);
 
                     // Recycle old packages
                     PacketsReused++;
@@ -177,7 +176,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         {
             PacketType type = GetType(bytes);
 
-//            Array.Clear(zeroBuffer, 0, zeroBuffer.Length);
+            //            Array.Clear(zeroBuffer, 0, zeroBuffer.Length);
 
             int i = 0;
             Packet packet = GetPacket(type);
@@ -228,7 +227,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                     return;
             }
 
-            if(!trypool)
+            if (!trypool)
                 return;
 
             lock (pool)
@@ -240,13 +239,13 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
                 if ((pool[type]).Count < 50)
                 {
-//                  m_log.DebugFormat("[PACKETPOOL]: Pushing {0} packet", type);
+                    //                  m_log.DebugFormat("[PACKETPOOL]: Pushing {0} packet", type);
                     pool[type].Push(packet);
                 }
             }
         }
 
-        public T GetDataBlock<T>() where T: new()
+        public T GetDataBlock<T>() where T : new()
         {
             lock (DataBlocks)
             {
@@ -271,7 +270,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             }
         }
 
-        public void ReturnDataBlock<T>(T block) where T: new()
+        public void ReturnDataBlock<T>(T block) where T : new()
         {
             if (block == null)
                 return;

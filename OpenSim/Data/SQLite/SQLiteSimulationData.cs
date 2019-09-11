@@ -29,7 +29,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
-using System.IO;
 using System.Reflection;
 using log4net;
 #if CSharpSqlite
@@ -38,7 +37,6 @@ using log4net;
 using Mono.Data.Sqlite;
 #endif
 using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
@@ -623,13 +621,13 @@ namespace OpenSim.Data.SQLite
             {
                 foreach (SceneObjectPart prim in obj.Parts)
                 {
-//                    m_log.Info("[REGION DB]: Adding obj: " + obj.UUID + " to region: " + regionUUID);
+                    //                    m_log.Info("[REGION DB]: Adding obj: " + obj.UUID + " to region: " + regionUUID);
                     addPrim(prim, obj.UUID, regionUUID);
                 }
             }
 
             Commit();
-//            m_log.Info("[Dump of prims]: " + ds.GetXml());
+            //            m_log.Info("[Dump of prims]: " + ds.GetXml());
         }
 
         /// <summary>
@@ -639,7 +637,7 @@ namespace OpenSim.Data.SQLite
         /// <param name="regionUUID">the region UUID</param>
         public void RemoveObject(UUID obj, UUID regionUUID)
         {
-//            m_log.InfoFormat("[REGION DB]: Removing obj: {0} from region: {1}", obj.Guid, regionUUID);
+            //            m_log.InfoFormat("[REGION DB]: Removing obj: {0} from region: {1}", obj.Guid, regionUUID);
 
             DataTable prims = ds.Tables["prims"];
             DataTable shapes = ds.Tables["primshapes"];
@@ -705,7 +703,7 @@ namespace OpenSim.Data.SQLite
             lock (ds)
             {
                 DataRow[] primsForRegion = prims.Select(byRegion);
-//                m_log.Info("[SQLITE REGION DB]: Loaded " + primsForRegion.Length + " prims for region: " + regionUUID);
+                //                m_log.Info("[SQLITE REGION DB]: Loaded " + primsForRegion.Length + " prims for region: " + regionUUID);
 
                 // First, create all groups
                 foreach (DataRow primRow in primsForRegion)
@@ -800,21 +798,21 @@ namespace OpenSim.Data.SQLite
         /// <param name="prim">the prim</param>
         private void LoadItems(SceneObjectPart prim)
         {
-//            m_log.DebugFormat("[SQLITE REGION DB]: Loading inventory for {0} {1}", prim.Name, prim.UUID);
+            //            m_log.DebugFormat("[SQLITE REGION DB]: Loading inventory for {0} {1}", prim.Name, prim.UUID);
 
             DataTable dbItems = ds.Tables["primitems"];
             String sql = String.Format("primID = '{0}'", prim.UUID.ToString());
             DataRow[] dbItemRows = dbItems.Select(sql);
             IList<TaskInventoryItem> inventory = new List<TaskInventoryItem>();
 
-//            m_log.DebugFormat("[SQLITE REGION DB]: Found {0} items for {1} {2}", dbItemRows.Length, prim.Name, prim.UUID);
+            //            m_log.DebugFormat("[SQLITE REGION DB]: Found {0} items for {1} {2}", dbItemRows.Length, prim.Name, prim.UUID);
 
             foreach (DataRow row in dbItemRows)
             {
                 TaskInventoryItem item = buildItem(row);
                 inventory.Add(item);
 
-//                m_log.DebugFormat("[SQLITE REGION DB]: Restored item {0} {1}", item.Name, item.ItemID);
+                //                m_log.DebugFormat("[SQLITE REGION DB]: Restored item {0} {1}", item.Name, item.ItemID);
             }
 
             prim.Inventory.RestoreInventoryItems(inventory);
@@ -1109,7 +1107,7 @@ namespace OpenSim.Data.SQLite
         /// </summary>
         public void Commit()
         {
-//            m_log.Debug("[SQLITE]: Starting commit");
+            //            m_log.Debug("[SQLITE]: Starting commit");
             lock (ds)
             {
                 primDa.Update(ds, "prims");
@@ -1794,7 +1792,7 @@ namespace OpenSim.Data.SQLite
 
             if (!(row["MediaURL"] is System.DBNull))
             {
-//                m_log.DebugFormat("[SQLITE]: MediaUrl type [{0}]", row["MediaURL"].GetType());
+                //                m_log.DebugFormat("[SQLITE]: MediaUrl type [{0}]", row["MediaURL"].GetType());
                 prim.MediaUrl = (string)row["MediaURL"];
             }
 
@@ -2249,7 +2247,7 @@ namespace OpenSim.Data.SQLite
             row["AttachedPosY"] = prim.AttachedPos.Y;
             row["AttachedPosZ"] = prim.AttachedPos.Z;
 
-            if (prim.DynAttrs!= null && prim.DynAttrs.CountNamespaces > 0)
+            if (prim.DynAttrs != null && prim.DynAttrs.CountNamespaces > 0)
                 row["DynAttrs"] = prim.DynAttrs.ToXml();
             else
                 row["DynAttrs"] = null;
@@ -2637,7 +2635,7 @@ namespace OpenSim.Data.SQLite
         /// <param name="items"></param>
         public void StorePrimInventory(UUID primID, ICollection<TaskInventoryItem> items)
         {
-//            m_log.DebugFormat("[SQLITE REGION DB]: Entered StorePrimInventory with prim ID {0}", primID);
+            //            m_log.DebugFormat("[SQLITE REGION DB]: Entered StorePrimInventory with prim ID {0}", primID);
 
             DataTable dbItems = ds.Tables["primitems"];
 
@@ -2704,7 +2702,7 @@ namespace OpenSim.Data.SQLite
             sql += ") values (:";
             sql += String.Join(", :", cols);
             sql += ")";
-//            m_log.DebugFormat("[SQLITE]: Created insert command {0}", sql);
+            //            m_log.DebugFormat("[SQLITE]: Created insert command {0}", sql);
             SqliteCommand cmd = new SqliteCommand(sql);
 
             // this provides the binding for all our parameters, so

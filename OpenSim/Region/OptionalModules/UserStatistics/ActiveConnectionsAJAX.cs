@@ -25,17 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using Mono.Data.SqliteClient;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
-using OpenSim.Region.Framework.Scenes;
 using OpenSim.Framework.Monitoring;
+using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
 
 namespace OpenSim.Region.UserStatistics
 {
@@ -62,7 +60,7 @@ namespace OpenSim.Region.UserStatistics
 
         public string RenderView(Hashtable pModelResult)
         {
-            List<Scene> all_scenes = (List<Scene>) pModelResult["hdata"];
+            List<Scene> all_scenes = (List<Scene>)pModelResult["hdata"];
 
             StringBuilder output = new StringBuilder();
             HTMLUtil.OL_O(ref output, "");
@@ -71,7 +69,7 @@ namespace OpenSim.Region.UserStatistics
                 HTMLUtil.LI_O(ref output, String.Empty);
                 output.Append(scene.RegionInfo.RegionName);
                 HTMLUtil.OL_O(ref output, String.Empty);
-                scene.ForEachScenePresence(delegate(ScenePresence av)
+                scene.ForEachScenePresence(delegate (ScenePresence av)
                 {
                     Dictionary<string, string> queues = new Dictionary<string, string>();
                     if (av.ControllingClient is IStatsCollector)
@@ -153,7 +151,7 @@ namespace OpenSim.Region.UserStatistics
         /// <returns></returns>
         public string RenderJson(Hashtable pModelResult)
         {
-            List<Scene> all_scenes = (List<Scene>) pModelResult["hdata"];
+            List<Scene> all_scenes = (List<Scene>)pModelResult["hdata"];
 
             OSDMap regionInfo = new OSDMap();
             foreach (Scene scene in all_scenes)
@@ -165,14 +163,15 @@ namespace OpenSim.Region.UserStatistics
                     OSDMap presenceInfo = new OSDMap();
                     presenceInfo.Add("Name", new OSDString(av.Name));
 
-                    Dictionary<string,string> queues = new Dictionary<string, string>();
+                    Dictionary<string, string> queues = new Dictionary<string, string>();
                     if (av.ControllingClient is IStatsCollector)
                     {
-                        IStatsCollector isClient = (IStatsCollector) av.ControllingClient;
+                        IStatsCollector isClient = (IStatsCollector)av.ControllingClient;
                         queues = decodeQueueReport(isClient.Report());
                     }
                     OSDMap queueInfo = new OpenMetaverse.StructuredData.OSDMap();
-                    foreach (KeyValuePair<string, string> kvp in queues) {
+                    foreach (KeyValuePair<string, string> kvp in queues)
+                    {
                         queueInfo.Add(kvp.Key, new OSDString(kvp.Value));
                     }
                     sceneInfo.Add("queues", queueInfo);
@@ -190,8 +189,8 @@ namespace OpenSim.Region.UserStatistics
                     {
                         presenceInfo.Add("position", new OSDString(string.Format("<{0},{1},{2}>",
                                                     (int)av.AbsolutePosition.X,
-                                                    (int) av.AbsolutePosition.Y,
-                                                    (int) av.AbsolutePosition.Z)) );
+                                                    (int)av.AbsolutePosition.Y,
+                                                    (int)av.AbsolutePosition.Z)));
                     }
 
                     Dictionary<string, int> throttles = DecodeClientThrottles(av.ControllingClient.GetThrottlesPacked(1));
@@ -268,7 +267,7 @@ namespace OpenSim.Region.UserStatistics
 
             return returndict;
         }
-        public Dictionary<string,string> decodeQueueReport(string rep)
+        public Dictionary<string, string> decodeQueueReport(string rep)
         {
             Dictionary<string, string> returndic = new Dictionary<string, string>();
             if (rep.Length == 79)
@@ -276,12 +275,12 @@ namespace OpenSim.Region.UserStatistics
                 int pos = 1;
                 returndic.Add("All", rep.Substring((6 * pos), 8)); pos++;
                 returndic.Add("Incoming", rep.Substring((7 * pos), 8)); pos++;
-                returndic.Add("Outgoing", rep.Substring((7 * pos) , 8)); pos++;
-                returndic.Add("Resend", rep.Substring((7 * pos) , 8)); pos++;
-                returndic.Add("Land", rep.Substring((7 * pos) , 8)); pos++;
-                returndic.Add("Wind", rep.Substring((7 * pos) , 8)); pos++;
-                returndic.Add("Cloud", rep.Substring((7 * pos) , 8)); pos++;
-                returndic.Add("Task", rep.Substring((7 * pos) , 8)); pos++;
+                returndic.Add("Outgoing", rep.Substring((7 * pos), 8)); pos++;
+                returndic.Add("Resend", rep.Substring((7 * pos), 8)); pos++;
+                returndic.Add("Land", rep.Substring((7 * pos), 8)); pos++;
+                returndic.Add("Wind", rep.Substring((7 * pos), 8)); pos++;
+                returndic.Add("Cloud", rep.Substring((7 * pos), 8)); pos++;
+                returndic.Add("Task", rep.Substring((7 * pos), 8)); pos++;
                 returndic.Add("Texture", rep.Substring((7 * pos), 8)); pos++;
                 returndic.Add("Asset", rep.Substring((7 * pos), 8));
                 /*

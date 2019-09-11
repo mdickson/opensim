@@ -25,21 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Monitoring;
 using System;
-using System.Timers;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading;
-using OpenMetaverse;
-using log4net;
-using Nini.Config;
-using OpenSim.Framework;
-using OpenSim.Framework.Monitoring;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
+using System.Timers;
 
 namespace OpenSim.Region.OptionalModules.Avatar.Chat
 {
@@ -327,7 +323,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.Chat
                 return;
 
             // Delay until next WD cycle if this is too close to the last start attempt
-            if(_icc_ < ICCD_PERIOD)
+            if (_icc_ < ICCD_PERIOD)
                 return;
 
             m_log.DebugFormat("[IRC-Connector-{0}]: Connection request for {1} on {2}:{3}", idn, m_nick, m_server, m_ircChannel);
@@ -358,7 +354,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.Chat
                         m_writer.WriteLine(String.Format("PASS {0}", m_password));
                     m_writer.WriteLine(String.Format("NICK {0}", m_nick));
                     m_writer.Flush();
-                    m_writer.WriteLine(String.Format("USER {0} 0 * :OpenSim Relay",m_user));
+                    m_writer.WriteLine(String.Format("USER {0} 0 * :OpenSim Relay", m_user));
                     m_writer.Flush();
                 }
                 catch (Exception e)
@@ -506,7 +502,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.Chat
                             c.Message = data["msg"];
                             c.Type = ChatTypeEnum.Region;
                             c.Position = CenterOfRegion;
-                            c.From =  data["nick"] + "@IRC";
+                            c.From = data["nick"] + "@IRC";
                             c.Sender = null;
                             c.SenderUUID = UUID.Zero;
 
@@ -754,13 +750,13 @@ namespace OpenSim.Region.OptionalModules.Avatar.Chat
             if (IrcChannel.StartsWith(":"))
                 IrcChannel = IrcChannel.Substring(1);
 
-            if(IrcChannel == m_ircChannel)
+            if (IrcChannel == m_ircChannel)
             {
-                m_log.InfoFormat("[IRC-Connector-{0}] Joined requested channel {1} at {2}", idn, IrcChannel,m_server);
+                m_log.InfoFormat("[IRC-Connector-{0}] Joined requested channel {1} at {2}", idn, IrcChannel, m_server);
                 m_pending = false;
             }
             else
-                m_log.InfoFormat("[IRC-Connector-{0}] Joined unknown channel {1} at {2}", idn, IrcChannel,m_server);
+                m_log.InfoFormat("[IRC-Connector-{0}] Joined unknown channel {1} at {2}", idn, IrcChannel, m_server);
             BroadcastSim(IrcUser, "/me joins {0}", IrcChannel);
         }
 

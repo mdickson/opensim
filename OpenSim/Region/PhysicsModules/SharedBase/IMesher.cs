@@ -25,11 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
+using OpenSim.Framework;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using OpenSim.Framework;
-using OpenMetaverse;
 
 namespace OpenSim.Region.PhysicsModules.SharedBase
 {
@@ -75,7 +75,7 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
 
         public override string ToString()
         {
-            return uuid.ToString() + "-" + hashC.ToString("x") ;
+            return uuid.ToString() + "-" + hashC.ToString("x");
         }
     }
 

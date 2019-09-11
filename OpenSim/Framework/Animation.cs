@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using System;
 
 namespace OpenSim.Framework
 {
@@ -127,7 +127,7 @@ namespace OpenSim.Framework
             {
                 return (other.AnimID.Equals(this.AnimID)
                         && other.SequenceNum == this.SequenceNum
-                        && other.ObjectID.Equals(this.ObjectID) );
+                        && other.ObjectID.Equals(this.ObjectID));
             }
             return base.Equals(obj);
         }

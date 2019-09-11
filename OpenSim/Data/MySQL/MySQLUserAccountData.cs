@@ -25,13 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using OpenMetaverse;
-using OpenSim.Framework;
 using MySql.Data.MySqlClient;
+using OpenMetaverse;
+using System;
 
 namespace OpenSim.Data.MySQL
 {
@@ -44,20 +40,20 @@ namespace OpenSim.Data.MySQL
 
         public UserAccountData[] GetUsers(UUID scopeID, string query)
         {
-            string[] words = query.Split(new char[] {' '});
+            string[] words = query.Split(new char[] { ' ' });
 
             bool valid = false;
 
-            for (int i = 0 ; i < words.Length ; i++)
+            for (int i = 0; i < words.Length; i++)
             {
                 if (words[i].Length > 2)
                     valid = true;
-//                if (words[i].Length < 3)
-//                {
-//                    if (i != words.Length - 1)
-//                        Array.Copy(words, i + 1, words, i, words.Length - i - 1);
-//                    Array.Resize(ref words, words.Length - 1);
-//                }
+                //                if (words[i].Length < 3)
+                //                {
+                //                    if (i != words.Length - 1)
+                //                        Array.Copy(words, i + 1, words, i, words.Length - i - 1);
+                //                    Array.Resize(ref words, words.Length - 1);
+                //                }
             }
 
             if ((!valid) || words.Length == 0)

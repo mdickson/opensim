@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using System;
 using System.Timers;
-using OpenMetaverse;
 
 namespace OpenSim.Region.PhysicsModules.SharedBase
 {
@@ -48,13 +48,13 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
             get { return new NullPhysicsSensor(); }
         }
         public abstract Vector3 Position { get; set; }
-        public abstract void TimerCallback (object obj, ElapsedEventArgs eea);
-        public abstract float radianarc {get; set;}
-        public abstract string targetname {get; set;}
-        public abstract Guid targetKey{get;set;}
-        public abstract SenseType sensetype { get;set;}
-        public abstract float range { get;set;}
-        public abstract float rateSeconds { get;set;}
+        public abstract void TimerCallback(object obj, ElapsedEventArgs eea);
+        public abstract float radianarc { get; set; }
+        public abstract string targetname { get; set; }
+        public abstract Guid targetKey { get; set; }
+        public abstract SenseType sensetype { get; set; }
+        public abstract float range { get; set; }
+        public abstract float rateSeconds { get; set; }
     }
 
     public class NullPhysicsSensor : PhysicsSensor

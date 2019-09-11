@@ -25,11 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
 using OpenMetaverse;
-using OpenSim.Framework;
 using OpenSim.Data;
+using OpenSim.Framework;
+using System.Collections.Generic;
 
 namespace OpenSim.Tests.Common
 {
@@ -43,15 +42,15 @@ namespace OpenSim.Tests.Common
         public string Version { get { return "0"; } }
         public string Name { get { return "MockAssetDataPlugin"; } }
 
-        public void Initialise() {}
-        public void Initialise(string connect) {}
-        public void Dispose() {}
+        public void Initialise() { }
+        public void Initialise(string connect) { }
+        public void Dispose() { }
 
         private readonly List<AssetBase> assets = new List<AssetBase>();
 
         public AssetBase GetAsset(UUID uuid)
         {
-            return assets.Find(x=>x.FullID == uuid);
+            return assets.Find(x => x.FullID == uuid);
         }
 
         public bool StoreAsset(AssetBase asset)

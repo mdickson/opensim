@@ -28,15 +28,15 @@
 using log4net;
 using Mono.Addins;
 using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using OpenSim.Framework;
-using OpenSim.Server.Base;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
-using OpenMetaverse;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.MuteList
 {
@@ -52,7 +52,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.MuteList
 
         private bool m_Enabled = false;
 
-         #region ISharedRegionModule
+        #region ISharedRegionModule
 
         public Type ReplaceableInterface
         {
@@ -80,7 +80,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.MuteList
                 return;
 
             string name = moduleConfig.GetString("MuteListService", "");
-            if(name != Name)
+            if (name != Name)
                 return;
 
             IConfig userConfig = source.Configs["MuteListService"];
@@ -129,7 +129,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.MuteList
             if (!m_Enabled)
                 return;
 
-            lock(m_Scenes)
+            lock (m_Scenes)
             {
                 m_Scenes.Add(scene);
                 scene.RegisterModuleInterface<IMuteListService>(this);
@@ -149,7 +149,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.MuteList
             if (!m_Enabled)
                 return;
 
-            lock(m_Scenes)
+            lock (m_Scenes)
             {
                 if (m_Scenes.Contains(scene))
                 {

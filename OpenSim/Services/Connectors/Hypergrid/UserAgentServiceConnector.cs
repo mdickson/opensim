@@ -25,22 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using Nwc.XmlRpc;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using OpenSim.Framework;
+using OpenSim.Services.Connectors.Simulation;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Reflection;
-using System.Text;
-using OpenSim.Framework;
-using OpenSim.Services.Interfaces;
-using OpenSim.Services.Connectors.Simulation;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using log4net;
-using Nwc.XmlRpc;
-using Nini.Config;
 
 namespace OpenSim.Services.Connectors.Hypergrid
 {
@@ -70,7 +68,7 @@ namespace OpenSim.Services.Connectors.Hypergrid
                 {
                     Uri m_Uri = new Uri(m_ServerURL);
                     IPAddress ip = Util.GetHostFromDNS(m_Uri.Host);
-                    if(ip != null)
+                    if (ip != null)
                     {
                         m_ServerURL = m_ServerURL.Replace(m_Uri.Host, ip.ToString());
                         if (!m_ServerURL.EndsWith("/"))
@@ -348,7 +346,7 @@ namespace OpenSim.Services.Connectors.Hypergrid
             paramList.Add(hash);
 
             XmlRpcRequest request = new XmlRpcRequest("status_notification", paramList);
-//            string reason = string.Empty;
+            //            string reason = string.Empty;
 
             // Send and get reply
             List<UUID> friendsOnline = new List<UUID>();
@@ -360,14 +358,14 @@ namespace OpenSim.Services.Connectors.Hypergrid
             catch
             {
                 m_log.DebugFormat("[USER AGENT CONNECTOR]: Unable to contact remote server {0} for StatusNotification", m_ServerURLHost);
-//                reason = "Exception: " + e.Message;
+                //                reason = "Exception: " + e.Message;
                 return friendsOnline;
             }
 
             if (response.IsFault)
             {
                 m_log.ErrorFormat("[USER AGENT CONNECTOR]: remote call to {0} for StatusNotification returned an error: {1}", m_ServerURLHost, response.FaultString);
-//                reason = "XMLRPC Fault";
+                //                reason = "XMLRPC Fault";
                 return friendsOnline;
             }
 
@@ -379,7 +377,7 @@ namespace OpenSim.Services.Connectors.Hypergrid
                 if (hash == null)
                 {
                     m_log.ErrorFormat("[USER AGENT CONNECTOR]: GetOnlineFriends Got null response from {0}! THIS IS BAAAAD", m_ServerURLHost);
-//                    reason = "Internal error 1";
+                    //                    reason = "Internal error 1";
                     return friendsOnline;
                 }
 
@@ -398,7 +396,7 @@ namespace OpenSim.Services.Connectors.Hypergrid
             catch
             {
                 m_log.ErrorFormat("[USER AGENT CONNECTOR]: Got exception on GetOnlineFriends response.");
-//                reason = "Exception: " + e.Message;
+                //                reason = "Exception: " + e.Message;
             }
 
             return friendsOnline;
@@ -420,7 +418,7 @@ namespace OpenSim.Services.Connectors.Hypergrid
             paramList.Add(hash);
 
             XmlRpcRequest request = new XmlRpcRequest("get_online_friends", paramList);
-//            string reason = string.Empty;
+            //            string reason = string.Empty;
 
             // Send and get reply
             List<UUID> online = new List<UUID>();
@@ -432,14 +430,14 @@ namespace OpenSim.Services.Connectors.Hypergrid
             catch
             {
                 m_log.DebugFormat("[USER AGENT CONNECTOR]: Unable to contact remote server {0} for GetOnlineFriends", m_ServerURLHost);
-//                reason = "Exception: " + e.Message;
+                //                reason = "Exception: " + e.Message;
                 return online;
             }
 
             if (response.IsFault)
             {
                 m_log.ErrorFormat("[USER AGENT CONNECTOR]: remote call to {0} for GetOnlineFriends returned an error: {1}", m_ServerURLHost, response.FaultString);
-//                reason = "XMLRPC Fault";
+                //                reason = "XMLRPC Fault";
                 return online;
             }
 
@@ -451,7 +449,7 @@ namespace OpenSim.Services.Connectors.Hypergrid
                 if (hash == null)
                 {
                     m_log.ErrorFormat("[USER AGENT CONNECTOR]: GetOnlineFriends Got null response from {0}! THIS IS BAAAAD", m_ServerURLHost);
-//                    reason = "Internal error 1";
+                    //                    reason = "Internal error 1";
                     return online;
                 }
 
@@ -470,13 +468,13 @@ namespace OpenSim.Services.Connectors.Hypergrid
             catch
             {
                 m_log.ErrorFormat("[USER AGENT CONNECTOR]: Got exception on GetOnlineFriends response.");
-//                reason = "Exception: " + e.Message;
+                //                reason = "Exception: " + e.Message;
             }
 
             return online;
         }
 
-        public Dictionary<string,object> GetUserInfo (UUID userID)
+        public Dictionary<string, object> GetUserInfo(UUID userID)
         {
             Hashtable hash = new Hashtable();
             hash["userID"] = userID.ToString();

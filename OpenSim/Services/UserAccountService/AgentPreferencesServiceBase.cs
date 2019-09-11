@@ -25,16 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
 using Nini.Config;
 using OpenSim.Data;
-using OpenSim.Services.Interfaces;
 using OpenSim.Services.Base;
+using System;
 
 namespace OpenSim.Services.UserAccountService
 {
-    public class AgentPreferencesServiceBase: ServiceBase
+    public class AgentPreferencesServiceBase : ServiceBase
     {
         protected IAgentPreferencesData m_Database = null;
 
@@ -64,7 +62,7 @@ namespace OpenSim.Services.UserAccountService
 
             realm = userConfig.GetString("Realm", realm);
 
-            m_Database = LoadPlugin<IAgentPreferencesData>(dllName, new Object[] {connString, realm});
+            m_Database = LoadPlugin<IAgentPreferencesData>(dllName, new Object[] { connString, realm });
 
             if (m_Database == null)
                 throw new Exception("Could not find a storage interface in the given module");

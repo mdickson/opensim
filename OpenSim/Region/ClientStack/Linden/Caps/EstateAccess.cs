@@ -25,29 +25,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-
-using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
-using Mono.Addins;
 using OpenSim.Framework;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using Caps=OpenSim.Framework.Capabilities.Caps;
+using System;
+using System.Collections;
+using System.Globalization;
+using System.Text;
+using Caps = OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Region.ClientStack.Linden
 {
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "EstateAcessCapModule")]
     public class EstateAccessCapModule : INonSharedRegionModule
     {
-//        private static readonly ILog m_log =
-//            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log =
+        //            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private Scene m_scene;
         private bool m_Enabled = false;
@@ -99,7 +96,7 @@ namespace OpenSim.Region.ClientStack.Linden
             }
 
             IEstateModule m_EstateModule = scene.RequestModuleInterface<IEstateModule>();
-            if(m_EstateModule == null)
+            if (m_EstateModule == null)
             {
                 m_Enabled = false;
                 return;
@@ -152,9 +149,9 @@ namespace OpenSim.Region.ClientStack.Linden
                 return responsedata;
             }
 
-            if (m_scene.RegionInfo == null 
+            if (m_scene.RegionInfo == null
                 || m_scene.RegionInfo.EstateSettings == null
-                ||!m_scene.Permissions.CanIssueEstateCommand(AgentId, false))
+                || !m_scene.Permissions.CanIssueEstateCommand(AgentId, false))
             {
                 responsedata["str_response_string"] = "<llsd><array /></llsd>"; ;
                 return responsedata;
@@ -178,7 +175,7 @@ namespace OpenSim.Region.ClientStack.Linden
                     if (id == UUID.Zero)
                         continue;
                     LLSDxmlEncode.AddMap(sb);
-                        LLSDxmlEncode.AddElem("id", id, sb);
+                    LLSDxmlEncode.AddElem("id", id, sb);
                     LLSDxmlEncode.AddEndMap(sb);
                 }
                 LLSDxmlEncode.AddEndArray(sb);
@@ -193,7 +190,7 @@ namespace OpenSim.Region.ClientStack.Linden
                     if (id == UUID.Zero)
                         continue;
                     LLSDxmlEncode.AddMap(sb);
-                        LLSDxmlEncode.AddElem("id", id, sb);
+                    LLSDxmlEncode.AddElem("id", id, sb);
                     LLSDxmlEncode.AddEndMap(sb);
                 }
                 LLSDxmlEncode.AddEndArray(sb);
@@ -209,13 +206,13 @@ namespace OpenSim.Region.ClientStack.Linden
                     if (id == UUID.Zero)
                         continue;
                     LLSDxmlEncode.AddMap(sb);
-                        LLSDxmlEncode.AddElem("id", id, sb);
-                        LLSDxmlEncode.AddElem("banning_id", ban.BanningUserID, sb);
-                        LLSDxmlEncode.AddElem("last_login_date", "na", sb); // We will not have this. This information is far at grid
-                        if (ban.BanTime == 0)
-                            LLSDxmlEncode.AddElem("ban_date", "0000-00-00 00:00", sb);
-                        else
-                            LLSDxmlEncode.AddElem("ban_date", (Util.ToDateTime(ban.BanTime)).ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture), sb);
+                    LLSDxmlEncode.AddElem("id", id, sb);
+                    LLSDxmlEncode.AddElem("banning_id", ban.BanningUserID, sb);
+                    LLSDxmlEncode.AddElem("last_login_date", "na", sb); // We will not have this. This information is far at grid
+                    if (ban.BanTime == 0)
+                        LLSDxmlEncode.AddElem("ban_date", "0000-00-00 00:00", sb);
+                    else
+                        LLSDxmlEncode.AddElem("ban_date", (Util.ToDateTime(ban.BanTime)).ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture), sb);
                     LLSDxmlEncode.AddEndMap(sb);
                 }
                 LLSDxmlEncode.AddEndArray(sb);
@@ -227,7 +224,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 for (int i = 0; i < managers.Length; ++i)
                 {
                     LLSDxmlEncode.AddMap(sb);
-                        LLSDxmlEncode.AddElem("agent_id", managers[i], sb);
+                    LLSDxmlEncode.AddElem("agent_id", managers[i], sb);
                     LLSDxmlEncode.AddEndMap(sb);
                 }
                 LLSDxmlEncode.AddEndArray(sb);

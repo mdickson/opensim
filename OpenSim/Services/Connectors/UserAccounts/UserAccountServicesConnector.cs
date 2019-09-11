@@ -26,17 +26,14 @@
  */
 
 using log4net;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Framework;
-
-using OpenSim.Framework.ServiceAuth;
 using OpenSim.Server.Base;
 using OpenSim.Services.Interfaces;
-using OpenMetaverse;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Services.Connectors
 {
@@ -196,16 +193,16 @@ namespace OpenSim.Services.Connectors
             List<UserAccount> accs = new List<UserAccount>();
             bool multisuported = true;
             accs = doGetMultiUserAccounts(scopeID, IDs, out multisuported);
-            if(multisuported)
+            if (multisuported)
                 return accs;
 
             // service does not do multi accounts so need to do it one by one
 
             UUID uuid = UUID.Zero;
-            foreach(string id in IDs)
+            foreach (string id in IDs)
             {
-                if(UUID.TryParse(id, out uuid) && uuid != UUID.Zero)
-                    accs.Add(GetUserAccount(scopeID,uuid));
+                if (UUID.TryParse(id, out uuid) && uuid != UUID.Zero)
+                    accs.Add(GetUserAccount(scopeID, uuid));
             }
 
             return accs;
@@ -252,10 +249,10 @@ namespace OpenSim.Services.Connectors
             {
                 if (replyData.ContainsKey("result"))
                 {
-                    if(replyData["result"].ToString() == "null")
+                    if (replyData["result"].ToString() == "null")
                         return accounts;
 
-                    if(replyData["result"].ToString() == "Failure")
+                    if (replyData["result"].ToString() == "Failure")
                     {
                         suported = false;
                         return accounts;

@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Xml;
-using log4net;
-using Nini.Config;
-using OpenMetaverse;
 
 /// <summary>
 /// Loads assets from the filesystem location.  Not yet a plugin, though it should be.
@@ -66,11 +66,11 @@ namespace OpenSim.Framework.AssetLoader.Filesystem
 
         protected static void LoadAsset(AssetBase info, string path)
         {
-//            bool image =
-//               (info.Type == (sbyte)AssetType.Texture ||
-//                info.Type == (sbyte)AssetType.TextureTGA ||
-//                info.Type == (sbyte)AssetType.ImageJPEG ||
-//                info.Type == (sbyte)AssetType.ImageTGA);
+            //            bool image =
+            //               (info.Type == (sbyte)AssetType.Texture ||
+            //                info.Type == (sbyte)AssetType.TextureTGA ||
+            //                info.Type == (sbyte)AssetType.ImageJPEG ||
+            //                info.Type == (sbyte)AssetType.ImageTGA);
 
             FileInfo fInfo = new FileInfo(path);
             long numBytes = fInfo.Length;

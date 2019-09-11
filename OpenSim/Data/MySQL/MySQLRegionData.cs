@@ -25,15 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Reflection;
 using MySql.Data.MySqlClient;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Data;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Reflection;
 using RegionFlags = OpenSim.Framework.RegionFlags;
 
 namespace OpenSim.Data.MySQL
@@ -66,7 +64,7 @@ namespace OpenSim.Data.MySQL
 
         public List<RegionData> Get(string regionName, UUID scopeID)
         {
-            string command = "select * from `"+m_Realm+"` where regionName like ?regionName";
+            string command = "select * from `" + m_Realm + "` where regionName like ?regionName";
             if (scopeID != UUID.Zero)
                 command += " and ScopeID = ?scopeID";
 
@@ -83,24 +81,24 @@ namespace OpenSim.Data.MySQL
 
         public RegionData Get(int posX, int posY, UUID scopeID)
         {
-/* fixed size regions
-            string command = "select * from `"+m_Realm+"` where locX = ?posX and locY = ?posY";
-            if (scopeID != UUID.Zero)
-                command += " and ScopeID = ?scopeID";
+            /* fixed size regions
+                        string command = "select * from `"+m_Realm+"` where locX = ?posX and locY = ?posY";
+                        if (scopeID != UUID.Zero)
+                            command += " and ScopeID = ?scopeID";
 
-            using (MySqlCommand cmd = new MySqlCommand(command))
-            {
-                cmd.Parameters.AddWithValue("?posX", posX.ToString());
-                cmd.Parameters.AddWithValue("?posY", posY.ToString());
-                cmd.Parameters.AddWithValue("?scopeID", scopeID.ToString());
+                        using (MySqlCommand cmd = new MySqlCommand(command))
+                        {
+                            cmd.Parameters.AddWithValue("?posX", posX.ToString());
+                            cmd.Parameters.AddWithValue("?posY", posY.ToString());
+                            cmd.Parameters.AddWithValue("?scopeID", scopeID.ToString());
 
-                List<RegionData> ret = RunCommand(cmd);
-                if (ret.Count == 0)
-                    return null;
+                            List<RegionData> ret = RunCommand(cmd);
+                            if (ret.Count == 0)
+                                return null;
 
-                return ret[0];
-            }
-*/
+                            return ret[0];
+                        }
+            */
             // extend database search for maximum region size area
             string command = "select * from `" + m_Realm + "` where locX between ?startX and ?endX and locY between ?startY and ?endY";
             if (scopeID != UUID.Zero)
@@ -143,7 +141,7 @@ namespace OpenSim.Data.MySQL
 
         public RegionData Get(UUID regionID, UUID scopeID)
         {
-            string command = "select * from `"+m_Realm+"` where uuid = ?regionID";
+            string command = "select * from `" + m_Realm + "` where uuid = ?regionID";
             if (scopeID != UUID.Zero)
                 command += " and ScopeID = ?scopeID";
 
@@ -162,22 +160,22 @@ namespace OpenSim.Data.MySQL
 
         public List<RegionData> Get(int startX, int startY, int endX, int endY, UUID scopeID)
         {
-/* fix size regions
-            string command = "select * from `"+m_Realm+"` where locX between ?startX and ?endX and locY between ?startY and ?endY";
-            if (scopeID != UUID.Zero)
-                command += " and ScopeID = ?scopeID";
+            /* fix size regions
+                        string command = "select * from `"+m_Realm+"` where locX between ?startX and ?endX and locY between ?startY and ?endY";
+                        if (scopeID != UUID.Zero)
+                            command += " and ScopeID = ?scopeID";
 
-            using (MySqlCommand cmd = new MySqlCommand(command))
-            {
-                cmd.Parameters.AddWithValue("?startX", startX.ToString());
-                cmd.Parameters.AddWithValue("?startY", startY.ToString());
-                cmd.Parameters.AddWithValue("?endX", endX.ToString());
-                cmd.Parameters.AddWithValue("?endY", endY.ToString());
-                cmd.Parameters.AddWithValue("?scopeID", scopeID.ToString());
+                        using (MySqlCommand cmd = new MySqlCommand(command))
+                        {
+                            cmd.Parameters.AddWithValue("?startX", startX.ToString());
+                            cmd.Parameters.AddWithValue("?startY", startY.ToString());
+                            cmd.Parameters.AddWithValue("?endX", endX.ToString());
+                            cmd.Parameters.AddWithValue("?endY", endY.ToString());
+                            cmd.Parameters.AddWithValue("?scopeID", scopeID.ToString());
 
-                return RunCommand(cmd);
-            }
- */
+                            return RunCommand(cmd);
+                        }
+             */
             string command = "select * from `" + m_Realm + "` where locX between ?startX and ?endX and locY between ?startY and ?endY";
             if (scopeID != UUID.Zero)
                 command += " and ScopeID = ?scopeID";

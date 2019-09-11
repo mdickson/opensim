@@ -25,10 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using OpenMetaverse;
-using NUnit.Framework;
 using NUnit.Framework.Constraints;
+using OpenMetaverse;
+using System;
 
 namespace OpenSim.Tests.Common
 {
@@ -55,7 +54,7 @@ namespace OpenSim.Tests.Common
             {
                 throw new ArgumentException("Constraint cannot be used upon null values.");
             }
-            if (valueToBeTested.GetType() != typeof (Quaternion))
+            if (valueToBeTested.GetType() != typeof(Quaternion))
             {
                 throw new ArgumentException("Constraint cannot be used upon non quaternion values.");
             }

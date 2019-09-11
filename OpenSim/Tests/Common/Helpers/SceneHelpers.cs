@@ -25,32 +25,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Net;
-using System.Collections.Generic;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Data.Null;
 using OpenSim.Framework;
-
 using OpenSim.Framework.Console;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Region.PhysicsModules.SharedBase;
-using OpenSim.Region.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.CoreModules.Avatar.Gods;
 using OpenSim.Region.CoreModules.Asset;
+using OpenSim.Region.CoreModules.Avatar.Gods;
 using OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset;
 using OpenSim.Region.CoreModules.ServiceConnectorsOut.Authentication;
-using OpenSim.Region.CoreModules.ServiceConnectorsOut.Inventory;
 using OpenSim.Region.CoreModules.ServiceConnectorsOut.Grid;
-using OpenSim.Region.CoreModules.ServiceConnectorsOut.UserAccounts;
+using OpenSim.Region.CoreModules.ServiceConnectorsOut.Inventory;
 using OpenSim.Region.CoreModules.ServiceConnectorsOut.Presence;
+using OpenSim.Region.CoreModules.ServiceConnectorsOut.UserAccounts;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.PhysicsModule.BasicPhysics;
+using OpenSim.Region.PhysicsModules.SharedBase;
 using OpenSim.Services.Interfaces;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
+using System;
+using System.Collections.Generic;
+using System.Net;
 
 namespace OpenSim.Tests.Common
 {
@@ -80,18 +75,18 @@ namespace OpenSim.Tests.Common
 
         private PhysicsScene m_physicsScene;
 
-        public SceneHelpers() : this(null) {}
+        public SceneHelpers() : this(null) { }
 
         public SceneHelpers(CoreAssetCache cache)
         {
             SceneManager = new SceneManager();
 
-            m_assetService          = StartAssetService(cache);
+            m_assetService = StartAssetService(cache);
             m_authenticationService = StartAuthenticationService();
-            m_inventoryService      = StartInventoryService();
-            m_gridService           = StartGridService();
-            m_userAccountService    = StartUserAccountService();
-            m_presenceService       = StartPresenceService();
+            m_inventoryService = StartInventoryService();
+            m_gridService = StartGridService();
+            m_userAccountService = StartUserAccountService();
+            m_presenceService = StartPresenceService();
 
             m_inventoryService.PostInitialise();
             m_assetService.PostInitialise();
@@ -398,7 +393,7 @@ namespace OpenSim.Tests.Common
             foreach (object module in modules)
             {
                 IRegionModuleBase m = (IRegionModuleBase)module;
-//                Console.WriteLine("MODULE {0}", m.Name);
+                //                Console.WriteLine("MODULE {0}", m.Name);
                 m.Initialise(config);
                 newModules.Add(m);
             }
@@ -669,7 +664,7 @@ namespace OpenSim.Tests.Common
         {
             return new SceneObjectPart(
                 ownerId, PrimitiveBaseShape.Default, Vector3.Zero, Quaternion.Identity, Vector3.Zero)
-                    { Name = name, UUID = id, Scale = new Vector3(1, 1, 1) };
+            { Name = name, UUID = id, Scale = new Vector3(1, 1, 1) };
         }
 
         /// <summary>

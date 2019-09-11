@@ -25,24 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using System.IO;
-using System.Web;
-
 using log4net;
-using Nini.Config;
 using Mono.Addins;
-
+using Nini.Config;
 using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-
-using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using Caps = OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Services.Connectors.SimianGrid
@@ -56,7 +47,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
         private Scene m_scene;
         private String m_simianURL;
 
-#region IRegionModule Members
+        #region IRegionModule Members
 
         public string Name
         {
@@ -88,7 +79,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
             }
             catch (Exception e)
             {
-                m_log.ErrorFormat("[SimianExternalCaps] initialization error: {0}",e.Message);
+                m_log.ErrorFormat("[SimianExternalCaps] initialization error: {0}", e.Message);
                 return;
             }
         }
@@ -98,7 +89,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
 
         public void AddRegion(Scene scene)
         {
-            if (! m_enabled)
+            if (!m_enabled)
                 return;
 
             m_scene = scene;
@@ -107,7 +98,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
 
         public void RemoveRegion(Scene scene)
         {
-            if (! m_enabled)
+            if (!m_enabled)
                 return;
 
             m_scene.EventManager.OnRegisterCaps -= RegisterCapsEventHandler;
@@ -116,7 +107,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
 
         public void RegionLoaded(Scene scene)
         {
-            if (! m_enabled)
+            if (!m_enabled)
                 return;
 
             m_scene.EventManager.OnRegisterCaps += RegisterCapsEventHandler;
@@ -128,9 +119,9 @@ namespace OpenSim.Services.Connectors.SimianGrid
             get { return null; }
         }
 
-#endregion
+        #endregion
 
-#region IExternalCapsModule
+        #region IExternalCapsModule
         // Eg http://grid.sciencesim.com/GridPublic/%CAP%/%OP%/"
         public bool RegisterExternalUserCapsHandler(UUID agentID, Caps caps, String capName, String urlSkel)
         {
@@ -148,30 +139,30 @@ namespace OpenSim.Services.Connectors.SimianGrid
 
             // OSDMap response = SimianGrid.PostToService(m_simianURL, requestArgs);
 
-            Dictionary<String,String> subs = new Dictionary<String,String>();
+            Dictionary<String, String> subs = new Dictionary<String, String>();
             subs["%OP%"] = capName;
             subs["%USR%"] = agentID.ToString();
             subs["%CAP%"] = cap.ToString();
             subs["%SIM%"] = m_scene.RegionInfo.RegionID.ToString();
 
-            caps.RegisterHandler(capName,ExpandSkeletonURL(urlSkel,subs));
+            caps.RegisterHandler(capName, ExpandSkeletonURL(urlSkel, subs));
             return true;
         }
 
-#endregion
+        #endregion
 
-#region EventHandlers
+        #region EventHandlers
         public void RegisterCapsEventHandler(UUID agentID, Caps caps) { }
         public void DeregisterCapsEventHandler(UUID agentID, Caps caps) { }
-#endregion
+        #endregion
 
-        private String ExpandSkeletonURL(String urlSkel, Dictionary<String,String> subs)
+        private String ExpandSkeletonURL(String urlSkel, Dictionary<String, String> subs)
         {
             String result = urlSkel;
 
-            foreach (KeyValuePair<String,String> kvp in subs)
+            foreach (KeyValuePair<String, String> kvp in subs)
             {
-                result = result.Replace(kvp.Key,kvp.Value);
+                result = result.Replace(kvp.Key, kvp.Value);
             }
 
             return result;

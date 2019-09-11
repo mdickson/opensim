@@ -25,23 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Timers;
-using Timer=System.Timers.Timer;
-using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
-using OpenMetaverse.Assets;
 using OpenSim.Framework;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.CoreModules.Avatar.Inventory.Archiver;
-using OpenSim.Region.CoreModules.World.Serialiser;
-using OpenSim.Region.CoreModules.ServiceConnectorsOut.Simulation;
+using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
 using OpenSim.Tests.Common;
 
@@ -54,7 +42,7 @@ namespace OpenSim.Region.Framework.Tests
         public void TestAddTaskInventoryItem()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             Scene scene = new SceneHelpers().SetupScene();
             UserAccount user1 = UserAccountHelpers.CreateUserWithInventory(scene);
@@ -77,7 +65,7 @@ namespace OpenSim.Region.Framework.Tests
         public void TestRezObjectFromInventoryItem()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             Scene scene = new SceneHelpers().SetupScene();
             UserAccount user1 = UserAccountHelpers.CreateUserWithInventory(scene);
@@ -95,7 +83,7 @@ namespace OpenSim.Region.Framework.Tests
             Quaternion rezRot = new Quaternion(0.5f, 0.5f, 0.5f, 0.5f);
             Vector3 rezVel = new Vector3(2, 2, 2);
 
-            scene.RezObject(sop1, taskSceneObjectItem, rezPos, rezRot, rezVel, 0,false);
+            scene.RezObject(sop1, taskSceneObjectItem, rezPos, rezRot, rezVel, 0, false);
 
             SceneObjectGroup rezzedObject = scene.GetSceneObjectGroup("tso");
 
@@ -103,7 +91,7 @@ namespace OpenSim.Region.Framework.Tests
             Assert.That(rezzedObject.AbsolutePosition, Is.EqualTo(rezPos));
 
             // Velocity doesn't get applied, probably because there is no physics in tests (yet)
-//            Assert.That(rezzedObject.Velocity, Is.EqualTo(rezVel));
+            //            Assert.That(rezzedObject.Velocity, Is.EqualTo(rezVel));
             Assert.That(rezzedObject.Velocity, Is.EqualTo(Vector3.Zero));
 
             // Confusingly, this isn't the rezzedObject.Rotation
@@ -120,7 +108,7 @@ namespace OpenSim.Region.Framework.Tests
         public void TestMoveTaskInventoryItem()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             Scene scene = new SceneHelpers().SetupScene();
             UserAccount user1 = UserAccountHelpers.CreateUserWithInventory(scene);
@@ -152,7 +140,7 @@ namespace OpenSim.Region.Framework.Tests
         public void TestMoveTaskInventoryItemNoParent()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             Scene scene = new SceneHelpers().SetupScene();
             UserAccount user1 = UserAccountHelpers.CreateUserWithInventory(scene);

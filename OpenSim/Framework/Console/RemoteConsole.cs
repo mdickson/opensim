@@ -25,20 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework.Servers.HttpServer;
 using System;
-using System.Xml;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Timers;
-using OpenMetaverse;
-using Nini.Config;
-using OpenSim.Framework.Servers.HttpServer;
-using log4net;
+using System.Xml;
 
 namespace OpenSim.Framework.Console
 {
@@ -285,7 +282,7 @@ namespace OpenSim.Framework.Console
 
             // Echo to all the other users what we have done. This
             // will also go to ourselves.
-            Output (cmdinput, String.Empty, false, false, true);
+            Output(cmdinput, String.Empty, false, false, true);
 
             // If this is a command, we need to resolve and execute it.
             if (isCommand)
@@ -299,7 +296,7 @@ namespace OpenSim.Framework.Console
                 {
                     int i;
 
-                    for (i=0 ; i < cmd.Length ; i++)
+                    for (i = 0; i < cmd.Length; i++)
                     {
                         if (cmd[i].Contains(" "))
                             cmd[i] = "\"" + cmd[i] + "\"";
@@ -405,7 +402,7 @@ namespace OpenSim.Framework.Console
             string uri = "/ReadResponses/" + sessionID.ToString() + "/";
 
             m_Server.AddPollServiceHTTPHandler(
-                uri, new PollServiceEventArgs(null, uri, HasEvents, GetEvents, NoEvents, null, sessionID,25000)); // 25 secs timeout
+                uri, new PollServiceEventArgs(null, uri, HasEvents, GetEvents, NoEvents, null, sessionID, 25000)); // 25 secs timeout
 
             // Our reply is an XML document.
             // TODO: Change this to Linq.Xml
@@ -554,11 +551,11 @@ namespace OpenSim.Framework.Console
         {
             Hashtable result = new Hashtable();
 
-            string[] terms = data.Split(new char[] {'&'});
+            string[] terms = data.Split(new char[] { '&' });
 
             foreach (string term in terms)
             {
-                string[] elems = term.Split(new char[] {'='});
+                string[] elems = term.Split(new char[] { '=' });
                 if (elems.Length == 0)
                     continue;
 
@@ -648,7 +645,7 @@ namespace OpenSim.Framework.Console
                 if (sendStart < c.lastLineSeen)
                     sendStart = c.lastLineSeen;
 
-                for (long i = sendStart ; i < m_lineNumber ; i++)
+                for (long i = sendStart; i < m_lineNumber; i++)
                 {
                     ScrollbackEntry e = m_Scrollback[(int)(i - startLine)];
 

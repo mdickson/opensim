@@ -25,18 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Framework.Servers;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.CoreModules.ServiceConnectorsOut.Simulation;
 using OpenSim.Tests.Common;
-using System.Threading;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.Framework.Scenes.Tests
 {
@@ -57,7 +49,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public void TestSitOutsideRangeNoTarget()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             // More than 10 meters away from 0, 0, 0 (default part position)
             Vector3 startPos = new Vector3(10.1f, 0, 0);
@@ -78,7 +70,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public void TestSitWithinRangeNoTarget()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             // Less than 10 meters away from 0, 0, 0 (default part position)
             Vector3 startPos = new Vector3(9.9f, 0, 0);
@@ -108,7 +100,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public void TestSitAndStandWithNoSitTarget()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             // Make sure we're within range to sit
             Vector3 startPos = new Vector3(1, 1, 1);
@@ -137,7 +129,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public void TestSitAndStandWithNoSitTargetChildPrim()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             // Make sure we're within range to sit
             Vector3 startPos = new Vector3(1, 1, 1);
@@ -166,76 +158,76 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         [Test]
         public void TestSitAndStandWithSitTarget()
         {
-/*  sit position math as changed, this needs to be fixed later
-            TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            /*  sit position math as changed, this needs to be fixed later
+                        TestHelpers.InMethod();
+            //            log4net.Config.XmlConfigurator.Configure();
 
-            // If a prim has a sit target then we can sit from any distance away
-            Vector3 startPos = new Vector3(128, 128, 30);
-            m_sp.AbsolutePosition = startPos;
+                        // If a prim has a sit target then we can sit from any distance away
+                        Vector3 startPos = new Vector3(128, 128, 30);
+                        m_sp.AbsolutePosition = startPos;
 
-            SceneObjectPart part = SceneHelpers.AddSceneObject(m_scene).RootPart;
-            part.SitTargetPosition = new Vector3(0, 0, 1);
+                        SceneObjectPart part = SceneHelpers.AddSceneObject(m_scene).RootPart;
+                        part.SitTargetPosition = new Vector3(0, 0, 1);
 
-            m_sp.HandleAgentRequestSit(m_sp.ControllingClient, m_sp.UUID, part.UUID, Vector3.Zero);
+                        m_sp.HandleAgentRequestSit(m_sp.ControllingClient, m_sp.UUID, part.UUID, Vector3.Zero);
 
-            Assert.That(part.SitTargetAvatar, Is.EqualTo(m_sp.UUID));
-            Assert.That(m_sp.ParentID, Is.EqualTo(part.LocalId));
+                        Assert.That(part.SitTargetAvatar, Is.EqualTo(m_sp.UUID));
+                        Assert.That(m_sp.ParentID, Is.EqualTo(part.LocalId));
 
-            // This section is copied from ScenePresence.HandleAgentSit().  Correctness is not guaranteed.
-            double x, y, z, m1, m2;
+                        // This section is copied from ScenePresence.HandleAgentSit().  Correctness is not guaranteed.
+                        double x, y, z, m1, m2;
 
-            Quaternion r = part.SitTargetOrientation;;
-            m1 = r.X * r.X + r.Y * r.Y;
-            m2 = r.Z * r.Z + r.W * r.W;
+                        Quaternion r = part.SitTargetOrientation;;
+                        m1 = r.X * r.X + r.Y * r.Y;
+                        m2 = r.Z * r.Z + r.W * r.W;
 
-            // Rotate the vector <0, 0, 1>
-            x = 2 * (r.X * r.Z + r.Y * r.W);
-            y = 2 * (-r.X * r.W + r.Y * r.Z);
-            z = m2 - m1;
+                        // Rotate the vector <0, 0, 1>
+                        x = 2 * (r.X * r.Z + r.Y * r.W);
+                        y = 2 * (-r.X * r.W + r.Y * r.Z);
+                        z = m2 - m1;
 
-            // Set m to be the square of the norm of r.
-            double m = m1 + m2;
+                        // Set m to be the square of the norm of r.
+                        double m = m1 + m2;
 
-            // This constant is emperically determined to be what is used in SL.
-            // See also http://opensimulator.org/mantis/view.php?id=7096
-            double offset = 0.05;
+                        // This constant is emperically determined to be what is used in SL.
+                        // See also http://opensimulator.org/mantis/view.php?id=7096
+                        double offset = 0.05;
 
-            Vector3 up = new Vector3((float)x, (float)y, (float)z);
-            Vector3 sitOffset = up * (float)offset;
-            // End of copied section.
+                        Vector3 up = new Vector3((float)x, (float)y, (float)z);
+                        Vector3 sitOffset = up * (float)offset;
+                        // End of copied section.
 
-            Assert.That(
-                m_sp.AbsolutePosition,
-                Is.EqualTo(part.AbsolutePosition + part.SitTargetPosition - sitOffset + ScenePresence.SIT_TARGET_ADJUSTMENT));
-            Assert.That(m_sp.PhysicsActor, Is.Null);
+                        Assert.That(
+                            m_sp.AbsolutePosition,
+                            Is.EqualTo(part.AbsolutePosition + part.SitTargetPosition - sitOffset + ScenePresence.SIT_TARGET_ADJUSTMENT));
+                        Assert.That(m_sp.PhysicsActor, Is.Null);
 
-            Assert.That(part.GetSittingAvatarsCount(), Is.EqualTo(1));
-            HashSet<ScenePresence> sittingAvatars = part.GetSittingAvatars();
-            Assert.That(sittingAvatars.Count, Is.EqualTo(1));
-            Assert.That(sittingAvatars.Contains(m_sp));
+                        Assert.That(part.GetSittingAvatarsCount(), Is.EqualTo(1));
+                        HashSet<ScenePresence> sittingAvatars = part.GetSittingAvatars();
+                        Assert.That(sittingAvatars.Count, Is.EqualTo(1));
+                        Assert.That(sittingAvatars.Contains(m_sp));
 
-            m_sp.StandUp();
+                        m_sp.StandUp();
 
-            Assert.That(part.SitTargetAvatar, Is.EqualTo(UUID.Zero));
-            Assert.That(m_sp.ParentID, Is.EqualTo(0));
-            Assert.That(m_sp.PhysicsActor, Is.Not.Null);
+                        Assert.That(part.SitTargetAvatar, Is.EqualTo(UUID.Zero));
+                        Assert.That(m_sp.ParentID, Is.EqualTo(0));
+                        Assert.That(m_sp.PhysicsActor, Is.Not.Null);
 
-            Assert.That(part.SitTargetAvatar, Is.EqualTo(UUID.Zero));
-            Assert.That(part.GetSittingAvatarsCount(), Is.EqualTo(0));
-            Assert.That(part.GetSittingAvatars(), Is.Null);
-*/
+                        Assert.That(part.SitTargetAvatar, Is.EqualTo(UUID.Zero));
+                        Assert.That(part.GetSittingAvatarsCount(), Is.EqualTo(0));
+                        Assert.That(part.GetSittingAvatars(), Is.Null);
+            */
         }
 
         [Test]
         public void TestSitAndStandOnGround()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             // If a prim has a sit target then we can sit from any distance away
-//            Vector3 startPos = new Vector3(128, 128, 30);
-//            sp.AbsolutePosition = startPos;
+            //            Vector3 startPos = new Vector3(128, 128, 30);
+            //            sp.AbsolutePosition = startPos;
 
             m_sp.HandleAgentSitOnGround();
 

@@ -24,9 +24,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using OpenSim.Region.CoreModules.World.Terrain;
 using OpenSim.Region.Framework.Interfaces;
+using System;
 
 namespace OpenSim.Region.CoreModules.World.Terrain.Modifiers
 {
@@ -111,10 +110,10 @@ namespace OpenSim.Region.CoreModules.World.Terrain.Modifiers
             else
             {
                 result = 0.0;
-                for(int yPos = (y - 2); yPos < (y + 3); yPos++)
+                for (int yPos = (y - 2); yPos < (y + 3); yPos++)
                 {
                     int yVal = (yPos <= 0) ? 0 : ((yPos < yMax) ? yPos : yMax - 1);
-                    for(int xPos = (x - 2); xPos < (x + 3); xPos++)
+                    for (int xPos = (x - 2); xPos < (x + 3); xPos++)
                     {
                         int xVal = (xPos <= 0) ? 0 : ((xPos < xMax) ? xPos : xMax - 1);
                         int dist = Math.Max(Math.Abs(x - xVal), Math.Abs(y - yVal));

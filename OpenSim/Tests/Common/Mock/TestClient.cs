@@ -25,18 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenMetaverse.Packets;
+using OpenSim.Framework;
+using OpenSim.Framework.Client;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 using System.Threading;
-using log4net;
-using OpenMetaverse;
-using OpenMetaverse.Packets;
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Framework.Client;
 
 namespace OpenSim.Tests.Common
 {
@@ -44,7 +44,7 @@ namespace OpenSim.Tests.Common
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        EventWaitHandle wh = new EventWaitHandle (false, EventResetMode.AutoReset, "Crossing");
+        EventWaitHandle wh = new EventWaitHandle(false, EventResetMode.AutoReset, "Crossing");
 
         private Scene m_scene;
 
@@ -79,7 +79,7 @@ namespace OpenSim.Tests.Common
             UUID fromAgentID, UUID ownerID, byte source, byte audible);
 
 
-// disable warning: public events, part of the public API
+        // disable warning: public events, part of the public API
 #pragma warning disable 67
 
         public event Action<IClientAPI> OnLogout;
@@ -476,7 +476,7 @@ namespace OpenSim.Tests.Common
             get { return new IPEndPoint(IPAddress.Loopback, (ushort)m_circuitCode); }
         }
 
-        public List<uint> SelectedObjects {get; private set;}
+        public List<uint> SelectedObjects { get; private set; }
 
         /// <summary>
         /// Constructor
@@ -630,7 +630,7 @@ namespace OpenSim.Tests.Common
             string message, byte type, Vector3 fromPos, string fromName,
             UUID fromAgentID, UUID ownerID, byte source, byte audible)
         {
-//            Console.WriteLine("mmm {0} {1} {2}", message, Name, AgentId);
+            //            Console.WriteLine("mmm {0} {1} {2}", message, Name, AgentId);
             if (OnReceivedChatMessage != null)
                 OnReceivedChatMessage(message, type, fromPos, fromName, fromAgentID, ownerID, source, audible);
         }
@@ -1157,19 +1157,19 @@ namespace OpenSim.Tests.Common
 
         }
 
-        public void SendSetFollowCamProperties (UUID objectID, SortedDictionary<int, float> parameters)
+        public void SendSetFollowCamProperties(UUID objectID, SortedDictionary<int, float> parameters)
         {
         }
 
-        public void SendClearFollowCamProperties (UUID objectID)
+        public void SendClearFollowCamProperties(UUID objectID)
         {
         }
 
-        public void SendRegionHandle (UUID regoinID, ulong handle)
+        public void SendRegionHandle(UUID regoinID, ulong handle)
         {
         }
 
-        public void SendParcelInfo (RegionInfo info, LandData land, UUID parcelID, uint x, uint y)
+        public void SendParcelInfo(RegionInfo info, LandData land, UUID parcelID, uint x, uint y)
         {
         }
 
@@ -1218,19 +1218,19 @@ namespace OpenSim.Tests.Common
         {
         }
 
-        public void SendEventInfoReply (EventData info)
+        public void SendEventInfoReply(EventData info)
         {
         }
 
-        public void SendOfferCallingCard (UUID destID, UUID transactionID)
+        public void SendOfferCallingCard(UUID destID, UUID transactionID)
         {
         }
 
-        public void SendAcceptCallingCard (UUID transactionID)
+        public void SendAcceptCallingCard(UUID transactionID)
         {
         }
 
-        public void SendDeclineCallingCard (UUID transactionID)
+        public void SendDeclineCallingCard(UUID transactionID)
         {
         }
 
@@ -1313,7 +1313,7 @@ namespace OpenSim.Tests.Common
         {
         }
 
-        public void GroupMembershipAddReplace(UUID GroupID,ulong GroupPowers)
+        public void GroupMembershipAddReplace(UUID GroupID, ulong GroupPowers)
         {
         }
 
@@ -1329,7 +1329,7 @@ namespace OpenSim.Tests.Common
         {
         }
 
-        public void SendPickInfoReply(UUID pickID,UUID creatorID, bool topPick, UUID parcelID, string name, string desc, UUID snapshotID, string user, string originalName, string simName, Vector3 posGlobal, int sortOrder, bool enabled)
+        public void SendPickInfoReply(UUID pickID, UUID creatorID, bool topPick, UUID parcelID, string name, string desc, UUID snapshotID, string user, string originalName, string simName, Vector3 posGlobal, int sortOrder, bool enabled)
         {
         }
 
@@ -1362,15 +1362,15 @@ namespace OpenSim.Tests.Common
         {
         }
 
-        public void SendGroupAccountingDetails(IClientAPI sender,UUID groupID, UUID transactionID, UUID sessionID, int amt)
+        public void SendGroupAccountingDetails(IClientAPI sender, UUID groupID, UUID transactionID, UUID sessionID, int amt)
         {
         }
 
-        public void SendGroupAccountingSummary(IClientAPI sender,UUID groupID, uint moneyAmt, int totalTier, int usedTier)
+        public void SendGroupAccountingSummary(IClientAPI sender, UUID groupID, uint moneyAmt, int totalTier, int usedTier)
         {
         }
 
-        public void SendGroupTransactionsSummaryDetails(IClientAPI sender,UUID groupID, UUID transactionID, UUID sessionID,int amt)
+        public void SendGroupTransactionsSummaryDetails(IClientAPI sender, UUID groupID, UUID transactionID, UUID sessionID, int amt)
         {
         }
 

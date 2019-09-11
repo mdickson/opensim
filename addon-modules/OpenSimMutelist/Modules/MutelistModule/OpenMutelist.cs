@@ -24,23 +24,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Xml;
-using System.Net;
-using System.Net.Sockets;
-using System.Reflection;
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
 using Nwc.XmlRpc;
 using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Xml;
 
 [assembly: Addin("OpenSimMutelist", OpenSim.VersionInfo.VersionNumber + "0.1")]
 [assembly: AddinDependency("OpenSim.Region.Framework", OpenSim.VersionInfo.VersionNumber)]
@@ -267,7 +267,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
 
             m_log.DebugFormat("[OS MUTELIST] Got mute list request");
 
-            string filename = "mutes"+client.AgentId.ToString();
+            string filename = "mutes" + client.AgentId.ToString();
 
             Hashtable ReqHash = new Hashtable();
             ReqHash["avataruuid"] = client.AgentId.ToString();
@@ -313,10 +313,10 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
 
             Hashtable ReqHash = new Hashtable();
             ReqHash["avataruuid"] = client.AgentId.ToString();
-            ReqHash["muteuuid"]   = MuteID.ToString();
-            ReqHash["name"]       = Name.ToString();
-            ReqHash["type"]       = type.ToString();
-            ReqHash["flags"]      = flags.ToString();
+            ReqHash["muteuuid"] = MuteID.ToString();
+            ReqHash["name"] = Name.ToString();
+            ReqHash["type"] = type.ToString();
+            ReqHash["flags"] = flags.ToString();
 
             string serverURI = String.Empty;
             GetUserMutelistServerURI(client.AgentId, out serverURI);
@@ -337,7 +337,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
 
             Hashtable ReqHash = new Hashtable();
             ReqHash["avataruuid"] = client.AgentId.ToString();
-            ReqHash["muteuuid"]   = MuteID.ToString();
+            ReqHash["muteuuid"] = MuteID.ToString();
 
             string serverURI = String.Empty;
             GetUserMutelistServerURI(client.AgentId, out serverURI);

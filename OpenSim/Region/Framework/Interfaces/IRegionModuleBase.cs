@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using Mono.Addins;
 using Nini.Config;
 using OpenSim.Region.Framework.Scenes;
+using System;
 
 namespace OpenSim.Region.Framework.Interfaces
 {
-    [TypeExtensionPoint(Path = "/OpenSim/RegionModules", NodeName="RegionModule")]
+    [TypeExtensionPoint(Path = "/OpenSim/RegionModules", NodeName = "RegionModule")]
     public interface IRegionModuleBase
     {
         /// <value>

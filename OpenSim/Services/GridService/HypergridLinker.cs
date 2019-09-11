@@ -25,25 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Data;
+using OpenSim.Framework;
+using OpenSim.Server.Base;
+using OpenSim.Services.Connectors.Hypergrid;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Xml;
-
-using Nini.Config;
-using log4net;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Data;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Services.Connectors.Hypergrid;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using OpenMetaverse;
 
 namespace OpenSim.Services.GridService
 {
@@ -63,7 +60,7 @@ namespace OpenSim.Services.GridService
         protected GatekeeperServiceConnector m_GatekeeperConnector;
 
         protected UUID m_ScopeID = UUID.Zero;
-//        protected bool m_Check4096 = true;
+        //        protected bool m_Check4096 = true;
         protected string m_MapTileDirectory = string.Empty;
         protected string m_ThisGatekeeper = string.Empty;
         protected Uri m_ThisGatekeeperURI = null;
@@ -120,7 +117,7 @@ namespace OpenSim.Services.GridService
             if (scope != string.Empty)
                 UUID.TryParse(scope, out m_ScopeID);
 
-//                m_Check4096 = gridConfig.GetBoolean("Check4096", true);
+            //                m_Check4096 = gridConfig.GetBoolean("Check4096", true);
 
             m_MapTileDirectory = gridConfig.GetString("MapTileDirectory", "maptiles");
 
@@ -138,10 +135,10 @@ namespace OpenSim.Services.GridService
             }
 
             m_ThisGatekeeper = m_ThisGatekeeperURI.AbsoluteUri;
-            if(m_ThisGatekeeperURI.Port == 80)
-                m_ThisGatekeeper = m_ThisGatekeeper.Trim(new char[] { '/', ' ' }) +":80/";
-            else if(m_ThisGatekeeperURI.Port == 443)
-                m_ThisGatekeeper = m_ThisGatekeeper.Trim(new char[] { '/', ' ' }) +":443/";
+            if (m_ThisGatekeeperURI.Port == 80)
+                m_ThisGatekeeper = m_ThisGatekeeper.Trim(new char[] { '/', ' ' }) + ":80/";
+            else if (m_ThisGatekeeperURI.Port == 443)
+                m_ThisGatekeeper = m_ThisGatekeeper.Trim(new char[] { '/', ' ' }) + ":443/";
 
             m_GatekeeperConnector = new GatekeeperServiceConnector(m_AssetService);
 
@@ -210,7 +207,7 @@ namespace OpenSim.Services.GridService
             string serverURI = string.Empty;
             string regionName = string.Empty;
 
-            if(!Util.buildHGRegionURI(mapName, out serverURI, out regionName))
+            if (!Util.buildHGRegionURI(mapName, out serverURI, out regionName))
             {
                 reason = "Wrong URI format for link-region";
                 return null;
@@ -265,7 +262,7 @@ namespace OpenSim.Services.GridService
                     regInfo.ExternalHostName = uri.Host;
                     regInfo.HttpPort = (uint)uri.Port;
                 }
-                catch {}
+                catch { }
             }
 
             if (remoteRegionName != string.Empty)
@@ -341,14 +338,14 @@ namespace OpenSim.Services.GridService
             // allows us to give better feedback when teleports fail because of the distance reason (which can't be
             // done here) and it also hypergrid teleports that are within range (possibly because the source grid
             // itself has regions that are very far apart).
-//            uint x, y;
-//            if (m_Check4096 && !Check4096(handle, out x, out y))
-//            {
-//                //RemoveHyperlinkRegion(regInfo.RegionID);
-//                reason = "Region is too far (" + x + ", " + y + ")";
-//                m_log.Info("[HYPERGRID LINKER]: Unable to link, region is too far (" + x + ", " + y + ")");
-//                //return false;
-//            }
+            //            uint x, y;
+            //            if (m_Check4096 && !Check4096(handle, out x, out y))
+            //            {
+            //                //RemoveHyperlinkRegion(regInfo.RegionID);
+            //                reason = "Region is too far (" + x + ", " + y + ")";
+            //                m_log.Info("[HYPERGRID LINKER]: Unable to link, region is too far (" + x + ", " + y + ")");
+            //                //return false;
+            //            }
 
             regInfo.RegionID = regionID;
             regInfo.RegionSizeX = sizeX;
@@ -356,7 +353,7 @@ namespace OpenSim.Services.GridService
 
             if (externalName == string.Empty)
                 regInfo.RegionName = regInfo.ServerURI;
-             else
+            else
                 regInfo.RegionName = externalName;
 
             m_log.DebugFormat("[HYPERGRID LINKER]: naming linked region {0}, handle {1}", regInfo.RegionName, handle.ToString());
@@ -402,51 +399,51 @@ namespace OpenSim.Services.GridService
             }
         }
 
-// Not currently used
-//        /// <summary>
-//        /// Cope with this viewer limitation.
-//        /// </summary>
-//        /// <param name="regInfo"></param>
-//        /// <returns></returns>
-//        public bool Check4096(ulong realHandle, out uint x, out uint y)
-//        {
-//            uint ux = 0, uy = 0;
-//            Utils.LongToUInts(realHandle, out ux, out uy);
-//            x = Util.WorldToRegionLoc(ux);
-//            y = Util.WorldToRegionLoc(uy);
-//
-//            const uint limit = Util.RegionToWorldLoc(4096 - 1);
-//            uint xmin = ux - limit;
-//            uint xmax = ux + limit;
-//            uint ymin = uy - limit;
-//            uint ymax = uy + limit;
-//            // World map boundary checks
-//            if (xmin < 0 || xmin > ux)
-//                xmin = 0;
-//            if (xmax > int.MaxValue || xmax < ux)
-//                xmax = int.MaxValue;
-//            if (ymin < 0 || ymin > uy)
-//                ymin = 0;
-//            if (ymax > int.MaxValue || ymax < uy)
-//                ymax = int.MaxValue;
-//
-//            // Check for any regions that are within the possible teleport range to the linked region
-//            List<GridRegion> regions = m_GridService.GetRegionRange(m_ScopeID, (int)xmin, (int)xmax, (int)ymin, (int)ymax);
-//            if (regions.Count == 0)
-//            {
-//                return false;
-//            }
-//            else
-//            {
-//                // Check for regions which are not linked regions
-//                List<GridRegion> hyperlinks = m_GridService.GetHyperlinks(m_ScopeID);
-//                IEnumerable<GridRegion> availableRegions = regions.Except(hyperlinks);
-//                if (availableRegions.Count() == 0)
-//                    return false;
-//            }
-//
-//            return true;
-//        }
+        // Not currently used
+        //        /// <summary>
+        //        /// Cope with this viewer limitation.
+        //        /// </summary>
+        //        /// <param name="regInfo"></param>
+        //        /// <returns></returns>
+        //        public bool Check4096(ulong realHandle, out uint x, out uint y)
+        //        {
+        //            uint ux = 0, uy = 0;
+        //            Utils.LongToUInts(realHandle, out ux, out uy);
+        //            x = Util.WorldToRegionLoc(ux);
+        //            y = Util.WorldToRegionLoc(uy);
+        //
+        //            const uint limit = Util.RegionToWorldLoc(4096 - 1);
+        //            uint xmin = ux - limit;
+        //            uint xmax = ux + limit;
+        //            uint ymin = uy - limit;
+        //            uint ymax = uy + limit;
+        //            // World map boundary checks
+        //            if (xmin < 0 || xmin > ux)
+        //                xmin = 0;
+        //            if (xmax > int.MaxValue || xmax < ux)
+        //                xmax = int.MaxValue;
+        //            if (ymin < 0 || ymin > uy)
+        //                ymin = 0;
+        //            if (ymax > int.MaxValue || ymax < uy)
+        //                ymax = int.MaxValue;
+        //
+        //            // Check for any regions that are within the possible teleport range to the linked region
+        //            List<GridRegion> regions = m_GridService.GetRegionRange(m_ScopeID, (int)xmin, (int)xmax, (int)ymin, (int)ymax);
+        //            if (regions.Count == 0)
+        //            {
+        //                return false;
+        //            }
+        //            else
+        //            {
+        //                // Check for regions which are not linked regions
+        //                List<GridRegion> hyperlinks = m_GridService.GetHyperlinks(m_ScopeID);
+        //                IEnumerable<GridRegion> availableRegions = regions.Except(hyperlinks);
+        //                if (availableRegions.Count() == 0)
+        //                    return false;
+        //            }
+        //
+        //            return true;
+        //        }
 
         private void AddHyperlinkRegion(GridRegion regionInfo, ulong regionHandle)
         {

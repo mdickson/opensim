@@ -25,19 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
-using Mono.Addins;
-
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Connectors.Hypergrid;
-
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Region.CoreModules.Avatar.Lure
@@ -168,7 +166,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Lure
                 // Forward. We do this, because the IM module explicitly rejects
                 // IMs of this type
                 if (m_TransferModule != null)
-                    m_TransferModule.SendInstantMessage(im, delegate(bool success) { });
+                    m_TransferModule.SendInstantMessage(im, delegate (bool success) { });
             }
         }
 
@@ -187,7 +185,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Lure
             UUID sessionID = UUID.Random();
 
             GridInstantMessage m = new GridInstantMessage(scene, client.AgentId,
-                    client.FirstName+" "+client.LastName, targetid,
+                    client.FirstName + " " + client.LastName, targetid,
                     (byte)InstantMessageDialog.RequestTeleport, false,
                     message, sessionID, false, presence.AbsolutePosition,
                     new Byte[0], true);
@@ -199,7 +197,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Lure
             if (m_TransferModule != null)
             {
                 m_TransferModule.SendInstantMessage(m,
-                    delegate(bool success) { });
+                    delegate (bool success) { });
             }
         }
 
@@ -208,7 +206,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Lure
             if (!(client.Scene is Scene))
                 return;
 
-//            Scene scene = (Scene)(client.Scene);
+            //            Scene scene = (Scene)(client.Scene);
 
             GridInstantMessage im = null;
             if (m_PendingLures.TryGetValue(lureID, out im))
@@ -233,7 +231,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Lure
                 if (parts.Length > 1)
                 {
                     string url = parts[parts.Length - 1]; // the last part
-                    if (url.Trim(new char[] {'/'}) != m_ThisGridURL.Trim(new char[] {'/'}))
+                    if (url.Trim(new char[] { '/' }) != m_ThisGridURL.Trim(new char[] { '/' }))
                     {
                         m_log.DebugFormat("[HG LURE MODULE]: Luring agent to grid {0} region {1} position {2}", url, im.RegionID, im.Position);
                         GatekeeperServiceConnector gConn = new GatekeeperServiceConnector();

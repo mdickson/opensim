@@ -25,17 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Data;
+using OpenSim.Framework;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Timers;
-using log4net;
-using Nini.Config;
-
-using OpenMetaverse;
-using OpenSim.Data;
-using OpenSim.Framework;
-using OpenSim.Services.Interfaces;
 
 namespace OpenSim.Groups
 {
@@ -87,7 +85,7 @@ namespace OpenSim.Groups
             GroupPowers.SendNotices |
             GroupPowers.SetLandingPoint;
 
-        public const GroupPowers OwnerPowers = OfficersPowers | 
+        public const GroupPowers OwnerPowers = OfficersPowers |
             GroupPowers.Accountable |
             GroupPowers.AllowEditLand |
             GroupPowers.AssignMember |
@@ -579,7 +577,7 @@ namespace OpenSim.Groups
             // TODO: check permissions
 
             RoleMembershipData[] data = m_Database.RetrieveMemberRoles(GroupID, AgentID);
-            if (data == null || (data != null && data.Length ==0))
+            if (data == null || (data != null && data.Length == 0))
                 return roles;
 
             foreach (RoleMembershipData d in data)
@@ -1056,7 +1054,7 @@ namespace OpenSim.Groups
             foreach (RoleMembershipData rdata in rmembership)
             {
                 RoleData role = m_Database.RetrieveRole(groupID, rdata.RoleID);
-                if ( (UInt64.Parse(role.Data["Powers"]) & (ulong)power) != 0 )
+                if ((UInt64.Parse(role.Data["Powers"]) & (ulong)power) != 0)
                     return true;
             }
             return false;

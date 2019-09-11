@@ -25,6 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using System;
 using System.Collections;
 using System.Globalization;
@@ -32,7 +33,6 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
-using OpenMetaverse;
 
 namespace OpenSim.Framework.Capabilities
 {
@@ -107,8 +107,8 @@ namespace OpenSim.Framework.Capabilities
         /// <returns></returns>
         public static byte[] LLSDSerialize(object obj)
         {
-            using(StringWriter sw = new StringWriter())
-            using(XmlTextWriter writer = new XmlTextWriter(sw))
+            using (StringWriter sw = new StringWriter())
+            using (XmlTextWriter writer = new XmlTextWriter(sw))
             {
                 writer.Formatting = Formatting.None;
 
@@ -117,7 +117,7 @@ namespace OpenSim.Framework.Capabilities
                 writer.WriteEndElement();
                 writer.Flush();
                 return Util.UTF8.GetBytes(sw.ToString());
-            }           
+            }
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace OpenSim.Framework.Capabilities
             if (obj is string)
             {
                 writer.WriteStartElement(String.Empty, "string", String.Empty);
-                writer.WriteString((string) obj);
+                writer.WriteString((string)obj);
                 writer.WriteEndElement();
             }
             else if (obj is int)
@@ -154,7 +154,7 @@ namespace OpenSim.Framework.Capabilities
             }
             else if (obj is bool)
             {
-                bool b = (bool) obj;
+                bool b = (bool)obj;
                 writer.WriteStartElement(String.Empty, "boolean", String.Empty);
                 writer.WriteString(b ? "1" : "0");
                 writer.WriteEndElement();
@@ -165,7 +165,7 @@ namespace OpenSim.Framework.Capabilities
             }
             else if (obj is UUID)
             {
-                UUID u = (UUID) obj;
+                UUID u = (UUID)obj;
                 writer.WriteStartElement(String.Empty, "uuid", String.Empty);
                 writer.WriteString(u.ToString());
                 writer.WriteEndElement();
@@ -471,7 +471,7 @@ namespace OpenSim.Framework.Capabilities
             }
             else if (obj is string)
             {
-                return GetSpaces(indent) + "- string \"" + (string) obj + "\"\n";
+                return GetSpaces(indent) + "- string \"" + (string)obj + "\"\n";
             }
             else if (obj is int)
             {
@@ -483,13 +483,13 @@ namespace OpenSim.Framework.Capabilities
             }
             else if (obj is UUID)
             {
-                return GetSpaces(indent) + "- uuid " + ((UUID) obj).ToString() + Environment.NewLine;
+                return GetSpaces(indent) + "- uuid " + ((UUID)obj).ToString() + Environment.NewLine;
             }
             else if (obj is Hashtable)
             {
                 StringBuilder ret = new StringBuilder();
                 ret.Append(GetSpaces(indent) + "- map" + Environment.NewLine);
-                Hashtable map = (Hashtable) obj;
+                Hashtable map = (Hashtable)obj;
 
                 foreach (string key in map.Keys)
                 {
@@ -503,7 +503,7 @@ namespace OpenSim.Framework.Capabilities
             {
                 StringBuilder ret = new StringBuilder();
                 ret.Append(GetSpaces(indent) + "- array\n");
-                ArrayList list = (ArrayList) obj;
+                ArrayList list = (ArrayList)obj;
 
                 foreach (object item in list)
                 {
@@ -514,7 +514,7 @@ namespace OpenSim.Framework.Capabilities
             }
             else if (obj is byte[])
             {
-                return GetSpaces(indent) + "- binary\n" + Utils.BytesToHexString((byte[]) obj, GetSpaces(indent)) +
+                return GetSpaces(indent) + "- binary\n" + Utils.BytesToHexString((byte[])obj, GetSpaces(indent)) +
                        Environment.NewLine;
             }
             else
@@ -660,7 +660,7 @@ namespace OpenSim.Framework.Capabilities
 
         private static int FindEnd(string llsd, int start)
         {
-            int end = llsd.IndexOfAny(new char[] {',', ']', '}'});
+            int end = llsd.IndexOfAny(new char[] { ',', ']', '}' });
             if (end == -1) end = llsd.Length - 1;
             return end;
         }

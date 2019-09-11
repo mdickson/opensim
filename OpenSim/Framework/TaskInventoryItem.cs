@@ -25,10 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
-using log4net;
 using OpenMetaverse;
+using System;
 
 namespace OpenSim.Framework
 {
@@ -37,7 +35,7 @@ namespace OpenSim.Framework
     /// </summary>
     public class TaskInventoryItem : ICloneable
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// XXX This should really be factored out into some constants class.
@@ -74,38 +72,50 @@ namespace OpenSim.Framework
 
         private bool _ownerChanged = false;
 
-        public UUID AssetID {
-            get {
+        public UUID AssetID
+        {
+            get
+            {
                 return _assetID;
             }
-            set {
+            set
+            {
                 _assetID = value;
             }
         }
 
-        public uint BasePermissions {
-            get {
+        public uint BasePermissions
+        {
+            get
+            {
                 return _baseMask;
             }
-            set {
+            set
+            {
                 _baseMask = value;
             }
         }
 
-        public uint CreationDate {
-            get {
+        public uint CreationDate
+        {
+            get
+            {
                 return _creationDate;
             }
-            set {
+            set
+            {
                 _creationDate = value;
             }
         }
 
-        public UUID CreatorID {
-            get {
+        public UUID CreatorID
+        {
+            get
+            {
                 return _creatorID;
             }
-            set {
+            set
+            {
                 _creatorID = value;
             }
         }
@@ -165,183 +175,242 @@ namespace OpenSim.Framework
             }
         }
 
-        public string Description {
-            get {
+        public string Description
+        {
+            get
+            {
                 return _description;
             }
-            set {
+            set
+            {
                 _description = value;
             }
         }
 
-        public uint EveryonePermissions {
-            get {
+        public uint EveryonePermissions
+        {
+            get
+            {
                 return _everyoneMask;
             }
-            set {
+            set
+            {
                 _everyoneMask = value;
             }
         }
 
-        public uint Flags {
-            get {
+        public uint Flags
+        {
+            get
+            {
                 return _flags;
             }
-            set {
+            set
+            {
                 _flags = value;
             }
         }
 
-        public UUID GroupID {
-            get {
+        public UUID GroupID
+        {
+            get
+            {
                 return _groupID;
             }
-            set {
+            set
+            {
                 _groupID = value;
             }
         }
 
-        public uint GroupPermissions {
-            get {
+        public uint GroupPermissions
+        {
+            get
+            {
                 return _groupMask;
             }
-            set {
+            set
+            {
                 _groupMask = value;
             }
         }
 
-        public int InvType {
-            get {
+        public int InvType
+        {
+            get
+            {
                 return _invType;
             }
-            set {
+            set
+            {
                 _invType = value;
             }
         }
 
-        public UUID ItemID {
-            get {
+        public UUID ItemID
+        {
+            get
+            {
                 return _itemID;
             }
-            set {
+            set
+            {
                 _itemID = value;
             }
         }
 
-        public UUID OldItemID {
-            get {
+        public UUID OldItemID
+        {
+            get
+            {
                 return _oldID;
             }
-            set {
+            set
+            {
                 _oldID = value;
             }
         }
 
-        public UUID LoadedItemID {
-            get {
+        public UUID LoadedItemID
+        {
+            get
+            {
                 return _loadedID;
             }
-            set {
+            set
+            {
                 _loadedID = value;
             }
         }
 
-        public UUID LastOwnerID {
-            get {
+        public UUID LastOwnerID
+        {
+            get
+            {
                 return _lastOwnerID;
             }
-            set {
+            set
+            {
                 _lastOwnerID = value;
             }
         }
 
         public UUID RezzerID
         {
-            get {
+            get
+            {
                 return _rezzerID;
             }
-            set {
+            set
+            {
                 _rezzerID = value;
             }
         }
 
-        public string Name {
-            get {
+        public string Name
+        {
+            get
+            {
                 return _name;
             }
-            set {
+            set
+            {
                 _name = value;
             }
         }
 
-        public uint NextPermissions {
-            get {
+        public uint NextPermissions
+        {
+            get
+            {
                 return _nextOwnerMask;
             }
-            set {
+            set
+            {
                 _nextOwnerMask = value;
             }
         }
 
-        public UUID OwnerID {
-            get {
+        public UUID OwnerID
+        {
+            get
+            {
                 return _ownerID;
             }
-            set {
+            set
+            {
                 _ownerID = value;
             }
         }
 
-        public uint CurrentPermissions {
-            get {
+        public uint CurrentPermissions
+        {
+            get
+            {
                 return _ownerMask;
             }
-            set {
+            set
+            {
                 _ownerMask = value;
             }
         }
 
-        public UUID ParentID {
-            get {
+        public UUID ParentID
+        {
+            get
+            {
                 return _parentID;
             }
-            set {
+            set
+            {
                 _parentID = value;
             }
         }
 
-        public UUID ParentPartID {
-            get {
+        public UUID ParentPartID
+        {
+            get
+            {
                 return _parentPartID;
             }
-            set {
+            set
+            {
                 _parentPartID = value;
             }
         }
 
-        public UUID PermsGranter {
-            get {
+        public UUID PermsGranter
+        {
+            get
+            {
                 return _permsGranter;
             }
-            set {
+            set
+            {
                 _permsGranter = value;
             }
         }
 
-        public int PermsMask {
-            get {
+        public int PermsMask
+        {
+            get
+            {
                 return _permsMask;
             }
-            set {
+            set
+            {
                 _permsMask = value;
             }
         }
 
-        public int Type {
-            get {
+        public int Type
+        {
+            get
+            {
                 return _type;
             }
-            set {
+            set
+            {
                 _type = value;
             }
         }
@@ -355,9 +424,9 @@ namespace OpenSim.Framework
             set
             {
                 _ownerChanged = value;
-//                m_log.DebugFormat(
-//                    "[TASK INVENTORY ITEM]: Owner changed set {0} for {1} {2} owned by {3}",
-//                    _ownerChanged, Name, ItemID, OwnerID);
+                //                m_log.DebugFormat(
+                //                    "[TASK INVENTORY ITEM]: Owner changed set {0} for {1} {2} owned by {3}",
+                //                    _ownerChanged, Name, ItemID, OwnerID);
             }
         }
 

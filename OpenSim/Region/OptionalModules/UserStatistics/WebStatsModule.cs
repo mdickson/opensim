@@ -25,15 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Net; // to be used for REST-->Grid shortly
-using System.Reflection;
-using System.Text;
-using System.Threading;
 using log4net;
+using Mono.Addins;
+using Mono.Data.SqliteClient;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
@@ -42,11 +36,13 @@ using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using Mono.Data.SqliteClient;
-using Mono.Addins;
-
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Text;
 using Caps = OpenSim.Framework.Capabilities.Caps;
-
 using OSD = OpenMetaverse.StructuredData.OSD;
 using OSDMap = OpenMetaverse.StructuredData.OSDMap;
 
@@ -338,7 +334,7 @@ namespace OpenSim.Region.UserStatistics
 
         private void OnRegisterCaps(UUID agentID, Caps caps)
         {
-//            m_log.DebugFormat("[WEB STATS MODULE]: OnRegisterCaps: agentID {0} caps {1}", agentID, caps);
+            //            m_log.DebugFormat("[WEB STATS MODULE]: OnRegisterCaps: agentID {0} caps {1}", agentID, caps);
 
             string capsPath = "/CAPS/VS/" + UUID.Random();
             caps.RegisterHandler(
@@ -373,9 +369,9 @@ namespace OpenSim.Region.UserStatistics
 
         private void OnMakeRootAgent(ScenePresence agent)
         {
-//            m_log.DebugFormat(
-//                "[WEB STATS MODULE]: Looking for session {0} for {1} in {2}",
-//                agent.ControllingClient.SessionId, agent.Name, agent.Scene.Name);
+            //            m_log.DebugFormat(
+            //                "[WEB STATS MODULE]: Looking for session {0} for {1} in {2}",
+            //                agent.ControllingClient.SessionId, agent.Name, agent.Scene.Name);
 
             lock (m_sessions)
             {
@@ -462,7 +458,7 @@ namespace OpenSim.Region.UserStatistics
         private string ViewerStatsReport(string request, string path, string param,
                                       UUID agentID, Caps caps)
         {
-//            m_log.DebugFormat("[WEB STATS MODULE]: Received viewer starts report from {0}", agentID);
+            //            m_log.DebugFormat("[WEB STATS MODULE]: Received viewer starts report from {0}", agentID);
 
             UpdateUserStats(ParseViewerStats(request, agentID), dbConn);
 
@@ -488,7 +484,7 @@ namespace OpenSim.Region.UserStatistics
 
                     uid = m_sessions[agentID];
 
-//                    m_log.DebugFormat("[WEB STATS MODULE]: Got session {0} for {1}", uid.session_id, agentID);
+                    //                    m_log.DebugFormat("[WEB STATS MODULE]: Got session {0} for {1}", uid.session_id, agentID);
                 }
                 else
                 {
@@ -560,7 +556,7 @@ namespace OpenSim.Region.UserStatistics
                 usd.d_texture_kb = (float)downloads_map["texture_kbytes"].AsReal();
                 usd.d_world_kb = (float)downloads_map["workd_kbytes"].AsReal();
 
-//                m_log.DebugFormat("[WEB STATS MODULE]: mmap[\"session_id\"] = [{0}]", mmap["session_id"].AsUUID());
+                //                m_log.DebugFormat("[WEB STATS MODULE]: mmap[\"session_id\"] = [{0}]", mmap["session_id"].AsUUID());
 
                 usd.session_id = mmap["session_id"].AsUUID();
 
@@ -612,16 +608,16 @@ namespace OpenSim.Region.UserStatistics
             uid.session_data = usd;
             m_sessions[agentID] = uid;
 
-//            m_log.DebugFormat(
-//                "[WEB STATS MODULE]: Parse data for {0} {1}, session {2}", uid.name_f, uid.name_l, uid.session_id);
+            //            m_log.DebugFormat(
+            //                "[WEB STATS MODULE]: Parse data for {0} {1}, session {2}", uid.name_f, uid.name_l, uid.session_id);
 
             return uid;
         }
 
         private void UpdateUserStats(UserSession uid, SqliteConnection db)
         {
-//            m_log.DebugFormat(
-//                "[WEB STATS MODULE]: Updating user stats for {0} {1}, session {2}", uid.name_f, uid.name_l, uid.session_id);
+            //            m_log.DebugFormat(
+            //                "[WEB STATS MODULE]: Updating user stats for {0} {1}, session {2}", uid.name_f, uid.name_l, uid.session_id);
 
             if (uid.session_id == UUID.Zero)
                 return;
@@ -633,17 +629,17 @@ namespace OpenSim.Region.UserStatistics
                     updatecmd.Parameters.Add(new SqliteParameter(":session_id", uid.session_data.session_id.ToString()));
                     updatecmd.Parameters.Add(new SqliteParameter(":agent_id", uid.session_data.agent_id.ToString()));
                     updatecmd.Parameters.Add(new SqliteParameter(":region_id", uid.session_data.region_id.ToString()));
-                    updatecmd.Parameters.Add(new SqliteParameter(":last_updated", (int) uid.session_data.last_updated));
+                    updatecmd.Parameters.Add(new SqliteParameter(":last_updated", (int)uid.session_data.last_updated));
                     updatecmd.Parameters.Add(new SqliteParameter(":remote_ip", uid.session_data.remote_ip));
                     updatecmd.Parameters.Add(new SqliteParameter(":name_f", uid.session_data.name_f));
                     updatecmd.Parameters.Add(new SqliteParameter(":name_l", uid.session_data.name_l));
                     updatecmd.Parameters.Add(new SqliteParameter(":avg_agents_in_view", uid.session_data.avg_agents_in_view));
                     updatecmd.Parameters.Add(new SqliteParameter(":min_agents_in_view",
-                                                                 (int) uid.session_data.min_agents_in_view));
+                                                                 (int)uid.session_data.min_agents_in_view));
                     updatecmd.Parameters.Add(new SqliteParameter(":max_agents_in_view",
-                                                                 (int) uid.session_data.max_agents_in_view));
+                                                                 (int)uid.session_data.max_agents_in_view));
                     updatecmd.Parameters.Add(new SqliteParameter(":mode_agents_in_view",
-                                                                 (int) uid.session_data.mode_agents_in_view));
+                                                                 (int)uid.session_data.mode_agents_in_view));
                     updatecmd.Parameters.Add(new SqliteParameter(":avg_fps", uid.session_data.avg_fps));
                     updatecmd.Parameters.Add(new SqliteParameter(":min_fps", uid.session_data.min_fps));
                     updatecmd.Parameters.Add(new SqliteParameter(":max_fps", uid.session_data.max_fps));
@@ -681,14 +677,14 @@ namespace OpenSim.Region.UserStatistics
                     updatecmd.Parameters.Add(new SqliteParameter(":f_resent", uid.session_data.f_resent));
                     updatecmd.Parameters.Add(new SqliteParameter(":f_send_packet", uid.session_data.f_send_packet));
 
-//                        StringBuilder parameters = new StringBuilder();
-//                        SqliteParameterCollection spc = updatecmd.Parameters;
-//                        foreach (SqliteParameter sp in spc)
-//                            parameters.AppendFormat("{0}={1},", sp.ParameterName, sp.Value);
-//
-//                        m_log.DebugFormat("[WEB STATS MODULE]: Parameters {0}", parameters);
+                    //                        StringBuilder parameters = new StringBuilder();
+                    //                        SqliteParameterCollection spc = updatecmd.Parameters;
+                    //                        foreach (SqliteParameter sp in spc)
+                    //                            parameters.AppendFormat("{0}={1},", sp.ParameterName, sp.Value);
+                    //
+                    //                        m_log.DebugFormat("[WEB STATS MODULE]: Parameters {0}", parameters);
 
-//                    m_log.DebugFormat("[WEB STATS MODULE]: Database stats update for {0}", uid.session_data.agent_id);
+                    //                    m_log.DebugFormat("[WEB STATS MODULE]: Database stats update for {0}", uid.session_data.agent_id);
 
                     updatecmd.ExecuteNonQuery();
                 }
@@ -763,7 +759,7 @@ VALUES
 )
 ";
 
-    #endregion
+        #endregion
 
     }
 
@@ -830,7 +826,7 @@ VALUES
                 return 0;
 
             Array.Sort(arr);
-            return arr[cnt-1];
+            return arr[cnt - 1];
         }
 
         public static float ArrayMin_f(float[] arr)
@@ -1146,7 +1142,7 @@ VALUES
         private volatile float m_scriptLinesPerSecond;
 
         public UUID RegionId { get { return m_regionID; } }
-        public int StatsCounter { get { return m_statcounter; } set { m_statcounter = value;}}
+        public int StatsCounter { get { return m_statcounter; } set { m_statcounter = value; } }
         public float TimeDilation { get { return m_timeDilation; } }
         public float SimFps { get { return m_simFps; } }
         public float PhysicsFps { get { return m_physicsFps; } }

@@ -34,9 +34,9 @@ namespace OpenSim.Framework
     /// </summary>
     public class PluginNotInitialisedException : Exception
     {
-        public PluginNotInitialisedException () : base() {}
-        public PluginNotInitialisedException (string msg) : base(msg) {}
-        public PluginNotInitialisedException (string msg, Exception e) : base(msg, e) {}
+        public PluginNotInitialisedException() : base() { }
+        public PluginNotInitialisedException(string msg) : base(msg) { }
+        public PluginNotInitialisedException(string msg, Exception e) : base(msg, e) { }
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ namespace OpenSim.Framework
         // this would be a lot simpler if C# supported currying or typedefs
 
         // default initialisation
-        public virtual void Initialise (IPlugin plugin)
+        public virtual void Initialise(IPlugin plugin)
         {
             plugin.Initialise();
         }

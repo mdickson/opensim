@@ -1,2396 +1,3487 @@
-using System;using Tools;
-namespace OpenSim.Region.ScriptEngine.Shared.CodeTools {
-//%+LSLProgramRoot+97
-public class LSLProgramRoot : SYMBOL{
- public  LSLProgramRoot (Parser yyp, States  s ):base(((LSLSyntax
-)yyp)){ while (0< s . kids . Count ) kids . Add ( s . kids . Pop ());
-}
- public  LSLProgramRoot (Parser yyp, GlobalDefinitions  gd , States  s ):base(((LSLSyntax
-)yyp)){ while (0< gd . kids . Count ) kids . Add ( gd . kids . Pop ());
- while (0< s . kids . Count ) kids . Add ( s . kids . Pop ());
-}
-
-public override string yyname { get { return "LSLProgramRoot"; }}
-public override int yynum { get { return 97; }}
-public LSLProgramRoot(Parser yyp):base(yyp){}}
-//%+GlobalDefinitions+98
-public class GlobalDefinitions : SYMBOL{
- public  GlobalDefinitions (Parser yyp, GlobalVariableDeclaration  gvd ):base(((LSLSyntax
-)yyp)){ kids . Add ( gvd );
-}
- public  GlobalDefinitions (Parser yyp, GlobalDefinitions  gd , GlobalVariableDeclaration  gvd ):base(((LSLSyntax
-)yyp)){ while (0< gd . kids . Count ) kids . Add ( gd . kids . Pop ());
- kids . Add ( gvd );
-}
- public  GlobalDefinitions (Parser yyp, GlobalFunctionDefinition  gfd ):base(((LSLSyntax
-)yyp)){ kids . Add ( gfd );
-}
- public  GlobalDefinitions (Parser yyp, GlobalDefinitions  gd , GlobalFunctionDefinition  gfd ):base(((LSLSyntax
-)yyp)){ while (0< gd . kids . Count ) kids . Add ( gd . kids . Pop ());
- kids . Add ( gfd );
-}
-
-public override string yyname { get { return "GlobalDefinitions"; }}
-public override int yynum { get { return 98; }}
-public GlobalDefinitions(Parser yyp):base(yyp){}}
-//%+GlobalVariableDeclaration+99
-public class GlobalVariableDeclaration : SYMBOL{
- public  GlobalVariableDeclaration (Parser yyp, Declaration  d ):base(((LSLSyntax
-)yyp)){ kids . Add ( d );
-}
- public  GlobalVariableDeclaration (Parser yyp, Assignment  a ):base(((LSLSyntax
-)yyp)){ kids . Add ( a );
-}
-
-public override string yyname { get { return "GlobalVariableDeclaration"; }}
-public override int yynum { get { return 99; }}
-public GlobalVariableDeclaration(Parser yyp):base(yyp){}}
-//%+GlobalFunctionDefinition+100
-public class GlobalFunctionDefinition : SYMBOL{
- private  string  m_returnType ;
- private  string  m_name ;
- public  GlobalFunctionDefinition (Parser yyp, string  returnType , string  name , ArgumentDeclarationList  adl , CompoundStatement  cs ):base(((LSLSyntax
-)yyp)){ m_returnType = returnType ;
- m_name = name ;
- kids . Add ( adl );
- kids . Add ( cs );
-}
- public  string  ReturnType { get { return  m_returnType ;
-}
- set { m_returnType = value ;
-}
-}
- public  string  Name { get { return  m_name ;
-}
-}
-
-public override string yyname { get { return "GlobalFunctionDefinition"; }}
-public override int yynum { get { return 100; }}
-public GlobalFunctionDefinition(Parser yyp):base(yyp){}}
-//%+States+101
-public class States : SYMBOL{
- public  States (Parser yyp, State  ds ):base(((LSLSyntax
-)yyp)){ kids . Add ( ds );
-}
- public  States (Parser yyp, States  s , State  us ):base(((LSLSyntax
-)yyp)){ while (0< s . kids . Count ) kids . Add ( s . kids . Pop ());
- kids . Add ( us );
-}
-
-public override string yyname { get { return "States"; }}
-public override int yynum { get { return 101; }}
-public States(Parser yyp):base(yyp){}}
-//%+State+102
-public class State : SYMBOL{
- private  string  m_name ;
- public  State (Parser yyp, string  name , StateBody  sb ):base(((LSLSyntax
-)yyp)){ m_name = name ;
- while (0< sb . kids . Count ) kids . Add ( sb . kids . Pop ());
-}
- public  override  string  ToString (){ return "STATE<"+ m_name +">";
-}
- public  string  Name { get { return  m_name ;
-}
-}
-
-public override string yyname { get { return "State"; }}
-public override int yynum { get { return 102; }}
-public State(Parser yyp):base(yyp){}}
-//%+StateBody+103
-public class StateBody : SYMBOL{
- public  StateBody (Parser yyp, StateBody  sb , StateEvent  se ):base(((LSLSyntax
-)yyp)){ while (0< sb . kids . Count ) kids . Add ( sb . kids . Pop ());
- kids . Add ( se );
-}
- public  StateBody (Parser yyp, StateEvent  se ):base(((LSLSyntax
-)yyp)){ kids . Add ( se );
-}
-
-public override string yyname { get { return "StateBody"; }}
-public override int yynum { get { return 103; }}
-public StateBody(Parser yyp):base(yyp){}}
-//%+StateEvent+104
-public class StateEvent : SYMBOL{
- private  string  m_name ;
- public  StateEvent (Parser yyp, string  name , CompoundStatement  cs ):base(((LSLSyntax
-)yyp)){ m_name = name ;
- kids . Add ( cs );
-}
- public  StateEvent (Parser yyp, string  name , ArgumentDeclarationList  adl , CompoundStatement  cs ):base(((LSLSyntax
-)yyp)){ m_name = name ;
- if (0< adl . kids . Count ) kids . Add ( adl );
- kids . Add ( cs );
-}
- public  override  string  ToString (){ return "EVENT<"+ m_name +">";
-}
- public  string  Name { get { return  m_name ;
-}
-}
-
-public override string yyname { get { return "StateEvent"; }}
-public override int yynum { get { return 104; }}
-public StateEvent(Parser yyp):base(yyp){}}
-//%+VoidArgStateEvent+105
-public class VoidArgStateEvent : StateEvent{
- public  VoidArgStateEvent (Parser yyp, string  name , CompoundStatement  cs ):base(((LSLSyntax
-)yyp), name , cs ){}
-
-public override string yyname { get { return "VoidArgStateEvent"; }}
-public override int yynum { get { return 105; }}
-public VoidArgStateEvent(Parser yyp):base(yyp){}}
-//%+KeyArgStateEvent+106
-public class KeyArgStateEvent : StateEvent{
- public  KeyArgStateEvent (Parser yyp, string  name , KeyArgumentDeclarationList  adl , CompoundStatement  cs ):base(((LSLSyntax
-)yyp), name , adl , cs ){}
-
-public override string yyname { get { return "KeyArgStateEvent"; }}
-public override int yynum { get { return 106; }}
-public KeyArgStateEvent(Parser yyp):base(yyp){}}
-//%+IntArgStateEvent+107
-public class IntArgStateEvent : StateEvent{
- public  IntArgStateEvent (Parser yyp, string  name , IntArgumentDeclarationList  adl , CompoundStatement  cs ):base(((LSLSyntax
-)yyp), name , adl , cs ){}
-
-public override string yyname { get { return "IntArgStateEvent"; }}
-public override int yynum { get { return 107; }}
-public IntArgStateEvent(Parser yyp):base(yyp){}}
-//%+VectorArgStateEvent+108
-public class VectorArgStateEvent : StateEvent{
- public  VectorArgStateEvent (Parser yyp, string  name , VectorArgumentDeclarationList  adl , CompoundStatement  cs ):base(((LSLSyntax
-)yyp), name , adl , cs ){}
-
-public override string yyname { get { return "VectorArgStateEvent"; }}
-public override int yynum { get { return 108; }}
-public VectorArgStateEvent(Parser yyp):base(yyp){}}
-//%+IntRotRotArgStateEvent+109
-public class IntRotRotArgStateEvent : StateEvent{
- public  IntRotRotArgStateEvent (Parser yyp, string  name , IntRotRotArgumentDeclarationList  adl , CompoundStatement  cs ):base(((LSLSyntax
-)yyp), name , adl , cs ){}
-
-public override string yyname { get { return "IntRotRotArgStateEvent"; }}
-public override int yynum { get { return 109; }}
-public IntRotRotArgStateEvent(Parser yyp):base(yyp){}}
-//%+IntVecVecArgStateEvent+110
-public class IntVecVecArgStateEvent : StateEvent{
- public  IntVecVecArgStateEvent (Parser yyp, string  name , IntVecVecArgumentDeclarationList  adl , CompoundStatement  cs ):base(((LSLSyntax
-)yyp), name , adl , cs ){}
-
-public override string yyname { get { return "IntVecVecArgStateEvent"; }}
-public override int yynum { get { return 110; }}
-public IntVecVecArgStateEvent(Parser yyp):base(yyp){}}
-//%+KeyIntIntArgStateEvent+111
-public class KeyIntIntArgStateEvent : StateEvent{
- public  KeyIntIntArgStateEvent (Parser yyp, string  name , KeyIntIntArgumentDeclarationList  adl , CompoundStatement  cs ):base(((LSLSyntax
-)yyp), name , adl , cs ){}
-
-public override string yyname { get { return "KeyIntIntArgStateEvent"; }}
-public override int yynum { get { return 111; }}
-public KeyIntIntArgStateEvent(Parser yyp):base(yyp){}}
-//%+ArgumentDeclarationList+112
-public class ArgumentDeclarationList : SYMBOL{
- public  ArgumentDeclarationList (Parser yyp, Declaration  d ):base(((LSLSyntax
-)yyp)){ kids . Add ( d );
-}
- public  ArgumentDeclarationList (Parser yyp, Declaration  d , Declaration  d2 ):base(((LSLSyntax
-)yyp)){ kids . Add ( d );
- kids . Add ( d2 );
-}
- public  ArgumentDeclarationList (Parser yyp, Declaration  d , Declaration  d2 , Declaration  d3 ):base(((LSLSyntax
-)yyp)){ kids . Add ( d );
- kids . Add ( d2 );
- kids . Add ( d3 );
-}
- public  ArgumentDeclarationList (Parser yyp, ArgumentDeclarationList  adl , Declaration  d ):base(((LSLSyntax
-)yyp)){ while (0< adl . kids . Count ) kids . Add ( adl . kids . Pop ());
- kids . Add ( d );
-}
-
-public override string yyname { get { return "ArgumentDeclarationList"; }}
-public override int yynum { get { return 112; }}
-public ArgumentDeclarationList(Parser yyp):base(yyp){}}
-//%+KeyArgumentDeclarationList+113
-public class KeyArgumentDeclarationList : ArgumentDeclarationList{
- public  KeyArgumentDeclarationList (Parser yyp, KeyDeclaration  d ):base(((LSLSyntax
-)yyp), d ){}
-
-public override string yyname { get { return "KeyArgumentDeclarationList"; }}
-public override int yynum { get { return 113; }}
-public KeyArgumentDeclarationList(Parser yyp):base(yyp){}}
-//%+IntArgumentDeclarationList+114
-public class IntArgumentDeclarationList : ArgumentDeclarationList{
- public  IntArgumentDeclarationList (Parser yyp, IntDeclaration  d ):base(((LSLSyntax
-)yyp), d ){}
-
-public override string yyname { get { return "IntArgumentDeclarationList"; }}
-public override int yynum { get { return 114; }}
-public IntArgumentDeclarationList(Parser yyp):base(yyp){}}
-//%+VectorArgumentDeclarationList+115
-public class VectorArgumentDeclarationList : ArgumentDeclarationList{
- public  VectorArgumentDeclarationList (Parser yyp, VecDeclaration  d ):base(((LSLSyntax
-)yyp), d ){}
-
-public override string yyname { get { return "VectorArgumentDeclarationList"; }}
-public override int yynum { get { return 115; }}
-public VectorArgumentDeclarationList(Parser yyp):base(yyp){}}
-//%+IntRotRotArgumentDeclarationList+116
-public class IntRotRotArgumentDeclarationList : ArgumentDeclarationList{
- public  IntRotRotArgumentDeclarationList (Parser yyp, Declaration  d1 , Declaration  d2 , Declaration  d3 ):base(((LSLSyntax
-)yyp), d1 , d2 , d3 ){}
-
-public override string yyname { get { return "IntRotRotArgumentDeclarationList"; }}
-public override int yynum { get { return 116; }}
-public IntRotRotArgumentDeclarationList(Parser yyp):base(yyp){}}
-//%+IntVecVecArgumentDeclarationList+117
-public class IntVecVecArgumentDeclarationList : ArgumentDeclarationList{
- public  IntVecVecArgumentDeclarationList (Parser yyp, Declaration  d1 , Declaration  d2 , Declaration  d3 ):base(((LSLSyntax
-)yyp), d1 , d2 , d3 ){}
-
-public override string yyname { get { return "IntVecVecArgumentDeclarationList"; }}
-public override int yynum { get { return 117; }}
-public IntVecVecArgumentDeclarationList(Parser yyp):base(yyp){}}
-//%+KeyIntIntArgumentDeclarationList+118
-public class KeyIntIntArgumentDeclarationList : ArgumentDeclarationList{
- public  KeyIntIntArgumentDeclarationList (Parser yyp, Declaration  d1 , Declaration  d2 , Declaration  d3 ):base(((LSLSyntax
-)yyp), d1 , d2 , d3 ){}
-
-public override string yyname { get { return "KeyIntIntArgumentDeclarationList"; }}
-public override int yynum { get { return 118; }}
-public KeyIntIntArgumentDeclarationList(Parser yyp):base(yyp){}}
-//%+Declaration+119
-public class Declaration : SYMBOL{
- private  string  m_datatype ;
- private  string  m_id ;
- public  Declaration (Parser yyp, string  type , string  id ):base(((LSLSyntax
-)yyp)){ m_datatype = type ;
- m_id = id ;
-}
- public  override  string  ToString (){ return "Declaration<"+ m_datatype +":"+ m_id +">";
-}
- public  string  Datatype { get { return  m_datatype ;
-}
- set { m_datatype = value ;
-}
-}
- public  string  Id { get { return  m_id ;
-}
-}
-
-public override string yyname { get { return "Declaration"; }}
-public override int yynum { get { return 119; }}
-public Declaration(Parser yyp):base(yyp){}}
-//%+KeyDeclaration+120
-public class KeyDeclaration : Declaration{
- public  KeyDeclaration (Parser yyp, string  type , string  id ):base(((LSLSyntax
-)yyp), type , id ){}
-
-public override string yyname { get { return "KeyDeclaration"; }}
-public override int yynum { get { return 120; }}
-public KeyDeclaration(Parser yyp):base(yyp){}}
-//%+IntDeclaration+121
-public class IntDeclaration : Declaration{
- public  IntDeclaration (Parser yyp, string  type , string  id ):base(((LSLSyntax
-)yyp), type , id ){}
-
-public override string yyname { get { return "IntDeclaration"; }}
-public override int yynum { get { return 121; }}
-public IntDeclaration(Parser yyp):base(yyp){}}
-//%+VecDeclaration+122
-public class VecDeclaration : Declaration{
- public  VecDeclaration (Parser yyp, string  type , string  id ):base(((LSLSyntax
-)yyp), type , id ){}
-
-public override string yyname { get { return "VecDeclaration"; }}
-public override int yynum { get { return 122; }}
-public VecDeclaration(Parser yyp):base(yyp){}}
-//%+RotDeclaration+123
-public class RotDeclaration : Declaration{
- public  RotDeclaration (Parser yyp, string  type , string  id ):base(((LSLSyntax
-)yyp), type , id ){}
-
-public override string yyname { get { return "RotDeclaration"; }}
-public override int yynum { get { return 123; }}
-public RotDeclaration(Parser yyp):base(yyp){}}
-//%+Typename+124
-public class Typename : SYMBOL{
- public  string  yytext ;
- public  Typename (Parser yyp, string  text ):base(((LSLSyntax
-)yyp)){ yytext = text ;
-}
-
-public override string yyname { get { return "Typename"; }}
-public override int yynum { get { return 124; }}
-public Typename(Parser yyp):base(yyp){}}
-//%+Event+125
-public class Event : SYMBOL{
- public  string  yytext ;
- public  Event (Parser yyp, string  text ):base(((LSLSyntax
-)yyp)){ yytext = text ;
-}
-
-public override string yyname { get { return "Event"; }}
-public override int yynum { get { return 125; }}
-public Event(Parser yyp):base(yyp){}}
-//%+VoidArgEvent+126
-public class VoidArgEvent : Event{
- public  VoidArgEvent (Parser yyp, string  text ):base(((LSLSyntax
-)yyp), text ){}
-
-public override string yyname { get { return "VoidArgEvent"; }}
-public override int yynum { get { return 126; }}
-public VoidArgEvent(Parser yyp):base(yyp){}}
-//%+KeyArgEvent+127
-public class KeyArgEvent : Event{
- public  KeyArgEvent (Parser yyp, string  text ):base(((LSLSyntax
-)yyp), text ){}
-
-public override string yyname { get { return "KeyArgEvent"; }}
-public override int yynum { get { return 127; }}
-public KeyArgEvent(Parser yyp):base(yyp){}}
-//%+IntArgEvent+128
-public class IntArgEvent : Event{
- public  IntArgEvent (Parser yyp, string  text ):base(((LSLSyntax
-)yyp), text ){}
-
-public override string yyname { get { return "IntArgEvent"; }}
-public override int yynum { get { return 128; }}
-public IntArgEvent(Parser yyp):base(yyp){}}
-//%+VectorArgEvent+129
-public class VectorArgEvent : Event{
- public  VectorArgEvent (Parser yyp, string  text ):base(((LSLSyntax
-)yyp), text ){}
-
-public override string yyname { get { return "VectorArgEvent"; }}
-public override int yynum { get { return 129; }}
-public VectorArgEvent(Parser yyp):base(yyp){}}
-//%+IntRotRotArgEvent+130
-public class IntRotRotArgEvent : Event{
- public  IntRotRotArgEvent (Parser yyp, string  text ):base(((LSLSyntax
-)yyp), text ){}
-
-public override string yyname { get { return "IntRotRotArgEvent"; }}
-public override int yynum { get { return 130; }}
-public IntRotRotArgEvent(Parser yyp):base(yyp){}}
-//%+IntVecVecArgEvent+131
-public class IntVecVecArgEvent : Event{
- public  IntVecVecArgEvent (Parser yyp, string  text ):base(((LSLSyntax
-)yyp), text ){}
-
-public override string yyname { get { return "IntVecVecArgEvent"; }}
-public override int yynum { get { return 131; }}
-public IntVecVecArgEvent(Parser yyp):base(yyp){}}
-//%+KeyIntIntArgEvent+132
-public class KeyIntIntArgEvent : Event{
- public  KeyIntIntArgEvent (Parser yyp, string  text ):base(((LSLSyntax
-)yyp), text ){}
-
-public override string yyname { get { return "KeyIntIntArgEvent"; }}
-public override int yynum { get { return 132; }}
-public KeyIntIntArgEvent(Parser yyp):base(yyp){}}
-//%+CompoundStatement+133
-public class CompoundStatement : SYMBOL{
- public  CompoundStatement (Parser yyp):base(((LSLSyntax
-)yyp)){}
- public  CompoundStatement (Parser yyp, StatementList  sl ):base(((LSLSyntax
-)yyp)){ while (0< sl . kids . Count ) kids . Add ( sl . kids . Pop ());
-}
-
-public override string yyname { get { return "CompoundStatement"; }}
-public override int yynum { get { return 133; }}
-}
-//%+StatementList+134
-public class StatementList : SYMBOL{
- private  void  AddStatement ( Statement  s ){ if ( s . kids . Top  is  IfStatement || s . kids . Top  is  WhileStatement || s . kids . Top  is  DoWhileStatement || s . kids . Top  is  ForLoop ) kids . Add ( s . kids . Pop ());
- else  kids . Add ( s );
-}
- public  StatementList (Parser yyp, Statement  s ):base(((LSLSyntax
-)yyp)){ AddStatement ( s );
-}
- public  StatementList (Parser yyp, StatementList  sl , Statement  s ):base(((LSLSyntax
-)yyp)){ while (0< sl . kids . Count ) kids . Add ( sl . kids . Pop ());
- AddStatement ( s );
-}
-
-public override string yyname { get { return "StatementList"; }}
-public override int yynum { get { return 134; }}
-public StatementList(Parser yyp):base(yyp){}}
-//%+Statement+135
-public class Statement : SYMBOL{
- public  Statement (Parser yyp, Declaration  d ):base(((LSLSyntax
-)yyp)){ kids . Add ( d );
-}
- public  Statement (Parser yyp, CompoundStatement  cs ):base(((LSLSyntax
-)yyp)){ kids . Add ( cs );
-}
- public  Statement (Parser yyp, FunctionCall  fc ):base(((LSLSyntax
-)yyp)){ kids . Add ( fc );
-}
- public  Statement (Parser yyp, Assignment  a ):base(((LSLSyntax
-)yyp)){ kids . Add ( a );
-}
- public  Statement (Parser yyp, Expression  e ):base(((LSLSyntax
-)yyp)){ kids . Add ( e );
-}
- public  Statement (Parser yyp, ReturnStatement  rs ):base(((LSLSyntax
-)yyp)){ kids . Add ( rs );
-}
- public  Statement (Parser yyp, StateChange  sc ):base(((LSLSyntax
-)yyp)){ kids . Add ( sc );
-}
- public  Statement (Parser yyp, IfStatement  ifs ):base(((LSLSyntax
-)yyp)){ kids . Add ( ifs );
-}
- public  Statement (Parser yyp, WhileStatement  ifs ):base(((LSLSyntax
-)yyp)){ kids . Add ( ifs );
-}
- public  Statement (Parser yyp, DoWhileStatement  ifs ):base(((LSLSyntax
-)yyp)){ kids . Add ( ifs );
-}
- public  Statement (Parser yyp, ForLoop  fl ):base(((LSLSyntax
-)yyp)){ kids . Add ( fl );
-}
- public  Statement (Parser yyp, JumpLabel  jl ):base(((LSLSyntax
-)yyp)){ kids . Add ( jl );
-}
- public  Statement (Parser yyp, JumpStatement  js ):base(((LSLSyntax
-)yyp)){ kids . Add ( js );
-}
- public  Statement (Parser yyp, EmptyStatement  es ):base(((LSLSyntax
-)yyp)){ kids . Add ( es );
-}
-
-public override string yyname { get { return "Statement"; }}
-public override int yynum { get { return 135; }}
-public Statement(Parser yyp):base(yyp){}}
-//%+EmptyStatement+136
-public class EmptyStatement : SYMBOL{
- public  EmptyStatement (Parser yyp):base(((LSLSyntax
-)yyp)){}
- public  override  string  ToString (){ return  base . ToString ();
-}
-
-public override string yyname { get { return "EmptyStatement"; }}
-public override int yynum { get { return 136; }}
-}
-//%+Assignment+137
-public class Assignment : SYMBOL{
- protected  string  m_assignmentType ;
- public  Assignment (Parser yyp, SYMBOL  lhs , SYMBOL  rhs , string  assignmentType ):base(((LSLSyntax
-)yyp)){ m_assignmentType = assignmentType ;
- kids . Add ( lhs );
- if ( rhs  is  ConstantExpression ) while (0< rhs . kids . Count ) kids . Add ( rhs . kids . Pop ());
- else  kids . Add ( rhs );
-}
- public  Assignment (Parser yyp, SimpleAssignment  sa ):base(((LSLSyntax
-)yyp)){ m_assignmentType = sa . AssignmentType ;
- while (0< sa . kids . Count ) kids . Add ( sa . kids . Pop ());
-}
- public  string  AssignmentType { get { return  m_assignmentType ;
-}
-}
- public  override  string  ToString (){ return  base . ToString ()+"<"+ m_assignmentType +">";
-}
-
-public override string yyname { get { return "Assignment"; }}
-public override int yynum { get { return 137; }}
-public Assignment(Parser yyp):base(yyp){}}
-//%+SimpleAssignment+138
-public class SimpleAssignment : Assignment{
- public  SimpleAssignment (Parser yyp, SYMBOL  lhs , SYMBOL  rhs , string  assignmentType ):base(((LSLSyntax
-)yyp)){ m_assignmentType = assignmentType ;
- kids . Add ( lhs );
- if ( rhs  is  ConstantExpression ) while (0< rhs . kids . Count ) kids . Add ( rhs . kids . Pop ());
- else  kids . Add ( rhs );
-}
-
-public override string yyname { get { return "SimpleAssignment"; }}
-public override int yynum { get { return 138; }}
-public SimpleAssignment(Parser yyp):base(yyp){}}
-//%+ReturnStatement+139
-public class ReturnStatement : SYMBOL{
- public  ReturnStatement (Parser yyp):base(((LSLSyntax
-)yyp)){}
- public  ReturnStatement (Parser yyp, Expression  e ):base(((LSLSyntax
-)yyp)){ if ( e  is  ConstantExpression ) while (0< e . kids . Count ) kids . Add ( e . kids . Pop ());
- else  kids . Add ( e );
-}
-
-public override string yyname { get { return "ReturnStatement"; }}
-public override int yynum { get { return 139; }}
-}
-//%+JumpLabel+140
-public class JumpLabel : SYMBOL{
- private  string  m_labelName ;
- public  JumpLabel (Parser yyp, string  labelName ):base(((LSLSyntax
-)yyp)){ m_labelName = labelName ;
-}
- public  string  LabelName { get { return  m_labelName ;
-}
-}
- public  override  string  ToString (){ return  base . ToString ()+"<"+ m_labelName +">";
-}
-
-public override string yyname { get { return "JumpLabel"; }}
-public override int yynum { get { return 140; }}
-public JumpLabel(Parser yyp):base(yyp){}}
-//%+JumpStatement+141
-public class JumpStatement : SYMBOL{
- private  string  m_targetName ;
- public  JumpStatement (Parser yyp, string  targetName ):base(((LSLSyntax
-)yyp)){ m_targetName = targetName ;
-}
- public  string  TargetName { get { return  m_targetName ;
-}
-}
- public  override  string  ToString (){ return  base . ToString ()+"<"+ m_targetName +">";
-}
-
-public override string yyname { get { return "JumpStatement"; }}
-public override int yynum { get { return 141; }}
-public JumpStatement(Parser yyp):base(yyp){}}
-//%+StateChange+142
-public class StateChange : SYMBOL{
- private  string  m_newState ;
- public  StateChange (Parser yyp, string  newState ):base(((LSLSyntax
-)yyp)){ m_newState = newState ;
-}
- public  string  NewState { get { return  m_newState ;
-}
-}
-
-public override string yyname { get { return "StateChange"; }}
-public override int yynum { get { return 142; }}
-public StateChange(Parser yyp):base(yyp){}}
-//%+IfStatement+143
-public class IfStatement : SYMBOL{
- private  void  AddStatement ( Statement  s ){ if (0< s . kids . Count && s . kids . Top  is  CompoundStatement ) kids . Add ( s . kids . Pop ());
- else  kids . Add ( s );
-}
- public  IfStatement (Parser yyp, SYMBOL  s , Statement  ifs ):base(((LSLSyntax
-)yyp)){ kids . Add ( s );
- AddStatement ( ifs );
-}
- public  IfStatement (Parser yyp, SYMBOL  s , Statement  ifs , Statement  es ):base(((LSLSyntax
-)yyp)){ kids . Add ( s );
- AddStatement ( ifs );
- if (0< es . kids . Count && es . kids . Top  is  IfStatement ) kids . Add ( es . kids . Pop ());
- else  AddStatement ( es );
-}
-
-public override string yyname { get { return "IfStatement"; }}
-public override int yynum { get { return 143; }}
-public IfStatement(Parser yyp):base(yyp){}}
-//%+WhileStatement+144
-public class WhileStatement : SYMBOL{
- public  WhileStatement (Parser yyp, SYMBOL  s , Statement  st ):base(((LSLSyntax
-)yyp)){ kids . Add ( s );
- if (0< st . kids . Count && st . kids . Top  is  CompoundStatement ) kids . Add ( st . kids . Pop ());
- else  kids . Add ( st );
-}
-
-public override string yyname { get { return "WhileStatement"; }}
-public override int yynum { get { return 144; }}
-public WhileStatement(Parser yyp):base(yyp){}}
-//%+DoWhileStatement+145
-public class DoWhileStatement : SYMBOL{
- public  DoWhileStatement (Parser yyp, SYMBOL  s , Statement  st ):base(((LSLSyntax
-)yyp)){ if (0< st . kids . Count && st . kids . Top  is  CompoundStatement ) kids . Add ( st . kids . Pop ());
- else  kids . Add ( st );
- kids . Add ( s );
-}
-
-public override string yyname { get { return "DoWhileStatement"; }}
-public override int yynum { get { return 145; }}
-public DoWhileStatement(Parser yyp):base(yyp){}}
-//%+ForLoop+146
-public class ForLoop : SYMBOL{
- public  ForLoop (Parser yyp, ForLoopStatement  flsa , Expression  e , ForLoopStatement  flsb , Statement  s ):base(((LSLSyntax
-)yyp)){ kids . Add ( flsa );
- kids . Add ( e );
- kids . Add ( flsb );
- if (0< s . kids . Count && s . kids . Top  is  CompoundStatement ) kids . Add ( s . kids . Pop ());
- else  kids . Add ( s );
-}
-
-public override string yyname { get { return "ForLoop"; }}
-public override int yynum { get { return 146; }}
-public ForLoop(Parser yyp):base(yyp){}}
-//%+ForLoopStatement+147
-public class ForLoopStatement : SYMBOL{
- public  ForLoopStatement (Parser yyp, Expression  e ):base(((LSLSyntax
-)yyp)){ kids . Add ( e );
-}
- public  ForLoopStatement (Parser yyp, SimpleAssignment  sa ):base(((LSLSyntax
-)yyp)){ kids . Add ( sa );
-}
- public  ForLoopStatement (Parser yyp, ForLoopStatement  fls , Expression  e ):base(((LSLSyntax
-)yyp)){ while (0< fls . kids . Count ) kids . Add ( fls . kids . Pop ());
- kids . Add ( e );
-}
- public  ForLoopStatement (Parser yyp, ForLoopStatement  fls , SimpleAssignment  sa ):base(((LSLSyntax
-)yyp)){ while (0< fls . kids . Count ) kids . Add ( fls . kids . Pop ());
- kids . Add ( sa );
-}
-
-public override string yyname { get { return "ForLoopStatement"; }}
-public override int yynum { get { return 147; }}
-public ForLoopStatement(Parser yyp):base(yyp){}}
-//%+FunctionCall+148
-public class FunctionCall : SYMBOL{
- private  string  m_id ;
- public  FunctionCall (Parser yyp, string  id , ArgumentList  al ):base(((LSLSyntax
-)yyp)){ m_id = id ;
- kids . Add ( al );
-}
- public  override  string  ToString (){ return  base . ToString ()+"<"+ m_id +">";
-}
- public  string  Id { get { return  m_id ;
-}
-}
-
-public override string yyname { get { return "FunctionCall"; }}
-public override int yynum { get { return 148; }}
-public FunctionCall(Parser yyp):base(yyp){}}
-//%+ArgumentList+149
-public class ArgumentList : SYMBOL{
- public  ArgumentList (Parser yyp, Argument  a ):base(((LSLSyntax
-)yyp)){ AddArgument ( a );
-}
- public  ArgumentList (Parser yyp, ArgumentList  al , Argument  a ):base(((LSLSyntax
-)yyp)){ while (0< al . kids . Count ) kids . Add ( al . kids . Pop ());
- AddArgument ( a );
-}
- private  void  AddArgument ( Argument  a ){ if ( a  is  ExpressionArgument ) while (0< a . kids . Count ) kids . Add ( a . kids . Pop ());
- else  kids . Add ( a );
-}
-
-public override string yyname { get { return "ArgumentList"; }}
-public override int yynum { get { return 149; }}
-public ArgumentList(Parser yyp):base(yyp){}}
-//%+Argument+150
-public class Argument : SYMBOL{
-public override string yyname { get { return "Argument"; }}
-public override int yynum { get { return 150; }}
-public Argument(Parser yyp):base(yyp){}}
-//%+ExpressionArgument+151
-public class ExpressionArgument : Argument{
- public  ExpressionArgument (Parser yyp, Expression  e ):base(((LSLSyntax
-)yyp)){ if ( e  is  ConstantExpression ) while (0< e . kids . Count ) kids . Add ( e . kids . Pop ());
- else  kids . Add ( e );
-}
-
-public override string yyname { get { return "ExpressionArgument"; }}
-public override int yynum { get { return 151; }}
-public ExpressionArgument(Parser yyp):base(yyp){}}
-//%+Constant+152
-public class Constant : SYMBOL{
- private  string  m_type ;
- private  string  m_val ;
- public  Constant (Parser yyp, string  type , string  val ):base(((LSLSyntax
-)yyp)){ m_type = type ;
- m_val = val ;
-}
- public  override  string  ToString (){ return  base . ToString ()+"<"+ m_type +":"+ m_val +">";
-}
- public  string  Value { get { return  m_val ;
-}
- set { m_val = value ;
-}
-}
- public  string  Type { get { return  m_type ;
-}
- set { m_type = value ;
-}
-}
-
-public override string yyname { get { return "Constant"; }}
-public override int yynum { get { return 152; }}
-public Constant(Parser yyp):base(yyp){}}
-//%+VectorConstant+153
-public class VectorConstant : Constant{
- public  VectorConstant (Parser yyp, Expression  valX , Expression  valY , Expression  valZ ):base(((LSLSyntax
-)yyp),"vector", null ){ kids . Add ( valX );
- kids . Add ( valY );
- kids . Add ( valZ );
-}
-
-public override string yyname { get { return "VectorConstant"; }}
-public override int yynum { get { return 153; }}
-public VectorConstant(Parser yyp):base(yyp){}}
-//%+RotationConstant+154
-public class RotationConstant : Constant{
- public  RotationConstant (Parser yyp, Expression  valX , Expression  valY , Expression  valZ , Expression  valS ):base(((LSLSyntax
-)yyp),"rotation", null ){ kids . Add ( valX );
- kids . Add ( valY );
- kids . Add ( valZ );
- kids . Add ( valS );
-}
-
-public override string yyname { get { return "RotationConstant"; }}
-public override int yynum { get { return 154; }}
-public RotationConstant(Parser yyp):base(yyp){}}
-//%+ListConstant+155
-public class ListConstant : Constant{
- public  ListConstant (Parser yyp, ArgumentList  al ):base(((LSLSyntax
-)yyp),"list", null ){ kids . Add ( al );
-}
-
-public override string yyname { get { return "ListConstant"; }}
-public override int yynum { get { return 155; }}
-public ListConstant(Parser yyp):base(yyp){}}
-//%+Expression+156
-public class Expression : SYMBOL{
- protected  void  AddExpression ( Expression  e ){ if ( e  is  ConstantExpression ) while (0< e . kids . Count ) kids . Add ( e . kids . Pop ());
- else  kids . Add ( e );
-}
-
-public override string yyname { get { return "Expression"; }}
-public override int yynum { get { return 156; }}
-public Expression(Parser yyp):base(yyp){}}
-//%+ConstantExpression+157
-public class ConstantExpression : Expression{
- public  ConstantExpression (Parser yyp, Constant  c ):base(((LSLSyntax
-)yyp)){ kids . Add ( c );
-}
-
-public override string yyname { get { return "ConstantExpression"; }}
-public override int yynum { get { return 157; }}
-public ConstantExpression(Parser yyp):base(yyp){}}
-//%+IdentExpression+158
-public class IdentExpression : Expression{
- protected  string  m_name ;
- public  IdentExpression (Parser yyp, string  name ):base(((LSLSyntax
-)yyp)){ m_name = name ;
-}
- public  override  string  ToString (){ return  base . ToString ()+"<"+ m_name +">";
-}
- public  string  Name { get { return  m_name ;
-}
-}
-
-public override string yyname { get { return "IdentExpression"; }}
-public override int yynum { get { return 158; }}
-public IdentExpression(Parser yyp):base(yyp){}}
-//%+IdentDotExpression+159
-public class IdentDotExpression : IdentExpression{
- private  string  m_member ;
- public  IdentDotExpression (Parser yyp, string  name , string  member ):base(((LSLSyntax
-)yyp), name ){ m_member = member ;
-}
- public  override  string  ToString (){ string  baseToString = base . ToString ();
- return  baseToString . Substring (0, baseToString . Length -1)+"."+ m_member +">";
-}
- public  string  Member { get { return  m_member ;
-}
-}
-
-public override string yyname { get { return "IdentDotExpression"; }}
-public override int yynum { get { return 159; }}
-public IdentDotExpression(Parser yyp):base(yyp){}}
-//%+FunctionCallExpression+160
-public class FunctionCallExpression : Expression{
- public  FunctionCallExpression (Parser yyp, FunctionCall  fc ):base(((LSLSyntax
-)yyp)){ kids . Add ( fc );
-}
-
-public override string yyname { get { return "FunctionCallExpression"; }}
-public override int yynum { get { return 160; }}
-public FunctionCallExpression(Parser yyp):base(yyp){}}
-//%+BinaryExpression+161
-public class BinaryExpression : Expression{
- private  string  m_expressionSymbol ;
- public  BinaryExpression (Parser yyp, Expression  lhs , Expression  rhs , string  expressionSymbol ):base(((LSLSyntax
-)yyp)){ m_expressionSymbol = expressionSymbol ;
- AddExpression ( lhs );
- AddExpression ( rhs );
-}
- public  string  ExpressionSymbol { get { return  m_expressionSymbol ;
-}
-}
- public  override  string  ToString (){ return  base . ToString ()+"<"+ m_expressionSymbol +">";
-}
-
-public override string yyname { get { return "BinaryExpression"; }}
-public override int yynum { get { return 161; }}
-public BinaryExpression(Parser yyp):base(yyp){}}
-//%+UnaryExpression+162
-public class UnaryExpression : Expression{
- private  string  m_unarySymbol ;
- public  UnaryExpression (Parser yyp, string  unarySymbol , Expression  e ):base(((LSLSyntax
-)yyp)){ m_unarySymbol = unarySymbol ;
- AddExpression ( e );
-}
- public  string  UnarySymbol { get { return  m_unarySymbol ;
-}
-}
- public  override  string  ToString (){ return  base . ToString ()+"<"+ m_unarySymbol +">";
-}
-
-public override string yyname { get { return "UnaryExpression"; }}
-public override int yynum { get { return 162; }}
-public UnaryExpression(Parser yyp):base(yyp){}}
-//%+TypecastExpression+163
-public class TypecastExpression : Expression{
- private  string  m_typecastType ;
- public  TypecastExpression (Parser yyp, string  typecastType , SYMBOL  rhs ):base(((LSLSyntax
-)yyp)){ m_typecastType = typecastType ;
- kids . Add ( rhs );
-}
- public  string  TypecastType { get { return  m_typecastType ;
-}
- set { m_typecastType = value ;
-}
-}
-
-public override string yyname { get { return "TypecastExpression"; }}
-public override int yynum { get { return 163; }}
-public TypecastExpression(Parser yyp):base(yyp){}}
-//%+ParenthesisExpression+164
-public class ParenthesisExpression : Expression{
- public  ParenthesisExpression (Parser yyp, SYMBOL  s ):base(((LSLSyntax
-)yyp)){ kids . Add ( s );
-}
-
-public override string yyname { get { return "ParenthesisExpression"; }}
-public override int yynum { get { return 164; }}
-public ParenthesisExpression(Parser yyp):base(yyp){}}
-//%+IncrementDecrementExpression+165
-public class IncrementDecrementExpression : Expression{
- private  string  m_name ;
- private  string  m_operation ;
- private  bool  m_postOperation ;
- public  IncrementDecrementExpression (Parser yyp, string  name , string  operation , bool  postOperation ):base(((LSLSyntax
-)yyp)){ m_name = name ;
- m_operation = operation ;
- m_postOperation = postOperation ;
-}
- public  IncrementDecrementExpression (Parser yyp, IdentDotExpression  ide , string  operation , bool  postOperation ):base(((LSLSyntax
-)yyp)){ m_operation = operation ;
- m_postOperation = postOperation ;
- kids . Add ( ide );
-}
- public  override  string  ToString (){ return  base . ToString ()+"<"+( m_postOperation ? m_name + m_operation : m_operation + m_name )+">";
-}
- public  string  Name { get { return  m_name ;
-}
-}
- public  string  Operation { get { return  m_operation ;
-}
-}
- public  bool  PostOperation { get { return  m_postOperation ;
-}
-}
-
-public override string yyname { get { return "IncrementDecrementExpression"; }}
-public override int yynum { get { return 165; }}
-public IncrementDecrementExpression(Parser yyp):base(yyp){}}
-
-public class LSLProgramRoot_1 : LSLProgramRoot {
-  public LSLProgramRoot_1(Parser yyq):base(yyq,
-	((GlobalDefinitions)(yyq.StackAt(1).m_value))
-	, 
-	((States)(yyq.StackAt(0).m_value))
-	){}}
-
-public class LSLProgramRoot_2 : LSLProgramRoot {
-  public LSLProgramRoot_2(Parser yyq):base(yyq,
-	((States)(yyq.StackAt(0).m_value))
-	){}}
-
-public class GlobalDefinitions_1 : GlobalDefinitions {
-  public GlobalDefinitions_1(Parser yyq):base(yyq,
-	((GlobalVariableDeclaration)(yyq.StackAt(0).m_value))
-	){}}
-
-public class GlobalDefinitions_2 : GlobalDefinitions {
-  public GlobalDefinitions_2(Parser yyq):base(yyq,
-	((GlobalDefinitions)(yyq.StackAt(1).m_value))
-	, 
-	((GlobalVariableDeclaration)(yyq.StackAt(0).m_value))
-	){}}
-
-public class GlobalDefinitions_3 : GlobalDefinitions {
-  public GlobalDefinitions_3(Parser yyq):base(yyq,
-	((GlobalFunctionDefinition)(yyq.StackAt(0).m_value))
-	){}}
-
-public class GlobalDefinitions_4 : GlobalDefinitions {
-  public GlobalDefinitions_4(Parser yyq):base(yyq,
-	((GlobalDefinitions)(yyq.StackAt(1).m_value))
-	, 
-	((GlobalFunctionDefinition)(yyq.StackAt(0).m_value))
-	){}}
-
-public class GlobalVariableDeclaration_1 : GlobalVariableDeclaration {
-  public GlobalVariableDeclaration_1(Parser yyq):base(yyq,
-	((Declaration)(yyq.StackAt(1).m_value))
-	){}}
-
-public class GlobalVariableDeclaration_2 : GlobalVariableDeclaration {
-  public GlobalVariableDeclaration_2(Parser yyq):base(yyq,new Assignment(((LSLSyntax
-)yyq), 
-	((Declaration)(yyq.StackAt(3).m_value))
-	, 
-	((Expression)(yyq.StackAt(1).m_value))
-	, 
-	((EQUALS)(yyq.StackAt(2).m_value))
-	.yytext)){}}
-
-public class GlobalFunctionDefinition_1 : GlobalFunctionDefinition {
-  public GlobalFunctionDefinition_1(Parser yyq):base(yyq,"void", 
-	((IDENT)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((ArgumentDeclarationList)(yyq.StackAt(2).m_value))
-	, 
-	((CompoundStatement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class GlobalFunctionDefinition_2 : GlobalFunctionDefinition {
-  public GlobalFunctionDefinition_2(Parser yyq):base(yyq,
-	((Typename)(yyq.StackAt(5).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((ArgumentDeclarationList)(yyq.StackAt(2).m_value))
-	, 
-	((CompoundStatement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class States_1 : States {
-  public States_1(Parser yyq):base(yyq,
-	((State)(yyq.StackAt(0).m_value))
-	){}}
-
-public class States_2 : States {
-  public States_2(Parser yyq):base(yyq,
-	((States)(yyq.StackAt(1).m_value))
-	, 
-	((State)(yyq.StackAt(0).m_value))
-	){}}
-
-public class State_1 : State {
-  public State_1(Parser yyq):base(yyq,
-	((DEFAULT_STATE)(yyq.StackAt(3).m_value))
-	.yytext, 
-	((StateBody)(yyq.StackAt(1).m_value))
-	){}}
-
-public class State_2 : State {
-  public State_2(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(3).m_value))
-	.yytext, 
-	((StateBody)(yyq.StackAt(1).m_value))
-	){}}
-
-public class StateBody_1 : StateBody {
-  public StateBody_1(Parser yyq):base(yyq,
-	((StateEvent)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StateBody_2 : StateBody {
-  public StateBody_2(Parser yyq):base(yyq,
-	((StateBody)(yyq.StackAt(1).m_value))
-	, 
-	((StateEvent)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StateBody_3 : StateBody {
-  public StateBody_3(Parser yyq):base(yyq,
-	((VoidArgStateEvent)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StateBody_4 : StateBody {
-  public StateBody_4(Parser yyq):base(yyq,
-	((StateBody)(yyq.StackAt(1).m_value))
-	, 
-	((VoidArgStateEvent)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StateBody_5 : StateBody {
-  public StateBody_5(Parser yyq):base(yyq,
-	((KeyArgStateEvent)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StateBody_6 : StateBody {
-  public StateBody_6(Parser yyq):base(yyq,
-	((StateBody)(yyq.StackAt(1).m_value))
-	, 
-	((KeyArgStateEvent)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StateBody_7 : StateBody {
-  public StateBody_7(Parser yyq):base(yyq,
-	((IntArgStateEvent)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StateBody_8 : StateBody {
-  public StateBody_8(Parser yyq):base(yyq,
-	((StateBody)(yyq.StackAt(1).m_value))
-	, 
-	((IntArgStateEvent)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StateBody_9 : StateBody {
-  public StateBody_9(Parser yyq):base(yyq,
-	((VectorArgStateEvent)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StateBody_10 : StateBody {
-  public StateBody_10(Parser yyq):base(yyq,
-	((StateBody)(yyq.StackAt(1).m_value))
-	, 
-	((VectorArgStateEvent)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StateBody_11 : StateBody {
-  public StateBody_11(Parser yyq):base(yyq,
-	((IntRotRotArgStateEvent)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StateBody_12 : StateBody {
-  public StateBody_12(Parser yyq):base(yyq,
-	((StateBody)(yyq.StackAt(1).m_value))
-	, 
-	((IntRotRotArgStateEvent)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StateBody_13 : StateBody {
-  public StateBody_13(Parser yyq):base(yyq,
-	((IntVecVecArgStateEvent)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StateBody_14 : StateBody {
-  public StateBody_14(Parser yyq):base(yyq,
-	((StateBody)(yyq.StackAt(1).m_value))
-	, 
-	((IntVecVecArgStateEvent)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StateBody_15 : StateBody {
-  public StateBody_15(Parser yyq):base(yyq,
-	((KeyIntIntArgStateEvent)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StateBody_16 : StateBody {
-  public StateBody_16(Parser yyq):base(yyq,
-	((StateBody)(yyq.StackAt(1).m_value))
-	, 
-	((KeyIntIntArgStateEvent)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StateEvent_1 : StateEvent {
-  public StateEvent_1(Parser yyq):base(yyq,
-	((Event)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((ArgumentDeclarationList)(yyq.StackAt(2).m_value))
-	, 
-	((CompoundStatement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class VoidArgStateEvent_1 : VoidArgStateEvent {
-  public VoidArgStateEvent_1(Parser yyq):base(yyq,
-	((VoidArgEvent)(yyq.StackAt(3).m_value))
-	.yytext, 
-	((CompoundStatement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class KeyArgStateEvent_1 : KeyArgStateEvent {
-  public KeyArgStateEvent_1(Parser yyq):base(yyq,
-	((KeyArgEvent)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((KeyArgumentDeclarationList)(yyq.StackAt(2).m_value))
-	, 
-	((CompoundStatement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class IntArgStateEvent_1 : IntArgStateEvent {
-  public IntArgStateEvent_1(Parser yyq):base(yyq,
-	((IntArgEvent)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((IntArgumentDeclarationList)(yyq.StackAt(2).m_value))
-	, 
-	((CompoundStatement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class VectorArgStateEvent_1 : VectorArgStateEvent {
-  public VectorArgStateEvent_1(Parser yyq):base(yyq,
-	((VectorArgEvent)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((VectorArgumentDeclarationList)(yyq.StackAt(2).m_value))
-	, 
-	((CompoundStatement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class IntRotRotArgStateEvent_1 : IntRotRotArgStateEvent {
-  public IntRotRotArgStateEvent_1(Parser yyq):base(yyq,
-	((IntRotRotArgEvent)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((IntRotRotArgumentDeclarationList)(yyq.StackAt(2).m_value))
-	, 
-	((CompoundStatement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class IntVecVecArgStateEvent_1 : IntVecVecArgStateEvent {
-  public IntVecVecArgStateEvent_1(Parser yyq):base(yyq,
-	((IntVecVecArgEvent)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((IntVecVecArgumentDeclarationList)(yyq.StackAt(2).m_value))
-	, 
-	((CompoundStatement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class KeyIntIntArgStateEvent_1 : KeyIntIntArgStateEvent {
-  public KeyIntIntArgStateEvent_1(Parser yyq):base(yyq,
-	((KeyIntIntArgEvent)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((KeyIntIntArgumentDeclarationList)(yyq.StackAt(2).m_value))
-	, 
-	((CompoundStatement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class ArgumentDeclarationList_1 : ArgumentDeclarationList {
-  public ArgumentDeclarationList_1(Parser yyq):base(yyq,
-	((Declaration)(yyq.StackAt(0).m_value))
-	){}}
-
-public class ArgumentDeclarationList_2 : ArgumentDeclarationList {
-  public ArgumentDeclarationList_2(Parser yyq):base(yyq,
-	((ArgumentDeclarationList)(yyq.StackAt(2).m_value))
-	, 
-	((Declaration)(yyq.StackAt(0).m_value))
-	){}}
-
-public class KeyArgumentDeclarationList_1 : KeyArgumentDeclarationList {
-  public KeyArgumentDeclarationList_1(Parser yyq):base(yyq,
-	((KeyDeclaration)(yyq.StackAt(0).m_value))
-	){}}
-
-public class IntArgumentDeclarationList_1 : IntArgumentDeclarationList {
-  public IntArgumentDeclarationList_1(Parser yyq):base(yyq,
-	((IntDeclaration)(yyq.StackAt(0).m_value))
-	){}}
-
-public class VectorArgumentDeclarationList_1 : VectorArgumentDeclarationList {
-  public VectorArgumentDeclarationList_1(Parser yyq):base(yyq,
-	((VecDeclaration)(yyq.StackAt(0).m_value))
-	){}}
-
-public class IntRotRotArgumentDeclarationList_1 : IntRotRotArgumentDeclarationList {
-  public IntRotRotArgumentDeclarationList_1(Parser yyq):base(yyq,
-	((IntDeclaration)(yyq.StackAt(4).m_value))
-	, 
-	((RotDeclaration)(yyq.StackAt(2).m_value))
-	, 
-	((RotDeclaration)(yyq.StackAt(0).m_value))
-	){}}
-
-public class IntVecVecArgumentDeclarationList_1 : IntVecVecArgumentDeclarationList {
-  public IntVecVecArgumentDeclarationList_1(Parser yyq):base(yyq,
-	((IntDeclaration)(yyq.StackAt(4).m_value))
-	, 
-	((VecDeclaration)(yyq.StackAt(2).m_value))
-	, 
-	((VecDeclaration)(yyq.StackAt(0).m_value))
-	){}}
-
-public class KeyIntIntArgumentDeclarationList_1 : KeyIntIntArgumentDeclarationList {
-  public KeyIntIntArgumentDeclarationList_1(Parser yyq):base(yyq,
-	((KeyDeclaration)(yyq.StackAt(4).m_value))
-	, 
-	((IntDeclaration)(yyq.StackAt(2).m_value))
-	, 
-	((IntDeclaration)(yyq.StackAt(0).m_value))
-	){}}
-
-public class Declaration_1 : Declaration {
-  public Declaration_1(Parser yyq):base(yyq,
-	((Typename)(yyq.StackAt(1).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class KeyDeclaration_1 : KeyDeclaration {
-  public KeyDeclaration_1(Parser yyq):base(yyq,
-	((KEY_TYPE)(yyq.StackAt(1).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class IntDeclaration_1 : IntDeclaration {
-  public IntDeclaration_1(Parser yyq):base(yyq,
-	((INTEGER_TYPE)(yyq.StackAt(1).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class VecDeclaration_1 : VecDeclaration {
-  public VecDeclaration_1(Parser yyq):base(yyq,
-	((VECTOR_TYPE)(yyq.StackAt(1).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class RotDeclaration_1 : RotDeclaration {
-  public RotDeclaration_1(Parser yyq):base(yyq,
-	((ROTATION_TYPE)(yyq.StackAt(1).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class CompoundStatement_1 : CompoundStatement {
-  public CompoundStatement_1(Parser yyq):base(yyq){}}
-
-public class CompoundStatement_2 : CompoundStatement {
-  public CompoundStatement_2(Parser yyq):base(yyq,
-	((StatementList)(yyq.StackAt(1).m_value))
-	){}}
-
-public class StatementList_1 : StatementList {
-  public StatementList_1(Parser yyq):base(yyq,
-	((Statement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class StatementList_2 : StatementList {
-  public StatementList_2(Parser yyq):base(yyq,
-	((StatementList)(yyq.StackAt(1).m_value))
-	, 
-	((Statement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class EmptyStatement_1 : EmptyStatement {
-  public EmptyStatement_1(Parser yyq):base(yyq){}}
-
-public class Statement_1 : Statement {
-  public Statement_1(Parser yyq):base(yyq,
-	((EmptyStatement)(yyq.StackAt(1).m_value))
-	){}}
-
-public class Statement_2 : Statement {
-  public Statement_2(Parser yyq):base(yyq,
-	((Declaration)(yyq.StackAt(1).m_value))
-	){}}
-
-public class Statement_3 : Statement {
-  public Statement_3(Parser yyq):base(yyq,
-	((Assignment)(yyq.StackAt(1).m_value))
-	){}}
-
-public class Statement_4 : Statement {
-  public Statement_4(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(1).m_value))
-	){}}
-
-public class Statement_5 : Statement {
-  public Statement_5(Parser yyq):base(yyq,
-	((ReturnStatement)(yyq.StackAt(1).m_value))
-	){}}
-
-public class Statement_6 : Statement {
-  public Statement_6(Parser yyq):base(yyq,
-	((JumpLabel)(yyq.StackAt(1).m_value))
-	){}}
-
-public class Statement_7 : Statement {
-  public Statement_7(Parser yyq):base(yyq,
-	((JumpStatement)(yyq.StackAt(1).m_value))
-	){}}
-
-public class Statement_8 : Statement {
-  public Statement_8(Parser yyq):base(yyq,
-	((StateChange)(yyq.StackAt(1).m_value))
-	){}}
-
-public class Statement_9 : Statement {
-  public Statement_9(Parser yyq):base(yyq,
-	((IfStatement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class Statement_10 : Statement {
-  public Statement_10(Parser yyq):base(yyq,
-	((WhileStatement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class Statement_11 : Statement {
-  public Statement_11(Parser yyq):base(yyq,
-	((DoWhileStatement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class Statement_12 : Statement {
-  public Statement_12(Parser yyq):base(yyq,
-	((ForLoop)(yyq.StackAt(0).m_value))
-	){}}
-
-public class Statement_13 : Statement {
-  public Statement_13(Parser yyq):base(yyq,
-	((CompoundStatement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class JumpLabel_1 : JumpLabel {
-  public JumpLabel_1(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class JumpStatement_1 : JumpStatement {
-  public JumpStatement_1(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class StateChange_1 : StateChange {
-  public StateChange_1(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class StateChange_2 : StateChange {
-  public StateChange_2(Parser yyq):base(yyq,
-	((DEFAULT_STATE)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class IfStatement_1 : IfStatement {
-  public IfStatement_1(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Statement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class IfStatement_2 : IfStatement {
-  public IfStatement_2(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(4).m_value))
-	, 
-	((Statement)(yyq.StackAt(2).m_value))
-	, 
-	((Statement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class IfStatement_3 : IfStatement {
-  public IfStatement_3(Parser yyq):base(yyq,
-	((SimpleAssignment)(yyq.StackAt(2).m_value))
-	, 
-	((Statement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class IfStatement_4 : IfStatement {
-  public IfStatement_4(Parser yyq):base(yyq,
-	((SimpleAssignment)(yyq.StackAt(4).m_value))
-	, 
-	((Statement)(yyq.StackAt(2).m_value))
-	, 
-	((Statement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class WhileStatement_1 : WhileStatement {
-  public WhileStatement_1(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Statement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class WhileStatement_2 : WhileStatement {
-  public WhileStatement_2(Parser yyq):base(yyq,
-	((SimpleAssignment)(yyq.StackAt(2).m_value))
-	, 
-	((Statement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class DoWhileStatement_1 : DoWhileStatement {
-  public DoWhileStatement_1(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Statement)(yyq.StackAt(5).m_value))
-	){}}
-
-public class DoWhileStatement_2 : DoWhileStatement {
-  public DoWhileStatement_2(Parser yyq):base(yyq,
-	((SimpleAssignment)(yyq.StackAt(2).m_value))
-	, 
-	((Statement)(yyq.StackAt(5).m_value))
-	){}}
-
-public class ForLoop_1 : ForLoop {
-  public ForLoop_1(Parser yyq):base(yyq,
-	((ForLoopStatement)(yyq.StackAt(6).m_value))
-	, 
-	((Expression)(yyq.StackAt(4).m_value))
-	, 
-	((ForLoopStatement)(yyq.StackAt(2).m_value))
-	, 
-	((Statement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class ForLoop_2 : ForLoop {
-  public ForLoop_2(Parser yyq):base(yyq,null, 
-	((Expression)(yyq.StackAt(4).m_value))
-	, 
-	((ForLoopStatement)(yyq.StackAt(2).m_value))
-	, 
-	((Statement)(yyq.StackAt(0).m_value))
-	){}}
-
-public class ForLoopStatement_1 : ForLoopStatement {
-  public ForLoopStatement_1(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(0).m_value))
-	){}}
-
-public class ForLoopStatement_2 : ForLoopStatement {
-  public ForLoopStatement_2(Parser yyq):base(yyq,
-	((SimpleAssignment)(yyq.StackAt(0).m_value))
-	){}}
-
-public class ForLoopStatement_3 : ForLoopStatement {
-  public ForLoopStatement_3(Parser yyq):base(yyq,
-	((ForLoopStatement)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	){}}
-
-public class ForLoopStatement_4 : ForLoopStatement {
-  public ForLoopStatement_4(Parser yyq):base(yyq,
-	((ForLoopStatement)(yyq.StackAt(2).m_value))
-	, 
-	((SimpleAssignment)(yyq.StackAt(0).m_value))
-	){}}
-
-public class Assignment_1 : Assignment {
-  public Assignment_1(Parser yyq):base(yyq,
-	((Declaration)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class Assignment_2 : Assignment {
-  public Assignment_2(Parser yyq):base(yyq,
-	((SimpleAssignment)(yyq.StackAt(0).m_value))
-	){}}
-
-public class SimpleAssignment_1 : SimpleAssignment {
-  public SimpleAssignment_1(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_2 : SimpleAssignment {
-  public SimpleAssignment_2(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((PLUS_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_3 : SimpleAssignment {
-  public SimpleAssignment_3(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((MINUS_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_4 : SimpleAssignment {
-  public SimpleAssignment_4(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((STAR_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_5 : SimpleAssignment {
-  public SimpleAssignment_5(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((SLASH_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_6 : SimpleAssignment {
-  public SimpleAssignment_6(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((PERCENT_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_7 : SimpleAssignment {
-  public SimpleAssignment_7(Parser yyq):base(yyq,new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(2).m_value))
-	.yytext), 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_8 : SimpleAssignment {
-  public SimpleAssignment_8(Parser yyq):base(yyq,new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(2).m_value))
-	.yytext), 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((PLUS_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_9 : SimpleAssignment {
-  public SimpleAssignment_9(Parser yyq):base(yyq,new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(2).m_value))
-	.yytext), 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((MINUS_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_10 : SimpleAssignment {
-  public SimpleAssignment_10(Parser yyq):base(yyq,new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(2).m_value))
-	.yytext), 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((STAR_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_11 : SimpleAssignment {
-  public SimpleAssignment_11(Parser yyq):base(yyq,new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(2).m_value))
-	.yytext), 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((SLASH_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_12 : SimpleAssignment {
-  public SimpleAssignment_12(Parser yyq):base(yyq,new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(2).m_value))
-	.yytext), 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((PERCENT_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_13 : SimpleAssignment {
-  public SimpleAssignment_13(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(2).m_value))
-	, 
-	((SimpleAssignment)(yyq.StackAt(0).m_value))
-	, 
-	((EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_14 : SimpleAssignment {
-  public SimpleAssignment_14(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(2).m_value))
-	, 
-	((SimpleAssignment)(yyq.StackAt(0).m_value))
-	, 
-	((PLUS_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_15 : SimpleAssignment {
-  public SimpleAssignment_15(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(2).m_value))
-	, 
-	((SimpleAssignment)(yyq.StackAt(0).m_value))
-	, 
-	((MINUS_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_16 : SimpleAssignment {
-  public SimpleAssignment_16(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(2).m_value))
-	, 
-	((SimpleAssignment)(yyq.StackAt(0).m_value))
-	, 
-	((STAR_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_17 : SimpleAssignment {
-  public SimpleAssignment_17(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(2).m_value))
-	, 
-	((SimpleAssignment)(yyq.StackAt(0).m_value))
-	, 
-	((SLASH_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_18 : SimpleAssignment {
-  public SimpleAssignment_18(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(2).m_value))
-	, 
-	((SimpleAssignment)(yyq.StackAt(0).m_value))
-	, 
-	((PERCENT_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_19 : SimpleAssignment {
-  public SimpleAssignment_19(Parser yyq):base(yyq,new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(2).m_value))
-	.yytext), 
-	((SimpleAssignment)(yyq.StackAt(0).m_value))
-	, 
-	((EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_20 : SimpleAssignment {
-  public SimpleAssignment_20(Parser yyq):base(yyq,new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(2).m_value))
-	.yytext), 
-	((SimpleAssignment)(yyq.StackAt(0).m_value))
-	, 
-	((PLUS_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_21 : SimpleAssignment {
-  public SimpleAssignment_21(Parser yyq):base(yyq,new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(2).m_value))
-	.yytext), 
-	((SimpleAssignment)(yyq.StackAt(0).m_value))
-	, 
-	((MINUS_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_22 : SimpleAssignment {
-  public SimpleAssignment_22(Parser yyq):base(yyq,new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(2).m_value))
-	.yytext), 
-	((SimpleAssignment)(yyq.StackAt(0).m_value))
-	, 
-	((STAR_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_23 : SimpleAssignment {
-  public SimpleAssignment_23(Parser yyq):base(yyq,new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(2).m_value))
-	.yytext), 
-	((SimpleAssignment)(yyq.StackAt(0).m_value))
-	, 
-	((SLASH_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class SimpleAssignment_24 : SimpleAssignment {
-  public SimpleAssignment_24(Parser yyq):base(yyq,new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(2).m_value))
-	.yytext), 
-	((SimpleAssignment)(yyq.StackAt(0).m_value))
-	, 
-	((PERCENT_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class ReturnStatement_1 : ReturnStatement {
-  public ReturnStatement_1(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(0).m_value))
-	){}}
-
-public class ReturnStatement_2 : ReturnStatement {
-  public ReturnStatement_2(Parser yyq):base(yyq){}}
-
-public class Constant_1 : Constant {
-  public Constant_1(Parser yyq):base(yyq,"integer", 
-	((INTEGER_CONSTANT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Constant_2 : Constant {
-  public Constant_2(Parser yyq):base(yyq,"integer", 
-	((HEX_INTEGER_CONSTANT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Constant_3 : Constant {
-  public Constant_3(Parser yyq):base(yyq,"float", 
-	((FLOAT_CONSTANT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Constant_4 : Constant {
-  public Constant_4(Parser yyq):base(yyq,"string", 
-	((STRING_CONSTANT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class ListConstant_1 : ListConstant {
-  public ListConstant_1(Parser yyq):base(yyq,
-	((ArgumentList)(yyq.StackAt(1).m_value))
-	){}}
-
-public class VectorConstant_1 : VectorConstant {
-  public VectorConstant_1(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(5).m_value))
-	, 
-	((Expression)(yyq.StackAt(3).m_value))
-	, 
-	((Expression)(yyq.StackAt(1).m_value))
-	){}}
-
-public class RotationConstant_1 : RotationConstant {
-  public RotationConstant_1(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(7).m_value))
-	, 
-	((Expression)(yyq.StackAt(5).m_value))
-	, 
-	((Expression)(yyq.StackAt(3).m_value))
-	, 
-	((Expression)(yyq.StackAt(1).m_value))
-	){}}
-
-public class ConstantExpression_1 : ConstantExpression {
-  public ConstantExpression_1(Parser yyq):base(yyq,
-	((Constant)(yyq.StackAt(0).m_value))
-	){}}
-
-public class IdentExpression_1 : IdentExpression {
-  public IdentExpression_1(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class IdentDotExpression_1 : IdentDotExpression {
-  public IdentDotExpression_1(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(2).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class IncrementDecrementExpression_1 : IncrementDecrementExpression {
-  public IncrementDecrementExpression_1(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(1).m_value))
-	.yytext, 
-	((INCREMENT)(yyq.StackAt(0).m_value))
-	.yytext, true){}}
-
-public class IncrementDecrementExpression_2 : IncrementDecrementExpression {
-  public IncrementDecrementExpression_2(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(1).m_value))
-	.yytext, 
-	((DECREMENT)(yyq.StackAt(0).m_value))
-	.yytext, true){}}
-
-public class IncrementDecrementExpression_3 : IncrementDecrementExpression {
-  public IncrementDecrementExpression_3(Parser yyq):base(yyq,new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(3).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(1).m_value))
-	.yytext), 
-	((INCREMENT)(yyq.StackAt(0).m_value))
-	.yytext, true){}}
-
-public class IncrementDecrementExpression_4 : IncrementDecrementExpression {
-  public IncrementDecrementExpression_4(Parser yyq):base(yyq,new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(3).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(1).m_value))
-	.yytext), 
-	((DECREMENT)(yyq.StackAt(0).m_value))
-	.yytext, true){}}
-
-public class IncrementDecrementExpression_5 : IncrementDecrementExpression {
-  public IncrementDecrementExpression_5(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(0).m_value))
-	.yytext, 
-	((INCREMENT)(yyq.StackAt(1).m_value))
-	.yytext, false){}}
-
-public class IncrementDecrementExpression_6 : IncrementDecrementExpression {
-  public IncrementDecrementExpression_6(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(0).m_value))
-	.yytext, 
-	((DECREMENT)(yyq.StackAt(1).m_value))
-	.yytext, false){}}
-
-public class IncrementDecrementExpression_7 : IncrementDecrementExpression {
-  public IncrementDecrementExpression_7(Parser yyq):base(yyq,new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(2).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(0).m_value))
-	.yytext), 
-	((INCREMENT)(yyq.StackAt(3).m_value))
-	.yytext, false){}}
-
-public class IncrementDecrementExpression_8 : IncrementDecrementExpression {
-  public IncrementDecrementExpression_8(Parser yyq):base(yyq,new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(2).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(0).m_value))
-	.yytext), 
-	((DECREMENT)(yyq.StackAt(3).m_value))
-	.yytext, false){}}
-
-public class FunctionCallExpression_1 : FunctionCallExpression {
-  public FunctionCallExpression_1(Parser yyq):base(yyq,
-	((FunctionCall)(yyq.StackAt(0).m_value))
-	){}}
-
-public class BinaryExpression_1 : BinaryExpression {
-  public BinaryExpression_1(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((PLUS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_2 : BinaryExpression {
-  public BinaryExpression_2(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((MINUS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_3 : BinaryExpression {
-  public BinaryExpression_3(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((STAR)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_4 : BinaryExpression {
-  public BinaryExpression_4(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((SLASH)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_5 : BinaryExpression {
-  public BinaryExpression_5(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((PERCENT)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_6 : BinaryExpression {
-  public BinaryExpression_6(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((AMP)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_7 : BinaryExpression {
-  public BinaryExpression_7(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((STROKE)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_8 : BinaryExpression {
-  public BinaryExpression_8(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((CARET)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_9 : BinaryExpression {
-  public BinaryExpression_9(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((RIGHT_ANGLE)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_10 : BinaryExpression {
-  public BinaryExpression_10(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((LEFT_ANGLE)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_11 : BinaryExpression {
-  public BinaryExpression_11(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((EQUALS_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_12 : BinaryExpression {
-  public BinaryExpression_12(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((EXCLAMATION_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_13 : BinaryExpression {
-  public BinaryExpression_13(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((LESS_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_14 : BinaryExpression {
-  public BinaryExpression_14(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((GREATER_EQUALS)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_15 : BinaryExpression {
-  public BinaryExpression_15(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((AMP_AMP)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_16 : BinaryExpression {
-  public BinaryExpression_16(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((STROKE_STROKE)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_17 : BinaryExpression {
-  public BinaryExpression_17(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((LEFT_SHIFT)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class BinaryExpression_18 : BinaryExpression {
-  public BinaryExpression_18(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(2).m_value))
-	, 
-	((Expression)(yyq.StackAt(0).m_value))
-	, 
-	((RIGHT_SHIFT)(yyq.StackAt(1).m_value))
-	.yytext){}}
-
-public class UnaryExpression_1 : UnaryExpression {
-  public UnaryExpression_1(Parser yyq):base(yyq,
-	((EXCLAMATION)(yyq.StackAt(1).m_value))
-	.yytext, 
-	((Expression)(yyq.StackAt(0).m_value))
-	){}}
-
-public class UnaryExpression_2 : UnaryExpression {
-  public UnaryExpression_2(Parser yyq):base(yyq,
-	((MINUS)(yyq.StackAt(1).m_value))
-	.yytext, 
-	((Expression)(yyq.StackAt(0).m_value))
-	){}}
-
-public class UnaryExpression_3 : UnaryExpression {
-  public UnaryExpression_3(Parser yyq):base(yyq,
-	((TILDE)(yyq.StackAt(1).m_value))
-	.yytext, 
-	((Expression)(yyq.StackAt(0).m_value))
-	){}}
-
-public class ParenthesisExpression_1 : ParenthesisExpression {
-  public ParenthesisExpression_1(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(1).m_value))
-	){}}
-
-public class ParenthesisExpression_2 : ParenthesisExpression {
-  public ParenthesisExpression_2(Parser yyq):base(yyq,
-	((SimpleAssignment)(yyq.StackAt(1).m_value))
-	){}}
-
-public class TypecastExpression_1 : TypecastExpression {
-  public TypecastExpression_1(Parser yyq):base(yyq,
-	((Typename)(yyq.StackAt(2).m_value))
-	.yytext, 
-	((Constant)(yyq.StackAt(0).m_value))
-	){}}
-
-public class TypecastExpression_2 : TypecastExpression {
-  public TypecastExpression_2(Parser yyq):base(yyq,
-	((Typename)(yyq.StackAt(2).m_value))
-	.yytext, new IdentExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(0).m_value))
-	.yytext)){}}
-
-public class TypecastExpression_3 : TypecastExpression {
-  public TypecastExpression_3(Parser yyq):base(yyq,
-	((Typename)(yyq.StackAt(4).m_value))
-	.yytext, new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(2).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(0).m_value))
-	.yytext)){}}
-
-public class TypecastExpression_4 : TypecastExpression {
-  public TypecastExpression_4(Parser yyq):base(yyq,
-	((Typename)(yyq.StackAt(3).m_value))
-	.yytext, new IncrementDecrementExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(1).m_value))
-	.yytext, 
-	((INCREMENT)(yyq.StackAt(0).m_value))
-	.yytext, true)){}}
-
-public class TypecastExpression_5 : TypecastExpression {
-  public TypecastExpression_5(Parser yyq):base(yyq,
-	((Typename)(yyq.StackAt(5).m_value))
-	.yytext, new IncrementDecrementExpression(((LSLSyntax
-)yyq), new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(3).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(1).m_value))
-	.yytext), 
-	((INCREMENT)(yyq.StackAt(0).m_value))
-	.yytext, true)){}}
-
-public class TypecastExpression_6 : TypecastExpression {
-  public TypecastExpression_6(Parser yyq):base(yyq,
-	((Typename)(yyq.StackAt(3).m_value))
-	.yytext, new IncrementDecrementExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(1).m_value))
-	.yytext, 
-	((DECREMENT)(yyq.StackAt(0).m_value))
-	.yytext, true)){}}
-
-public class TypecastExpression_7 : TypecastExpression {
-  public TypecastExpression_7(Parser yyq):base(yyq,
-	((Typename)(yyq.StackAt(5).m_value))
-	.yytext, new IncrementDecrementExpression(((LSLSyntax
-)yyq), new IdentDotExpression(((LSLSyntax
-)yyq), 
-	((IDENT)(yyq.StackAt(3).m_value))
-	.yytext, 
-	((IDENT)(yyq.StackAt(1).m_value))
-	.yytext), 
-	((DECREMENT)(yyq.StackAt(0).m_value))
-	.yytext, true)){}}
-
-public class TypecastExpression_8 : TypecastExpression {
-  public TypecastExpression_8(Parser yyq):base(yyq,
-	((Typename)(yyq.StackAt(2).m_value))
-	.yytext, 
-	((FunctionCall)(yyq.StackAt(0).m_value))
-	){}}
-
-public class TypecastExpression_9 : TypecastExpression {
-  public TypecastExpression_9(Parser yyq):base(yyq,
-	((Typename)(yyq.StackAt(4).m_value))
-	.yytext, 
-	((Expression)(yyq.StackAt(1).m_value))
-	){}}
-
-public class FunctionCall_1 : FunctionCall {
-  public FunctionCall_1(Parser yyq):base(yyq,
-	((IDENT)(yyq.StackAt(3).m_value))
-	.yytext, 
-	((ArgumentList)(yyq.StackAt(1).m_value))
-	){}}
-
-public class ArgumentList_1 : ArgumentList {
-  public ArgumentList_1(Parser yyq):base(yyq,
-	((Argument)(yyq.StackAt(0).m_value))
-	){}}
-
-public class ArgumentList_2 : ArgumentList {
-  public ArgumentList_2(Parser yyq):base(yyq,
-	((ArgumentList)(yyq.StackAt(2).m_value))
-	, 
-	((Argument)(yyq.StackAt(0).m_value))
-	){}}
-
-public class ExpressionArgument_1 : ExpressionArgument {
-  public ExpressionArgument_1(Parser yyq):base(yyq,
-	((Expression)(yyq.StackAt(0).m_value))
-	){}}
-
-public class Typename_1 : Typename {
-  public Typename_1(Parser yyq):base(yyq,
-	((INTEGER_TYPE)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Typename_2 : Typename {
-  public Typename_2(Parser yyq):base(yyq,
-	((FLOAT_TYPE)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Typename_3 : Typename {
-  public Typename_3(Parser yyq):base(yyq,
-	((STRING_TYPE)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Typename_4 : Typename {
-  public Typename_4(Parser yyq):base(yyq,
-	((KEY_TYPE)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Typename_5 : Typename {
-  public Typename_5(Parser yyq):base(yyq,
-	((VECTOR_TYPE)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Typename_6 : Typename {
-  public Typename_6(Parser yyq):base(yyq,
-	((ROTATION_TYPE)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Typename_7 : Typename {
-  public Typename_7(Parser yyq):base(yyq,
-	((LIST_TYPE)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Event_1 : Event {
-  public Event_1(Parser yyq):base(yyq,
-	((DATASERVER_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Event_2 : Event {
-  public Event_2(Parser yyq):base(yyq,
-	((EMAIL_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Event_3 : Event {
-  public Event_3(Parser yyq):base(yyq,
-	((HTTP_RESPONSE_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Event_4 : Event {
-  public Event_4(Parser yyq):base(yyq,
-	((LINK_MESSAGE_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Event_5 : Event {
-  public Event_5(Parser yyq):base(yyq,
-	((LISTEN_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Event_6 : Event {
-  public Event_6(Parser yyq):base(yyq,
-	((MONEY_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Event_7 : Event {
-  public Event_7(Parser yyq):base(yyq,
-	((REMOTE_DATA_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Event_8 : Event {
-  public Event_8(Parser yyq):base(yyq,
-	((HTTP_REQUEST_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class Event_9 : Event {
-  public Event_9(Parser yyq):base(yyq,
-	((TRANSACTION_RESULT_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class VoidArgEvent_1 : VoidArgEvent {
-  public VoidArgEvent_1(Parser yyq):base(yyq,
-	((STATE_ENTRY_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class VoidArgEvent_2 : VoidArgEvent {
-  public VoidArgEvent_2(Parser yyq):base(yyq,
-	((STATE_EXIT_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class VoidArgEvent_3 : VoidArgEvent {
-  public VoidArgEvent_3(Parser yyq):base(yyq,
-	((MOVING_END_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class VoidArgEvent_4 : VoidArgEvent {
-  public VoidArgEvent_4(Parser yyq):base(yyq,
-	((MOVING_START_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class VoidArgEvent_5 : VoidArgEvent {
-  public VoidArgEvent_5(Parser yyq):base(yyq,
-	((NO_SENSOR_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class VoidArgEvent_6 : VoidArgEvent {
-  public VoidArgEvent_6(Parser yyq):base(yyq,
-	((NOT_AT_ROT_TARGET_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class VoidArgEvent_7 : VoidArgEvent {
-  public VoidArgEvent_7(Parser yyq):base(yyq,
-	((NOT_AT_TARGET_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class VoidArgEvent_8 : VoidArgEvent {
-  public VoidArgEvent_8(Parser yyq):base(yyq,
-	((TIMER_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class KeyArgEvent_1 : KeyArgEvent {
-  public KeyArgEvent_1(Parser yyq):base(yyq,
-	((ATTACH_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class KeyArgEvent_2 : KeyArgEvent {
-  public KeyArgEvent_2(Parser yyq):base(yyq,
-	((OBJECT_REZ_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class IntArgEvent_1 : IntArgEvent {
-  public IntArgEvent_1(Parser yyq):base(yyq,
-	((CHANGED_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class IntArgEvent_2 : IntArgEvent {
-  public IntArgEvent_2(Parser yyq):base(yyq,
-	((COLLISION_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class IntArgEvent_3 : IntArgEvent {
-  public IntArgEvent_3(Parser yyq):base(yyq,
-	((COLLISION_END_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class IntArgEvent_4 : IntArgEvent {
-  public IntArgEvent_4(Parser yyq):base(yyq,
-	((COLLISION_START_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class IntArgEvent_5 : IntArgEvent {
-  public IntArgEvent_5(Parser yyq):base(yyq,
-	((ON_REZ_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class IntArgEvent_6 : IntArgEvent {
-  public IntArgEvent_6(Parser yyq):base(yyq,
-	((RUN_TIME_PERMISSIONS_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class IntArgEvent_7 : IntArgEvent {
-  public IntArgEvent_7(Parser yyq):base(yyq,
-	((SENSOR_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class IntArgEvent_8 : IntArgEvent {
-  public IntArgEvent_8(Parser yyq):base(yyq,
-	((TOUCH_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class IntArgEvent_9 : IntArgEvent {
-  public IntArgEvent_9(Parser yyq):base(yyq,
-	((TOUCH_END_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class IntArgEvent_10 : IntArgEvent {
-  public IntArgEvent_10(Parser yyq):base(yyq,
-	((TOUCH_START_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class VectorArgEvent_1 : VectorArgEvent {
-  public VectorArgEvent_1(Parser yyq):base(yyq,
-	((LAND_COLLISION_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class VectorArgEvent_2 : VectorArgEvent {
-  public VectorArgEvent_2(Parser yyq):base(yyq,
-	((LAND_COLLISION_END_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class VectorArgEvent_3 : VectorArgEvent {
-  public VectorArgEvent_3(Parser yyq):base(yyq,
-	((LAND_COLLISION_START_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class IntRotRotArgEvent_1 : IntRotRotArgEvent {
-  public IntRotRotArgEvent_1(Parser yyq):base(yyq,
-	((AT_ROT_TARGET_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class IntVecVecArgEvent_1 : IntVecVecArgEvent {
-  public IntVecVecArgEvent_1(Parser yyq):base(yyq,
-	((AT_TARGET_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-
-public class KeyIntIntArgEvent_1 : KeyIntIntArgEvent {
-  public KeyIntIntArgEvent_1(Parser yyq):base(yyq,
-	((CONTROL_EVENT)(yyq.StackAt(0).m_value))
-	.yytext){}}
-public class yyLSLSyntax
-: YyParser {
-  public override object Action(Parser yyq,SYMBOL yysym, int yyact) {
-    switch(yyact) {
-	 case -1: break; //// keep compiler happy
-}  return null; }
-
-public class ArgumentDeclarationList_3 : ArgumentDeclarationList {
-  public ArgumentDeclarationList_3(Parser yyq):base(yyq){}}
-
-public class ArgumentList_3 : ArgumentList {
-  public ArgumentList_3(Parser yyq):base(yyq){}}
-
-public class ArgumentList_4 : ArgumentList {
-  public ArgumentList_4(Parser yyq):base(yyq){}}
-
-public class ArgumentDeclarationList_4 : ArgumentDeclarationList {
-  public ArgumentDeclarationList_4(Parser yyq):base(yyq){}}
-
-public class ArgumentDeclarationList_5 : ArgumentDeclarationList {
-  public ArgumentDeclarationList_5(Parser yyq):base(yyq){}}
-public yyLSLSyntax
-():base() { arr = new int[] { 
+using Tools;
+namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
+{
+    //%+LSLProgramRoot+97
+    public class LSLProgramRoot : SYMBOL
+    {
+        public LSLProgramRoot(Parser yyp, States s) : base(((LSLSyntax
+       )yyp))
+        {
+            while (0 < s.kids.Count) kids.Add(s.kids.Pop());
+        }
+        public LSLProgramRoot(Parser yyp, GlobalDefinitions gd, States s) : base(((LSLSyntax
+       )yyp))
+        {
+            while (0 < gd.kids.Count) kids.Add(gd.kids.Pop());
+            while (0 < s.kids.Count) kids.Add(s.kids.Pop());
+        }
+
+        public override string yyname { get { return "LSLProgramRoot"; } }
+        public override int yynum { get { return 97; } }
+        public LSLProgramRoot(Parser yyp) : base(yyp) { }
+    }
+    //%+GlobalDefinitions+98
+    public class GlobalDefinitions : SYMBOL
+    {
+        public GlobalDefinitions(Parser yyp, GlobalVariableDeclaration gvd) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(gvd);
+        }
+        public GlobalDefinitions(Parser yyp, GlobalDefinitions gd, GlobalVariableDeclaration gvd) : base(((LSLSyntax
+       )yyp))
+        {
+            while (0 < gd.kids.Count) kids.Add(gd.kids.Pop());
+            kids.Add(gvd);
+        }
+        public GlobalDefinitions(Parser yyp, GlobalFunctionDefinition gfd) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(gfd);
+        }
+        public GlobalDefinitions(Parser yyp, GlobalDefinitions gd, GlobalFunctionDefinition gfd) : base(((LSLSyntax
+       )yyp))
+        {
+            while (0 < gd.kids.Count) kids.Add(gd.kids.Pop());
+            kids.Add(gfd);
+        }
+
+        public override string yyname { get { return "GlobalDefinitions"; } }
+        public override int yynum { get { return 98; } }
+        public GlobalDefinitions(Parser yyp) : base(yyp) { }
+    }
+    //%+GlobalVariableDeclaration+99
+    public class GlobalVariableDeclaration : SYMBOL
+    {
+        public GlobalVariableDeclaration(Parser yyp, Declaration d) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(d);
+        }
+        public GlobalVariableDeclaration(Parser yyp, Assignment a) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(a);
+        }
+
+        public override string yyname { get { return "GlobalVariableDeclaration"; } }
+        public override int yynum { get { return 99; } }
+        public GlobalVariableDeclaration(Parser yyp) : base(yyp) { }
+    }
+    //%+GlobalFunctionDefinition+100
+    public class GlobalFunctionDefinition : SYMBOL
+    {
+        private string m_returnType;
+        private string m_name;
+        public GlobalFunctionDefinition(Parser yyp, string returnType, string name, ArgumentDeclarationList adl, CompoundStatement cs) : base(((LSLSyntax
+       )yyp))
+        {
+            m_returnType = returnType;
+            m_name = name;
+            kids.Add(adl);
+            kids.Add(cs);
+        }
+        public string ReturnType
+        {
+            get
+            {
+                return m_returnType;
+            }
+            set
+            {
+                m_returnType = value;
+            }
+        }
+        public string Name
+        {
+            get
+            {
+                return m_name;
+            }
+        }
+
+        public override string yyname { get { return "GlobalFunctionDefinition"; } }
+        public override int yynum { get { return 100; } }
+        public GlobalFunctionDefinition(Parser yyp) : base(yyp) { }
+    }
+    //%+States+101
+    public class States : SYMBOL
+    {
+        public States(Parser yyp, State ds) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(ds);
+        }
+        public States(Parser yyp, States s, State us) : base(((LSLSyntax
+       )yyp))
+        {
+            while (0 < s.kids.Count) kids.Add(s.kids.Pop());
+            kids.Add(us);
+        }
+
+        public override string yyname { get { return "States"; } }
+        public override int yynum { get { return 101; } }
+        public States(Parser yyp) : base(yyp) { }
+    }
+    //%+State+102
+    public class State : SYMBOL
+    {
+        private string m_name;
+        public State(Parser yyp, string name, StateBody sb) : base(((LSLSyntax
+       )yyp))
+        {
+            m_name = name;
+            while (0 < sb.kids.Count) kids.Add(sb.kids.Pop());
+        }
+        public override string ToString()
+        {
+            return "STATE<" + m_name + ">";
+        }
+        public string Name
+        {
+            get
+            {
+                return m_name;
+            }
+        }
+
+        public override string yyname { get { return "State"; } }
+        public override int yynum { get { return 102; } }
+        public State(Parser yyp) : base(yyp) { }
+    }
+    //%+StateBody+103
+    public class StateBody : SYMBOL
+    {
+        public StateBody(Parser yyp, StateBody sb, StateEvent se) : base(((LSLSyntax
+       )yyp))
+        {
+            while (0 < sb.kids.Count) kids.Add(sb.kids.Pop());
+            kids.Add(se);
+        }
+        public StateBody(Parser yyp, StateEvent se) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(se);
+        }
+
+        public override string yyname { get { return "StateBody"; } }
+        public override int yynum { get { return 103; } }
+        public StateBody(Parser yyp) : base(yyp) { }
+    }
+    //%+StateEvent+104
+    public class StateEvent : SYMBOL
+    {
+        private string m_name;
+        public StateEvent(Parser yyp, string name, CompoundStatement cs) : base(((LSLSyntax
+       )yyp))
+        {
+            m_name = name;
+            kids.Add(cs);
+        }
+        public StateEvent(Parser yyp, string name, ArgumentDeclarationList adl, CompoundStatement cs) : base(((LSLSyntax
+       )yyp))
+        {
+            m_name = name;
+            if (0 < adl.kids.Count) kids.Add(adl);
+            kids.Add(cs);
+        }
+        public override string ToString()
+        {
+            return "EVENT<" + m_name + ">";
+        }
+        public string Name
+        {
+            get
+            {
+                return m_name;
+            }
+        }
+
+        public override string yyname { get { return "StateEvent"; } }
+        public override int yynum { get { return 104; } }
+        public StateEvent(Parser yyp) : base(yyp) { }
+    }
+    //%+VoidArgStateEvent+105
+    public class VoidArgStateEvent : StateEvent
+    {
+        public VoidArgStateEvent(Parser yyp, string name, CompoundStatement cs) : base(((LSLSyntax
+       )yyp), name, cs)
+        { }
+
+        public override string yyname { get { return "VoidArgStateEvent"; } }
+        public override int yynum { get { return 105; } }
+        public VoidArgStateEvent(Parser yyp) : base(yyp) { }
+    }
+    //%+KeyArgStateEvent+106
+    public class KeyArgStateEvent : StateEvent
+    {
+        public KeyArgStateEvent(Parser yyp, string name, KeyArgumentDeclarationList adl, CompoundStatement cs) : base(((LSLSyntax
+       )yyp), name, adl, cs)
+        { }
+
+        public override string yyname { get { return "KeyArgStateEvent"; } }
+        public override int yynum { get { return 106; } }
+        public KeyArgStateEvent(Parser yyp) : base(yyp) { }
+    }
+    //%+IntArgStateEvent+107
+    public class IntArgStateEvent : StateEvent
+    {
+        public IntArgStateEvent(Parser yyp, string name, IntArgumentDeclarationList adl, CompoundStatement cs) : base(((LSLSyntax
+       )yyp), name, adl, cs)
+        { }
+
+        public override string yyname { get { return "IntArgStateEvent"; } }
+        public override int yynum { get { return 107; } }
+        public IntArgStateEvent(Parser yyp) : base(yyp) { }
+    }
+    //%+VectorArgStateEvent+108
+    public class VectorArgStateEvent : StateEvent
+    {
+        public VectorArgStateEvent(Parser yyp, string name, VectorArgumentDeclarationList adl, CompoundStatement cs) : base(((LSLSyntax
+       )yyp), name, adl, cs)
+        { }
+
+        public override string yyname { get { return "VectorArgStateEvent"; } }
+        public override int yynum { get { return 108; } }
+        public VectorArgStateEvent(Parser yyp) : base(yyp) { }
+    }
+    //%+IntRotRotArgStateEvent+109
+    public class IntRotRotArgStateEvent : StateEvent
+    {
+        public IntRotRotArgStateEvent(Parser yyp, string name, IntRotRotArgumentDeclarationList adl, CompoundStatement cs) : base(((LSLSyntax
+       )yyp), name, adl, cs)
+        { }
+
+        public override string yyname { get { return "IntRotRotArgStateEvent"; } }
+        public override int yynum { get { return 109; } }
+        public IntRotRotArgStateEvent(Parser yyp) : base(yyp) { }
+    }
+    //%+IntVecVecArgStateEvent+110
+    public class IntVecVecArgStateEvent : StateEvent
+    {
+        public IntVecVecArgStateEvent(Parser yyp, string name, IntVecVecArgumentDeclarationList adl, CompoundStatement cs) : base(((LSLSyntax
+       )yyp), name, adl, cs)
+        { }
+
+        public override string yyname { get { return "IntVecVecArgStateEvent"; } }
+        public override int yynum { get { return 110; } }
+        public IntVecVecArgStateEvent(Parser yyp) : base(yyp) { }
+    }
+    //%+KeyIntIntArgStateEvent+111
+    public class KeyIntIntArgStateEvent : StateEvent
+    {
+        public KeyIntIntArgStateEvent(Parser yyp, string name, KeyIntIntArgumentDeclarationList adl, CompoundStatement cs) : base(((LSLSyntax
+       )yyp), name, adl, cs)
+        { }
+
+        public override string yyname { get { return "KeyIntIntArgStateEvent"; } }
+        public override int yynum { get { return 111; } }
+        public KeyIntIntArgStateEvent(Parser yyp) : base(yyp) { }
+    }
+    //%+ArgumentDeclarationList+112
+    public class ArgumentDeclarationList : SYMBOL
+    {
+        public ArgumentDeclarationList(Parser yyp, Declaration d) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(d);
+        }
+        public ArgumentDeclarationList(Parser yyp, Declaration d, Declaration d2) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(d);
+            kids.Add(d2);
+        }
+        public ArgumentDeclarationList(Parser yyp, Declaration d, Declaration d2, Declaration d3) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(d);
+            kids.Add(d2);
+            kids.Add(d3);
+        }
+        public ArgumentDeclarationList(Parser yyp, ArgumentDeclarationList adl, Declaration d) : base(((LSLSyntax
+       )yyp))
+        {
+            while (0 < adl.kids.Count) kids.Add(adl.kids.Pop());
+            kids.Add(d);
+        }
+
+        public override string yyname { get { return "ArgumentDeclarationList"; } }
+        public override int yynum { get { return 112; } }
+        public ArgumentDeclarationList(Parser yyp) : base(yyp) { }
+    }
+    //%+KeyArgumentDeclarationList+113
+    public class KeyArgumentDeclarationList : ArgumentDeclarationList
+    {
+        public KeyArgumentDeclarationList(Parser yyp, KeyDeclaration d) : base(((LSLSyntax
+       )yyp), d)
+        { }
+
+        public override string yyname { get { return "KeyArgumentDeclarationList"; } }
+        public override int yynum { get { return 113; } }
+        public KeyArgumentDeclarationList(Parser yyp) : base(yyp) { }
+    }
+    //%+IntArgumentDeclarationList+114
+    public class IntArgumentDeclarationList : ArgumentDeclarationList
+    {
+        public IntArgumentDeclarationList(Parser yyp, IntDeclaration d) : base(((LSLSyntax
+       )yyp), d)
+        { }
+
+        public override string yyname { get { return "IntArgumentDeclarationList"; } }
+        public override int yynum { get { return 114; } }
+        public IntArgumentDeclarationList(Parser yyp) : base(yyp) { }
+    }
+    //%+VectorArgumentDeclarationList+115
+    public class VectorArgumentDeclarationList : ArgumentDeclarationList
+    {
+        public VectorArgumentDeclarationList(Parser yyp, VecDeclaration d) : base(((LSLSyntax
+       )yyp), d)
+        { }
+
+        public override string yyname { get { return "VectorArgumentDeclarationList"; } }
+        public override int yynum { get { return 115; } }
+        public VectorArgumentDeclarationList(Parser yyp) : base(yyp) { }
+    }
+    //%+IntRotRotArgumentDeclarationList+116
+    public class IntRotRotArgumentDeclarationList : ArgumentDeclarationList
+    {
+        public IntRotRotArgumentDeclarationList(Parser yyp, Declaration d1, Declaration d2, Declaration d3) : base(((LSLSyntax
+       )yyp), d1, d2, d3)
+        { }
+
+        public override string yyname { get { return "IntRotRotArgumentDeclarationList"; } }
+        public override int yynum { get { return 116; } }
+        public IntRotRotArgumentDeclarationList(Parser yyp) : base(yyp) { }
+    }
+    //%+IntVecVecArgumentDeclarationList+117
+    public class IntVecVecArgumentDeclarationList : ArgumentDeclarationList
+    {
+        public IntVecVecArgumentDeclarationList(Parser yyp, Declaration d1, Declaration d2, Declaration d3) : base(((LSLSyntax
+       )yyp), d1, d2, d3)
+        { }
+
+        public override string yyname { get { return "IntVecVecArgumentDeclarationList"; } }
+        public override int yynum { get { return 117; } }
+        public IntVecVecArgumentDeclarationList(Parser yyp) : base(yyp) { }
+    }
+    //%+KeyIntIntArgumentDeclarationList+118
+    public class KeyIntIntArgumentDeclarationList : ArgumentDeclarationList
+    {
+        public KeyIntIntArgumentDeclarationList(Parser yyp, Declaration d1, Declaration d2, Declaration d3) : base(((LSLSyntax
+       )yyp), d1, d2, d3)
+        { }
+
+        public override string yyname { get { return "KeyIntIntArgumentDeclarationList"; } }
+        public override int yynum { get { return 118; } }
+        public KeyIntIntArgumentDeclarationList(Parser yyp) : base(yyp) { }
+    }
+    //%+Declaration+119
+    public class Declaration : SYMBOL
+    {
+        private string m_datatype;
+        private string m_id;
+        public Declaration(Parser yyp, string type, string id) : base(((LSLSyntax
+       )yyp))
+        {
+            m_datatype = type;
+            m_id = id;
+        }
+        public override string ToString()
+        {
+            return "Declaration<" + m_datatype + ":" + m_id + ">";
+        }
+        public string Datatype
+        {
+            get
+            {
+                return m_datatype;
+            }
+            set
+            {
+                m_datatype = value;
+            }
+        }
+        public string Id
+        {
+            get
+            {
+                return m_id;
+            }
+        }
+
+        public override string yyname { get { return "Declaration"; } }
+        public override int yynum { get { return 119; } }
+        public Declaration(Parser yyp) : base(yyp) { }
+    }
+    //%+KeyDeclaration+120
+    public class KeyDeclaration : Declaration
+    {
+        public KeyDeclaration(Parser yyp, string type, string id) : base(((LSLSyntax
+       )yyp), type, id)
+        { }
+
+        public override string yyname { get { return "KeyDeclaration"; } }
+        public override int yynum { get { return 120; } }
+        public KeyDeclaration(Parser yyp) : base(yyp) { }
+    }
+    //%+IntDeclaration+121
+    public class IntDeclaration : Declaration
+    {
+        public IntDeclaration(Parser yyp, string type, string id) : base(((LSLSyntax
+       )yyp), type, id)
+        { }
+
+        public override string yyname { get { return "IntDeclaration"; } }
+        public override int yynum { get { return 121; } }
+        public IntDeclaration(Parser yyp) : base(yyp) { }
+    }
+    //%+VecDeclaration+122
+    public class VecDeclaration : Declaration
+    {
+        public VecDeclaration(Parser yyp, string type, string id) : base(((LSLSyntax
+       )yyp), type, id)
+        { }
+
+        public override string yyname { get { return "VecDeclaration"; } }
+        public override int yynum { get { return 122; } }
+        public VecDeclaration(Parser yyp) : base(yyp) { }
+    }
+    //%+RotDeclaration+123
+    public class RotDeclaration : Declaration
+    {
+        public RotDeclaration(Parser yyp, string type, string id) : base(((LSLSyntax
+       )yyp), type, id)
+        { }
+
+        public override string yyname { get { return "RotDeclaration"; } }
+        public override int yynum { get { return 123; } }
+        public RotDeclaration(Parser yyp) : base(yyp) { }
+    }
+    //%+Typename+124
+    public class Typename : SYMBOL
+    {
+        public string yytext;
+        public Typename(Parser yyp, string text) : base(((LSLSyntax
+       )yyp))
+        {
+            yytext = text;
+        }
+
+        public override string yyname { get { return "Typename"; } }
+        public override int yynum { get { return 124; } }
+        public Typename(Parser yyp) : base(yyp) { }
+    }
+    //%+Event+125
+    public class Event : SYMBOL
+    {
+        public string yytext;
+        public Event(Parser yyp, string text) : base(((LSLSyntax
+       )yyp))
+        {
+            yytext = text;
+        }
+
+        public override string yyname { get { return "Event"; } }
+        public override int yynum { get { return 125; } }
+        public Event(Parser yyp) : base(yyp) { }
+    }
+    //%+VoidArgEvent+126
+    public class VoidArgEvent : Event
+    {
+        public VoidArgEvent(Parser yyp, string text) : base(((LSLSyntax
+       )yyp), text)
+        { }
+
+        public override string yyname { get { return "VoidArgEvent"; } }
+        public override int yynum { get { return 126; } }
+        public VoidArgEvent(Parser yyp) : base(yyp) { }
+    }
+    //%+KeyArgEvent+127
+    public class KeyArgEvent : Event
+    {
+        public KeyArgEvent(Parser yyp, string text) : base(((LSLSyntax
+       )yyp), text)
+        { }
+
+        public override string yyname { get { return "KeyArgEvent"; } }
+        public override int yynum { get { return 127; } }
+        public KeyArgEvent(Parser yyp) : base(yyp) { }
+    }
+    //%+IntArgEvent+128
+    public class IntArgEvent : Event
+    {
+        public IntArgEvent(Parser yyp, string text) : base(((LSLSyntax
+       )yyp), text)
+        { }
+
+        public override string yyname { get { return "IntArgEvent"; } }
+        public override int yynum { get { return 128; } }
+        public IntArgEvent(Parser yyp) : base(yyp) { }
+    }
+    //%+VectorArgEvent+129
+    public class VectorArgEvent : Event
+    {
+        public VectorArgEvent(Parser yyp, string text) : base(((LSLSyntax
+       )yyp), text)
+        { }
+
+        public override string yyname { get { return "VectorArgEvent"; } }
+        public override int yynum { get { return 129; } }
+        public VectorArgEvent(Parser yyp) : base(yyp) { }
+    }
+    //%+IntRotRotArgEvent+130
+    public class IntRotRotArgEvent : Event
+    {
+        public IntRotRotArgEvent(Parser yyp, string text) : base(((LSLSyntax
+       )yyp), text)
+        { }
+
+        public override string yyname { get { return "IntRotRotArgEvent"; } }
+        public override int yynum { get { return 130; } }
+        public IntRotRotArgEvent(Parser yyp) : base(yyp) { }
+    }
+    //%+IntVecVecArgEvent+131
+    public class IntVecVecArgEvent : Event
+    {
+        public IntVecVecArgEvent(Parser yyp, string text) : base(((LSLSyntax
+       )yyp), text)
+        { }
+
+        public override string yyname { get { return "IntVecVecArgEvent"; } }
+        public override int yynum { get { return 131; } }
+        public IntVecVecArgEvent(Parser yyp) : base(yyp) { }
+    }
+    //%+KeyIntIntArgEvent+132
+    public class KeyIntIntArgEvent : Event
+    {
+        public KeyIntIntArgEvent(Parser yyp, string text) : base(((LSLSyntax
+       )yyp), text)
+        { }
+
+        public override string yyname { get { return "KeyIntIntArgEvent"; } }
+        public override int yynum { get { return 132; } }
+        public KeyIntIntArgEvent(Parser yyp) : base(yyp) { }
+    }
+    //%+CompoundStatement+133
+    public class CompoundStatement : SYMBOL
+    {
+        public CompoundStatement(Parser yyp) : base(((LSLSyntax
+       )yyp))
+        { }
+        public CompoundStatement(Parser yyp, StatementList sl) : base(((LSLSyntax
+       )yyp))
+        {
+            while (0 < sl.kids.Count) kids.Add(sl.kids.Pop());
+        }
+
+        public override string yyname { get { return "CompoundStatement"; } }
+        public override int yynum { get { return 133; } }
+    }
+    //%+StatementList+134
+    public class StatementList : SYMBOL
+    {
+        private void AddStatement(Statement s)
+        {
+            if (s.kids.Top is IfStatement || s.kids.Top is WhileStatement || s.kids.Top is DoWhileStatement || s.kids.Top is ForLoop) kids.Add(s.kids.Pop());
+            else kids.Add(s);
+        }
+        public StatementList(Parser yyp, Statement s) : base(((LSLSyntax
+       )yyp))
+        {
+            AddStatement(s);
+        }
+        public StatementList(Parser yyp, StatementList sl, Statement s) : base(((LSLSyntax
+       )yyp))
+        {
+            while (0 < sl.kids.Count) kids.Add(sl.kids.Pop());
+            AddStatement(s);
+        }
+
+        public override string yyname { get { return "StatementList"; } }
+        public override int yynum { get { return 134; } }
+        public StatementList(Parser yyp) : base(yyp) { }
+    }
+    //%+Statement+135
+    public class Statement : SYMBOL
+    {
+        public Statement(Parser yyp, Declaration d) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(d);
+        }
+        public Statement(Parser yyp, CompoundStatement cs) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(cs);
+        }
+        public Statement(Parser yyp, FunctionCall fc) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(fc);
+        }
+        public Statement(Parser yyp, Assignment a) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(a);
+        }
+        public Statement(Parser yyp, Expression e) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(e);
+        }
+        public Statement(Parser yyp, ReturnStatement rs) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(rs);
+        }
+        public Statement(Parser yyp, StateChange sc) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(sc);
+        }
+        public Statement(Parser yyp, IfStatement ifs) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(ifs);
+        }
+        public Statement(Parser yyp, WhileStatement ifs) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(ifs);
+        }
+        public Statement(Parser yyp, DoWhileStatement ifs) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(ifs);
+        }
+        public Statement(Parser yyp, ForLoop fl) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(fl);
+        }
+        public Statement(Parser yyp, JumpLabel jl) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(jl);
+        }
+        public Statement(Parser yyp, JumpStatement js) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(js);
+        }
+        public Statement(Parser yyp, EmptyStatement es) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(es);
+        }
+
+        public override string yyname { get { return "Statement"; } }
+        public override int yynum { get { return 135; } }
+        public Statement(Parser yyp) : base(yyp) { }
+    }
+    //%+EmptyStatement+136
+    public class EmptyStatement : SYMBOL
+    {
+        public EmptyStatement(Parser yyp) : base(((LSLSyntax
+       )yyp))
+        { }
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+
+        public override string yyname { get { return "EmptyStatement"; } }
+        public override int yynum { get { return 136; } }
+    }
+    //%+Assignment+137
+    public class Assignment : SYMBOL
+    {
+        protected string m_assignmentType;
+        public Assignment(Parser yyp, SYMBOL lhs, SYMBOL rhs, string assignmentType) : base(((LSLSyntax
+       )yyp))
+        {
+            m_assignmentType = assignmentType;
+            kids.Add(lhs);
+            if (rhs is ConstantExpression) while (0 < rhs.kids.Count) kids.Add(rhs.kids.Pop());
+            else kids.Add(rhs);
+        }
+        public Assignment(Parser yyp, SimpleAssignment sa) : base(((LSLSyntax
+       )yyp))
+        {
+            m_assignmentType = sa.AssignmentType;
+            while (0 < sa.kids.Count) kids.Add(sa.kids.Pop());
+        }
+        public string AssignmentType
+        {
+            get
+            {
+                return m_assignmentType;
+            }
+        }
+        public override string ToString()
+        {
+            return base.ToString() + "<" + m_assignmentType + ">";
+        }
+
+        public override string yyname { get { return "Assignment"; } }
+        public override int yynum { get { return 137; } }
+        public Assignment(Parser yyp) : base(yyp) { }
+    }
+    //%+SimpleAssignment+138
+    public class SimpleAssignment : Assignment
+    {
+        public SimpleAssignment(Parser yyp, SYMBOL lhs, SYMBOL rhs, string assignmentType) : base(((LSLSyntax
+       )yyp))
+        {
+            m_assignmentType = assignmentType;
+            kids.Add(lhs);
+            if (rhs is ConstantExpression) while (0 < rhs.kids.Count) kids.Add(rhs.kids.Pop());
+            else kids.Add(rhs);
+        }
+
+        public override string yyname { get { return "SimpleAssignment"; } }
+        public override int yynum { get { return 138; } }
+        public SimpleAssignment(Parser yyp) : base(yyp) { }
+    }
+    //%+ReturnStatement+139
+    public class ReturnStatement : SYMBOL
+    {
+        public ReturnStatement(Parser yyp) : base(((LSLSyntax
+       )yyp))
+        { }
+        public ReturnStatement(Parser yyp, Expression e) : base(((LSLSyntax
+       )yyp))
+        {
+            if (e is ConstantExpression) while (0 < e.kids.Count) kids.Add(e.kids.Pop());
+            else kids.Add(e);
+        }
+
+        public override string yyname { get { return "ReturnStatement"; } }
+        public override int yynum { get { return 139; } }
+    }
+    //%+JumpLabel+140
+    public class JumpLabel : SYMBOL
+    {
+        private string m_labelName;
+        public JumpLabel(Parser yyp, string labelName) : base(((LSLSyntax
+       )yyp))
+        {
+            m_labelName = labelName;
+        }
+        public string LabelName
+        {
+            get
+            {
+                return m_labelName;
+            }
+        }
+        public override string ToString()
+        {
+            return base.ToString() + "<" + m_labelName + ">";
+        }
+
+        public override string yyname { get { return "JumpLabel"; } }
+        public override int yynum { get { return 140; } }
+        public JumpLabel(Parser yyp) : base(yyp) { }
+    }
+    //%+JumpStatement+141
+    public class JumpStatement : SYMBOL
+    {
+        private string m_targetName;
+        public JumpStatement(Parser yyp, string targetName) : base(((LSLSyntax
+       )yyp))
+        {
+            m_targetName = targetName;
+        }
+        public string TargetName
+        {
+            get
+            {
+                return m_targetName;
+            }
+        }
+        public override string ToString()
+        {
+            return base.ToString() + "<" + m_targetName + ">";
+        }
+
+        public override string yyname { get { return "JumpStatement"; } }
+        public override int yynum { get { return 141; } }
+        public JumpStatement(Parser yyp) : base(yyp) { }
+    }
+    //%+StateChange+142
+    public class StateChange : SYMBOL
+    {
+        private string m_newState;
+        public StateChange(Parser yyp, string newState) : base(((LSLSyntax
+       )yyp))
+        {
+            m_newState = newState;
+        }
+        public string NewState
+        {
+            get
+            {
+                return m_newState;
+            }
+        }
+
+        public override string yyname { get { return "StateChange"; } }
+        public override int yynum { get { return 142; } }
+        public StateChange(Parser yyp) : base(yyp) { }
+    }
+    //%+IfStatement+143
+    public class IfStatement : SYMBOL
+    {
+        private void AddStatement(Statement s)
+        {
+            if (0 < s.kids.Count && s.kids.Top is CompoundStatement) kids.Add(s.kids.Pop());
+            else kids.Add(s);
+        }
+        public IfStatement(Parser yyp, SYMBOL s, Statement ifs) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(s);
+            AddStatement(ifs);
+        }
+        public IfStatement(Parser yyp, SYMBOL s, Statement ifs, Statement es) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(s);
+            AddStatement(ifs);
+            if (0 < es.kids.Count && es.kids.Top is IfStatement) kids.Add(es.kids.Pop());
+            else AddStatement(es);
+        }
+
+        public override string yyname { get { return "IfStatement"; } }
+        public override int yynum { get { return 143; } }
+        public IfStatement(Parser yyp) : base(yyp) { }
+    }
+    //%+WhileStatement+144
+    public class WhileStatement : SYMBOL
+    {
+        public WhileStatement(Parser yyp, SYMBOL s, Statement st) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(s);
+            if (0 < st.kids.Count && st.kids.Top is CompoundStatement) kids.Add(st.kids.Pop());
+            else kids.Add(st);
+        }
+
+        public override string yyname { get { return "WhileStatement"; } }
+        public override int yynum { get { return 144; } }
+        public WhileStatement(Parser yyp) : base(yyp) { }
+    }
+    //%+DoWhileStatement+145
+    public class DoWhileStatement : SYMBOL
+    {
+        public DoWhileStatement(Parser yyp, SYMBOL s, Statement st) : base(((LSLSyntax
+       )yyp))
+        {
+            if (0 < st.kids.Count && st.kids.Top is CompoundStatement) kids.Add(st.kids.Pop());
+            else kids.Add(st);
+            kids.Add(s);
+        }
+
+        public override string yyname { get { return "DoWhileStatement"; } }
+        public override int yynum { get { return 145; } }
+        public DoWhileStatement(Parser yyp) : base(yyp) { }
+    }
+    //%+ForLoop+146
+    public class ForLoop : SYMBOL
+    {
+        public ForLoop(Parser yyp, ForLoopStatement flsa, Expression e, ForLoopStatement flsb, Statement s) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(flsa);
+            kids.Add(e);
+            kids.Add(flsb);
+            if (0 < s.kids.Count && s.kids.Top is CompoundStatement) kids.Add(s.kids.Pop());
+            else kids.Add(s);
+        }
+
+        public override string yyname { get { return "ForLoop"; } }
+        public override int yynum { get { return 146; } }
+        public ForLoop(Parser yyp) : base(yyp) { }
+    }
+    //%+ForLoopStatement+147
+    public class ForLoopStatement : SYMBOL
+    {
+        public ForLoopStatement(Parser yyp, Expression e) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(e);
+        }
+        public ForLoopStatement(Parser yyp, SimpleAssignment sa) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(sa);
+        }
+        public ForLoopStatement(Parser yyp, ForLoopStatement fls, Expression e) : base(((LSLSyntax
+       )yyp))
+        {
+            while (0 < fls.kids.Count) kids.Add(fls.kids.Pop());
+            kids.Add(e);
+        }
+        public ForLoopStatement(Parser yyp, ForLoopStatement fls, SimpleAssignment sa) : base(((LSLSyntax
+       )yyp))
+        {
+            while (0 < fls.kids.Count) kids.Add(fls.kids.Pop());
+            kids.Add(sa);
+        }
+
+        public override string yyname { get { return "ForLoopStatement"; } }
+        public override int yynum { get { return 147; } }
+        public ForLoopStatement(Parser yyp) : base(yyp) { }
+    }
+    //%+FunctionCall+148
+    public class FunctionCall : SYMBOL
+    {
+        private string m_id;
+        public FunctionCall(Parser yyp, string id, ArgumentList al) : base(((LSLSyntax
+       )yyp))
+        {
+            m_id = id;
+            kids.Add(al);
+        }
+        public override string ToString()
+        {
+            return base.ToString() + "<" + m_id + ">";
+        }
+        public string Id
+        {
+            get
+            {
+                return m_id;
+            }
+        }
+
+        public override string yyname { get { return "FunctionCall"; } }
+        public override int yynum { get { return 148; } }
+        public FunctionCall(Parser yyp) : base(yyp) { }
+    }
+    //%+ArgumentList+149
+    public class ArgumentList : SYMBOL
+    {
+        public ArgumentList(Parser yyp, Argument a) : base(((LSLSyntax
+       )yyp))
+        {
+            AddArgument(a);
+        }
+        public ArgumentList(Parser yyp, ArgumentList al, Argument a) : base(((LSLSyntax
+       )yyp))
+        {
+            while (0 < al.kids.Count) kids.Add(al.kids.Pop());
+            AddArgument(a);
+        }
+        private void AddArgument(Argument a)
+        {
+            if (a is ExpressionArgument) while (0 < a.kids.Count) kids.Add(a.kids.Pop());
+            else kids.Add(a);
+        }
+
+        public override string yyname { get { return "ArgumentList"; } }
+        public override int yynum { get { return 149; } }
+        public ArgumentList(Parser yyp) : base(yyp) { }
+    }
+    //%+Argument+150
+    public class Argument : SYMBOL
+    {
+        public override string yyname { get { return "Argument"; } }
+        public override int yynum { get { return 150; } }
+        public Argument(Parser yyp) : base(yyp) { }
+    }
+    //%+ExpressionArgument+151
+    public class ExpressionArgument : Argument
+    {
+        public ExpressionArgument(Parser yyp, Expression e) : base(((LSLSyntax
+       )yyp))
+        {
+            if (e is ConstantExpression) while (0 < e.kids.Count) kids.Add(e.kids.Pop());
+            else kids.Add(e);
+        }
+
+        public override string yyname { get { return "ExpressionArgument"; } }
+        public override int yynum { get { return 151; } }
+        public ExpressionArgument(Parser yyp) : base(yyp) { }
+    }
+    //%+Constant+152
+    public class Constant : SYMBOL
+    {
+        private string m_type;
+        private string m_val;
+        public Constant(Parser yyp, string type, string val) : base(((LSLSyntax
+       )yyp))
+        {
+            m_type = type;
+            m_val = val;
+        }
+        public override string ToString()
+        {
+            return base.ToString() + "<" + m_type + ":" + m_val + ">";
+        }
+        public string Value
+        {
+            get
+            {
+                return m_val;
+            }
+            set
+            {
+                m_val = value;
+            }
+        }
+        public string Type
+        {
+            get
+            {
+                return m_type;
+            }
+            set
+            {
+                m_type = value;
+            }
+        }
+
+        public override string yyname { get { return "Constant"; } }
+        public override int yynum { get { return 152; } }
+        public Constant(Parser yyp) : base(yyp) { }
+    }
+    //%+VectorConstant+153
+    public class VectorConstant : Constant
+    {
+        public VectorConstant(Parser yyp, Expression valX, Expression valY, Expression valZ) : base(((LSLSyntax
+       )yyp), "vector", null)
+        {
+            kids.Add(valX);
+            kids.Add(valY);
+            kids.Add(valZ);
+        }
+
+        public override string yyname { get { return "VectorConstant"; } }
+        public override int yynum { get { return 153; } }
+        public VectorConstant(Parser yyp) : base(yyp) { }
+    }
+    //%+RotationConstant+154
+    public class RotationConstant : Constant
+    {
+        public RotationConstant(Parser yyp, Expression valX, Expression valY, Expression valZ, Expression valS) : base(((LSLSyntax
+       )yyp), "rotation", null)
+        {
+            kids.Add(valX);
+            kids.Add(valY);
+            kids.Add(valZ);
+            kids.Add(valS);
+        }
+
+        public override string yyname { get { return "RotationConstant"; } }
+        public override int yynum { get { return 154; } }
+        public RotationConstant(Parser yyp) : base(yyp) { }
+    }
+    //%+ListConstant+155
+    public class ListConstant : Constant
+    {
+        public ListConstant(Parser yyp, ArgumentList al) : base(((LSLSyntax
+       )yyp), "list", null)
+        {
+            kids.Add(al);
+        }
+
+        public override string yyname { get { return "ListConstant"; } }
+        public override int yynum { get { return 155; } }
+        public ListConstant(Parser yyp) : base(yyp) { }
+    }
+    //%+Expression+156
+    public class Expression : SYMBOL
+    {
+        protected void AddExpression(Expression e)
+        {
+            if (e is ConstantExpression) while (0 < e.kids.Count) kids.Add(e.kids.Pop());
+            else kids.Add(e);
+        }
+
+        public override string yyname { get { return "Expression"; } }
+        public override int yynum { get { return 156; } }
+        public Expression(Parser yyp) : base(yyp) { }
+    }
+    //%+ConstantExpression+157
+    public class ConstantExpression : Expression
+    {
+        public ConstantExpression(Parser yyp, Constant c) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(c);
+        }
+
+        public override string yyname { get { return "ConstantExpression"; } }
+        public override int yynum { get { return 157; } }
+        public ConstantExpression(Parser yyp) : base(yyp) { }
+    }
+    //%+IdentExpression+158
+    public class IdentExpression : Expression
+    {
+        protected string m_name;
+        public IdentExpression(Parser yyp, string name) : base(((LSLSyntax
+       )yyp))
+        {
+            m_name = name;
+        }
+        public override string ToString()
+        {
+            return base.ToString() + "<" + m_name + ">";
+        }
+        public string Name
+        {
+            get
+            {
+                return m_name;
+            }
+        }
+
+        public override string yyname { get { return "IdentExpression"; } }
+        public override int yynum { get { return 158; } }
+        public IdentExpression(Parser yyp) : base(yyp) { }
+    }
+    //%+IdentDotExpression+159
+    public class IdentDotExpression : IdentExpression
+    {
+        private string m_member;
+        public IdentDotExpression(Parser yyp, string name, string member) : base(((LSLSyntax
+       )yyp), name)
+        {
+            m_member = member;
+        }
+        public override string ToString()
+        {
+            string baseToString = base.ToString();
+            return baseToString.Substring(0, baseToString.Length - 1) + "." + m_member + ">";
+        }
+        public string Member
+        {
+            get
+            {
+                return m_member;
+            }
+        }
+
+        public override string yyname { get { return "IdentDotExpression"; } }
+        public override int yynum { get { return 159; } }
+        public IdentDotExpression(Parser yyp) : base(yyp) { }
+    }
+    //%+FunctionCallExpression+160
+    public class FunctionCallExpression : Expression
+    {
+        public FunctionCallExpression(Parser yyp, FunctionCall fc) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(fc);
+        }
+
+        public override string yyname { get { return "FunctionCallExpression"; } }
+        public override int yynum { get { return 160; } }
+        public FunctionCallExpression(Parser yyp) : base(yyp) { }
+    }
+    //%+BinaryExpression+161
+    public class BinaryExpression : Expression
+    {
+        private string m_expressionSymbol;
+        public BinaryExpression(Parser yyp, Expression lhs, Expression rhs, string expressionSymbol) : base(((LSLSyntax
+       )yyp))
+        {
+            m_expressionSymbol = expressionSymbol;
+            AddExpression(lhs);
+            AddExpression(rhs);
+        }
+        public string ExpressionSymbol
+        {
+            get
+            {
+                return m_expressionSymbol;
+            }
+        }
+        public override string ToString()
+        {
+            return base.ToString() + "<" + m_expressionSymbol + ">";
+        }
+
+        public override string yyname { get { return "BinaryExpression"; } }
+        public override int yynum { get { return 161; } }
+        public BinaryExpression(Parser yyp) : base(yyp) { }
+    }
+    //%+UnaryExpression+162
+    public class UnaryExpression : Expression
+    {
+        private string m_unarySymbol;
+        public UnaryExpression(Parser yyp, string unarySymbol, Expression e) : base(((LSLSyntax
+       )yyp))
+        {
+            m_unarySymbol = unarySymbol;
+            AddExpression(e);
+        }
+        public string UnarySymbol
+        {
+            get
+            {
+                return m_unarySymbol;
+            }
+        }
+        public override string ToString()
+        {
+            return base.ToString() + "<" + m_unarySymbol + ">";
+        }
+
+        public override string yyname { get { return "UnaryExpression"; } }
+        public override int yynum { get { return 162; } }
+        public UnaryExpression(Parser yyp) : base(yyp) { }
+    }
+    //%+TypecastExpression+163
+    public class TypecastExpression : Expression
+    {
+        private string m_typecastType;
+        public TypecastExpression(Parser yyp, string typecastType, SYMBOL rhs) : base(((LSLSyntax
+       )yyp))
+        {
+            m_typecastType = typecastType;
+            kids.Add(rhs);
+        }
+        public string TypecastType
+        {
+            get
+            {
+                return m_typecastType;
+            }
+            set
+            {
+                m_typecastType = value;
+            }
+        }
+
+        public override string yyname { get { return "TypecastExpression"; } }
+        public override int yynum { get { return 163; } }
+        public TypecastExpression(Parser yyp) : base(yyp) { }
+    }
+    //%+ParenthesisExpression+164
+    public class ParenthesisExpression : Expression
+    {
+        public ParenthesisExpression(Parser yyp, SYMBOL s) : base(((LSLSyntax
+       )yyp))
+        {
+            kids.Add(s);
+        }
+
+        public override string yyname { get { return "ParenthesisExpression"; } }
+        public override int yynum { get { return 164; } }
+        public ParenthesisExpression(Parser yyp) : base(yyp) { }
+    }
+    //%+IncrementDecrementExpression+165
+    public class IncrementDecrementExpression : Expression
+    {
+        private string m_name;
+        private string m_operation;
+        private bool m_postOperation;
+        public IncrementDecrementExpression(Parser yyp, string name, string operation, bool postOperation) : base(((LSLSyntax
+       )yyp))
+        {
+            m_name = name;
+            m_operation = operation;
+            m_postOperation = postOperation;
+        }
+        public IncrementDecrementExpression(Parser yyp, IdentDotExpression ide, string operation, bool postOperation) : base(((LSLSyntax
+       )yyp))
+        {
+            m_operation = operation;
+            m_postOperation = postOperation;
+            kids.Add(ide);
+        }
+        public override string ToString()
+        {
+            return base.ToString() + "<" + (m_postOperation ? m_name + m_operation : m_operation + m_name) + ">";
+        }
+        public string Name
+        {
+            get
+            {
+                return m_name;
+            }
+        }
+        public string Operation
+        {
+            get
+            {
+                return m_operation;
+            }
+        }
+        public bool PostOperation
+        {
+            get
+            {
+                return m_postOperation;
+            }
+        }
+
+        public override string yyname { get { return "IncrementDecrementExpression"; } }
+        public override int yynum { get { return 165; } }
+        public IncrementDecrementExpression(Parser yyp) : base(yyp) { }
+    }
+
+    public class LSLProgramRoot_1 : LSLProgramRoot
+    {
+        public LSLProgramRoot_1(Parser yyq) : base(yyq,
+          ((GlobalDefinitions)(yyq.StackAt(1).m_value))
+          ,
+          ((States)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class LSLProgramRoot_2 : LSLProgramRoot
+    {
+        public LSLProgramRoot_2(Parser yyq) : base(yyq,
+          ((States)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class GlobalDefinitions_1 : GlobalDefinitions
+    {
+        public GlobalDefinitions_1(Parser yyq) : base(yyq,
+          ((GlobalVariableDeclaration)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class GlobalDefinitions_2 : GlobalDefinitions
+    {
+        public GlobalDefinitions_2(Parser yyq) : base(yyq,
+          ((GlobalDefinitions)(yyq.StackAt(1).m_value))
+          ,
+          ((GlobalVariableDeclaration)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class GlobalDefinitions_3 : GlobalDefinitions
+    {
+        public GlobalDefinitions_3(Parser yyq) : base(yyq,
+          ((GlobalFunctionDefinition)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class GlobalDefinitions_4 : GlobalDefinitions
+    {
+        public GlobalDefinitions_4(Parser yyq) : base(yyq,
+          ((GlobalDefinitions)(yyq.StackAt(1).m_value))
+          ,
+          ((GlobalFunctionDefinition)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class GlobalVariableDeclaration_1 : GlobalVariableDeclaration
+    {
+        public GlobalVariableDeclaration_1(Parser yyq) : base(yyq,
+          ((Declaration)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class GlobalVariableDeclaration_2 : GlobalVariableDeclaration
+    {
+        public GlobalVariableDeclaration_2(Parser yyq) : base(yyq, new Assignment(((LSLSyntax
+      )yyq),
+          ((Declaration)(yyq.StackAt(3).m_value))
+          ,
+          ((Expression)(yyq.StackAt(1).m_value))
+          ,
+          ((EQUALS)(yyq.StackAt(2).m_value))
+          .yytext))
+        { }
+    }
+
+    public class GlobalFunctionDefinition_1 : GlobalFunctionDefinition
+    {
+        public GlobalFunctionDefinition_1(Parser yyq) : base(yyq, "void",
+          ((IDENT)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((ArgumentDeclarationList)(yyq.StackAt(2).m_value))
+          ,
+          ((CompoundStatement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class GlobalFunctionDefinition_2 : GlobalFunctionDefinition
+    {
+        public GlobalFunctionDefinition_2(Parser yyq) : base(yyq,
+          ((Typename)(yyq.StackAt(5).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((ArgumentDeclarationList)(yyq.StackAt(2).m_value))
+          ,
+          ((CompoundStatement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class States_1 : States
+    {
+        public States_1(Parser yyq) : base(yyq,
+          ((State)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class States_2 : States
+    {
+        public States_2(Parser yyq) : base(yyq,
+          ((States)(yyq.StackAt(1).m_value))
+          ,
+          ((State)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class State_1 : State
+    {
+        public State_1(Parser yyq) : base(yyq,
+          ((DEFAULT_STATE)(yyq.StackAt(3).m_value))
+          .yytext,
+          ((StateBody)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class State_2 : State
+    {
+        public State_2(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(3).m_value))
+          .yytext,
+          ((StateBody)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class StateBody_1 : StateBody
+    {
+        public StateBody_1(Parser yyq) : base(yyq,
+          ((StateEvent)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StateBody_2 : StateBody
+    {
+        public StateBody_2(Parser yyq) : base(yyq,
+          ((StateBody)(yyq.StackAt(1).m_value))
+          ,
+          ((StateEvent)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StateBody_3 : StateBody
+    {
+        public StateBody_3(Parser yyq) : base(yyq,
+          ((VoidArgStateEvent)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StateBody_4 : StateBody
+    {
+        public StateBody_4(Parser yyq) : base(yyq,
+          ((StateBody)(yyq.StackAt(1).m_value))
+          ,
+          ((VoidArgStateEvent)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StateBody_5 : StateBody
+    {
+        public StateBody_5(Parser yyq) : base(yyq,
+          ((KeyArgStateEvent)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StateBody_6 : StateBody
+    {
+        public StateBody_6(Parser yyq) : base(yyq,
+          ((StateBody)(yyq.StackAt(1).m_value))
+          ,
+          ((KeyArgStateEvent)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StateBody_7 : StateBody
+    {
+        public StateBody_7(Parser yyq) : base(yyq,
+          ((IntArgStateEvent)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StateBody_8 : StateBody
+    {
+        public StateBody_8(Parser yyq) : base(yyq,
+          ((StateBody)(yyq.StackAt(1).m_value))
+          ,
+          ((IntArgStateEvent)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StateBody_9 : StateBody
+    {
+        public StateBody_9(Parser yyq) : base(yyq,
+          ((VectorArgStateEvent)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StateBody_10 : StateBody
+    {
+        public StateBody_10(Parser yyq) : base(yyq,
+          ((StateBody)(yyq.StackAt(1).m_value))
+          ,
+          ((VectorArgStateEvent)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StateBody_11 : StateBody
+    {
+        public StateBody_11(Parser yyq) : base(yyq,
+          ((IntRotRotArgStateEvent)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StateBody_12 : StateBody
+    {
+        public StateBody_12(Parser yyq) : base(yyq,
+          ((StateBody)(yyq.StackAt(1).m_value))
+          ,
+          ((IntRotRotArgStateEvent)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StateBody_13 : StateBody
+    {
+        public StateBody_13(Parser yyq) : base(yyq,
+          ((IntVecVecArgStateEvent)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StateBody_14 : StateBody
+    {
+        public StateBody_14(Parser yyq) : base(yyq,
+          ((StateBody)(yyq.StackAt(1).m_value))
+          ,
+          ((IntVecVecArgStateEvent)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StateBody_15 : StateBody
+    {
+        public StateBody_15(Parser yyq) : base(yyq,
+          ((KeyIntIntArgStateEvent)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StateBody_16 : StateBody
+    {
+        public StateBody_16(Parser yyq) : base(yyq,
+          ((StateBody)(yyq.StackAt(1).m_value))
+          ,
+          ((KeyIntIntArgStateEvent)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StateEvent_1 : StateEvent
+    {
+        public StateEvent_1(Parser yyq) : base(yyq,
+          ((Event)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((ArgumentDeclarationList)(yyq.StackAt(2).m_value))
+          ,
+          ((CompoundStatement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class VoidArgStateEvent_1 : VoidArgStateEvent
+    {
+        public VoidArgStateEvent_1(Parser yyq) : base(yyq,
+          ((VoidArgEvent)(yyq.StackAt(3).m_value))
+          .yytext,
+          ((CompoundStatement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class KeyArgStateEvent_1 : KeyArgStateEvent
+    {
+        public KeyArgStateEvent_1(Parser yyq) : base(yyq,
+          ((KeyArgEvent)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((KeyArgumentDeclarationList)(yyq.StackAt(2).m_value))
+          ,
+          ((CompoundStatement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class IntArgStateEvent_1 : IntArgStateEvent
+    {
+        public IntArgStateEvent_1(Parser yyq) : base(yyq,
+          ((IntArgEvent)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((IntArgumentDeclarationList)(yyq.StackAt(2).m_value))
+          ,
+          ((CompoundStatement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class VectorArgStateEvent_1 : VectorArgStateEvent
+    {
+        public VectorArgStateEvent_1(Parser yyq) : base(yyq,
+          ((VectorArgEvent)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((VectorArgumentDeclarationList)(yyq.StackAt(2).m_value))
+          ,
+          ((CompoundStatement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class IntRotRotArgStateEvent_1 : IntRotRotArgStateEvent
+    {
+        public IntRotRotArgStateEvent_1(Parser yyq) : base(yyq,
+          ((IntRotRotArgEvent)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((IntRotRotArgumentDeclarationList)(yyq.StackAt(2).m_value))
+          ,
+          ((CompoundStatement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class IntVecVecArgStateEvent_1 : IntVecVecArgStateEvent
+    {
+        public IntVecVecArgStateEvent_1(Parser yyq) : base(yyq,
+          ((IntVecVecArgEvent)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((IntVecVecArgumentDeclarationList)(yyq.StackAt(2).m_value))
+          ,
+          ((CompoundStatement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class KeyIntIntArgStateEvent_1 : KeyIntIntArgStateEvent
+    {
+        public KeyIntIntArgStateEvent_1(Parser yyq) : base(yyq,
+          ((KeyIntIntArgEvent)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((KeyIntIntArgumentDeclarationList)(yyq.StackAt(2).m_value))
+          ,
+          ((CompoundStatement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class ArgumentDeclarationList_1 : ArgumentDeclarationList
+    {
+        public ArgumentDeclarationList_1(Parser yyq) : base(yyq,
+          ((Declaration)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class ArgumentDeclarationList_2 : ArgumentDeclarationList
+    {
+        public ArgumentDeclarationList_2(Parser yyq) : base(yyq,
+          ((ArgumentDeclarationList)(yyq.StackAt(2).m_value))
+          ,
+          ((Declaration)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class KeyArgumentDeclarationList_1 : KeyArgumentDeclarationList
+    {
+        public KeyArgumentDeclarationList_1(Parser yyq) : base(yyq,
+          ((KeyDeclaration)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class IntArgumentDeclarationList_1 : IntArgumentDeclarationList
+    {
+        public IntArgumentDeclarationList_1(Parser yyq) : base(yyq,
+          ((IntDeclaration)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class VectorArgumentDeclarationList_1 : VectorArgumentDeclarationList
+    {
+        public VectorArgumentDeclarationList_1(Parser yyq) : base(yyq,
+          ((VecDeclaration)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class IntRotRotArgumentDeclarationList_1 : IntRotRotArgumentDeclarationList
+    {
+        public IntRotRotArgumentDeclarationList_1(Parser yyq) : base(yyq,
+          ((IntDeclaration)(yyq.StackAt(4).m_value))
+          ,
+          ((RotDeclaration)(yyq.StackAt(2).m_value))
+          ,
+          ((RotDeclaration)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class IntVecVecArgumentDeclarationList_1 : IntVecVecArgumentDeclarationList
+    {
+        public IntVecVecArgumentDeclarationList_1(Parser yyq) : base(yyq,
+          ((IntDeclaration)(yyq.StackAt(4).m_value))
+          ,
+          ((VecDeclaration)(yyq.StackAt(2).m_value))
+          ,
+          ((VecDeclaration)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class KeyIntIntArgumentDeclarationList_1 : KeyIntIntArgumentDeclarationList
+    {
+        public KeyIntIntArgumentDeclarationList_1(Parser yyq) : base(yyq,
+          ((KeyDeclaration)(yyq.StackAt(4).m_value))
+          ,
+          ((IntDeclaration)(yyq.StackAt(2).m_value))
+          ,
+          ((IntDeclaration)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class Declaration_1 : Declaration
+    {
+        public Declaration_1(Parser yyq) : base(yyq,
+          ((Typename)(yyq.StackAt(1).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class KeyDeclaration_1 : KeyDeclaration
+    {
+        public KeyDeclaration_1(Parser yyq) : base(yyq,
+          ((KEY_TYPE)(yyq.StackAt(1).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class IntDeclaration_1 : IntDeclaration
+    {
+        public IntDeclaration_1(Parser yyq) : base(yyq,
+          ((INTEGER_TYPE)(yyq.StackAt(1).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class VecDeclaration_1 : VecDeclaration
+    {
+        public VecDeclaration_1(Parser yyq) : base(yyq,
+          ((VECTOR_TYPE)(yyq.StackAt(1).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class RotDeclaration_1 : RotDeclaration
+    {
+        public RotDeclaration_1(Parser yyq) : base(yyq,
+          ((ROTATION_TYPE)(yyq.StackAt(1).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class CompoundStatement_1 : CompoundStatement
+    {
+        public CompoundStatement_1(Parser yyq) : base(yyq) { }
+    }
+
+    public class CompoundStatement_2 : CompoundStatement
+    {
+        public CompoundStatement_2(Parser yyq) : base(yyq,
+          ((StatementList)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class StatementList_1 : StatementList
+    {
+        public StatementList_1(Parser yyq) : base(yyq,
+          ((Statement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class StatementList_2 : StatementList
+    {
+        public StatementList_2(Parser yyq) : base(yyq,
+          ((StatementList)(yyq.StackAt(1).m_value))
+          ,
+          ((Statement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class EmptyStatement_1 : EmptyStatement
+    {
+        public EmptyStatement_1(Parser yyq) : base(yyq) { }
+    }
+
+    public class Statement_1 : Statement
+    {
+        public Statement_1(Parser yyq) : base(yyq,
+          ((EmptyStatement)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class Statement_2 : Statement
+    {
+        public Statement_2(Parser yyq) : base(yyq,
+          ((Declaration)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class Statement_3 : Statement
+    {
+        public Statement_3(Parser yyq) : base(yyq,
+          ((Assignment)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class Statement_4 : Statement
+    {
+        public Statement_4(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class Statement_5 : Statement
+    {
+        public Statement_5(Parser yyq) : base(yyq,
+          ((ReturnStatement)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class Statement_6 : Statement
+    {
+        public Statement_6(Parser yyq) : base(yyq,
+          ((JumpLabel)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class Statement_7 : Statement
+    {
+        public Statement_7(Parser yyq) : base(yyq,
+          ((JumpStatement)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class Statement_8 : Statement
+    {
+        public Statement_8(Parser yyq) : base(yyq,
+          ((StateChange)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class Statement_9 : Statement
+    {
+        public Statement_9(Parser yyq) : base(yyq,
+          ((IfStatement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class Statement_10 : Statement
+    {
+        public Statement_10(Parser yyq) : base(yyq,
+          ((WhileStatement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class Statement_11 : Statement
+    {
+        public Statement_11(Parser yyq) : base(yyq,
+          ((DoWhileStatement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class Statement_12 : Statement
+    {
+        public Statement_12(Parser yyq) : base(yyq,
+          ((ForLoop)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class Statement_13 : Statement
+    {
+        public Statement_13(Parser yyq) : base(yyq,
+          ((CompoundStatement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class JumpLabel_1 : JumpLabel
+    {
+        public JumpLabel_1(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class JumpStatement_1 : JumpStatement
+    {
+        public JumpStatement_1(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class StateChange_1 : StateChange
+    {
+        public StateChange_1(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class StateChange_2 : StateChange
+    {
+        public StateChange_2(Parser yyq) : base(yyq,
+          ((DEFAULT_STATE)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class IfStatement_1 : IfStatement
+    {
+        public IfStatement_1(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Statement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class IfStatement_2 : IfStatement
+    {
+        public IfStatement_2(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(4).m_value))
+          ,
+          ((Statement)(yyq.StackAt(2).m_value))
+          ,
+          ((Statement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class IfStatement_3 : IfStatement
+    {
+        public IfStatement_3(Parser yyq) : base(yyq,
+          ((SimpleAssignment)(yyq.StackAt(2).m_value))
+          ,
+          ((Statement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class IfStatement_4 : IfStatement
+    {
+        public IfStatement_4(Parser yyq) : base(yyq,
+          ((SimpleAssignment)(yyq.StackAt(4).m_value))
+          ,
+          ((Statement)(yyq.StackAt(2).m_value))
+          ,
+          ((Statement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class WhileStatement_1 : WhileStatement
+    {
+        public WhileStatement_1(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Statement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class WhileStatement_2 : WhileStatement
+    {
+        public WhileStatement_2(Parser yyq) : base(yyq,
+          ((SimpleAssignment)(yyq.StackAt(2).m_value))
+          ,
+          ((Statement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class DoWhileStatement_1 : DoWhileStatement
+    {
+        public DoWhileStatement_1(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Statement)(yyq.StackAt(5).m_value))
+          )
+        { }
+    }
+
+    public class DoWhileStatement_2 : DoWhileStatement
+    {
+        public DoWhileStatement_2(Parser yyq) : base(yyq,
+          ((SimpleAssignment)(yyq.StackAt(2).m_value))
+          ,
+          ((Statement)(yyq.StackAt(5).m_value))
+          )
+        { }
+    }
+
+    public class ForLoop_1 : ForLoop
+    {
+        public ForLoop_1(Parser yyq) : base(yyq,
+          ((ForLoopStatement)(yyq.StackAt(6).m_value))
+          ,
+          ((Expression)(yyq.StackAt(4).m_value))
+          ,
+          ((ForLoopStatement)(yyq.StackAt(2).m_value))
+          ,
+          ((Statement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class ForLoop_2 : ForLoop
+    {
+        public ForLoop_2(Parser yyq) : base(yyq, null,
+          ((Expression)(yyq.StackAt(4).m_value))
+          ,
+          ((ForLoopStatement)(yyq.StackAt(2).m_value))
+          ,
+          ((Statement)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class ForLoopStatement_1 : ForLoopStatement
+    {
+        public ForLoopStatement_1(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class ForLoopStatement_2 : ForLoopStatement
+    {
+        public ForLoopStatement_2(Parser yyq) : base(yyq,
+          ((SimpleAssignment)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class ForLoopStatement_3 : ForLoopStatement
+    {
+        public ForLoopStatement_3(Parser yyq) : base(yyq,
+          ((ForLoopStatement)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class ForLoopStatement_4 : ForLoopStatement
+    {
+        public ForLoopStatement_4(Parser yyq) : base(yyq,
+          ((ForLoopStatement)(yyq.StackAt(2).m_value))
+          ,
+          ((SimpleAssignment)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class Assignment_1 : Assignment
+    {
+        public Assignment_1(Parser yyq) : base(yyq,
+          ((Declaration)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Assignment_2 : Assignment
+    {
+        public Assignment_2(Parser yyq) : base(yyq,
+          ((SimpleAssignment)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class SimpleAssignment_1 : SimpleAssignment
+    {
+        public SimpleAssignment_1(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_2 : SimpleAssignment
+    {
+        public SimpleAssignment_2(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((PLUS_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_3 : SimpleAssignment
+    {
+        public SimpleAssignment_3(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((MINUS_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_4 : SimpleAssignment
+    {
+        public SimpleAssignment_4(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((STAR_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_5 : SimpleAssignment
+    {
+        public SimpleAssignment_5(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((SLASH_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_6 : SimpleAssignment
+    {
+        public SimpleAssignment_6(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((PERCENT_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_7 : SimpleAssignment
+    {
+        public SimpleAssignment_7(Parser yyq) : base(yyq, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          .yytext),
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_8 : SimpleAssignment
+    {
+        public SimpleAssignment_8(Parser yyq) : base(yyq, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          .yytext),
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((PLUS_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_9 : SimpleAssignment
+    {
+        public SimpleAssignment_9(Parser yyq) : base(yyq, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          .yytext),
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((MINUS_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_10 : SimpleAssignment
+    {
+        public SimpleAssignment_10(Parser yyq) : base(yyq, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          .yytext),
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((STAR_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_11 : SimpleAssignment
+    {
+        public SimpleAssignment_11(Parser yyq) : base(yyq, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          .yytext),
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((SLASH_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_12 : SimpleAssignment
+    {
+        public SimpleAssignment_12(Parser yyq) : base(yyq, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          .yytext),
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((PERCENT_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_13 : SimpleAssignment
+    {
+        public SimpleAssignment_13(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          ,
+          ((SimpleAssignment)(yyq.StackAt(0).m_value))
+          ,
+          ((EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_14 : SimpleAssignment
+    {
+        public SimpleAssignment_14(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          ,
+          ((SimpleAssignment)(yyq.StackAt(0).m_value))
+          ,
+          ((PLUS_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_15 : SimpleAssignment
+    {
+        public SimpleAssignment_15(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          ,
+          ((SimpleAssignment)(yyq.StackAt(0).m_value))
+          ,
+          ((MINUS_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_16 : SimpleAssignment
+    {
+        public SimpleAssignment_16(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          ,
+          ((SimpleAssignment)(yyq.StackAt(0).m_value))
+          ,
+          ((STAR_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_17 : SimpleAssignment
+    {
+        public SimpleAssignment_17(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          ,
+          ((SimpleAssignment)(yyq.StackAt(0).m_value))
+          ,
+          ((SLASH_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_18 : SimpleAssignment
+    {
+        public SimpleAssignment_18(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          ,
+          ((SimpleAssignment)(yyq.StackAt(0).m_value))
+          ,
+          ((PERCENT_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_19 : SimpleAssignment
+    {
+        public SimpleAssignment_19(Parser yyq) : base(yyq, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          .yytext),
+          ((SimpleAssignment)(yyq.StackAt(0).m_value))
+          ,
+          ((EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_20 : SimpleAssignment
+    {
+        public SimpleAssignment_20(Parser yyq) : base(yyq, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          .yytext),
+          ((SimpleAssignment)(yyq.StackAt(0).m_value))
+          ,
+          ((PLUS_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_21 : SimpleAssignment
+    {
+        public SimpleAssignment_21(Parser yyq) : base(yyq, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          .yytext),
+          ((SimpleAssignment)(yyq.StackAt(0).m_value))
+          ,
+          ((MINUS_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_22 : SimpleAssignment
+    {
+        public SimpleAssignment_22(Parser yyq) : base(yyq, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          .yytext),
+          ((SimpleAssignment)(yyq.StackAt(0).m_value))
+          ,
+          ((STAR_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_23 : SimpleAssignment
+    {
+        public SimpleAssignment_23(Parser yyq) : base(yyq, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          .yytext),
+          ((SimpleAssignment)(yyq.StackAt(0).m_value))
+          ,
+          ((SLASH_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class SimpleAssignment_24 : SimpleAssignment
+    {
+        public SimpleAssignment_24(Parser yyq) : base(yyq, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          .yytext),
+          ((SimpleAssignment)(yyq.StackAt(0).m_value))
+          ,
+          ((PERCENT_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class ReturnStatement_1 : ReturnStatement
+    {
+        public ReturnStatement_1(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class ReturnStatement_2 : ReturnStatement
+    {
+        public ReturnStatement_2(Parser yyq) : base(yyq) { }
+    }
+
+    public class Constant_1 : Constant
+    {
+        public Constant_1(Parser yyq) : base(yyq, "integer",
+          ((INTEGER_CONSTANT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Constant_2 : Constant
+    {
+        public Constant_2(Parser yyq) : base(yyq, "integer",
+          ((HEX_INTEGER_CONSTANT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Constant_3 : Constant
+    {
+        public Constant_3(Parser yyq) : base(yyq, "float",
+          ((FLOAT_CONSTANT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Constant_4 : Constant
+    {
+        public Constant_4(Parser yyq) : base(yyq, "string",
+          ((STRING_CONSTANT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class ListConstant_1 : ListConstant
+    {
+        public ListConstant_1(Parser yyq) : base(yyq,
+          ((ArgumentList)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class VectorConstant_1 : VectorConstant
+    {
+        public VectorConstant_1(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(5).m_value))
+          ,
+          ((Expression)(yyq.StackAt(3).m_value))
+          ,
+          ((Expression)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class RotationConstant_1 : RotationConstant
+    {
+        public RotationConstant_1(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(7).m_value))
+          ,
+          ((Expression)(yyq.StackAt(5).m_value))
+          ,
+          ((Expression)(yyq.StackAt(3).m_value))
+          ,
+          ((Expression)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class ConstantExpression_1 : ConstantExpression
+    {
+        public ConstantExpression_1(Parser yyq) : base(yyq,
+          ((Constant)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class IdentExpression_1 : IdentExpression
+    {
+        public IdentExpression_1(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class IdentDotExpression_1 : IdentDotExpression
+    {
+        public IdentDotExpression_1(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(2).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class IncrementDecrementExpression_1 : IncrementDecrementExpression
+    {
+        public IncrementDecrementExpression_1(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(1).m_value))
+          .yytext,
+          ((INCREMENT)(yyq.StackAt(0).m_value))
+          .yytext, true)
+        { }
+    }
+
+    public class IncrementDecrementExpression_2 : IncrementDecrementExpression
+    {
+        public IncrementDecrementExpression_2(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(1).m_value))
+          .yytext,
+          ((DECREMENT)(yyq.StackAt(0).m_value))
+          .yytext, true)
+        { }
+    }
+
+    public class IncrementDecrementExpression_3 : IncrementDecrementExpression
+    {
+        public IncrementDecrementExpression_3(Parser yyq) : base(yyq, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(3).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(1).m_value))
+          .yytext),
+          ((INCREMENT)(yyq.StackAt(0).m_value))
+          .yytext, true)
+        { }
+    }
+
+    public class IncrementDecrementExpression_4 : IncrementDecrementExpression
+    {
+        public IncrementDecrementExpression_4(Parser yyq) : base(yyq, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(3).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(1).m_value))
+          .yytext),
+          ((DECREMENT)(yyq.StackAt(0).m_value))
+          .yytext, true)
+        { }
+    }
+
+    public class IncrementDecrementExpression_5 : IncrementDecrementExpression
+    {
+        public IncrementDecrementExpression_5(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(0).m_value))
+          .yytext,
+          ((INCREMENT)(yyq.StackAt(1).m_value))
+          .yytext, false)
+        { }
+    }
+
+    public class IncrementDecrementExpression_6 : IncrementDecrementExpression
+    {
+        public IncrementDecrementExpression_6(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(0).m_value))
+          .yytext,
+          ((DECREMENT)(yyq.StackAt(1).m_value))
+          .yytext, false)
+        { }
+    }
+
+    public class IncrementDecrementExpression_7 : IncrementDecrementExpression
+    {
+        public IncrementDecrementExpression_7(Parser yyq) : base(yyq, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(2).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(0).m_value))
+          .yytext),
+          ((INCREMENT)(yyq.StackAt(3).m_value))
+          .yytext, false)
+        { }
+    }
+
+    public class IncrementDecrementExpression_8 : IncrementDecrementExpression
+    {
+        public IncrementDecrementExpression_8(Parser yyq) : base(yyq, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(2).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(0).m_value))
+          .yytext),
+          ((DECREMENT)(yyq.StackAt(3).m_value))
+          .yytext, false)
+        { }
+    }
+
+    public class FunctionCallExpression_1 : FunctionCallExpression
+    {
+        public FunctionCallExpression_1(Parser yyq) : base(yyq,
+          ((FunctionCall)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class BinaryExpression_1 : BinaryExpression
+    {
+        public BinaryExpression_1(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((PLUS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_2 : BinaryExpression
+    {
+        public BinaryExpression_2(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((MINUS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_3 : BinaryExpression
+    {
+        public BinaryExpression_3(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((STAR)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_4 : BinaryExpression
+    {
+        public BinaryExpression_4(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((SLASH)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_5 : BinaryExpression
+    {
+        public BinaryExpression_5(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((PERCENT)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_6 : BinaryExpression
+    {
+        public BinaryExpression_6(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((AMP)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_7 : BinaryExpression
+    {
+        public BinaryExpression_7(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((STROKE)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_8 : BinaryExpression
+    {
+        public BinaryExpression_8(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((CARET)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_9 : BinaryExpression
+    {
+        public BinaryExpression_9(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((RIGHT_ANGLE)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_10 : BinaryExpression
+    {
+        public BinaryExpression_10(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((LEFT_ANGLE)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_11 : BinaryExpression
+    {
+        public BinaryExpression_11(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((EQUALS_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_12 : BinaryExpression
+    {
+        public BinaryExpression_12(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((EXCLAMATION_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_13 : BinaryExpression
+    {
+        public BinaryExpression_13(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((LESS_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_14 : BinaryExpression
+    {
+        public BinaryExpression_14(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((GREATER_EQUALS)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_15 : BinaryExpression
+    {
+        public BinaryExpression_15(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((AMP_AMP)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_16 : BinaryExpression
+    {
+        public BinaryExpression_16(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((STROKE_STROKE)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_17 : BinaryExpression
+    {
+        public BinaryExpression_17(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((LEFT_SHIFT)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class BinaryExpression_18 : BinaryExpression
+    {
+        public BinaryExpression_18(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(2).m_value))
+          ,
+          ((Expression)(yyq.StackAt(0).m_value))
+          ,
+          ((RIGHT_SHIFT)(yyq.StackAt(1).m_value))
+          .yytext)
+        { }
+    }
+
+    public class UnaryExpression_1 : UnaryExpression
+    {
+        public UnaryExpression_1(Parser yyq) : base(yyq,
+          ((EXCLAMATION)(yyq.StackAt(1).m_value))
+          .yytext,
+          ((Expression)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class UnaryExpression_2 : UnaryExpression
+    {
+        public UnaryExpression_2(Parser yyq) : base(yyq,
+          ((MINUS)(yyq.StackAt(1).m_value))
+          .yytext,
+          ((Expression)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class UnaryExpression_3 : UnaryExpression
+    {
+        public UnaryExpression_3(Parser yyq) : base(yyq,
+          ((TILDE)(yyq.StackAt(1).m_value))
+          .yytext,
+          ((Expression)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class ParenthesisExpression_1 : ParenthesisExpression
+    {
+        public ParenthesisExpression_1(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class ParenthesisExpression_2 : ParenthesisExpression
+    {
+        public ParenthesisExpression_2(Parser yyq) : base(yyq,
+          ((SimpleAssignment)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class TypecastExpression_1 : TypecastExpression
+    {
+        public TypecastExpression_1(Parser yyq) : base(yyq,
+          ((Typename)(yyq.StackAt(2).m_value))
+          .yytext,
+          ((Constant)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class TypecastExpression_2 : TypecastExpression
+    {
+        public TypecastExpression_2(Parser yyq) : base(yyq,
+          ((Typename)(yyq.StackAt(2).m_value))
+          .yytext, new IdentExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(0).m_value))
+          .yytext))
+        { }
+    }
+
+    public class TypecastExpression_3 : TypecastExpression
+    {
+        public TypecastExpression_3(Parser yyq) : base(yyq,
+          ((Typename)(yyq.StackAt(4).m_value))
+          .yytext, new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(2).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(0).m_value))
+          .yytext))
+        { }
+    }
+
+    public class TypecastExpression_4 : TypecastExpression
+    {
+        public TypecastExpression_4(Parser yyq) : base(yyq,
+          ((Typename)(yyq.StackAt(3).m_value))
+          .yytext, new IncrementDecrementExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(1).m_value))
+          .yytext,
+          ((INCREMENT)(yyq.StackAt(0).m_value))
+          .yytext, true))
+        { }
+    }
+
+    public class TypecastExpression_5 : TypecastExpression
+    {
+        public TypecastExpression_5(Parser yyq) : base(yyq,
+          ((Typename)(yyq.StackAt(5).m_value))
+          .yytext, new IncrementDecrementExpression(((LSLSyntax
+      )yyq), new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(3).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(1).m_value))
+          .yytext),
+          ((INCREMENT)(yyq.StackAt(0).m_value))
+          .yytext, true))
+        { }
+    }
+
+    public class TypecastExpression_6 : TypecastExpression
+    {
+        public TypecastExpression_6(Parser yyq) : base(yyq,
+          ((Typename)(yyq.StackAt(3).m_value))
+          .yytext, new IncrementDecrementExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(1).m_value))
+          .yytext,
+          ((DECREMENT)(yyq.StackAt(0).m_value))
+          .yytext, true))
+        { }
+    }
+
+    public class TypecastExpression_7 : TypecastExpression
+    {
+        public TypecastExpression_7(Parser yyq) : base(yyq,
+          ((Typename)(yyq.StackAt(5).m_value))
+          .yytext, new IncrementDecrementExpression(((LSLSyntax
+      )yyq), new IdentDotExpression(((LSLSyntax
+      )yyq),
+          ((IDENT)(yyq.StackAt(3).m_value))
+          .yytext,
+          ((IDENT)(yyq.StackAt(1).m_value))
+          .yytext),
+          ((DECREMENT)(yyq.StackAt(0).m_value))
+          .yytext, true))
+        { }
+    }
+
+    public class TypecastExpression_8 : TypecastExpression
+    {
+        public TypecastExpression_8(Parser yyq) : base(yyq,
+          ((Typename)(yyq.StackAt(2).m_value))
+          .yytext,
+          ((FunctionCall)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class TypecastExpression_9 : TypecastExpression
+    {
+        public TypecastExpression_9(Parser yyq) : base(yyq,
+          ((Typename)(yyq.StackAt(4).m_value))
+          .yytext,
+          ((Expression)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class FunctionCall_1 : FunctionCall
+    {
+        public FunctionCall_1(Parser yyq) : base(yyq,
+          ((IDENT)(yyq.StackAt(3).m_value))
+          .yytext,
+          ((ArgumentList)(yyq.StackAt(1).m_value))
+          )
+        { }
+    }
+
+    public class ArgumentList_1 : ArgumentList
+    {
+        public ArgumentList_1(Parser yyq) : base(yyq,
+          ((Argument)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class ArgumentList_2 : ArgumentList
+    {
+        public ArgumentList_2(Parser yyq) : base(yyq,
+          ((ArgumentList)(yyq.StackAt(2).m_value))
+          ,
+          ((Argument)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class ExpressionArgument_1 : ExpressionArgument
+    {
+        public ExpressionArgument_1(Parser yyq) : base(yyq,
+          ((Expression)(yyq.StackAt(0).m_value))
+          )
+        { }
+    }
+
+    public class Typename_1 : Typename
+    {
+        public Typename_1(Parser yyq) : base(yyq,
+          ((INTEGER_TYPE)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Typename_2 : Typename
+    {
+        public Typename_2(Parser yyq) : base(yyq,
+          ((FLOAT_TYPE)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Typename_3 : Typename
+    {
+        public Typename_3(Parser yyq) : base(yyq,
+          ((STRING_TYPE)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Typename_4 : Typename
+    {
+        public Typename_4(Parser yyq) : base(yyq,
+          ((KEY_TYPE)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Typename_5 : Typename
+    {
+        public Typename_5(Parser yyq) : base(yyq,
+          ((VECTOR_TYPE)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Typename_6 : Typename
+    {
+        public Typename_6(Parser yyq) : base(yyq,
+          ((ROTATION_TYPE)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Typename_7 : Typename
+    {
+        public Typename_7(Parser yyq) : base(yyq,
+          ((LIST_TYPE)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Event_1 : Event
+    {
+        public Event_1(Parser yyq) : base(yyq,
+          ((DATASERVER_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Event_2 : Event
+    {
+        public Event_2(Parser yyq) : base(yyq,
+          ((EMAIL_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Event_3 : Event
+    {
+        public Event_3(Parser yyq) : base(yyq,
+          ((HTTP_RESPONSE_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Event_4 : Event
+    {
+        public Event_4(Parser yyq) : base(yyq,
+          ((LINK_MESSAGE_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Event_5 : Event
+    {
+        public Event_5(Parser yyq) : base(yyq,
+          ((LISTEN_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Event_6 : Event
+    {
+        public Event_6(Parser yyq) : base(yyq,
+          ((MONEY_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Event_7 : Event
+    {
+        public Event_7(Parser yyq) : base(yyq,
+          ((REMOTE_DATA_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Event_8 : Event
+    {
+        public Event_8(Parser yyq) : base(yyq,
+          ((HTTP_REQUEST_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class Event_9 : Event
+    {
+        public Event_9(Parser yyq) : base(yyq,
+          ((TRANSACTION_RESULT_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class VoidArgEvent_1 : VoidArgEvent
+    {
+        public VoidArgEvent_1(Parser yyq) : base(yyq,
+          ((STATE_ENTRY_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class VoidArgEvent_2 : VoidArgEvent
+    {
+        public VoidArgEvent_2(Parser yyq) : base(yyq,
+          ((STATE_EXIT_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class VoidArgEvent_3 : VoidArgEvent
+    {
+        public VoidArgEvent_3(Parser yyq) : base(yyq,
+          ((MOVING_END_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class VoidArgEvent_4 : VoidArgEvent
+    {
+        public VoidArgEvent_4(Parser yyq) : base(yyq,
+          ((MOVING_START_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class VoidArgEvent_5 : VoidArgEvent
+    {
+        public VoidArgEvent_5(Parser yyq) : base(yyq,
+          ((NO_SENSOR_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class VoidArgEvent_6 : VoidArgEvent
+    {
+        public VoidArgEvent_6(Parser yyq) : base(yyq,
+          ((NOT_AT_ROT_TARGET_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class VoidArgEvent_7 : VoidArgEvent
+    {
+        public VoidArgEvent_7(Parser yyq) : base(yyq,
+          ((NOT_AT_TARGET_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class VoidArgEvent_8 : VoidArgEvent
+    {
+        public VoidArgEvent_8(Parser yyq) : base(yyq,
+          ((TIMER_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class KeyArgEvent_1 : KeyArgEvent
+    {
+        public KeyArgEvent_1(Parser yyq) : base(yyq,
+          ((ATTACH_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class KeyArgEvent_2 : KeyArgEvent
+    {
+        public KeyArgEvent_2(Parser yyq) : base(yyq,
+          ((OBJECT_REZ_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class IntArgEvent_1 : IntArgEvent
+    {
+        public IntArgEvent_1(Parser yyq) : base(yyq,
+          ((CHANGED_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class IntArgEvent_2 : IntArgEvent
+    {
+        public IntArgEvent_2(Parser yyq) : base(yyq,
+          ((COLLISION_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class IntArgEvent_3 : IntArgEvent
+    {
+        public IntArgEvent_3(Parser yyq) : base(yyq,
+          ((COLLISION_END_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class IntArgEvent_4 : IntArgEvent
+    {
+        public IntArgEvent_4(Parser yyq) : base(yyq,
+          ((COLLISION_START_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class IntArgEvent_5 : IntArgEvent
+    {
+        public IntArgEvent_5(Parser yyq) : base(yyq,
+          ((ON_REZ_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class IntArgEvent_6 : IntArgEvent
+    {
+        public IntArgEvent_6(Parser yyq) : base(yyq,
+          ((RUN_TIME_PERMISSIONS_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class IntArgEvent_7 : IntArgEvent
+    {
+        public IntArgEvent_7(Parser yyq) : base(yyq,
+          ((SENSOR_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class IntArgEvent_8 : IntArgEvent
+    {
+        public IntArgEvent_8(Parser yyq) : base(yyq,
+          ((TOUCH_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class IntArgEvent_9 : IntArgEvent
+    {
+        public IntArgEvent_9(Parser yyq) : base(yyq,
+          ((TOUCH_END_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class IntArgEvent_10 : IntArgEvent
+    {
+        public IntArgEvent_10(Parser yyq) : base(yyq,
+          ((TOUCH_START_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class VectorArgEvent_1 : VectorArgEvent
+    {
+        public VectorArgEvent_1(Parser yyq) : base(yyq,
+          ((LAND_COLLISION_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class VectorArgEvent_2 : VectorArgEvent
+    {
+        public VectorArgEvent_2(Parser yyq) : base(yyq,
+          ((LAND_COLLISION_END_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class VectorArgEvent_3 : VectorArgEvent
+    {
+        public VectorArgEvent_3(Parser yyq) : base(yyq,
+          ((LAND_COLLISION_START_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class IntRotRotArgEvent_1 : IntRotRotArgEvent
+    {
+        public IntRotRotArgEvent_1(Parser yyq) : base(yyq,
+          ((AT_ROT_TARGET_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class IntVecVecArgEvent_1 : IntVecVecArgEvent
+    {
+        public IntVecVecArgEvent_1(Parser yyq) : base(yyq,
+          ((AT_TARGET_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+
+    public class KeyIntIntArgEvent_1 : KeyIntIntArgEvent
+    {
+        public KeyIntIntArgEvent_1(Parser yyq) : base(yyq,
+          ((CONTROL_EVENT)(yyq.StackAt(0).m_value))
+          .yytext)
+        { }
+    }
+    public class yyLSLSyntax
+    : YyParser
+    {
+        public override object Action(Parser yyq, SYMBOL yysym, int yyact)
+        {
+            switch (yyact)
+            {
+                case -1: break; //// keep compiler happy
+            }
+            return null;
+        }
+
+        public class ArgumentDeclarationList_3 : ArgumentDeclarationList
+        {
+            public ArgumentDeclarationList_3(Parser yyq) : base(yyq) { }
+        }
+
+        public class ArgumentList_3 : ArgumentList
+        {
+            public ArgumentList_3(Parser yyq) : base(yyq) { }
+        }
+
+        public class ArgumentList_4 : ArgumentList
+        {
+            public ArgumentList_4(Parser yyq) : base(yyq) { }
+        }
+
+        public class ArgumentDeclarationList_4 : ArgumentDeclarationList
+        {
+            public ArgumentDeclarationList_4(Parser yyq) : base(yyq) { }
+        }
+
+        public class ArgumentDeclarationList_5 : ArgumentDeclarationList
+        {
+            public ArgumentDeclarationList_5(Parser yyq) : base(yyq) { }
+        }
+        public yyLSLSyntax
+        () : base()
+        {
+            arr = new int[] {
 101,4,6,52,0,
 46,0,53,0,102,
 20,103,4,28,76,
@@ -12931,591 +14022,593 @@ public yyLSLSyntax
 2,1,1,5110,22,
 1,2,1,2755,2866,
 2,0,0};
-new Sfactory(this,"IncrementDecrementExpression_1",new SCreator(IncrementDecrementExpression_1_factory));
-new Sfactory(this,"StateChange",new SCreator(StateChange_factory));
-new Sfactory(this,"ArgumentDeclarationList_3",new SCreator(ArgumentDeclarationList_3_factory));
-new Sfactory(this,"BinaryExpression",new SCreator(BinaryExpression_factory));
-new Sfactory(this,"VoidArgEvent_5",new SCreator(VoidArgEvent_5_factory));
-new Sfactory(this,"IdentDotExpression_1",new SCreator(IdentDotExpression_1_factory));
-new Sfactory(this,"StateBody_10",new SCreator(StateBody_10_factory));
-new Sfactory(this,"VectorArgEvent_1",new SCreator(VectorArgEvent_1_factory));
-new Sfactory(this,"ReturnStatement_1",new SCreator(ReturnStatement_1_factory));
-new Sfactory(this,"ReturnStatement_2",new SCreator(ReturnStatement_2_factory));
-new Sfactory(this,"Typename_7",new SCreator(Typename_7_factory));
-new Sfactory(this,"ExpressionArgument",new SCreator(ExpressionArgument_factory));
-new Sfactory(this,"ForLoop",new SCreator(ForLoop_factory));
-new Sfactory(this,"GlobalDefinitions",new SCreator(GlobalDefinitions_factory));
-new Sfactory(this,"Typename_1",new SCreator(Typename_1_factory));
-new Sfactory(this,"TypecastExpression_3",new SCreator(TypecastExpression_3_factory));
-new Sfactory(this,"IncrementDecrementExpression_6",new SCreator(IncrementDecrementExpression_6_factory));
-new Sfactory(this,"SimpleAssignment_2",new SCreator(SimpleAssignment_2_factory));
-new Sfactory(this,"IntVecVecArgEvent_1",new SCreator(IntVecVecArgEvent_1_factory));
-new Sfactory(this,"LSLProgramRoot_2",new SCreator(LSLProgramRoot_2_factory));
-new Sfactory(this,"IdentDotExpression",new SCreator(IdentDotExpression_factory));
-new Sfactory(this,"UnaryExpression_1",new SCreator(UnaryExpression_1_factory));
-new Sfactory(this,"RotationConstant",new SCreator(RotationConstant_factory));
-new Sfactory(this,"IntArgumentDeclarationList",new SCreator(IntArgumentDeclarationList_factory));
-new Sfactory(this,"ArgumentList",new SCreator(ArgumentList_factory));
-new Sfactory(this,"BinaryExpression_3",new SCreator(BinaryExpression_3_factory));
-new Sfactory(this,"Event_2",new SCreator(Event_2_factory));
-new Sfactory(this,"ArgumentList_4",new SCreator(ArgumentList_4_factory));
-new Sfactory(this,"IntVecVecArgEvent",new SCreator(IntVecVecArgEvent_factory));
-new Sfactory(this,"WhileStatement_2",new SCreator(WhileStatement_2_factory));
-new Sfactory(this,"Assignment",new SCreator(Assignment_factory));
-new Sfactory(this,"Statement_12",new SCreator(Statement_12_factory));
-new Sfactory(this,"IncrementDecrementExpression_8",new SCreator(IncrementDecrementExpression_8_factory));
-new Sfactory(this,"VectorArgEvent_2",new SCreator(VectorArgEvent_2_factory));
-new Sfactory(this,"Constant_2",new SCreator(Constant_2_factory));
-new Sfactory(this,"Statement_1",new SCreator(Statement_1_factory));
-new Sfactory(this,"VectorArgEvent",new SCreator(VectorArgEvent_factory));
-new Sfactory(this,"ForLoopStatement_1",new SCreator(ForLoopStatement_1_factory));
-new Sfactory(this,"IncrementDecrementExpression_2",new SCreator(IncrementDecrementExpression_2_factory));
-new Sfactory(this,"IntArgumentDeclarationList_1",new SCreator(IntArgumentDeclarationList_1_factory));
-new Sfactory(this,"VoidArgEvent_4",new SCreator(VoidArgEvent_4_factory));
-new Sfactory(this,"ForLoop_1",new SCreator(ForLoop_1_factory));
-new Sfactory(this,"Typename_4",new SCreator(Typename_4_factory));
-new Sfactory(this,"IdentExpression",new SCreator(IdentExpression_factory));
-new Sfactory(this,"ForLoop_2",new SCreator(ForLoop_2_factory));
-new Sfactory(this,"DoWhileStatement",new SCreator(DoWhileStatement_factory));
-new Sfactory(this,"SimpleAssignment_6",new SCreator(SimpleAssignment_6_factory));
-new Sfactory(this,"IntDeclaration_1",new SCreator(IntDeclaration_1_factory));
-new Sfactory(this,"State_1",new SCreator(State_1_factory));
-new Sfactory(this,"StateBody_9",new SCreator(StateBody_9_factory));
-new Sfactory(this,"StateBody_8",new SCreator(StateBody_8_factory));
-new Sfactory(this,"State_2",new SCreator(State_2_factory));
-new Sfactory(this,"StateBody_3",new SCreator(StateBody_3_factory));
-new Sfactory(this,"StateBody_2",new SCreator(StateBody_2_factory));
-new Sfactory(this,"StateBody_1",new SCreator(StateBody_1_factory));
-new Sfactory(this,"Typename_6",new SCreator(Typename_6_factory));
-new Sfactory(this,"StateBody_7",new SCreator(StateBody_7_factory));
-new Sfactory(this,"StateBody_4",new SCreator(StateBody_4_factory));
-new Sfactory(this,"IfStatement_1",new SCreator(IfStatement_1_factory));
-new Sfactory(this,"IfStatement_3",new SCreator(IfStatement_3_factory));
-new Sfactory(this,"IfStatement_2",new SCreator(IfStatement_2_factory));
-new Sfactory(this,"SimpleAssignment_1",new SCreator(SimpleAssignment_1_factory));
-new Sfactory(this,"VoidArgEvent_6",new SCreator(VoidArgEvent_6_factory));
-new Sfactory(this,"IfStatement",new SCreator(IfStatement_factory));
-new Sfactory(this,"ConstantExpression",new SCreator(ConstantExpression_factory));
-new Sfactory(this,"BinaryExpression_7",new SCreator(BinaryExpression_7_factory));
-new Sfactory(this,"IncrementDecrementExpression",new SCreator(IncrementDecrementExpression_factory));
-new Sfactory(this,"Statement_9",new SCreator(Statement_9_factory));
-new Sfactory(this,"IntVecVecArgStateEvent",new SCreator(IntVecVecArgStateEvent_factory));
-new Sfactory(this,"Declaration_1",new SCreator(Declaration_1_factory));
-new Sfactory(this,"KeyIntIntArgumentDeclarationList",new SCreator(KeyIntIntArgumentDeclarationList_factory));
-new Sfactory(this,"VectorArgumentDeclarationList_1",new SCreator(VectorArgumentDeclarationList_1_factory));
-new Sfactory(this,"SimpleAssignment",new SCreator(SimpleAssignment_factory));
-new Sfactory(this,"BinaryExpression_9",new SCreator(BinaryExpression_9_factory));
-new Sfactory(this,"IntDeclaration",new SCreator(IntDeclaration_factory));
-new Sfactory(this,"IntArgEvent_10",new SCreator(IntArgEvent_10_factory));
-new Sfactory(this,"ArgumentDeclarationList_2",new SCreator(ArgumentDeclarationList_2_factory));
-new Sfactory(this,"ArgumentDeclarationList_1",new SCreator(ArgumentDeclarationList_1_factory));
-new Sfactory(this,"ArgumentDeclarationList_4",new SCreator(ArgumentDeclarationList_4_factory));
-new Sfactory(this,"SimpleAssignment_9",new SCreator(SimpleAssignment_9_factory));
-new Sfactory(this,"ForLoopStatement_2",new SCreator(ForLoopStatement_2_factory));
-new Sfactory(this,"StatementList",new SCreator(StatementList_factory));
-new Sfactory(this,"StateBody_13",new SCreator(StateBody_13_factory));
-new Sfactory(this,"Typename_3",new SCreator(Typename_3_factory));
-new Sfactory(this,"KeyArgumentDeclarationList_1",new SCreator(KeyArgumentDeclarationList_1_factory));
-new Sfactory(this,"UnaryExpression_3",new SCreator(UnaryExpression_3_factory));
-new Sfactory(this,"StateBody_16",new SCreator(StateBody_16_factory));
-new Sfactory(this,"VectorArgumentDeclarationList",new SCreator(VectorArgumentDeclarationList_factory));
-new Sfactory(this,"IntArgEvent_3",new SCreator(IntArgEvent_3_factory));
-new Sfactory(this,"StatementList_2",new SCreator(StatementList_2_factory));
-new Sfactory(this,"KeyArgStateEvent",new SCreator(KeyArgStateEvent_factory));
-new Sfactory(this,"LSLProgramRoot_1",new SCreator(LSLProgramRoot_1_factory));
-new Sfactory(this,"Typename_2",new SCreator(Typename_2_factory));
-new Sfactory(this,"TypecastExpression_6",new SCreator(TypecastExpression_6_factory));
-new Sfactory(this,"Event_3",new SCreator(Event_3_factory));
-new Sfactory(this,"IntArgStateEvent",new SCreator(IntArgStateEvent_factory));
-new Sfactory(this,"StateChange_2",new SCreator(StateChange_2_factory));
-new Sfactory(this,"StateChange_1",new SCreator(StateChange_1_factory));
-new Sfactory(this,"VectorConstant_1",new SCreator(VectorConstant_1_factory));
-new Sfactory(this,"KeyDeclaration",new SCreator(KeyDeclaration_factory));
-new Sfactory(this,"States_2",new SCreator(States_2_factory));
-new Sfactory(this,"VoidArgEvent",new SCreator(VoidArgEvent_factory));
-new Sfactory(this,"WhileStatement",new SCreator(WhileStatement_factory));
-new Sfactory(this,"UnaryExpression",new SCreator(UnaryExpression_factory));
-new Sfactory(this,"BinaryExpression_6",new SCreator(BinaryExpression_6_factory));
-new Sfactory(this,"ConstantExpression_1",new SCreator(ConstantExpression_1_factory));
-new Sfactory(this,"ForLoopStatement",new SCreator(ForLoopStatement_factory));
-new Sfactory(this,"BinaryExpression_1",new SCreator(BinaryExpression_1_factory));
-new Sfactory(this,"StateEvent",new SCreator(StateEvent_factory));
-new Sfactory(this,"Event_5",new SCreator(Event_5_factory));
-new Sfactory(this,"SimpleAssignment_5",new SCreator(SimpleAssignment_5_factory));
-new Sfactory(this,"RotationConstant_1",new SCreator(RotationConstant_1_factory));
-new Sfactory(this,"Constant",new SCreator(Constant_factory));
-new Sfactory(this,"IntArgEvent_1",new SCreator(IntArgEvent_1_factory));
-new Sfactory(this,"SimpleAssignment_8",new SCreator(SimpleAssignment_8_factory));
-new Sfactory(this,"ForLoopStatement_3",new SCreator(ForLoopStatement_3_factory));
-new Sfactory(this,"IntArgEvent_2",new SCreator(IntArgEvent_2_factory));
-new Sfactory(this,"LSLProgramRoot",new SCreator(LSLProgramRoot_factory));
-new Sfactory(this,"StateBody_12",new SCreator(StateBody_12_factory));
-new Sfactory(this,"IntArgEvent_4",new SCreator(IntArgEvent_4_factory));
-new Sfactory(this,"IntArgEvent_7",new SCreator(IntArgEvent_7_factory));
-new Sfactory(this,"IntArgEvent_6",new SCreator(IntArgEvent_6_factory));
-new Sfactory(this,"IntArgEvent_9",new SCreator(IntArgEvent_9_factory));
-new Sfactory(this,"TypecastExpression_7",new SCreator(TypecastExpression_7_factory));
-new Sfactory(this,"StateBody_15",new SCreator(StateBody_15_factory));
-new Sfactory(this,"VoidArgStateEvent_1",new SCreator(VoidArgStateEvent_1_factory));
-new Sfactory(this,"error",new SCreator(error_factory));
-new Sfactory(this,"TypecastExpression_1",new SCreator(TypecastExpression_1_factory));
-new Sfactory(this,"GlobalDefinitions_4",new SCreator(GlobalDefinitions_4_factory));
-new Sfactory(this,"GlobalDefinitions_3",new SCreator(GlobalDefinitions_3_factory));
-new Sfactory(this,"GlobalDefinitions_2",new SCreator(GlobalDefinitions_2_factory));
-new Sfactory(this,"GlobalDefinitions_1",new SCreator(GlobalDefinitions_1_factory));
-new Sfactory(this,"ArgumentList_1",new SCreator(ArgumentList_1_factory));
-new Sfactory(this,"IncrementDecrementExpression_7",new SCreator(IncrementDecrementExpression_7_factory));
-new Sfactory(this,"UnaryExpression_2",new SCreator(UnaryExpression_2_factory));
-new Sfactory(this,"Argument",new SCreator(Argument_factory));
-new Sfactory(this,"SimpleAssignment_24",new SCreator(SimpleAssignment_24_factory));
-new Sfactory(this,"ExpressionArgument_1",new SCreator(ExpressionArgument_1_factory));
-new Sfactory(this,"EmptyStatement",new SCreator(EmptyStatement_factory));
-new Sfactory(this,"KeyIntIntArgStateEvent",new SCreator(KeyIntIntArgStateEvent_factory));
-new Sfactory(this,"VectorArgStateEvent_1",new SCreator(VectorArgStateEvent_1_factory));
-new Sfactory(this,"GlobalFunctionDefinition_1",new SCreator(GlobalFunctionDefinition_1_factory));
-new Sfactory(this,"FunctionCallExpression_1",new SCreator(FunctionCallExpression_1_factory));
-new Sfactory(this,"DoWhileStatement_2",new SCreator(DoWhileStatement_2_factory));
-new Sfactory(this,"VoidArgEvent_1",new SCreator(VoidArgEvent_1_factory));
-new Sfactory(this,"KeyArgumentDeclarationList",new SCreator(KeyArgumentDeclarationList_factory));
-new Sfactory(this,"KeyIntIntArgEvent",new SCreator(KeyIntIntArgEvent_factory));
-new Sfactory(this,"ListConstant_1",new SCreator(ListConstant_1_factory));
-new Sfactory(this,"StateEvent_1",new SCreator(StateEvent_1_factory));
-new Sfactory(this,"SimpleAssignment_20",new SCreator(SimpleAssignment_20_factory));
-new Sfactory(this,"SimpleAssignment_23",new SCreator(SimpleAssignment_23_factory));
-new Sfactory(this,"SimpleAssignment_22",new SCreator(SimpleAssignment_22_factory));
-new Sfactory(this,"IntArgEvent_5",new SCreator(IntArgEvent_5_factory));
-new Sfactory(this,"ParenthesisExpression",new SCreator(ParenthesisExpression_factory));
-new Sfactory(this,"JumpStatement",new SCreator(JumpStatement_factory));
-new Sfactory(this,"IntRotRotArgumentDeclarationList_1",new SCreator(IntRotRotArgumentDeclarationList_1_factory));
-new Sfactory(this,"SimpleAssignment_4",new SCreator(SimpleAssignment_4_factory));
-new Sfactory(this,"KeyArgEvent",new SCreator(KeyArgEvent_factory));
-new Sfactory(this,"Assignment_2",new SCreator(Assignment_2_factory));
-new Sfactory(this,"ForLoopStatement_4",new SCreator(ForLoopStatement_4_factory));
-new Sfactory(this,"Statement_13",new SCreator(Statement_13_factory));
-new Sfactory(this,"RotDeclaration",new SCreator(RotDeclaration_factory));
-new Sfactory(this,"StateBody_11",new SCreator(StateBody_11_factory));
-new Sfactory(this,"KeyArgEvent_2",new SCreator(KeyArgEvent_2_factory));
-new Sfactory(this,"StatementList_1",new SCreator(StatementList_1_factory));
-new Sfactory(this,"StateBody_6",new SCreator(StateBody_6_factory));
-new Sfactory(this,"Constant_1",new SCreator(Constant_1_factory));
-new Sfactory(this,"VecDeclaration",new SCreator(VecDeclaration_factory));
-new Sfactory(this,"TypecastExpression_5",new SCreator(TypecastExpression_5_factory));
-new Sfactory(this,"GlobalFunctionDefinition_2",new SCreator(GlobalFunctionDefinition_2_factory));
-new Sfactory(this,"KeyIntIntArgEvent_1",new SCreator(KeyIntIntArgEvent_1_factory));
-new Sfactory(this,"Constant_4",new SCreator(Constant_4_factory));
-new Sfactory(this,"TypecastExpression_9",new SCreator(TypecastExpression_9_factory));
-new Sfactory(this,"IntRotRotArgStateEvent_1",new SCreator(IntRotRotArgStateEvent_1_factory));
-new Sfactory(this,"IncrementDecrementExpression_3",new SCreator(IncrementDecrementExpression_3_factory));
-new Sfactory(this,"States_1",new SCreator(States_1_factory));
-new Sfactory(this,"GlobalVariableDeclaration",new SCreator(GlobalVariableDeclaration_factory));
-new Sfactory(this,"VoidArgEvent_3",new SCreator(VoidArgEvent_3_factory));
-new Sfactory(this,"Assignment_1",new SCreator(Assignment_1_factory));
-new Sfactory(this,"BinaryExpression_5",new SCreator(BinaryExpression_5_factory));
-new Sfactory(this,"IfStatement_4",new SCreator(IfStatement_4_factory));
-new Sfactory(this,"IntVecVecArgumentDeclarationList_1",new SCreator(IntVecVecArgumentDeclarationList_1_factory));
-new Sfactory(this,"KeyIntIntArgumentDeclarationList_1",new SCreator(KeyIntIntArgumentDeclarationList_1_factory));
-new Sfactory(this,"Statement",new SCreator(Statement_factory));
-new Sfactory(this,"ParenthesisExpression_1",new SCreator(ParenthesisExpression_1_factory));
-new Sfactory(this,"ParenthesisExpression_2",new SCreator(ParenthesisExpression_2_factory));
-new Sfactory(this,"DoWhileStatement_1",new SCreator(DoWhileStatement_1_factory));
-new Sfactory(this,"VoidArgStateEvent",new SCreator(VoidArgStateEvent_factory));
-new Sfactory(this,"GlobalFunctionDefinition",new SCreator(GlobalFunctionDefinition_factory));
-new Sfactory(this,"Event_4",new SCreator(Event_4_factory));
-new Sfactory(this,"IntArgEvent",new SCreator(IntArgEvent_factory));
-new Sfactory(this,"SimpleAssignment_11",new SCreator(SimpleAssignment_11_factory));
-new Sfactory(this,"SimpleAssignment_10",new SCreator(SimpleAssignment_10_factory));
-new Sfactory(this,"SimpleAssignment_13",new SCreator(SimpleAssignment_13_factory));
-new Sfactory(this,"SimpleAssignment_12",new SCreator(SimpleAssignment_12_factory));
-new Sfactory(this,"SimpleAssignment_15",new SCreator(SimpleAssignment_15_factory));
-new Sfactory(this,"SimpleAssignment_14",new SCreator(SimpleAssignment_14_factory));
-new Sfactory(this,"SimpleAssignment_17",new SCreator(SimpleAssignment_17_factory));
-new Sfactory(this,"SimpleAssignment_16",new SCreator(SimpleAssignment_16_factory));
-new Sfactory(this,"SimpleAssignment_19",new SCreator(SimpleAssignment_19_factory));
-new Sfactory(this,"SimpleAssignment_18",new SCreator(SimpleAssignment_18_factory));
-new Sfactory(this,"IntVecVecArgumentDeclarationList",new SCreator(IntVecVecArgumentDeclarationList_factory));
-new Sfactory(this,"StateBody_5",new SCreator(StateBody_5_factory));
-new Sfactory(this,"BinaryExpression_17",new SCreator(BinaryExpression_17_factory));
-new Sfactory(this,"BinaryExpression_16",new SCreator(BinaryExpression_16_factory));
-new Sfactory(this,"BinaryExpression_15",new SCreator(BinaryExpression_15_factory));
-new Sfactory(this,"BinaryExpression_14",new SCreator(BinaryExpression_14_factory));
-new Sfactory(this,"BinaryExpression_13",new SCreator(BinaryExpression_13_factory));
-new Sfactory(this,"BinaryExpression_12",new SCreator(BinaryExpression_12_factory));
-new Sfactory(this,"BinaryExpression_11",new SCreator(BinaryExpression_11_factory));
-new Sfactory(this,"BinaryExpression_10",new SCreator(BinaryExpression_10_factory));
-new Sfactory(this,"VectorArgStateEvent",new SCreator(VectorArgStateEvent_factory));
-new Sfactory(this,"Statement_10",new SCreator(Statement_10_factory));
-new Sfactory(this,"BinaryExpression_8",new SCreator(BinaryExpression_8_factory));
-new Sfactory(this,"BinaryExpression_18",new SCreator(BinaryExpression_18_factory));
-new Sfactory(this,"BinaryExpression_2",new SCreator(BinaryExpression_2_factory));
-new Sfactory(this,"FunctionCallExpression",new SCreator(FunctionCallExpression_factory));
-new Sfactory(this,"VectorArgEvent_3",new SCreator(VectorArgEvent_3_factory));
-new Sfactory(this,"IdentExpression_1",new SCreator(IdentExpression_1_factory));
-new Sfactory(this,"IntArgEvent_8",new SCreator(IntArgEvent_8_factory));
-new Sfactory(this,"VoidArgEvent_7",new SCreator(VoidArgEvent_7_factory));
-new Sfactory(this,"IncrementDecrementExpression_4",new SCreator(IncrementDecrementExpression_4_factory));
-new Sfactory(this,"FunctionCall",new SCreator(FunctionCall_factory));
-new Sfactory(this,"ArgumentList_3",new SCreator(ArgumentList_3_factory));
-new Sfactory(this,"KeyIntIntArgStateEvent_1",new SCreator(KeyIntIntArgStateEvent_1_factory));
-new Sfactory(this,"IntRotRotArgumentDeclarationList",new SCreator(IntRotRotArgumentDeclarationList_factory));
-new Sfactory(this,"KeyDeclaration_1",new SCreator(KeyDeclaration_1_factory));
-new Sfactory(this,"BinaryExpression_4",new SCreator(BinaryExpression_4_factory));
-new Sfactory(this,"FunctionCall_1",new SCreator(FunctionCall_1_factory));
-new Sfactory(this,"KeyArgStateEvent_1",new SCreator(KeyArgStateEvent_1_factory));
-new Sfactory(this,"IntArgStateEvent_1",new SCreator(IntArgStateEvent_1_factory));
-new Sfactory(this,"Event",new SCreator(Event_factory));
-new Sfactory(this,"IntRotRotArgEvent",new SCreator(IntRotRotArgEvent_factory));
-new Sfactory(this,"SimpleAssignment_7",new SCreator(SimpleAssignment_7_factory));
-new Sfactory(this,"Statement_3",new SCreator(Statement_3_factory));
-new Sfactory(this,"Expression",new SCreator(Expression_factory));
-new Sfactory(this,"CompoundStatement_2",new SCreator(CompoundStatement_2_factory));
-new Sfactory(this,"CompoundStatement_1",new SCreator(CompoundStatement_1_factory));
-new Sfactory(this,"JumpLabel",new SCreator(JumpLabel_factory));
-new Sfactory(this,"State",new SCreator(State_factory));
-new Sfactory(this,"TypecastExpression",new SCreator(TypecastExpression_factory));
-new Sfactory(this,"IntRotRotArgEvent_1",new SCreator(IntRotRotArgEvent_1_factory));
-new Sfactory(this,"Statement_11",new SCreator(Statement_11_factory));
-new Sfactory(this,"VoidArgEvent_2",new SCreator(VoidArgEvent_2_factory));
-new Sfactory(this,"Typename",new SCreator(Typename_factory));
-new Sfactory(this,"ArgumentDeclarationList",new SCreator(ArgumentDeclarationList_factory));
-new Sfactory(this,"StateBody",new SCreator(StateBody_factory));
-new Sfactory(this,"Event_8",new SCreator(Event_8_factory));
-new Sfactory(this,"Event_9",new SCreator(Event_9_factory));
-new Sfactory(this,"Event_6",new SCreator(Event_6_factory));
-new Sfactory(this,"Event_7",new SCreator(Event_7_factory));
-new Sfactory(this,"Statement_8",new SCreator(Statement_8_factory));
-new Sfactory(this,"CompoundStatement",new SCreator(CompoundStatement_factory));
-new Sfactory(this,"Event_1",new SCreator(Event_1_factory));
-new Sfactory(this,"Statement_4",new SCreator(Statement_4_factory));
-new Sfactory(this,"Statement_5",new SCreator(Statement_5_factory));
-new Sfactory(this,"Statement_6",new SCreator(Statement_6_factory));
-new Sfactory(this,"Statement_7",new SCreator(Statement_7_factory));
-new Sfactory(this,"IncrementDecrementExpression_5",new SCreator(IncrementDecrementExpression_5_factory));
-new Sfactory(this,"Statement_2",new SCreator(Statement_2_factory));
-new Sfactory(this,"ListConstant",new SCreator(ListConstant_factory));
-new Sfactory(this,"States",new SCreator(States_factory));
-new Sfactory(this,"TypecastExpression_2",new SCreator(TypecastExpression_2_factory));
-new Sfactory(this,"ArgumentList_2",new SCreator(ArgumentList_2_factory));
-new Sfactory(this,"StateBody_14",new SCreator(StateBody_14_factory));
-new Sfactory(this,"KeyArgEvent_1",new SCreator(KeyArgEvent_1_factory));
-new Sfactory(this,"VectorConstant",new SCreator(VectorConstant_factory));
-new Sfactory(this,"SimpleAssignment_3",new SCreator(SimpleAssignment_3_factory));
-new Sfactory(this,"Typename_5",new SCreator(Typename_5_factory));
-new Sfactory(this,"TypecastExpression_8",new SCreator(TypecastExpression_8_factory));
-new Sfactory(this,"SimpleAssignment_21",new SCreator(SimpleAssignment_21_factory));
-new Sfactory(this,"JumpLabel_1",new SCreator(JumpLabel_1_factory));
-new Sfactory(this,"TypecastExpression_4",new SCreator(TypecastExpression_4_factory));
-new Sfactory(this,"JumpStatement_1",new SCreator(JumpStatement_1_factory));
-new Sfactory(this,"VoidArgEvent_8",new SCreator(VoidArgEvent_8_factory));
-new Sfactory(this,"GlobalVariableDeclaration_2",new SCreator(GlobalVariableDeclaration_2_factory));
-new Sfactory(this,"GlobalVariableDeclaration_1",new SCreator(GlobalVariableDeclaration_1_factory));
-new Sfactory(this,"RotDeclaration_1",new SCreator(RotDeclaration_1_factory));
-new Sfactory(this,"WhileStatement_1",new SCreator(WhileStatement_1_factory));
-new Sfactory(this,"VecDeclaration_1",new SCreator(VecDeclaration_1_factory));
-new Sfactory(this,"IntRotRotArgStateEvent",new SCreator(IntRotRotArgStateEvent_factory));
-new Sfactory(this,"Constant_3",new SCreator(Constant_3_factory));
-new Sfactory(this,"Declaration",new SCreator(Declaration_factory));
-new Sfactory(this,"IntVecVecArgStateEvent_1",new SCreator(IntVecVecArgStateEvent_1_factory));
-new Sfactory(this,"ArgumentDeclarationList_5",new SCreator(ArgumentDeclarationList_5_factory));
-new Sfactory(this,"ReturnStatement",new SCreator(ReturnStatement_factory));
-new Sfactory(this,"EmptyStatement_1",new SCreator(EmptyStatement_1_factory));
-}
-public static object IncrementDecrementExpression_1_factory(Parser yyp) { return new IncrementDecrementExpression_1(yyp); }
-public static object StateChange_factory(Parser yyp) { return new StateChange(yyp); }
-public static object ArgumentDeclarationList_3_factory(Parser yyp) { return new ArgumentDeclarationList_3(yyp); }
-public static object BinaryExpression_factory(Parser yyp) { return new BinaryExpression(yyp); }
-public static object VoidArgEvent_5_factory(Parser yyp) { return new VoidArgEvent_5(yyp); }
-public static object IdentDotExpression_1_factory(Parser yyp) { return new IdentDotExpression_1(yyp); }
-public static object StateBody_10_factory(Parser yyp) { return new StateBody_10(yyp); }
-public static object VectorArgEvent_1_factory(Parser yyp) { return new VectorArgEvent_1(yyp); }
-public static object ReturnStatement_1_factory(Parser yyp) { return new ReturnStatement_1(yyp); }
-public static object ReturnStatement_2_factory(Parser yyp) { return new ReturnStatement_2(yyp); }
-public static object Typename_7_factory(Parser yyp) { return new Typename_7(yyp); }
-public static object ExpressionArgument_factory(Parser yyp) { return new ExpressionArgument(yyp); }
-public static object ForLoop_factory(Parser yyp) { return new ForLoop(yyp); }
-public static object GlobalDefinitions_factory(Parser yyp) { return new GlobalDefinitions(yyp); }
-public static object Typename_1_factory(Parser yyp) { return new Typename_1(yyp); }
-public static object TypecastExpression_3_factory(Parser yyp) { return new TypecastExpression_3(yyp); }
-public static object IncrementDecrementExpression_6_factory(Parser yyp) { return new IncrementDecrementExpression_6(yyp); }
-public static object SimpleAssignment_2_factory(Parser yyp) { return new SimpleAssignment_2(yyp); }
-public static object IntVecVecArgEvent_1_factory(Parser yyp) { return new IntVecVecArgEvent_1(yyp); }
-public static object LSLProgramRoot_2_factory(Parser yyp) { return new LSLProgramRoot_2(yyp); }
-public static object IdentDotExpression_factory(Parser yyp) { return new IdentDotExpression(yyp); }
-public static object UnaryExpression_1_factory(Parser yyp) { return new UnaryExpression_1(yyp); }
-public static object RotationConstant_factory(Parser yyp) { return new RotationConstant(yyp); }
-public static object IntArgumentDeclarationList_factory(Parser yyp) { return new IntArgumentDeclarationList(yyp); }
-public static object ArgumentList_factory(Parser yyp) { return new ArgumentList(yyp); }
-public static object BinaryExpression_3_factory(Parser yyp) { return new BinaryExpression_3(yyp); }
-public static object Event_2_factory(Parser yyp) { return new Event_2(yyp); }
-public static object ArgumentList_4_factory(Parser yyp) { return new ArgumentList_4(yyp); }
-public static object IntVecVecArgEvent_factory(Parser yyp) { return new IntVecVecArgEvent(yyp); }
-public static object WhileStatement_2_factory(Parser yyp) { return new WhileStatement_2(yyp); }
-public static object Assignment_factory(Parser yyp) { return new Assignment(yyp); }
-public static object Statement_12_factory(Parser yyp) { return new Statement_12(yyp); }
-public static object IncrementDecrementExpression_8_factory(Parser yyp) { return new IncrementDecrementExpression_8(yyp); }
-public static object VectorArgEvent_2_factory(Parser yyp) { return new VectorArgEvent_2(yyp); }
-public static object Constant_2_factory(Parser yyp) { return new Constant_2(yyp); }
-public static object Statement_1_factory(Parser yyp) { return new Statement_1(yyp); }
-public static object VectorArgEvent_factory(Parser yyp) { return new VectorArgEvent(yyp); }
-public static object ForLoopStatement_1_factory(Parser yyp) { return new ForLoopStatement_1(yyp); }
-public static object IncrementDecrementExpression_2_factory(Parser yyp) { return new IncrementDecrementExpression_2(yyp); }
-public static object IntArgumentDeclarationList_1_factory(Parser yyp) { return new IntArgumentDeclarationList_1(yyp); }
-public static object VoidArgEvent_4_factory(Parser yyp) { return new VoidArgEvent_4(yyp); }
-public static object ForLoop_1_factory(Parser yyp) { return new ForLoop_1(yyp); }
-public static object Typename_4_factory(Parser yyp) { return new Typename_4(yyp); }
-public static object IdentExpression_factory(Parser yyp) { return new IdentExpression(yyp); }
-public static object ForLoop_2_factory(Parser yyp) { return new ForLoop_2(yyp); }
-public static object DoWhileStatement_factory(Parser yyp) { return new DoWhileStatement(yyp); }
-public static object SimpleAssignment_6_factory(Parser yyp) { return new SimpleAssignment_6(yyp); }
-public static object IntDeclaration_1_factory(Parser yyp) { return new IntDeclaration_1(yyp); }
-public static object State_1_factory(Parser yyp) { return new State_1(yyp); }
-public static object StateBody_9_factory(Parser yyp) { return new StateBody_9(yyp); }
-public static object StateBody_8_factory(Parser yyp) { return new StateBody_8(yyp); }
-public static object State_2_factory(Parser yyp) { return new State_2(yyp); }
-public static object StateBody_3_factory(Parser yyp) { return new StateBody_3(yyp); }
-public static object StateBody_2_factory(Parser yyp) { return new StateBody_2(yyp); }
-public static object StateBody_1_factory(Parser yyp) { return new StateBody_1(yyp); }
-public static object Typename_6_factory(Parser yyp) { return new Typename_6(yyp); }
-public static object StateBody_7_factory(Parser yyp) { return new StateBody_7(yyp); }
-public static object StateBody_4_factory(Parser yyp) { return new StateBody_4(yyp); }
-public static object IfStatement_1_factory(Parser yyp) { return new IfStatement_1(yyp); }
-public static object IfStatement_3_factory(Parser yyp) { return new IfStatement_3(yyp); }
-public static object IfStatement_2_factory(Parser yyp) { return new IfStatement_2(yyp); }
-public static object SimpleAssignment_1_factory(Parser yyp) { return new SimpleAssignment_1(yyp); }
-public static object VoidArgEvent_6_factory(Parser yyp) { return new VoidArgEvent_6(yyp); }
-public static object IfStatement_factory(Parser yyp) { return new IfStatement(yyp); }
-public static object ConstantExpression_factory(Parser yyp) { return new ConstantExpression(yyp); }
-public static object BinaryExpression_7_factory(Parser yyp) { return new BinaryExpression_7(yyp); }
-public static object IncrementDecrementExpression_factory(Parser yyp) { return new IncrementDecrementExpression(yyp); }
-public static object Statement_9_factory(Parser yyp) { return new Statement_9(yyp); }
-public static object IntVecVecArgStateEvent_factory(Parser yyp) { return new IntVecVecArgStateEvent(yyp); }
-public static object Declaration_1_factory(Parser yyp) { return new Declaration_1(yyp); }
-public static object KeyIntIntArgumentDeclarationList_factory(Parser yyp) { return new KeyIntIntArgumentDeclarationList(yyp); }
-public static object VectorArgumentDeclarationList_1_factory(Parser yyp) { return new VectorArgumentDeclarationList_1(yyp); }
-public static object SimpleAssignment_factory(Parser yyp) { return new SimpleAssignment(yyp); }
-public static object BinaryExpression_9_factory(Parser yyp) { return new BinaryExpression_9(yyp); }
-public static object IntDeclaration_factory(Parser yyp) { return new IntDeclaration(yyp); }
-public static object IntArgEvent_10_factory(Parser yyp) { return new IntArgEvent_10(yyp); }
-public static object ArgumentDeclarationList_2_factory(Parser yyp) { return new ArgumentDeclarationList_2(yyp); }
-public static object ArgumentDeclarationList_1_factory(Parser yyp) { return new ArgumentDeclarationList_1(yyp); }
-public static object ArgumentDeclarationList_4_factory(Parser yyp) { return new ArgumentDeclarationList_4(yyp); }
-public static object SimpleAssignment_9_factory(Parser yyp) { return new SimpleAssignment_9(yyp); }
-public static object ForLoopStatement_2_factory(Parser yyp) { return new ForLoopStatement_2(yyp); }
-public static object StatementList_factory(Parser yyp) { return new StatementList(yyp); }
-public static object StateBody_13_factory(Parser yyp) { return new StateBody_13(yyp); }
-public static object Typename_3_factory(Parser yyp) { return new Typename_3(yyp); }
-public static object KeyArgumentDeclarationList_1_factory(Parser yyp) { return new KeyArgumentDeclarationList_1(yyp); }
-public static object UnaryExpression_3_factory(Parser yyp) { return new UnaryExpression_3(yyp); }
-public static object StateBody_16_factory(Parser yyp) { return new StateBody_16(yyp); }
-public static object VectorArgumentDeclarationList_factory(Parser yyp) { return new VectorArgumentDeclarationList(yyp); }
-public static object IntArgEvent_3_factory(Parser yyp) { return new IntArgEvent_3(yyp); }
-public static object StatementList_2_factory(Parser yyp) { return new StatementList_2(yyp); }
-public static object KeyArgStateEvent_factory(Parser yyp) { return new KeyArgStateEvent(yyp); }
-public static object LSLProgramRoot_1_factory(Parser yyp) { return new LSLProgramRoot_1(yyp); }
-public static object Typename_2_factory(Parser yyp) { return new Typename_2(yyp); }
-public static object TypecastExpression_6_factory(Parser yyp) { return new TypecastExpression_6(yyp); }
-public static object Event_3_factory(Parser yyp) { return new Event_3(yyp); }
-public static object IntArgStateEvent_factory(Parser yyp) { return new IntArgStateEvent(yyp); }
-public static object StateChange_2_factory(Parser yyp) { return new StateChange_2(yyp); }
-public static object StateChange_1_factory(Parser yyp) { return new StateChange_1(yyp); }
-public static object VectorConstant_1_factory(Parser yyp) { return new VectorConstant_1(yyp); }
-public static object KeyDeclaration_factory(Parser yyp) { return new KeyDeclaration(yyp); }
-public static object States_2_factory(Parser yyp) { return new States_2(yyp); }
-public static object VoidArgEvent_factory(Parser yyp) { return new VoidArgEvent(yyp); }
-public static object WhileStatement_factory(Parser yyp) { return new WhileStatement(yyp); }
-public static object UnaryExpression_factory(Parser yyp) { return new UnaryExpression(yyp); }
-public static object BinaryExpression_6_factory(Parser yyp) { return new BinaryExpression_6(yyp); }
-public static object ConstantExpression_1_factory(Parser yyp) { return new ConstantExpression_1(yyp); }
-public static object ForLoopStatement_factory(Parser yyp) { return new ForLoopStatement(yyp); }
-public static object BinaryExpression_1_factory(Parser yyp) { return new BinaryExpression_1(yyp); }
-public static object StateEvent_factory(Parser yyp) { return new StateEvent(yyp); }
-public static object Event_5_factory(Parser yyp) { return new Event_5(yyp); }
-public static object SimpleAssignment_5_factory(Parser yyp) { return new SimpleAssignment_5(yyp); }
-public static object RotationConstant_1_factory(Parser yyp) { return new RotationConstant_1(yyp); }
-public static object Constant_factory(Parser yyp) { return new Constant(yyp); }
-public static object IntArgEvent_1_factory(Parser yyp) { return new IntArgEvent_1(yyp); }
-public static object SimpleAssignment_8_factory(Parser yyp) { return new SimpleAssignment_8(yyp); }
-public static object ForLoopStatement_3_factory(Parser yyp) { return new ForLoopStatement_3(yyp); }
-public static object IntArgEvent_2_factory(Parser yyp) { return new IntArgEvent_2(yyp); }
-public static object LSLProgramRoot_factory(Parser yyp) { return new LSLProgramRoot(yyp); }
-public static object StateBody_12_factory(Parser yyp) { return new StateBody_12(yyp); }
-public static object IntArgEvent_4_factory(Parser yyp) { return new IntArgEvent_4(yyp); }
-public static object IntArgEvent_7_factory(Parser yyp) { return new IntArgEvent_7(yyp); }
-public static object IntArgEvent_6_factory(Parser yyp) { return new IntArgEvent_6(yyp); }
-public static object IntArgEvent_9_factory(Parser yyp) { return new IntArgEvent_9(yyp); }
-public static object TypecastExpression_7_factory(Parser yyp) { return new TypecastExpression_7(yyp); }
-public static object StateBody_15_factory(Parser yyp) { return new StateBody_15(yyp); }
-public static object VoidArgStateEvent_1_factory(Parser yyp) { return new VoidArgStateEvent_1(yyp); }
-public static object error_factory(Parser yyp) { return new error(yyp); }
-public static object TypecastExpression_1_factory(Parser yyp) { return new TypecastExpression_1(yyp); }
-public static object GlobalDefinitions_4_factory(Parser yyp) { return new GlobalDefinitions_4(yyp); }
-public static object GlobalDefinitions_3_factory(Parser yyp) { return new GlobalDefinitions_3(yyp); }
-public static object GlobalDefinitions_2_factory(Parser yyp) { return new GlobalDefinitions_2(yyp); }
-public static object GlobalDefinitions_1_factory(Parser yyp) { return new GlobalDefinitions_1(yyp); }
-public static object ArgumentList_1_factory(Parser yyp) { return new ArgumentList_1(yyp); }
-public static object IncrementDecrementExpression_7_factory(Parser yyp) { return new IncrementDecrementExpression_7(yyp); }
-public static object UnaryExpression_2_factory(Parser yyp) { return new UnaryExpression_2(yyp); }
-public static object Argument_factory(Parser yyp) { return new Argument(yyp); }
-public static object SimpleAssignment_24_factory(Parser yyp) { return new SimpleAssignment_24(yyp); }
-public static object ExpressionArgument_1_factory(Parser yyp) { return new ExpressionArgument_1(yyp); }
-public static object EmptyStatement_factory(Parser yyp) { return new EmptyStatement(yyp); }
-public static object KeyIntIntArgStateEvent_factory(Parser yyp) { return new KeyIntIntArgStateEvent(yyp); }
-public static object VectorArgStateEvent_1_factory(Parser yyp) { return new VectorArgStateEvent_1(yyp); }
-public static object GlobalFunctionDefinition_1_factory(Parser yyp) { return new GlobalFunctionDefinition_1(yyp); }
-public static object FunctionCallExpression_1_factory(Parser yyp) { return new FunctionCallExpression_1(yyp); }
-public static object DoWhileStatement_2_factory(Parser yyp) { return new DoWhileStatement_2(yyp); }
-public static object VoidArgEvent_1_factory(Parser yyp) { return new VoidArgEvent_1(yyp); }
-public static object KeyArgumentDeclarationList_factory(Parser yyp) { return new KeyArgumentDeclarationList(yyp); }
-public static object KeyIntIntArgEvent_factory(Parser yyp) { return new KeyIntIntArgEvent(yyp); }
-public static object ListConstant_1_factory(Parser yyp) { return new ListConstant_1(yyp); }
-public static object StateEvent_1_factory(Parser yyp) { return new StateEvent_1(yyp); }
-public static object SimpleAssignment_20_factory(Parser yyp) { return new SimpleAssignment_20(yyp); }
-public static object SimpleAssignment_23_factory(Parser yyp) { return new SimpleAssignment_23(yyp); }
-public static object SimpleAssignment_22_factory(Parser yyp) { return new SimpleAssignment_22(yyp); }
-public static object IntArgEvent_5_factory(Parser yyp) { return new IntArgEvent_5(yyp); }
-public static object ParenthesisExpression_factory(Parser yyp) { return new ParenthesisExpression(yyp); }
-public static object JumpStatement_factory(Parser yyp) { return new JumpStatement(yyp); }
-public static object IntRotRotArgumentDeclarationList_1_factory(Parser yyp) { return new IntRotRotArgumentDeclarationList_1(yyp); }
-public static object SimpleAssignment_4_factory(Parser yyp) { return new SimpleAssignment_4(yyp); }
-public static object KeyArgEvent_factory(Parser yyp) { return new KeyArgEvent(yyp); }
-public static object Assignment_2_factory(Parser yyp) { return new Assignment_2(yyp); }
-public static object ForLoopStatement_4_factory(Parser yyp) { return new ForLoopStatement_4(yyp); }
-public static object Statement_13_factory(Parser yyp) { return new Statement_13(yyp); }
-public static object RotDeclaration_factory(Parser yyp) { return new RotDeclaration(yyp); }
-public static object StateBody_11_factory(Parser yyp) { return new StateBody_11(yyp); }
-public static object KeyArgEvent_2_factory(Parser yyp) { return new KeyArgEvent_2(yyp); }
-public static object StatementList_1_factory(Parser yyp) { return new StatementList_1(yyp); }
-public static object StateBody_6_factory(Parser yyp) { return new StateBody_6(yyp); }
-public static object Constant_1_factory(Parser yyp) { return new Constant_1(yyp); }
-public static object VecDeclaration_factory(Parser yyp) { return new VecDeclaration(yyp); }
-public static object TypecastExpression_5_factory(Parser yyp) { return new TypecastExpression_5(yyp); }
-public static object GlobalFunctionDefinition_2_factory(Parser yyp) { return new GlobalFunctionDefinition_2(yyp); }
-public static object KeyIntIntArgEvent_1_factory(Parser yyp) { return new KeyIntIntArgEvent_1(yyp); }
-public static object Constant_4_factory(Parser yyp) { return new Constant_4(yyp); }
-public static object TypecastExpression_9_factory(Parser yyp) { return new TypecastExpression_9(yyp); }
-public static object IntRotRotArgStateEvent_1_factory(Parser yyp) { return new IntRotRotArgStateEvent_1(yyp); }
-public static object IncrementDecrementExpression_3_factory(Parser yyp) { return new IncrementDecrementExpression_3(yyp); }
-public static object States_1_factory(Parser yyp) { return new States_1(yyp); }
-public static object GlobalVariableDeclaration_factory(Parser yyp) { return new GlobalVariableDeclaration(yyp); }
-public static object VoidArgEvent_3_factory(Parser yyp) { return new VoidArgEvent_3(yyp); }
-public static object Assignment_1_factory(Parser yyp) { return new Assignment_1(yyp); }
-public static object BinaryExpression_5_factory(Parser yyp) { return new BinaryExpression_5(yyp); }
-public static object IfStatement_4_factory(Parser yyp) { return new IfStatement_4(yyp); }
-public static object IntVecVecArgumentDeclarationList_1_factory(Parser yyp) { return new IntVecVecArgumentDeclarationList_1(yyp); }
-public static object KeyIntIntArgumentDeclarationList_1_factory(Parser yyp) { return new KeyIntIntArgumentDeclarationList_1(yyp); }
-public static object Statement_factory(Parser yyp) { return new Statement(yyp); }
-public static object ParenthesisExpression_1_factory(Parser yyp) { return new ParenthesisExpression_1(yyp); }
-public static object ParenthesisExpression_2_factory(Parser yyp) { return new ParenthesisExpression_2(yyp); }
-public static object DoWhileStatement_1_factory(Parser yyp) { return new DoWhileStatement_1(yyp); }
-public static object VoidArgStateEvent_factory(Parser yyp) { return new VoidArgStateEvent(yyp); }
-public static object GlobalFunctionDefinition_factory(Parser yyp) { return new GlobalFunctionDefinition(yyp); }
-public static object Event_4_factory(Parser yyp) { return new Event_4(yyp); }
-public static object IntArgEvent_factory(Parser yyp) { return new IntArgEvent(yyp); }
-public static object SimpleAssignment_11_factory(Parser yyp) { return new SimpleAssignment_11(yyp); }
-public static object SimpleAssignment_10_factory(Parser yyp) { return new SimpleAssignment_10(yyp); }
-public static object SimpleAssignment_13_factory(Parser yyp) { return new SimpleAssignment_13(yyp); }
-public static object SimpleAssignment_12_factory(Parser yyp) { return new SimpleAssignment_12(yyp); }
-public static object SimpleAssignment_15_factory(Parser yyp) { return new SimpleAssignment_15(yyp); }
-public static object SimpleAssignment_14_factory(Parser yyp) { return new SimpleAssignment_14(yyp); }
-public static object SimpleAssignment_17_factory(Parser yyp) { return new SimpleAssignment_17(yyp); }
-public static object SimpleAssignment_16_factory(Parser yyp) { return new SimpleAssignment_16(yyp); }
-public static object SimpleAssignment_19_factory(Parser yyp) { return new SimpleAssignment_19(yyp); }
-public static object SimpleAssignment_18_factory(Parser yyp) { return new SimpleAssignment_18(yyp); }
-public static object IntVecVecArgumentDeclarationList_factory(Parser yyp) { return new IntVecVecArgumentDeclarationList(yyp); }
-public static object StateBody_5_factory(Parser yyp) { return new StateBody_5(yyp); }
-public static object BinaryExpression_17_factory(Parser yyp) { return new BinaryExpression_17(yyp); }
-public static object BinaryExpression_16_factory(Parser yyp) { return new BinaryExpression_16(yyp); }
-public static object BinaryExpression_15_factory(Parser yyp) { return new BinaryExpression_15(yyp); }
-public static object BinaryExpression_14_factory(Parser yyp) { return new BinaryExpression_14(yyp); }
-public static object BinaryExpression_13_factory(Parser yyp) { return new BinaryExpression_13(yyp); }
-public static object BinaryExpression_12_factory(Parser yyp) { return new BinaryExpression_12(yyp); }
-public static object BinaryExpression_11_factory(Parser yyp) { return new BinaryExpression_11(yyp); }
-public static object BinaryExpression_10_factory(Parser yyp) { return new BinaryExpression_10(yyp); }
-public static object VectorArgStateEvent_factory(Parser yyp) { return new VectorArgStateEvent(yyp); }
-public static object Statement_10_factory(Parser yyp) { return new Statement_10(yyp); }
-public static object BinaryExpression_8_factory(Parser yyp) { return new BinaryExpression_8(yyp); }
-public static object BinaryExpression_18_factory(Parser yyp) { return new BinaryExpression_18(yyp); }
-public static object BinaryExpression_2_factory(Parser yyp) { return new BinaryExpression_2(yyp); }
-public static object FunctionCallExpression_factory(Parser yyp) { return new FunctionCallExpression(yyp); }
-public static object VectorArgEvent_3_factory(Parser yyp) { return new VectorArgEvent_3(yyp); }
-public static object IdentExpression_1_factory(Parser yyp) { return new IdentExpression_1(yyp); }
-public static object IntArgEvent_8_factory(Parser yyp) { return new IntArgEvent_8(yyp); }
-public static object VoidArgEvent_7_factory(Parser yyp) { return new VoidArgEvent_7(yyp); }
-public static object IncrementDecrementExpression_4_factory(Parser yyp) { return new IncrementDecrementExpression_4(yyp); }
-public static object FunctionCall_factory(Parser yyp) { return new FunctionCall(yyp); }
-public static object ArgumentList_3_factory(Parser yyp) { return new ArgumentList_3(yyp); }
-public static object KeyIntIntArgStateEvent_1_factory(Parser yyp) { return new KeyIntIntArgStateEvent_1(yyp); }
-public static object IntRotRotArgumentDeclarationList_factory(Parser yyp) { return new IntRotRotArgumentDeclarationList(yyp); }
-public static object KeyDeclaration_1_factory(Parser yyp) { return new KeyDeclaration_1(yyp); }
-public static object BinaryExpression_4_factory(Parser yyp) { return new BinaryExpression_4(yyp); }
-public static object FunctionCall_1_factory(Parser yyp) { return new FunctionCall_1(yyp); }
-public static object KeyArgStateEvent_1_factory(Parser yyp) { return new KeyArgStateEvent_1(yyp); }
-public static object IntArgStateEvent_1_factory(Parser yyp) { return new IntArgStateEvent_1(yyp); }
-public static object Event_factory(Parser yyp) { return new Event(yyp); }
-public static object IntRotRotArgEvent_factory(Parser yyp) { return new IntRotRotArgEvent(yyp); }
-public static object SimpleAssignment_7_factory(Parser yyp) { return new SimpleAssignment_7(yyp); }
-public static object Statement_3_factory(Parser yyp) { return new Statement_3(yyp); }
-public static object Expression_factory(Parser yyp) { return new Expression(yyp); }
-public static object CompoundStatement_2_factory(Parser yyp) { return new CompoundStatement_2(yyp); }
-public static object CompoundStatement_1_factory(Parser yyp) { return new CompoundStatement_1(yyp); }
-public static object JumpLabel_factory(Parser yyp) { return new JumpLabel(yyp); }
-public static object State_factory(Parser yyp) { return new State(yyp); }
-public static object TypecastExpression_factory(Parser yyp) { return new TypecastExpression(yyp); }
-public static object IntRotRotArgEvent_1_factory(Parser yyp) { return new IntRotRotArgEvent_1(yyp); }
-public static object Statement_11_factory(Parser yyp) { return new Statement_11(yyp); }
-public static object VoidArgEvent_2_factory(Parser yyp) { return new VoidArgEvent_2(yyp); }
-public static object Typename_factory(Parser yyp) { return new Typename(yyp); }
-public static object ArgumentDeclarationList_factory(Parser yyp) { return new ArgumentDeclarationList(yyp); }
-public static object StateBody_factory(Parser yyp) { return new StateBody(yyp); }
-public static object Event_8_factory(Parser yyp) { return new Event_8(yyp); }
-public static object Event_9_factory(Parser yyp) { return new Event_9(yyp); }
-public static object Event_6_factory(Parser yyp) { return new Event_6(yyp); }
-public static object Event_7_factory(Parser yyp) { return new Event_7(yyp); }
-public static object Statement_8_factory(Parser yyp) { return new Statement_8(yyp); }
-public static object CompoundStatement_factory(Parser yyp) { return new CompoundStatement(yyp); }
-public static object Event_1_factory(Parser yyp) { return new Event_1(yyp); }
-public static object Statement_4_factory(Parser yyp) { return new Statement_4(yyp); }
-public static object Statement_5_factory(Parser yyp) { return new Statement_5(yyp); }
-public static object Statement_6_factory(Parser yyp) { return new Statement_6(yyp); }
-public static object Statement_7_factory(Parser yyp) { return new Statement_7(yyp); }
-public static object IncrementDecrementExpression_5_factory(Parser yyp) { return new IncrementDecrementExpression_5(yyp); }
-public static object Statement_2_factory(Parser yyp) { return new Statement_2(yyp); }
-public static object ListConstant_factory(Parser yyp) { return new ListConstant(yyp); }
-public static object States_factory(Parser yyp) { return new States(yyp); }
-public static object TypecastExpression_2_factory(Parser yyp) { return new TypecastExpression_2(yyp); }
-public static object ArgumentList_2_factory(Parser yyp) { return new ArgumentList_2(yyp); }
-public static object StateBody_14_factory(Parser yyp) { return new StateBody_14(yyp); }
-public static object KeyArgEvent_1_factory(Parser yyp) { return new KeyArgEvent_1(yyp); }
-public static object VectorConstant_factory(Parser yyp) { return new VectorConstant(yyp); }
-public static object SimpleAssignment_3_factory(Parser yyp) { return new SimpleAssignment_3(yyp); }
-public static object Typename_5_factory(Parser yyp) { return new Typename_5(yyp); }
-public static object TypecastExpression_8_factory(Parser yyp) { return new TypecastExpression_8(yyp); }
-public static object SimpleAssignment_21_factory(Parser yyp) { return new SimpleAssignment_21(yyp); }
-public static object JumpLabel_1_factory(Parser yyp) { return new JumpLabel_1(yyp); }
-public static object TypecastExpression_4_factory(Parser yyp) { return new TypecastExpression_4(yyp); }
-public static object JumpStatement_1_factory(Parser yyp) { return new JumpStatement_1(yyp); }
-public static object VoidArgEvent_8_factory(Parser yyp) { return new VoidArgEvent_8(yyp); }
-public static object GlobalVariableDeclaration_2_factory(Parser yyp) { return new GlobalVariableDeclaration_2(yyp); }
-public static object GlobalVariableDeclaration_1_factory(Parser yyp) { return new GlobalVariableDeclaration_1(yyp); }
-public static object RotDeclaration_1_factory(Parser yyp) { return new RotDeclaration_1(yyp); }
-public static object WhileStatement_1_factory(Parser yyp) { return new WhileStatement_1(yyp); }
-public static object VecDeclaration_1_factory(Parser yyp) { return new VecDeclaration_1(yyp); }
-public static object IntRotRotArgStateEvent_factory(Parser yyp) { return new IntRotRotArgStateEvent(yyp); }
-public static object Constant_3_factory(Parser yyp) { return new Constant_3(yyp); }
-public static object Declaration_factory(Parser yyp) { return new Declaration(yyp); }
-public static object IntVecVecArgStateEvent_1_factory(Parser yyp) { return new IntVecVecArgStateEvent_1(yyp); }
-public static object ArgumentDeclarationList_5_factory(Parser yyp) { return new ArgumentDeclarationList_5(yyp); }
-public static object ReturnStatement_factory(Parser yyp) { return new ReturnStatement(yyp); }
-public static object EmptyStatement_1_factory(Parser yyp) { return new EmptyStatement_1(yyp); }
-}
-public class LSLSyntax
-: Parser {
-public LSLSyntax
-():base(new yyLSLSyntax
-(),new LSLTokens()) {}
-public LSLSyntax
-(YyParser syms):base(syms,new LSLTokens()) {}
-public LSLSyntax
-(YyParser syms,ErrorHandler erh):base(syms,new LSLTokens(erh)) {}
+            new Sfactory(this, "IncrementDecrementExpression_1", new SCreator(IncrementDecrementExpression_1_factory));
+            new Sfactory(this, "StateChange", new SCreator(StateChange_factory));
+            new Sfactory(this, "ArgumentDeclarationList_3", new SCreator(ArgumentDeclarationList_3_factory));
+            new Sfactory(this, "BinaryExpression", new SCreator(BinaryExpression_factory));
+            new Sfactory(this, "VoidArgEvent_5", new SCreator(VoidArgEvent_5_factory));
+            new Sfactory(this, "IdentDotExpression_1", new SCreator(IdentDotExpression_1_factory));
+            new Sfactory(this, "StateBody_10", new SCreator(StateBody_10_factory));
+            new Sfactory(this, "VectorArgEvent_1", new SCreator(VectorArgEvent_1_factory));
+            new Sfactory(this, "ReturnStatement_1", new SCreator(ReturnStatement_1_factory));
+            new Sfactory(this, "ReturnStatement_2", new SCreator(ReturnStatement_2_factory));
+            new Sfactory(this, "Typename_7", new SCreator(Typename_7_factory));
+            new Sfactory(this, "ExpressionArgument", new SCreator(ExpressionArgument_factory));
+            new Sfactory(this, "ForLoop", new SCreator(ForLoop_factory));
+            new Sfactory(this, "GlobalDefinitions", new SCreator(GlobalDefinitions_factory));
+            new Sfactory(this, "Typename_1", new SCreator(Typename_1_factory));
+            new Sfactory(this, "TypecastExpression_3", new SCreator(TypecastExpression_3_factory));
+            new Sfactory(this, "IncrementDecrementExpression_6", new SCreator(IncrementDecrementExpression_6_factory));
+            new Sfactory(this, "SimpleAssignment_2", new SCreator(SimpleAssignment_2_factory));
+            new Sfactory(this, "IntVecVecArgEvent_1", new SCreator(IntVecVecArgEvent_1_factory));
+            new Sfactory(this, "LSLProgramRoot_2", new SCreator(LSLProgramRoot_2_factory));
+            new Sfactory(this, "IdentDotExpression", new SCreator(IdentDotExpression_factory));
+            new Sfactory(this, "UnaryExpression_1", new SCreator(UnaryExpression_1_factory));
+            new Sfactory(this, "RotationConstant", new SCreator(RotationConstant_factory));
+            new Sfactory(this, "IntArgumentDeclarationList", new SCreator(IntArgumentDeclarationList_factory));
+            new Sfactory(this, "ArgumentList", new SCreator(ArgumentList_factory));
+            new Sfactory(this, "BinaryExpression_3", new SCreator(BinaryExpression_3_factory));
+            new Sfactory(this, "Event_2", new SCreator(Event_2_factory));
+            new Sfactory(this, "ArgumentList_4", new SCreator(ArgumentList_4_factory));
+            new Sfactory(this, "IntVecVecArgEvent", new SCreator(IntVecVecArgEvent_factory));
+            new Sfactory(this, "WhileStatement_2", new SCreator(WhileStatement_2_factory));
+            new Sfactory(this, "Assignment", new SCreator(Assignment_factory));
+            new Sfactory(this, "Statement_12", new SCreator(Statement_12_factory));
+            new Sfactory(this, "IncrementDecrementExpression_8", new SCreator(IncrementDecrementExpression_8_factory));
+            new Sfactory(this, "VectorArgEvent_2", new SCreator(VectorArgEvent_2_factory));
+            new Sfactory(this, "Constant_2", new SCreator(Constant_2_factory));
+            new Sfactory(this, "Statement_1", new SCreator(Statement_1_factory));
+            new Sfactory(this, "VectorArgEvent", new SCreator(VectorArgEvent_factory));
+            new Sfactory(this, "ForLoopStatement_1", new SCreator(ForLoopStatement_1_factory));
+            new Sfactory(this, "IncrementDecrementExpression_2", new SCreator(IncrementDecrementExpression_2_factory));
+            new Sfactory(this, "IntArgumentDeclarationList_1", new SCreator(IntArgumentDeclarationList_1_factory));
+            new Sfactory(this, "VoidArgEvent_4", new SCreator(VoidArgEvent_4_factory));
+            new Sfactory(this, "ForLoop_1", new SCreator(ForLoop_1_factory));
+            new Sfactory(this, "Typename_4", new SCreator(Typename_4_factory));
+            new Sfactory(this, "IdentExpression", new SCreator(IdentExpression_factory));
+            new Sfactory(this, "ForLoop_2", new SCreator(ForLoop_2_factory));
+            new Sfactory(this, "DoWhileStatement", new SCreator(DoWhileStatement_factory));
+            new Sfactory(this, "SimpleAssignment_6", new SCreator(SimpleAssignment_6_factory));
+            new Sfactory(this, "IntDeclaration_1", new SCreator(IntDeclaration_1_factory));
+            new Sfactory(this, "State_1", new SCreator(State_1_factory));
+            new Sfactory(this, "StateBody_9", new SCreator(StateBody_9_factory));
+            new Sfactory(this, "StateBody_8", new SCreator(StateBody_8_factory));
+            new Sfactory(this, "State_2", new SCreator(State_2_factory));
+            new Sfactory(this, "StateBody_3", new SCreator(StateBody_3_factory));
+            new Sfactory(this, "StateBody_2", new SCreator(StateBody_2_factory));
+            new Sfactory(this, "StateBody_1", new SCreator(StateBody_1_factory));
+            new Sfactory(this, "Typename_6", new SCreator(Typename_6_factory));
+            new Sfactory(this, "StateBody_7", new SCreator(StateBody_7_factory));
+            new Sfactory(this, "StateBody_4", new SCreator(StateBody_4_factory));
+            new Sfactory(this, "IfStatement_1", new SCreator(IfStatement_1_factory));
+            new Sfactory(this, "IfStatement_3", new SCreator(IfStatement_3_factory));
+            new Sfactory(this, "IfStatement_2", new SCreator(IfStatement_2_factory));
+            new Sfactory(this, "SimpleAssignment_1", new SCreator(SimpleAssignment_1_factory));
+            new Sfactory(this, "VoidArgEvent_6", new SCreator(VoidArgEvent_6_factory));
+            new Sfactory(this, "IfStatement", new SCreator(IfStatement_factory));
+            new Sfactory(this, "ConstantExpression", new SCreator(ConstantExpression_factory));
+            new Sfactory(this, "BinaryExpression_7", new SCreator(BinaryExpression_7_factory));
+            new Sfactory(this, "IncrementDecrementExpression", new SCreator(IncrementDecrementExpression_factory));
+            new Sfactory(this, "Statement_9", new SCreator(Statement_9_factory));
+            new Sfactory(this, "IntVecVecArgStateEvent", new SCreator(IntVecVecArgStateEvent_factory));
+            new Sfactory(this, "Declaration_1", new SCreator(Declaration_1_factory));
+            new Sfactory(this, "KeyIntIntArgumentDeclarationList", new SCreator(KeyIntIntArgumentDeclarationList_factory));
+            new Sfactory(this, "VectorArgumentDeclarationList_1", new SCreator(VectorArgumentDeclarationList_1_factory));
+            new Sfactory(this, "SimpleAssignment", new SCreator(SimpleAssignment_factory));
+            new Sfactory(this, "BinaryExpression_9", new SCreator(BinaryExpression_9_factory));
+            new Sfactory(this, "IntDeclaration", new SCreator(IntDeclaration_factory));
+            new Sfactory(this, "IntArgEvent_10", new SCreator(IntArgEvent_10_factory));
+            new Sfactory(this, "ArgumentDeclarationList_2", new SCreator(ArgumentDeclarationList_2_factory));
+            new Sfactory(this, "ArgumentDeclarationList_1", new SCreator(ArgumentDeclarationList_1_factory));
+            new Sfactory(this, "ArgumentDeclarationList_4", new SCreator(ArgumentDeclarationList_4_factory));
+            new Sfactory(this, "SimpleAssignment_9", new SCreator(SimpleAssignment_9_factory));
+            new Sfactory(this, "ForLoopStatement_2", new SCreator(ForLoopStatement_2_factory));
+            new Sfactory(this, "StatementList", new SCreator(StatementList_factory));
+            new Sfactory(this, "StateBody_13", new SCreator(StateBody_13_factory));
+            new Sfactory(this, "Typename_3", new SCreator(Typename_3_factory));
+            new Sfactory(this, "KeyArgumentDeclarationList_1", new SCreator(KeyArgumentDeclarationList_1_factory));
+            new Sfactory(this, "UnaryExpression_3", new SCreator(UnaryExpression_3_factory));
+            new Sfactory(this, "StateBody_16", new SCreator(StateBody_16_factory));
+            new Sfactory(this, "VectorArgumentDeclarationList", new SCreator(VectorArgumentDeclarationList_factory));
+            new Sfactory(this, "IntArgEvent_3", new SCreator(IntArgEvent_3_factory));
+            new Sfactory(this, "StatementList_2", new SCreator(StatementList_2_factory));
+            new Sfactory(this, "KeyArgStateEvent", new SCreator(KeyArgStateEvent_factory));
+            new Sfactory(this, "LSLProgramRoot_1", new SCreator(LSLProgramRoot_1_factory));
+            new Sfactory(this, "Typename_2", new SCreator(Typename_2_factory));
+            new Sfactory(this, "TypecastExpression_6", new SCreator(TypecastExpression_6_factory));
+            new Sfactory(this, "Event_3", new SCreator(Event_3_factory));
+            new Sfactory(this, "IntArgStateEvent", new SCreator(IntArgStateEvent_factory));
+            new Sfactory(this, "StateChange_2", new SCreator(StateChange_2_factory));
+            new Sfactory(this, "StateChange_1", new SCreator(StateChange_1_factory));
+            new Sfactory(this, "VectorConstant_1", new SCreator(VectorConstant_1_factory));
+            new Sfactory(this, "KeyDeclaration", new SCreator(KeyDeclaration_factory));
+            new Sfactory(this, "States_2", new SCreator(States_2_factory));
+            new Sfactory(this, "VoidArgEvent", new SCreator(VoidArgEvent_factory));
+            new Sfactory(this, "WhileStatement", new SCreator(WhileStatement_factory));
+            new Sfactory(this, "UnaryExpression", new SCreator(UnaryExpression_factory));
+            new Sfactory(this, "BinaryExpression_6", new SCreator(BinaryExpression_6_factory));
+            new Sfactory(this, "ConstantExpression_1", new SCreator(ConstantExpression_1_factory));
+            new Sfactory(this, "ForLoopStatement", new SCreator(ForLoopStatement_factory));
+            new Sfactory(this, "BinaryExpression_1", new SCreator(BinaryExpression_1_factory));
+            new Sfactory(this, "StateEvent", new SCreator(StateEvent_factory));
+            new Sfactory(this, "Event_5", new SCreator(Event_5_factory));
+            new Sfactory(this, "SimpleAssignment_5", new SCreator(SimpleAssignment_5_factory));
+            new Sfactory(this, "RotationConstant_1", new SCreator(RotationConstant_1_factory));
+            new Sfactory(this, "Constant", new SCreator(Constant_factory));
+            new Sfactory(this, "IntArgEvent_1", new SCreator(IntArgEvent_1_factory));
+            new Sfactory(this, "SimpleAssignment_8", new SCreator(SimpleAssignment_8_factory));
+            new Sfactory(this, "ForLoopStatement_3", new SCreator(ForLoopStatement_3_factory));
+            new Sfactory(this, "IntArgEvent_2", new SCreator(IntArgEvent_2_factory));
+            new Sfactory(this, "LSLProgramRoot", new SCreator(LSLProgramRoot_factory));
+            new Sfactory(this, "StateBody_12", new SCreator(StateBody_12_factory));
+            new Sfactory(this, "IntArgEvent_4", new SCreator(IntArgEvent_4_factory));
+            new Sfactory(this, "IntArgEvent_7", new SCreator(IntArgEvent_7_factory));
+            new Sfactory(this, "IntArgEvent_6", new SCreator(IntArgEvent_6_factory));
+            new Sfactory(this, "IntArgEvent_9", new SCreator(IntArgEvent_9_factory));
+            new Sfactory(this, "TypecastExpression_7", new SCreator(TypecastExpression_7_factory));
+            new Sfactory(this, "StateBody_15", new SCreator(StateBody_15_factory));
+            new Sfactory(this, "VoidArgStateEvent_1", new SCreator(VoidArgStateEvent_1_factory));
+            new Sfactory(this, "error", new SCreator(error_factory));
+            new Sfactory(this, "TypecastExpression_1", new SCreator(TypecastExpression_1_factory));
+            new Sfactory(this, "GlobalDefinitions_4", new SCreator(GlobalDefinitions_4_factory));
+            new Sfactory(this, "GlobalDefinitions_3", new SCreator(GlobalDefinitions_3_factory));
+            new Sfactory(this, "GlobalDefinitions_2", new SCreator(GlobalDefinitions_2_factory));
+            new Sfactory(this, "GlobalDefinitions_1", new SCreator(GlobalDefinitions_1_factory));
+            new Sfactory(this, "ArgumentList_1", new SCreator(ArgumentList_1_factory));
+            new Sfactory(this, "IncrementDecrementExpression_7", new SCreator(IncrementDecrementExpression_7_factory));
+            new Sfactory(this, "UnaryExpression_2", new SCreator(UnaryExpression_2_factory));
+            new Sfactory(this, "Argument", new SCreator(Argument_factory));
+            new Sfactory(this, "SimpleAssignment_24", new SCreator(SimpleAssignment_24_factory));
+            new Sfactory(this, "ExpressionArgument_1", new SCreator(ExpressionArgument_1_factory));
+            new Sfactory(this, "EmptyStatement", new SCreator(EmptyStatement_factory));
+            new Sfactory(this, "KeyIntIntArgStateEvent", new SCreator(KeyIntIntArgStateEvent_factory));
+            new Sfactory(this, "VectorArgStateEvent_1", new SCreator(VectorArgStateEvent_1_factory));
+            new Sfactory(this, "GlobalFunctionDefinition_1", new SCreator(GlobalFunctionDefinition_1_factory));
+            new Sfactory(this, "FunctionCallExpression_1", new SCreator(FunctionCallExpression_1_factory));
+            new Sfactory(this, "DoWhileStatement_2", new SCreator(DoWhileStatement_2_factory));
+            new Sfactory(this, "VoidArgEvent_1", new SCreator(VoidArgEvent_1_factory));
+            new Sfactory(this, "KeyArgumentDeclarationList", new SCreator(KeyArgumentDeclarationList_factory));
+            new Sfactory(this, "KeyIntIntArgEvent", new SCreator(KeyIntIntArgEvent_factory));
+            new Sfactory(this, "ListConstant_1", new SCreator(ListConstant_1_factory));
+            new Sfactory(this, "StateEvent_1", new SCreator(StateEvent_1_factory));
+            new Sfactory(this, "SimpleAssignment_20", new SCreator(SimpleAssignment_20_factory));
+            new Sfactory(this, "SimpleAssignment_23", new SCreator(SimpleAssignment_23_factory));
+            new Sfactory(this, "SimpleAssignment_22", new SCreator(SimpleAssignment_22_factory));
+            new Sfactory(this, "IntArgEvent_5", new SCreator(IntArgEvent_5_factory));
+            new Sfactory(this, "ParenthesisExpression", new SCreator(ParenthesisExpression_factory));
+            new Sfactory(this, "JumpStatement", new SCreator(JumpStatement_factory));
+            new Sfactory(this, "IntRotRotArgumentDeclarationList_1", new SCreator(IntRotRotArgumentDeclarationList_1_factory));
+            new Sfactory(this, "SimpleAssignment_4", new SCreator(SimpleAssignment_4_factory));
+            new Sfactory(this, "KeyArgEvent", new SCreator(KeyArgEvent_factory));
+            new Sfactory(this, "Assignment_2", new SCreator(Assignment_2_factory));
+            new Sfactory(this, "ForLoopStatement_4", new SCreator(ForLoopStatement_4_factory));
+            new Sfactory(this, "Statement_13", new SCreator(Statement_13_factory));
+            new Sfactory(this, "RotDeclaration", new SCreator(RotDeclaration_factory));
+            new Sfactory(this, "StateBody_11", new SCreator(StateBody_11_factory));
+            new Sfactory(this, "KeyArgEvent_2", new SCreator(KeyArgEvent_2_factory));
+            new Sfactory(this, "StatementList_1", new SCreator(StatementList_1_factory));
+            new Sfactory(this, "StateBody_6", new SCreator(StateBody_6_factory));
+            new Sfactory(this, "Constant_1", new SCreator(Constant_1_factory));
+            new Sfactory(this, "VecDeclaration", new SCreator(VecDeclaration_factory));
+            new Sfactory(this, "TypecastExpression_5", new SCreator(TypecastExpression_5_factory));
+            new Sfactory(this, "GlobalFunctionDefinition_2", new SCreator(GlobalFunctionDefinition_2_factory));
+            new Sfactory(this, "KeyIntIntArgEvent_1", new SCreator(KeyIntIntArgEvent_1_factory));
+            new Sfactory(this, "Constant_4", new SCreator(Constant_4_factory));
+            new Sfactory(this, "TypecastExpression_9", new SCreator(TypecastExpression_9_factory));
+            new Sfactory(this, "IntRotRotArgStateEvent_1", new SCreator(IntRotRotArgStateEvent_1_factory));
+            new Sfactory(this, "IncrementDecrementExpression_3", new SCreator(IncrementDecrementExpression_3_factory));
+            new Sfactory(this, "States_1", new SCreator(States_1_factory));
+            new Sfactory(this, "GlobalVariableDeclaration", new SCreator(GlobalVariableDeclaration_factory));
+            new Sfactory(this, "VoidArgEvent_3", new SCreator(VoidArgEvent_3_factory));
+            new Sfactory(this, "Assignment_1", new SCreator(Assignment_1_factory));
+            new Sfactory(this, "BinaryExpression_5", new SCreator(BinaryExpression_5_factory));
+            new Sfactory(this, "IfStatement_4", new SCreator(IfStatement_4_factory));
+            new Sfactory(this, "IntVecVecArgumentDeclarationList_1", new SCreator(IntVecVecArgumentDeclarationList_1_factory));
+            new Sfactory(this, "KeyIntIntArgumentDeclarationList_1", new SCreator(KeyIntIntArgumentDeclarationList_1_factory));
+            new Sfactory(this, "Statement", new SCreator(Statement_factory));
+            new Sfactory(this, "ParenthesisExpression_1", new SCreator(ParenthesisExpression_1_factory));
+            new Sfactory(this, "ParenthesisExpression_2", new SCreator(ParenthesisExpression_2_factory));
+            new Sfactory(this, "DoWhileStatement_1", new SCreator(DoWhileStatement_1_factory));
+            new Sfactory(this, "VoidArgStateEvent", new SCreator(VoidArgStateEvent_factory));
+            new Sfactory(this, "GlobalFunctionDefinition", new SCreator(GlobalFunctionDefinition_factory));
+            new Sfactory(this, "Event_4", new SCreator(Event_4_factory));
+            new Sfactory(this, "IntArgEvent", new SCreator(IntArgEvent_factory));
+            new Sfactory(this, "SimpleAssignment_11", new SCreator(SimpleAssignment_11_factory));
+            new Sfactory(this, "SimpleAssignment_10", new SCreator(SimpleAssignment_10_factory));
+            new Sfactory(this, "SimpleAssignment_13", new SCreator(SimpleAssignment_13_factory));
+            new Sfactory(this, "SimpleAssignment_12", new SCreator(SimpleAssignment_12_factory));
+            new Sfactory(this, "SimpleAssignment_15", new SCreator(SimpleAssignment_15_factory));
+            new Sfactory(this, "SimpleAssignment_14", new SCreator(SimpleAssignment_14_factory));
+            new Sfactory(this, "SimpleAssignment_17", new SCreator(SimpleAssignment_17_factory));
+            new Sfactory(this, "SimpleAssignment_16", new SCreator(SimpleAssignment_16_factory));
+            new Sfactory(this, "SimpleAssignment_19", new SCreator(SimpleAssignment_19_factory));
+            new Sfactory(this, "SimpleAssignment_18", new SCreator(SimpleAssignment_18_factory));
+            new Sfactory(this, "IntVecVecArgumentDeclarationList", new SCreator(IntVecVecArgumentDeclarationList_factory));
+            new Sfactory(this, "StateBody_5", new SCreator(StateBody_5_factory));
+            new Sfactory(this, "BinaryExpression_17", new SCreator(BinaryExpression_17_factory));
+            new Sfactory(this, "BinaryExpression_16", new SCreator(BinaryExpression_16_factory));
+            new Sfactory(this, "BinaryExpression_15", new SCreator(BinaryExpression_15_factory));
+            new Sfactory(this, "BinaryExpression_14", new SCreator(BinaryExpression_14_factory));
+            new Sfactory(this, "BinaryExpression_13", new SCreator(BinaryExpression_13_factory));
+            new Sfactory(this, "BinaryExpression_12", new SCreator(BinaryExpression_12_factory));
+            new Sfactory(this, "BinaryExpression_11", new SCreator(BinaryExpression_11_factory));
+            new Sfactory(this, "BinaryExpression_10", new SCreator(BinaryExpression_10_factory));
+            new Sfactory(this, "VectorArgStateEvent", new SCreator(VectorArgStateEvent_factory));
+            new Sfactory(this, "Statement_10", new SCreator(Statement_10_factory));
+            new Sfactory(this, "BinaryExpression_8", new SCreator(BinaryExpression_8_factory));
+            new Sfactory(this, "BinaryExpression_18", new SCreator(BinaryExpression_18_factory));
+            new Sfactory(this, "BinaryExpression_2", new SCreator(BinaryExpression_2_factory));
+            new Sfactory(this, "FunctionCallExpression", new SCreator(FunctionCallExpression_factory));
+            new Sfactory(this, "VectorArgEvent_3", new SCreator(VectorArgEvent_3_factory));
+            new Sfactory(this, "IdentExpression_1", new SCreator(IdentExpression_1_factory));
+            new Sfactory(this, "IntArgEvent_8", new SCreator(IntArgEvent_8_factory));
+            new Sfactory(this, "VoidArgEvent_7", new SCreator(VoidArgEvent_7_factory));
+            new Sfactory(this, "IncrementDecrementExpression_4", new SCreator(IncrementDecrementExpression_4_factory));
+            new Sfactory(this, "FunctionCall", new SCreator(FunctionCall_factory));
+            new Sfactory(this, "ArgumentList_3", new SCreator(ArgumentList_3_factory));
+            new Sfactory(this, "KeyIntIntArgStateEvent_1", new SCreator(KeyIntIntArgStateEvent_1_factory));
+            new Sfactory(this, "IntRotRotArgumentDeclarationList", new SCreator(IntRotRotArgumentDeclarationList_factory));
+            new Sfactory(this, "KeyDeclaration_1", new SCreator(KeyDeclaration_1_factory));
+            new Sfactory(this, "BinaryExpression_4", new SCreator(BinaryExpression_4_factory));
+            new Sfactory(this, "FunctionCall_1", new SCreator(FunctionCall_1_factory));
+            new Sfactory(this, "KeyArgStateEvent_1", new SCreator(KeyArgStateEvent_1_factory));
+            new Sfactory(this, "IntArgStateEvent_1", new SCreator(IntArgStateEvent_1_factory));
+            new Sfactory(this, "Event", new SCreator(Event_factory));
+            new Sfactory(this, "IntRotRotArgEvent", new SCreator(IntRotRotArgEvent_factory));
+            new Sfactory(this, "SimpleAssignment_7", new SCreator(SimpleAssignment_7_factory));
+            new Sfactory(this, "Statement_3", new SCreator(Statement_3_factory));
+            new Sfactory(this, "Expression", new SCreator(Expression_factory));
+            new Sfactory(this, "CompoundStatement_2", new SCreator(CompoundStatement_2_factory));
+            new Sfactory(this, "CompoundStatement_1", new SCreator(CompoundStatement_1_factory));
+            new Sfactory(this, "JumpLabel", new SCreator(JumpLabel_factory));
+            new Sfactory(this, "State", new SCreator(State_factory));
+            new Sfactory(this, "TypecastExpression", new SCreator(TypecastExpression_factory));
+            new Sfactory(this, "IntRotRotArgEvent_1", new SCreator(IntRotRotArgEvent_1_factory));
+            new Sfactory(this, "Statement_11", new SCreator(Statement_11_factory));
+            new Sfactory(this, "VoidArgEvent_2", new SCreator(VoidArgEvent_2_factory));
+            new Sfactory(this, "Typename", new SCreator(Typename_factory));
+            new Sfactory(this, "ArgumentDeclarationList", new SCreator(ArgumentDeclarationList_factory));
+            new Sfactory(this, "StateBody", new SCreator(StateBody_factory));
+            new Sfactory(this, "Event_8", new SCreator(Event_8_factory));
+            new Sfactory(this, "Event_9", new SCreator(Event_9_factory));
+            new Sfactory(this, "Event_6", new SCreator(Event_6_factory));
+            new Sfactory(this, "Event_7", new SCreator(Event_7_factory));
+            new Sfactory(this, "Statement_8", new SCreator(Statement_8_factory));
+            new Sfactory(this, "CompoundStatement", new SCreator(CompoundStatement_factory));
+            new Sfactory(this, "Event_1", new SCreator(Event_1_factory));
+            new Sfactory(this, "Statement_4", new SCreator(Statement_4_factory));
+            new Sfactory(this, "Statement_5", new SCreator(Statement_5_factory));
+            new Sfactory(this, "Statement_6", new SCreator(Statement_6_factory));
+            new Sfactory(this, "Statement_7", new SCreator(Statement_7_factory));
+            new Sfactory(this, "IncrementDecrementExpression_5", new SCreator(IncrementDecrementExpression_5_factory));
+            new Sfactory(this, "Statement_2", new SCreator(Statement_2_factory));
+            new Sfactory(this, "ListConstant", new SCreator(ListConstant_factory));
+            new Sfactory(this, "States", new SCreator(States_factory));
+            new Sfactory(this, "TypecastExpression_2", new SCreator(TypecastExpression_2_factory));
+            new Sfactory(this, "ArgumentList_2", new SCreator(ArgumentList_2_factory));
+            new Sfactory(this, "StateBody_14", new SCreator(StateBody_14_factory));
+            new Sfactory(this, "KeyArgEvent_1", new SCreator(KeyArgEvent_1_factory));
+            new Sfactory(this, "VectorConstant", new SCreator(VectorConstant_factory));
+            new Sfactory(this, "SimpleAssignment_3", new SCreator(SimpleAssignment_3_factory));
+            new Sfactory(this, "Typename_5", new SCreator(Typename_5_factory));
+            new Sfactory(this, "TypecastExpression_8", new SCreator(TypecastExpression_8_factory));
+            new Sfactory(this, "SimpleAssignment_21", new SCreator(SimpleAssignment_21_factory));
+            new Sfactory(this, "JumpLabel_1", new SCreator(JumpLabel_1_factory));
+            new Sfactory(this, "TypecastExpression_4", new SCreator(TypecastExpression_4_factory));
+            new Sfactory(this, "JumpStatement_1", new SCreator(JumpStatement_1_factory));
+            new Sfactory(this, "VoidArgEvent_8", new SCreator(VoidArgEvent_8_factory));
+            new Sfactory(this, "GlobalVariableDeclaration_2", new SCreator(GlobalVariableDeclaration_2_factory));
+            new Sfactory(this, "GlobalVariableDeclaration_1", new SCreator(GlobalVariableDeclaration_1_factory));
+            new Sfactory(this, "RotDeclaration_1", new SCreator(RotDeclaration_1_factory));
+            new Sfactory(this, "WhileStatement_1", new SCreator(WhileStatement_1_factory));
+            new Sfactory(this, "VecDeclaration_1", new SCreator(VecDeclaration_1_factory));
+            new Sfactory(this, "IntRotRotArgStateEvent", new SCreator(IntRotRotArgStateEvent_factory));
+            new Sfactory(this, "Constant_3", new SCreator(Constant_3_factory));
+            new Sfactory(this, "Declaration", new SCreator(Declaration_factory));
+            new Sfactory(this, "IntVecVecArgStateEvent_1", new SCreator(IntVecVecArgStateEvent_1_factory));
+            new Sfactory(this, "ArgumentDeclarationList_5", new SCreator(ArgumentDeclarationList_5_factory));
+            new Sfactory(this, "ReturnStatement", new SCreator(ReturnStatement_factory));
+            new Sfactory(this, "EmptyStatement_1", new SCreator(EmptyStatement_1_factory));
+        }
+        public static object IncrementDecrementExpression_1_factory(Parser yyp) { return new IncrementDecrementExpression_1(yyp); }
+        public static object StateChange_factory(Parser yyp) { return new StateChange(yyp); }
+        public static object ArgumentDeclarationList_3_factory(Parser yyp) { return new ArgumentDeclarationList_3(yyp); }
+        public static object BinaryExpression_factory(Parser yyp) { return new BinaryExpression(yyp); }
+        public static object VoidArgEvent_5_factory(Parser yyp) { return new VoidArgEvent_5(yyp); }
+        public static object IdentDotExpression_1_factory(Parser yyp) { return new IdentDotExpression_1(yyp); }
+        public static object StateBody_10_factory(Parser yyp) { return new StateBody_10(yyp); }
+        public static object VectorArgEvent_1_factory(Parser yyp) { return new VectorArgEvent_1(yyp); }
+        public static object ReturnStatement_1_factory(Parser yyp) { return new ReturnStatement_1(yyp); }
+        public static object ReturnStatement_2_factory(Parser yyp) { return new ReturnStatement_2(yyp); }
+        public static object Typename_7_factory(Parser yyp) { return new Typename_7(yyp); }
+        public static object ExpressionArgument_factory(Parser yyp) { return new ExpressionArgument(yyp); }
+        public static object ForLoop_factory(Parser yyp) { return new ForLoop(yyp); }
+        public static object GlobalDefinitions_factory(Parser yyp) { return new GlobalDefinitions(yyp); }
+        public static object Typename_1_factory(Parser yyp) { return new Typename_1(yyp); }
+        public static object TypecastExpression_3_factory(Parser yyp) { return new TypecastExpression_3(yyp); }
+        public static object IncrementDecrementExpression_6_factory(Parser yyp) { return new IncrementDecrementExpression_6(yyp); }
+        public static object SimpleAssignment_2_factory(Parser yyp) { return new SimpleAssignment_2(yyp); }
+        public static object IntVecVecArgEvent_1_factory(Parser yyp) { return new IntVecVecArgEvent_1(yyp); }
+        public static object LSLProgramRoot_2_factory(Parser yyp) { return new LSLProgramRoot_2(yyp); }
+        public static object IdentDotExpression_factory(Parser yyp) { return new IdentDotExpression(yyp); }
+        public static object UnaryExpression_1_factory(Parser yyp) { return new UnaryExpression_1(yyp); }
+        public static object RotationConstant_factory(Parser yyp) { return new RotationConstant(yyp); }
+        public static object IntArgumentDeclarationList_factory(Parser yyp) { return new IntArgumentDeclarationList(yyp); }
+        public static object ArgumentList_factory(Parser yyp) { return new ArgumentList(yyp); }
+        public static object BinaryExpression_3_factory(Parser yyp) { return new BinaryExpression_3(yyp); }
+        public static object Event_2_factory(Parser yyp) { return new Event_2(yyp); }
+        public static object ArgumentList_4_factory(Parser yyp) { return new ArgumentList_4(yyp); }
+        public static object IntVecVecArgEvent_factory(Parser yyp) { return new IntVecVecArgEvent(yyp); }
+        public static object WhileStatement_2_factory(Parser yyp) { return new WhileStatement_2(yyp); }
+        public static object Assignment_factory(Parser yyp) { return new Assignment(yyp); }
+        public static object Statement_12_factory(Parser yyp) { return new Statement_12(yyp); }
+        public static object IncrementDecrementExpression_8_factory(Parser yyp) { return new IncrementDecrementExpression_8(yyp); }
+        public static object VectorArgEvent_2_factory(Parser yyp) { return new VectorArgEvent_2(yyp); }
+        public static object Constant_2_factory(Parser yyp) { return new Constant_2(yyp); }
+        public static object Statement_1_factory(Parser yyp) { return new Statement_1(yyp); }
+        public static object VectorArgEvent_factory(Parser yyp) { return new VectorArgEvent(yyp); }
+        public static object ForLoopStatement_1_factory(Parser yyp) { return new ForLoopStatement_1(yyp); }
+        public static object IncrementDecrementExpression_2_factory(Parser yyp) { return new IncrementDecrementExpression_2(yyp); }
+        public static object IntArgumentDeclarationList_1_factory(Parser yyp) { return new IntArgumentDeclarationList_1(yyp); }
+        public static object VoidArgEvent_4_factory(Parser yyp) { return new VoidArgEvent_4(yyp); }
+        public static object ForLoop_1_factory(Parser yyp) { return new ForLoop_1(yyp); }
+        public static object Typename_4_factory(Parser yyp) { return new Typename_4(yyp); }
+        public static object IdentExpression_factory(Parser yyp) { return new IdentExpression(yyp); }
+        public static object ForLoop_2_factory(Parser yyp) { return new ForLoop_2(yyp); }
+        public static object DoWhileStatement_factory(Parser yyp) { return new DoWhileStatement(yyp); }
+        public static object SimpleAssignment_6_factory(Parser yyp) { return new SimpleAssignment_6(yyp); }
+        public static object IntDeclaration_1_factory(Parser yyp) { return new IntDeclaration_1(yyp); }
+        public static object State_1_factory(Parser yyp) { return new State_1(yyp); }
+        public static object StateBody_9_factory(Parser yyp) { return new StateBody_9(yyp); }
+        public static object StateBody_8_factory(Parser yyp) { return new StateBody_8(yyp); }
+        public static object State_2_factory(Parser yyp) { return new State_2(yyp); }
+        public static object StateBody_3_factory(Parser yyp) { return new StateBody_3(yyp); }
+        public static object StateBody_2_factory(Parser yyp) { return new StateBody_2(yyp); }
+        public static object StateBody_1_factory(Parser yyp) { return new StateBody_1(yyp); }
+        public static object Typename_6_factory(Parser yyp) { return new Typename_6(yyp); }
+        public static object StateBody_7_factory(Parser yyp) { return new StateBody_7(yyp); }
+        public static object StateBody_4_factory(Parser yyp) { return new StateBody_4(yyp); }
+        public static object IfStatement_1_factory(Parser yyp) { return new IfStatement_1(yyp); }
+        public static object IfStatement_3_factory(Parser yyp) { return new IfStatement_3(yyp); }
+        public static object IfStatement_2_factory(Parser yyp) { return new IfStatement_2(yyp); }
+        public static object SimpleAssignment_1_factory(Parser yyp) { return new SimpleAssignment_1(yyp); }
+        public static object VoidArgEvent_6_factory(Parser yyp) { return new VoidArgEvent_6(yyp); }
+        public static object IfStatement_factory(Parser yyp) { return new IfStatement(yyp); }
+        public static object ConstantExpression_factory(Parser yyp) { return new ConstantExpression(yyp); }
+        public static object BinaryExpression_7_factory(Parser yyp) { return new BinaryExpression_7(yyp); }
+        public static object IncrementDecrementExpression_factory(Parser yyp) { return new IncrementDecrementExpression(yyp); }
+        public static object Statement_9_factory(Parser yyp) { return new Statement_9(yyp); }
+        public static object IntVecVecArgStateEvent_factory(Parser yyp) { return new IntVecVecArgStateEvent(yyp); }
+        public static object Declaration_1_factory(Parser yyp) { return new Declaration_1(yyp); }
+        public static object KeyIntIntArgumentDeclarationList_factory(Parser yyp) { return new KeyIntIntArgumentDeclarationList(yyp); }
+        public static object VectorArgumentDeclarationList_1_factory(Parser yyp) { return new VectorArgumentDeclarationList_1(yyp); }
+        public static object SimpleAssignment_factory(Parser yyp) { return new SimpleAssignment(yyp); }
+        public static object BinaryExpression_9_factory(Parser yyp) { return new BinaryExpression_9(yyp); }
+        public static object IntDeclaration_factory(Parser yyp) { return new IntDeclaration(yyp); }
+        public static object IntArgEvent_10_factory(Parser yyp) { return new IntArgEvent_10(yyp); }
+        public static object ArgumentDeclarationList_2_factory(Parser yyp) { return new ArgumentDeclarationList_2(yyp); }
+        public static object ArgumentDeclarationList_1_factory(Parser yyp) { return new ArgumentDeclarationList_1(yyp); }
+        public static object ArgumentDeclarationList_4_factory(Parser yyp) { return new ArgumentDeclarationList_4(yyp); }
+        public static object SimpleAssignment_9_factory(Parser yyp) { return new SimpleAssignment_9(yyp); }
+        public static object ForLoopStatement_2_factory(Parser yyp) { return new ForLoopStatement_2(yyp); }
+        public static object StatementList_factory(Parser yyp) { return new StatementList(yyp); }
+        public static object StateBody_13_factory(Parser yyp) { return new StateBody_13(yyp); }
+        public static object Typename_3_factory(Parser yyp) { return new Typename_3(yyp); }
+        public static object KeyArgumentDeclarationList_1_factory(Parser yyp) { return new KeyArgumentDeclarationList_1(yyp); }
+        public static object UnaryExpression_3_factory(Parser yyp) { return new UnaryExpression_3(yyp); }
+        public static object StateBody_16_factory(Parser yyp) { return new StateBody_16(yyp); }
+        public static object VectorArgumentDeclarationList_factory(Parser yyp) { return new VectorArgumentDeclarationList(yyp); }
+        public static object IntArgEvent_3_factory(Parser yyp) { return new IntArgEvent_3(yyp); }
+        public static object StatementList_2_factory(Parser yyp) { return new StatementList_2(yyp); }
+        public static object KeyArgStateEvent_factory(Parser yyp) { return new KeyArgStateEvent(yyp); }
+        public static object LSLProgramRoot_1_factory(Parser yyp) { return new LSLProgramRoot_1(yyp); }
+        public static object Typename_2_factory(Parser yyp) { return new Typename_2(yyp); }
+        public static object TypecastExpression_6_factory(Parser yyp) { return new TypecastExpression_6(yyp); }
+        public static object Event_3_factory(Parser yyp) { return new Event_3(yyp); }
+        public static object IntArgStateEvent_factory(Parser yyp) { return new IntArgStateEvent(yyp); }
+        public static object StateChange_2_factory(Parser yyp) { return new StateChange_2(yyp); }
+        public static object StateChange_1_factory(Parser yyp) { return new StateChange_1(yyp); }
+        public static object VectorConstant_1_factory(Parser yyp) { return new VectorConstant_1(yyp); }
+        public static object KeyDeclaration_factory(Parser yyp) { return new KeyDeclaration(yyp); }
+        public static object States_2_factory(Parser yyp) { return new States_2(yyp); }
+        public static object VoidArgEvent_factory(Parser yyp) { return new VoidArgEvent(yyp); }
+        public static object WhileStatement_factory(Parser yyp) { return new WhileStatement(yyp); }
+        public static object UnaryExpression_factory(Parser yyp) { return new UnaryExpression(yyp); }
+        public static object BinaryExpression_6_factory(Parser yyp) { return new BinaryExpression_6(yyp); }
+        public static object ConstantExpression_1_factory(Parser yyp) { return new ConstantExpression_1(yyp); }
+        public static object ForLoopStatement_factory(Parser yyp) { return new ForLoopStatement(yyp); }
+        public static object BinaryExpression_1_factory(Parser yyp) { return new BinaryExpression_1(yyp); }
+        public static object StateEvent_factory(Parser yyp) { return new StateEvent(yyp); }
+        public static object Event_5_factory(Parser yyp) { return new Event_5(yyp); }
+        public static object SimpleAssignment_5_factory(Parser yyp) { return new SimpleAssignment_5(yyp); }
+        public static object RotationConstant_1_factory(Parser yyp) { return new RotationConstant_1(yyp); }
+        public static object Constant_factory(Parser yyp) { return new Constant(yyp); }
+        public static object IntArgEvent_1_factory(Parser yyp) { return new IntArgEvent_1(yyp); }
+        public static object SimpleAssignment_8_factory(Parser yyp) { return new SimpleAssignment_8(yyp); }
+        public static object ForLoopStatement_3_factory(Parser yyp) { return new ForLoopStatement_3(yyp); }
+        public static object IntArgEvent_2_factory(Parser yyp) { return new IntArgEvent_2(yyp); }
+        public static object LSLProgramRoot_factory(Parser yyp) { return new LSLProgramRoot(yyp); }
+        public static object StateBody_12_factory(Parser yyp) { return new StateBody_12(yyp); }
+        public static object IntArgEvent_4_factory(Parser yyp) { return new IntArgEvent_4(yyp); }
+        public static object IntArgEvent_7_factory(Parser yyp) { return new IntArgEvent_7(yyp); }
+        public static object IntArgEvent_6_factory(Parser yyp) { return new IntArgEvent_6(yyp); }
+        public static object IntArgEvent_9_factory(Parser yyp) { return new IntArgEvent_9(yyp); }
+        public static object TypecastExpression_7_factory(Parser yyp) { return new TypecastExpression_7(yyp); }
+        public static object StateBody_15_factory(Parser yyp) { return new StateBody_15(yyp); }
+        public static object VoidArgStateEvent_1_factory(Parser yyp) { return new VoidArgStateEvent_1(yyp); }
+        public static object error_factory(Parser yyp) { return new error(yyp); }
+        public static object TypecastExpression_1_factory(Parser yyp) { return new TypecastExpression_1(yyp); }
+        public static object GlobalDefinitions_4_factory(Parser yyp) { return new GlobalDefinitions_4(yyp); }
+        public static object GlobalDefinitions_3_factory(Parser yyp) { return new GlobalDefinitions_3(yyp); }
+        public static object GlobalDefinitions_2_factory(Parser yyp) { return new GlobalDefinitions_2(yyp); }
+        public static object GlobalDefinitions_1_factory(Parser yyp) { return new GlobalDefinitions_1(yyp); }
+        public static object ArgumentList_1_factory(Parser yyp) { return new ArgumentList_1(yyp); }
+        public static object IncrementDecrementExpression_7_factory(Parser yyp) { return new IncrementDecrementExpression_7(yyp); }
+        public static object UnaryExpression_2_factory(Parser yyp) { return new UnaryExpression_2(yyp); }
+        public static object Argument_factory(Parser yyp) { return new Argument(yyp); }
+        public static object SimpleAssignment_24_factory(Parser yyp) { return new SimpleAssignment_24(yyp); }
+        public static object ExpressionArgument_1_factory(Parser yyp) { return new ExpressionArgument_1(yyp); }
+        public static object EmptyStatement_factory(Parser yyp) { return new EmptyStatement(yyp); }
+        public static object KeyIntIntArgStateEvent_factory(Parser yyp) { return new KeyIntIntArgStateEvent(yyp); }
+        public static object VectorArgStateEvent_1_factory(Parser yyp) { return new VectorArgStateEvent_1(yyp); }
+        public static object GlobalFunctionDefinition_1_factory(Parser yyp) { return new GlobalFunctionDefinition_1(yyp); }
+        public static object FunctionCallExpression_1_factory(Parser yyp) { return new FunctionCallExpression_1(yyp); }
+        public static object DoWhileStatement_2_factory(Parser yyp) { return new DoWhileStatement_2(yyp); }
+        public static object VoidArgEvent_1_factory(Parser yyp) { return new VoidArgEvent_1(yyp); }
+        public static object KeyArgumentDeclarationList_factory(Parser yyp) { return new KeyArgumentDeclarationList(yyp); }
+        public static object KeyIntIntArgEvent_factory(Parser yyp) { return new KeyIntIntArgEvent(yyp); }
+        public static object ListConstant_1_factory(Parser yyp) { return new ListConstant_1(yyp); }
+        public static object StateEvent_1_factory(Parser yyp) { return new StateEvent_1(yyp); }
+        public static object SimpleAssignment_20_factory(Parser yyp) { return new SimpleAssignment_20(yyp); }
+        public static object SimpleAssignment_23_factory(Parser yyp) { return new SimpleAssignment_23(yyp); }
+        public static object SimpleAssignment_22_factory(Parser yyp) { return new SimpleAssignment_22(yyp); }
+        public static object IntArgEvent_5_factory(Parser yyp) { return new IntArgEvent_5(yyp); }
+        public static object ParenthesisExpression_factory(Parser yyp) { return new ParenthesisExpression(yyp); }
+        public static object JumpStatement_factory(Parser yyp) { return new JumpStatement(yyp); }
+        public static object IntRotRotArgumentDeclarationList_1_factory(Parser yyp) { return new IntRotRotArgumentDeclarationList_1(yyp); }
+        public static object SimpleAssignment_4_factory(Parser yyp) { return new SimpleAssignment_4(yyp); }
+        public static object KeyArgEvent_factory(Parser yyp) { return new KeyArgEvent(yyp); }
+        public static object Assignment_2_factory(Parser yyp) { return new Assignment_2(yyp); }
+        public static object ForLoopStatement_4_factory(Parser yyp) { return new ForLoopStatement_4(yyp); }
+        public static object Statement_13_factory(Parser yyp) { return new Statement_13(yyp); }
+        public static object RotDeclaration_factory(Parser yyp) { return new RotDeclaration(yyp); }
+        public static object StateBody_11_factory(Parser yyp) { return new StateBody_11(yyp); }
+        public static object KeyArgEvent_2_factory(Parser yyp) { return new KeyArgEvent_2(yyp); }
+        public static object StatementList_1_factory(Parser yyp) { return new StatementList_1(yyp); }
+        public static object StateBody_6_factory(Parser yyp) { return new StateBody_6(yyp); }
+        public static object Constant_1_factory(Parser yyp) { return new Constant_1(yyp); }
+        public static object VecDeclaration_factory(Parser yyp) { return new VecDeclaration(yyp); }
+        public static object TypecastExpression_5_factory(Parser yyp) { return new TypecastExpression_5(yyp); }
+        public static object GlobalFunctionDefinition_2_factory(Parser yyp) { return new GlobalFunctionDefinition_2(yyp); }
+        public static object KeyIntIntArgEvent_1_factory(Parser yyp) { return new KeyIntIntArgEvent_1(yyp); }
+        public static object Constant_4_factory(Parser yyp) { return new Constant_4(yyp); }
+        public static object TypecastExpression_9_factory(Parser yyp) { return new TypecastExpression_9(yyp); }
+        public static object IntRotRotArgStateEvent_1_factory(Parser yyp) { return new IntRotRotArgStateEvent_1(yyp); }
+        public static object IncrementDecrementExpression_3_factory(Parser yyp) { return new IncrementDecrementExpression_3(yyp); }
+        public static object States_1_factory(Parser yyp) { return new States_1(yyp); }
+        public static object GlobalVariableDeclaration_factory(Parser yyp) { return new GlobalVariableDeclaration(yyp); }
+        public static object VoidArgEvent_3_factory(Parser yyp) { return new VoidArgEvent_3(yyp); }
+        public static object Assignment_1_factory(Parser yyp) { return new Assignment_1(yyp); }
+        public static object BinaryExpression_5_factory(Parser yyp) { return new BinaryExpression_5(yyp); }
+        public static object IfStatement_4_factory(Parser yyp) { return new IfStatement_4(yyp); }
+        public static object IntVecVecArgumentDeclarationList_1_factory(Parser yyp) { return new IntVecVecArgumentDeclarationList_1(yyp); }
+        public static object KeyIntIntArgumentDeclarationList_1_factory(Parser yyp) { return new KeyIntIntArgumentDeclarationList_1(yyp); }
+        public static object Statement_factory(Parser yyp) { return new Statement(yyp); }
+        public static object ParenthesisExpression_1_factory(Parser yyp) { return new ParenthesisExpression_1(yyp); }
+        public static object ParenthesisExpression_2_factory(Parser yyp) { return new ParenthesisExpression_2(yyp); }
+        public static object DoWhileStatement_1_factory(Parser yyp) { return new DoWhileStatement_1(yyp); }
+        public static object VoidArgStateEvent_factory(Parser yyp) { return new VoidArgStateEvent(yyp); }
+        public static object GlobalFunctionDefinition_factory(Parser yyp) { return new GlobalFunctionDefinition(yyp); }
+        public static object Event_4_factory(Parser yyp) { return new Event_4(yyp); }
+        public static object IntArgEvent_factory(Parser yyp) { return new IntArgEvent(yyp); }
+        public static object SimpleAssignment_11_factory(Parser yyp) { return new SimpleAssignment_11(yyp); }
+        public static object SimpleAssignment_10_factory(Parser yyp) { return new SimpleAssignment_10(yyp); }
+        public static object SimpleAssignment_13_factory(Parser yyp) { return new SimpleAssignment_13(yyp); }
+        public static object SimpleAssignment_12_factory(Parser yyp) { return new SimpleAssignment_12(yyp); }
+        public static object SimpleAssignment_15_factory(Parser yyp) { return new SimpleAssignment_15(yyp); }
+        public static object SimpleAssignment_14_factory(Parser yyp) { return new SimpleAssignment_14(yyp); }
+        public static object SimpleAssignment_17_factory(Parser yyp) { return new SimpleAssignment_17(yyp); }
+        public static object SimpleAssignment_16_factory(Parser yyp) { return new SimpleAssignment_16(yyp); }
+        public static object SimpleAssignment_19_factory(Parser yyp) { return new SimpleAssignment_19(yyp); }
+        public static object SimpleAssignment_18_factory(Parser yyp) { return new SimpleAssignment_18(yyp); }
+        public static object IntVecVecArgumentDeclarationList_factory(Parser yyp) { return new IntVecVecArgumentDeclarationList(yyp); }
+        public static object StateBody_5_factory(Parser yyp) { return new StateBody_5(yyp); }
+        public static object BinaryExpression_17_factory(Parser yyp) { return new BinaryExpression_17(yyp); }
+        public static object BinaryExpression_16_factory(Parser yyp) { return new BinaryExpression_16(yyp); }
+        public static object BinaryExpression_15_factory(Parser yyp) { return new BinaryExpression_15(yyp); }
+        public static object BinaryExpression_14_factory(Parser yyp) { return new BinaryExpression_14(yyp); }
+        public static object BinaryExpression_13_factory(Parser yyp) { return new BinaryExpression_13(yyp); }
+        public static object BinaryExpression_12_factory(Parser yyp) { return new BinaryExpression_12(yyp); }
+        public static object BinaryExpression_11_factory(Parser yyp) { return new BinaryExpression_11(yyp); }
+        public static object BinaryExpression_10_factory(Parser yyp) { return new BinaryExpression_10(yyp); }
+        public static object VectorArgStateEvent_factory(Parser yyp) { return new VectorArgStateEvent(yyp); }
+        public static object Statement_10_factory(Parser yyp) { return new Statement_10(yyp); }
+        public static object BinaryExpression_8_factory(Parser yyp) { return new BinaryExpression_8(yyp); }
+        public static object BinaryExpression_18_factory(Parser yyp) { return new BinaryExpression_18(yyp); }
+        public static object BinaryExpression_2_factory(Parser yyp) { return new BinaryExpression_2(yyp); }
+        public static object FunctionCallExpression_factory(Parser yyp) { return new FunctionCallExpression(yyp); }
+        public static object VectorArgEvent_3_factory(Parser yyp) { return new VectorArgEvent_3(yyp); }
+        public static object IdentExpression_1_factory(Parser yyp) { return new IdentExpression_1(yyp); }
+        public static object IntArgEvent_8_factory(Parser yyp) { return new IntArgEvent_8(yyp); }
+        public static object VoidArgEvent_7_factory(Parser yyp) { return new VoidArgEvent_7(yyp); }
+        public static object IncrementDecrementExpression_4_factory(Parser yyp) { return new IncrementDecrementExpression_4(yyp); }
+        public static object FunctionCall_factory(Parser yyp) { return new FunctionCall(yyp); }
+        public static object ArgumentList_3_factory(Parser yyp) { return new ArgumentList_3(yyp); }
+        public static object KeyIntIntArgStateEvent_1_factory(Parser yyp) { return new KeyIntIntArgStateEvent_1(yyp); }
+        public static object IntRotRotArgumentDeclarationList_factory(Parser yyp) { return new IntRotRotArgumentDeclarationList(yyp); }
+        public static object KeyDeclaration_1_factory(Parser yyp) { return new KeyDeclaration_1(yyp); }
+        public static object BinaryExpression_4_factory(Parser yyp) { return new BinaryExpression_4(yyp); }
+        public static object FunctionCall_1_factory(Parser yyp) { return new FunctionCall_1(yyp); }
+        public static object KeyArgStateEvent_1_factory(Parser yyp) { return new KeyArgStateEvent_1(yyp); }
+        public static object IntArgStateEvent_1_factory(Parser yyp) { return new IntArgStateEvent_1(yyp); }
+        public static object Event_factory(Parser yyp) { return new Event(yyp); }
+        public static object IntRotRotArgEvent_factory(Parser yyp) { return new IntRotRotArgEvent(yyp); }
+        public static object SimpleAssignment_7_factory(Parser yyp) { return new SimpleAssignment_7(yyp); }
+        public static object Statement_3_factory(Parser yyp) { return new Statement_3(yyp); }
+        public static object Expression_factory(Parser yyp) { return new Expression(yyp); }
+        public static object CompoundStatement_2_factory(Parser yyp) { return new CompoundStatement_2(yyp); }
+        public static object CompoundStatement_1_factory(Parser yyp) { return new CompoundStatement_1(yyp); }
+        public static object JumpLabel_factory(Parser yyp) { return new JumpLabel(yyp); }
+        public static object State_factory(Parser yyp) { return new State(yyp); }
+        public static object TypecastExpression_factory(Parser yyp) { return new TypecastExpression(yyp); }
+        public static object IntRotRotArgEvent_1_factory(Parser yyp) { return new IntRotRotArgEvent_1(yyp); }
+        public static object Statement_11_factory(Parser yyp) { return new Statement_11(yyp); }
+        public static object VoidArgEvent_2_factory(Parser yyp) { return new VoidArgEvent_2(yyp); }
+        public static object Typename_factory(Parser yyp) { return new Typename(yyp); }
+        public static object ArgumentDeclarationList_factory(Parser yyp) { return new ArgumentDeclarationList(yyp); }
+        public static object StateBody_factory(Parser yyp) { return new StateBody(yyp); }
+        public static object Event_8_factory(Parser yyp) { return new Event_8(yyp); }
+        public static object Event_9_factory(Parser yyp) { return new Event_9(yyp); }
+        public static object Event_6_factory(Parser yyp) { return new Event_6(yyp); }
+        public static object Event_7_factory(Parser yyp) { return new Event_7(yyp); }
+        public static object Statement_8_factory(Parser yyp) { return new Statement_8(yyp); }
+        public static object CompoundStatement_factory(Parser yyp) { return new CompoundStatement(yyp); }
+        public static object Event_1_factory(Parser yyp) { return new Event_1(yyp); }
+        public static object Statement_4_factory(Parser yyp) { return new Statement_4(yyp); }
+        public static object Statement_5_factory(Parser yyp) { return new Statement_5(yyp); }
+        public static object Statement_6_factory(Parser yyp) { return new Statement_6(yyp); }
+        public static object Statement_7_factory(Parser yyp) { return new Statement_7(yyp); }
+        public static object IncrementDecrementExpression_5_factory(Parser yyp) { return new IncrementDecrementExpression_5(yyp); }
+        public static object Statement_2_factory(Parser yyp) { return new Statement_2(yyp); }
+        public static object ListConstant_factory(Parser yyp) { return new ListConstant(yyp); }
+        public static object States_factory(Parser yyp) { return new States(yyp); }
+        public static object TypecastExpression_2_factory(Parser yyp) { return new TypecastExpression_2(yyp); }
+        public static object ArgumentList_2_factory(Parser yyp) { return new ArgumentList_2(yyp); }
+        public static object StateBody_14_factory(Parser yyp) { return new StateBody_14(yyp); }
+        public static object KeyArgEvent_1_factory(Parser yyp) { return new KeyArgEvent_1(yyp); }
+        public static object VectorConstant_factory(Parser yyp) { return new VectorConstant(yyp); }
+        public static object SimpleAssignment_3_factory(Parser yyp) { return new SimpleAssignment_3(yyp); }
+        public static object Typename_5_factory(Parser yyp) { return new Typename_5(yyp); }
+        public static object TypecastExpression_8_factory(Parser yyp) { return new TypecastExpression_8(yyp); }
+        public static object SimpleAssignment_21_factory(Parser yyp) { return new SimpleAssignment_21(yyp); }
+        public static object JumpLabel_1_factory(Parser yyp) { return new JumpLabel_1(yyp); }
+        public static object TypecastExpression_4_factory(Parser yyp) { return new TypecastExpression_4(yyp); }
+        public static object JumpStatement_1_factory(Parser yyp) { return new JumpStatement_1(yyp); }
+        public static object VoidArgEvent_8_factory(Parser yyp) { return new VoidArgEvent_8(yyp); }
+        public static object GlobalVariableDeclaration_2_factory(Parser yyp) { return new GlobalVariableDeclaration_2(yyp); }
+        public static object GlobalVariableDeclaration_1_factory(Parser yyp) { return new GlobalVariableDeclaration_1(yyp); }
+        public static object RotDeclaration_1_factory(Parser yyp) { return new RotDeclaration_1(yyp); }
+        public static object WhileStatement_1_factory(Parser yyp) { return new WhileStatement_1(yyp); }
+        public static object VecDeclaration_1_factory(Parser yyp) { return new VecDeclaration_1(yyp); }
+        public static object IntRotRotArgStateEvent_factory(Parser yyp) { return new IntRotRotArgStateEvent(yyp); }
+        public static object Constant_3_factory(Parser yyp) { return new Constant_3(yyp); }
+        public static object Declaration_factory(Parser yyp) { return new Declaration(yyp); }
+        public static object IntVecVecArgStateEvent_1_factory(Parser yyp) { return new IntVecVecArgStateEvent_1(yyp); }
+        public static object ArgumentDeclarationList_5_factory(Parser yyp) { return new ArgumentDeclarationList_5(yyp); }
+        public static object ReturnStatement_factory(Parser yyp) { return new ReturnStatement(yyp); }
+        public static object EmptyStatement_1_factory(Parser yyp) { return new EmptyStatement_1(yyp); }
+    }
+    public class LSLSyntax
+    : Parser
+    {
+        public LSLSyntax
+        () : base(new yyLSLSyntax
+        (), new LSLTokens())
+        { }
+        public LSLSyntax
+        (YyParser syms) : base(syms, new LSLTokens()) { }
+        public LSLSyntax
+        (YyParser syms, ErrorHandler erh) : base(syms, new LSLTokens(erh)) { }
 
- }
+    }
 }

@@ -25,10 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenSim.Region.Framework.Interfaces;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using OpenSim.Region.Framework.Interfaces;
 
 namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
 {
@@ -47,8 +47,8 @@ namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
         /// <param name="map">The terrain channel being saved</param>
         public override void SaveFile(string filename, ITerrainChannel map)
         {
-            using(Bitmap colours = CreateGrayscaleBitmapFromMap(map))
-                colours.Save(filename,ImageFormat.Bmp);
+            using (Bitmap colours = CreateGrayscaleBitmapFromMap(map))
+                colours.Save(filename, ImageFormat.Bmp);
         }
 
         /// <summary>
@@ -58,8 +58,8 @@ namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
         /// <param name="map">The terrain channel being saved</param>
         public override void SaveStream(Stream stream, ITerrainChannel map)
         {
-            using(Bitmap colours = CreateGrayscaleBitmapFromMap(map))
-                colours.Save(stream,ImageFormat.Bmp);
+            using (Bitmap colours = CreateGrayscaleBitmapFromMap(map))
+                colours.Save(stream, ImageFormat.Bmp);
         }
 
         /// <summary>

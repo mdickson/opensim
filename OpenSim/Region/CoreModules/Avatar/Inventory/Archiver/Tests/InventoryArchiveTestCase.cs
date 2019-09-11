@@ -25,23 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Threading;
 using NUnit.Framework;
 using OpenMetaverse;
-using OpenSim.Data;
 using OpenSim.Framework;
-using OpenSim.Framework.Serialization;
-using OpenSim.Framework.Serialization.External;
-using OpenSim.Region.CoreModules.Avatar.Inventory.Archiver;
-using OpenSim.Region.CoreModules.World.Serialiser;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Scenes.Serialization;
 using OpenSim.Services.Interfaces;
 using OpenSim.Tests.Common;
+using System;
+using System.IO;
+using System.Threading;
 
 namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
 {
@@ -61,22 +53,28 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
         protected MemoryStream m_iarStream;
 
         protected UserAccount m_uaMT
-            = new UserAccount {
+            = new UserAccount
+            {
                 PrincipalID = UUID.Parse("00000000-0000-0000-0000-000000000555"),
                 FirstName = "Mr",
-                LastName = "Tiddles" };
+                LastName = "Tiddles"
+            };
 
         protected UserAccount m_uaLL1
-            = new UserAccount {
+            = new UserAccount
+            {
                 PrincipalID = UUID.Parse("00000000-0000-0000-0000-000000000666"),
                 FirstName = "Lord",
-                LastName = "Lucan" };
+                LastName = "Lucan"
+            };
 
         protected UserAccount m_uaLL2
-            = new UserAccount {
+            = new UserAccount
+            {
                 PrincipalID = UUID.Parse("00000000-0000-0000-0000-000000000777"),
                 FirstName = "Lord",
-                LastName = "Lucan" };
+                LastName = "Lucan"
+            };
 
         protected string m_item1Name = "Ray Gun Item";
         protected string m_coaItemName = "Coalesced Item";
@@ -108,7 +106,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
 
         protected void ConstructDefaultIarBytesForTestLoad()
         {
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             InventoryArchiverModule archiverModule = new InventoryArchiverModule();
             Scene scene = new SceneHelpers().SetupScene();

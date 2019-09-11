@@ -28,9 +28,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Threading;
-using log4net;
 
 namespace OpenSim.Framework.Monitoring
 {
@@ -39,7 +36,7 @@ namespace OpenSim.Framework.Monitoring
     /// </summary>
     public static class MemoryWatchdog
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Is this watchdog active?
@@ -49,7 +46,7 @@ namespace OpenSim.Framework.Monitoring
             get { return m_enabled; }
             set
             {
-//                m_log.DebugFormat("[MEMORY WATCHDOG]: Setting MemoryWatchdog.Enabled to {0}", value);
+                //                m_log.DebugFormat("[MEMORY WATCHDOG]: Setting MemoryWatchdog.Enabled to {0}", value);
 
                 if (value && !m_enabled)
                     UpdateLastRecord(GC.GetTotalMemory(false), Util.EnvironmentTickCount());
@@ -111,7 +108,7 @@ namespace OpenSim.Framework.Monitoring
             long memoryDiff = memoryNow - m_lastUpdateMemory;
 
             if (m_samples.Count >= m_maxSamples)
-                    m_samples.Dequeue();
+                m_samples.Dequeue();
 
             double elapsed = Util.EnvironmentTickCountSubtract(now, m_lastUpdateTick);
 

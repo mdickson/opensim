@@ -25,24 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using OpenMetaverse;
-using OpenSim.Framework;
-using System.Reflection;
-using System.Text;
-using log4net;
 using Npgsql;
-using NpgsqlTypes;
+using OpenMetaverse;
+using System;
 
 namespace OpenSim.Data.PGSQL
 {
     public class PGSQLXInventoryData : IXInventoryData
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(
-//                MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(
+        //                MethodBase.GetCurrentMethod().DeclaringType);
 
         private PGSQLFolderHandler m_Folders;
         private PGSQLItemHandler m_Items;
@@ -153,7 +145,7 @@ namespace OpenSim.Data.PGSQL
                 {
                     cmd.CommandText = String.Format(@"update {0} set ""parentFolderID"" = :ParentFolderID where ""inventoryID"" = :InventoryID", m_Realm);
                     cmd.Parameters.Add(m_database.CreateParameter("ParentFolderID", newParent));
-                    cmd.Parameters.Add(m_database.CreateParameter("InventoryID", id ));
+                    cmd.Parameters.Add(m_database.CreateParameter("InventoryID", id));
                     cmd.Connection = conn;
                     conn.Open();
 
@@ -174,7 +166,7 @@ namespace OpenSim.Data.PGSQL
             {
                 using (NpgsqlCommand cmd = new NpgsqlCommand())
                 {
-//                    cmd.CommandText = String.Format(@"select * from inventoryitems where ""avatarID"" = :uuid and ""assetType"" = :type and ""flags"" = 1", m_Realm);
+                    //                    cmd.CommandText = String.Format(@"select * from inventoryitems where ""avatarID"" = :uuid and ""assetType"" = :type and ""flags"" = 1", m_Realm);
 
                     cmd.CommandText = String.Format(@"select * from inventoryitems where ""avatarID"" = :uuid and ""assetType"" = :type and ""flags"" = 1");
 
@@ -196,13 +188,13 @@ namespace OpenSim.Data.PGSQL
             {
                 using (NpgsqlCommand cmd = new NpgsqlCommand())
                 {
-/*
-                    cmd.CommandText = String.Format(@"select bit_or(""inventoryCurrentPermissions"") as ""inventoryCurrentPermissions""
-                                 from inventoryitems
-                                 where ""avatarID"" = :PrincipalID
-                                   and ""assetID"" = :AssetID
-                                 group by ""assetID"" ", m_Realm);
-*/
+                    /*
+                                        cmd.CommandText = String.Format(@"select bit_or(""inventoryCurrentPermissions"") as ""inventoryCurrentPermissions""
+                                                     from inventoryitems
+                                                     where ""avatarID"" = :PrincipalID
+                                                       and ""assetID"" = :AssetID
+                                                     group by ""assetID"" ", m_Realm);
+                    */
                     cmd.CommandText = String.Format(@"select bit_or(""inventoryCurrentPermissions"") as ""inventoryCurrentPermissions""
                                  from inventoryitems
                                  where ""avatarID""::uuid = :PrincipalID
@@ -295,9 +287,9 @@ namespace OpenSim.Data.PGSQL
         }
     }
 
-    public class PGSQLInventoryHandler<T> : PGSQLGenericTableHandler<T> where T: class, new()
+    public class PGSQLInventoryHandler<T> : PGSQLGenericTableHandler<T> where T : class, new()
     {
-        public PGSQLInventoryHandler(string c, string t, string m) : base(c, t, m) {}
+        public PGSQLInventoryHandler(string c, string t, string m) : base(c, t, m) { }
 
         protected bool IncrementFolderVersion(UUID folderID)
         {
@@ -306,8 +298,8 @@ namespace OpenSim.Data.PGSQL
 
         protected bool IncrementFolderVersion(string folderID)
         {
-//            m_log.DebugFormat("[PGSQL ITEM HANDLER]: Incrementing version on folder {0}", folderID);
-//            Util.PrintCallStack();
+            //            m_log.DebugFormat("[PGSQL ITEM HANDLER]: Incrementing version on folder {0}", folderID);
+            //            Util.PrintCallStack();
 
             string sql = @"update inventoryfolders set version=version+1 where ""folderID"" = :folderID";
 
@@ -320,7 +312,7 @@ namespace OpenSim.Data.PGSQL
 
                     conn.Open();
 
-                    cmd.Parameters.Add( m_database.CreateParameter("folderID", foldID) );
+                    cmd.Parameters.Add(m_database.CreateParameter("folderID", foldID));
 
                     try
                     {

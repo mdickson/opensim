@@ -25,12 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using log4net;
+using OpenMetaverse;
+using OpenSim.Framework;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using OpenSim.Framework;
-using OpenMetaverse;
 
 namespace OpenSim.Region.PhysicsModules.SharedBase
 {
@@ -138,11 +136,11 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
                 float lastVel = m_objCollisionList[localID].RelativeSpeed;
                 if (m_objCollisionList[localID].PenetrationDepth < contact.PenetrationDepth)
                 {
-                    if(Math.Abs(lastVel) > Math.Abs(contact.RelativeSpeed))
+                    if (Math.Abs(lastVel) > Math.Abs(contact.RelativeSpeed))
                         contact.RelativeSpeed = lastVel;
                     m_objCollisionList[localID] = contact;
                 }
-                else if(Math.Abs(lastVel) < Math.Abs(contact.RelativeSpeed))
+                else if (Math.Abs(lastVel) < Math.Abs(contact.RelativeSpeed))
                 {
                     ContactPoint tmp = m_objCollisionList[localID];
                     tmp.RelativeSpeed = contact.RelativeSpeed;
@@ -162,7 +160,7 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
 
     public abstract class PhysicsActor
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public delegate void RequestTerseUpdate();
         public delegate void CollisionUpdate(EventArgs e);
@@ -295,13 +293,13 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
         {
             CollisionUpdate handler = OnCollisionUpdate;
 
-//            m_log.DebugFormat("[PHYSICS ACTOR]: Sending collision for {0}", LocalID);
+            //            m_log.DebugFormat("[PHYSICS ACTOR]: Sending collision for {0}", LocalID);
 
             if (handler != null)
                 handler(e);
         }
 
-        public virtual void SetMaterial (int material) { }
+        public virtual void SetMaterial(int material) { }
         public virtual float Density { get; set; }
         public virtual float GravModifier { get; set; }
         public virtual float Friction { get; set; }
@@ -411,7 +409,8 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
         public virtual Vector3 TargetVelocity
         {
             get { return m_targetVelocity; }
-            set {
+            set
+            {
                 m_targetVelocity = value;
                 Velocity = m_targetVelocity;
             }
@@ -421,7 +420,7 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
         public virtual Vector3 rootVelocity { get { return Vector3.Zero; } }
 
         public abstract Vector3 Torque { get; set; }
-        public abstract float CollisionScore { get; set;}
+        public abstract float CollisionScore { get; set; }
         public abstract Vector3 Acceleration { get; set; }
         public abstract Quaternion Orientation { get; set; }
         public abstract int PhysicsActorType { get; set; }
@@ -444,16 +443,16 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
 
         // Used for llSetHoverHeight and maybe vehicle height
         // Hover Height will override MoveTo target's Z
-        public abstract bool PIDHoverActive {get; set;}
-        public abstract float PIDHoverHeight { set;}
-        public abstract PIDHoverType PIDHoverType { set;}
-        public abstract float PIDHoverTau { set;}
+        public abstract bool PIDHoverActive { get; set; }
+        public abstract float PIDHoverHeight { set; }
+        public abstract PIDHoverType PIDHoverType { set; }
+        public abstract float PIDHoverTau { set; }
 
         // For RotLookAt
-        public abstract Quaternion APIDTarget { set;}
-        public abstract bool APIDActive { set;}
-        public abstract float APIDStrength { set;}
-        public abstract float APIDDamping { set;}
+        public abstract Quaternion APIDTarget { set; }
+        public abstract bool APIDActive { set; }
+        public abstract float APIDStrength { set; }
+        public abstract float APIDDamping { set; }
 
         public abstract void AddForce(Vector3 force, bool pushforce);
         public abstract void AddAngularForce(Vector3 force, bool pushforce);
@@ -499,7 +498,7 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
 
         public override bool Stopped
         {
-            get{ return true; }
+            get { return true; }
         }
 
         public override Vector3 Position
@@ -536,7 +535,7 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
             set { return; }
         }
 
-        public override bool  FloatOnWater
+        public override bool FloatOnWater
         {
             set { return; }
         }
@@ -576,17 +575,17 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
             set { return; }
         }
 
-        public override void VehicleFloatParam(int param, float value) {}
+        public override void VehicleFloatParam(int param, float value) { }
         public override void VehicleVectorParam(int param, Vector3 value) { }
         public override void VehicleRotationParam(int param, Quaternion rotation) { }
         public override void VehicleFlags(int param, bool remove) { }
-        public override void SetVolumeDetect(int param) {}
-        public override void SetMaterial(int material) {}
-        public override Vector3 CenterOfMass { get { return Vector3.Zero; }}
+        public override void SetVolumeDetect(int param) { }
+        public override void SetMaterial(int material) { }
+        public override Vector3 CenterOfMass { get { return Vector3.Zero; } }
 
-        public override Vector3 GeometricCenter { get { return Vector3.Zero; }}
+        public override Vector3 GeometricCenter { get { return Vector3.Zero; } }
 
-        public override PrimitiveBaseShape Shape { set { return; }}
+        public override PrimitiveBaseShape Shape { set { return; } }
 
         public override Vector3 Velocity
         {
@@ -606,7 +605,7 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
             set { }
         }
 
-        public override void CrossingFailure() {}
+        public override void CrossingFailure() { }
 
         public override Quaternion Orientation
         {
@@ -647,7 +646,8 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
         public override int PhysicsActorType
         {
             get { return (int)m_actorType; }
-            set {
+            set
+            {
                 ActorTypes type = (ActorTypes)value;
                 switch (type)
                 {
@@ -691,7 +691,7 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
         public override float PIDTau { set { return; } }
 
         public override float PIDHoverHeight { set { return; } }
-        public override bool PIDHoverActive {get {return false;} set { return; } }
+        public override bool PIDHoverActive { get { return false; } set { return; } }
         public override PIDHoverType PIDHoverType { set { return; } }
         public override float PIDHoverTau { set { return; } }
 

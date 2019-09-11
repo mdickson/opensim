@@ -25,11 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenSim.Region.Framework.Interfaces;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using OpenSim.Region.Framework.Interfaces;
 
 namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
 {
@@ -59,8 +59,8 @@ namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
 
         public void SaveFile(string filename, ITerrainChannel map)
         {
-            using(Bitmap colours = CreateBitmapFromMap(map))
-                colours.Save(filename,ImageFormat.Jpeg);
+            using (Bitmap colours = CreateBitmapFromMap(map))
+                colours.Save(filename, ImageFormat.Jpeg);
         }
 
         /// <summary>
@@ -70,8 +70,8 @@ namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
         /// <param name="map">The terrain channel being saved</param>
         public void SaveStream(Stream stream, ITerrainChannel map)
         {
-            using(Bitmap colours = CreateBitmapFromMap(map))
-                colours.Save(stream,ImageFormat.Jpeg);
+            using (Bitmap colours = CreateBitmapFromMap(map))
+                colours.Save(stream, ImageFormat.Jpeg);
         }
 
         public virtual void SaveFile(ITerrainChannel m_channel, string filename,
@@ -119,7 +119,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
                 for (int x = 0; x < map.Width; x++)
                 {
                     // 512 is the largest possible height before colours clamp
-                    int colorindex = (int) (Math.Max(Math.Min(1.0, map[x, y] / 512.0), 0.0) * (pallete - 1));
+                    int colorindex = (int)(Math.Max(Math.Min(1.0, map[x, y] / 512.0), 0.0) * (pallete - 1));
                     bmp.SetPixel(x, map.Height - y - 1, colours[colorindex]);
                 }
             }

@@ -25,16 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenSim.Framework.Serialization;
+using OpenSim.Region.Framework.Scenes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using OpenSim.Region.Framework.Scenes;
-using OpenMetaverse;
 using System.Drawing;
-using log4net;
+using System.Linq;
 using System.Reflection;
-using OpenSim.Framework.Serialization;
 
 namespace OpenSim.Region.CoreModules.World.Archiver
 {
@@ -78,7 +77,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
 
             public RegionInfo()
             {
-                RegionSize = new Vector3(256f,256f,float.MaxValue);
+                RegionSize = new Vector3(256f, 256f, float.MaxValue);
             }
         }
 
@@ -123,7 +122,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
         public void StartRegion()
         {
             m_curX = (m_curX == null) ? 0 : m_curX + 1;
-           // Note: this doesn't mean we have a real region in this location; this could just be a "hole"
+            // Note: this doesn't mean we have a real region in this location; this could just be a "hole"
         }
 
         public void SetRegionOriginalID(string id)
@@ -139,7 +138,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
 
         public void SetRegionDirectory(string directory)
         {
-            if(m_curRegion != null)
+            if (m_curRegion != null)
             {
                 m_curRegion.Directory = directory;
                 m_directory2region[directory] = m_curRegion;
@@ -148,7 +147,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
 
         public void SetRegionSize(Vector3 size)
         {
-            if(m_curRegion != null)
+            if (m_curRegion != null)
                 m_curRegion.RegionSize = size;
         }
 

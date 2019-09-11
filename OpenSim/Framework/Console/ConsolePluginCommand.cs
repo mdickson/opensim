@@ -80,7 +80,7 @@ namespace OpenSim.Framework.Console
         {
             // QUESTION: have a case insensitive flag?
             cmdWithParams = cmdWithParams.ToLower().Trim();
-            string matchText = String.Join(" ",m_cmdText).ToLower().Trim();
+            string matchText = String.Join(" ", m_cmdText).ToLower().Trim();
             if (cmdWithParams.StartsWith(matchText))
             {
                 // QUESTION Instead return cmdText.Length; ?
@@ -111,8 +111,9 @@ namespace OpenSim.Framework.Console
             string[] sendCmdParams = cmdParams;
             if (skipParams > 0)
             {
-                sendCmdParams = new string[cmdParams.Length-skipParams];
-                for (int i=0;i<sendCmdParams.Length;i++) {
+                sendCmdParams = new string[cmdParams.Length - skipParams];
+                for (int i = 0; i < sendCmdParams.Length; i++)
+                {
                     sendCmdParams[i] = cmdParams[skipParams++];
                 }
             }

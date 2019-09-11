@@ -25,12 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
+using log4net;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using log4net;
 
 namespace OpenSim.Framework.Monitoring
 {
@@ -81,7 +79,7 @@ namespace OpenSim.Framework.Monitoring
                     string[] components = name.Split('.');
 
                     string categoryName = components[0];
-//                    string containerName = components.Length > 1 ? components[1] : null;
+                    //                    string containerName = components.Length > 1 ? components[1] : null;
 
                     if (categoryName == ListSubCommand)
                     {
@@ -90,33 +88,33 @@ namespace OpenSim.Framework.Monitoring
                         foreach (string category in RegisteredChecks.Keys)
                             con.Output("  {0}", null, category);
                     }
-//                    else
-//                    {
-//                        SortedDictionary<string, SortedDictionary<string, Check>> category;
-//                        if (!Registeredchecks.TryGetValue(categoryName, out category))
-//                        {
-//                            con.OutputFormat("No such category as {0}", categoryName);
-//                        }
-//                        else
-//                        {
-//                            if (String.IsNullOrEmpty(containerName))
-//                            {
-//                                OutputConfiguredToConsole(con, category);
-//                            }
-//                            else
-//                            {
-//                                SortedDictionary<string, Check> container;
-//                                if (category.TryGetValue(containerName, out container))
-//                                {
-//                                    OutputContainerChecksToConsole(con, container);
-//                                }
-//                                else
-//                                {
-//                                    con.OutputFormat("No such container {0} in category {1}", containerName, categoryName);
-//                                }
-//                            }
-//                        }
-//                    }
+                    //                    else
+                    //                    {
+                    //                        SortedDictionary<string, SortedDictionary<string, Check>> category;
+                    //                        if (!Registeredchecks.TryGetValue(categoryName, out category))
+                    //                        {
+                    //                            con.OutputFormat("No such category as {0}", categoryName);
+                    //                        }
+                    //                        else
+                    //                        {
+                    //                            if (String.IsNullOrEmpty(containerName))
+                    //                            {
+                    //                                OutputConfiguredToConsole(con, category);
+                    //                            }
+                    //                            else
+                    //                            {
+                    //                                SortedDictionary<string, Check> container;
+                    //                                if (category.TryGetValue(containerName, out container))
+                    //                                {
+                    //                                    OutputContainerChecksToConsole(con, container);
+                    //                                }
+                    //                                else
+                    //                                {
+                    //                                    con.OutputFormat("No such container {0} in category {1}", containerName, categoryName);
+                    //                                }
+                    //                            }
+                    //                        }
+                    //                    }
                 }
             }
             else
@@ -175,13 +173,13 @@ namespace OpenSim.Framework.Monitoring
                 if (!TryGetCheckParents(check, out category, out container))
                     return false;
 
-                if(container != null)
+                if (container != null)
                 {
                     container.Remove(check.ShortName);
-                    if(category != null && container.Count == 0)
+                    if (category != null && container.Count == 0)
                     {
                         category.Remove(check.Container);
-                        if(category.Count == 0)
+                        if (category.Count == 0)
                             RegisteredChecks.Remove(check.Category);
                     }
                 }

@@ -25,10 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Net;
-using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Net;
 
 namespace OpenSim.Framework.ServiceAuth
 {

@@ -25,23 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading;
-using System.Text;
-
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
-
-using OpenMetaverse;
-using Mono.Addins;
-using log4net;
-using Nini.Config;
 
 namespace OpenSim.Groups
 {
@@ -186,10 +180,10 @@ namespace OpenSim.Groups
             if (GroupID == UUID.Zero && (GroupName == null || GroupName != null && GroupName == string.Empty))
                 return null;
 
-            return m_CacheWrapper.GetGroupRecord(RequestingAgentID,GroupID,GroupName, delegate
-            {
-                return m_GroupsService.GetGroupRecord(RequestingAgentID, GroupID, GroupName);
-            });
+            return m_CacheWrapper.GetGroupRecord(RequestingAgentID, GroupID, GroupName, delegate
+              {
+                  return m_GroupsService.GetGroupRecord(RequestingAgentID, GroupID, GroupName);
+              });
         }
 
         public List<DirGroupsReplyData> FindGroups(string RequestingAgentID, string search)

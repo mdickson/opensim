@@ -25,19 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
+using System;
+using System.Collections.Specialized;
+using System.Reflection;
 
 [assembly: Addin("SimianGrid", OpenSim.VersionInfo.VersionNumber)]
 [assembly: AddinDependency("OpenSim.Region.Framework", OpenSim.VersionInfo.VersionNumber)]
@@ -53,7 +51,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
 
         private String m_simianURL;
 
-#region IRegionModule Members
+        #region IRegionModule Members
 
         public string Name
         {
@@ -77,12 +75,12 @@ namespace OpenSim.Services.Connectors.SimianGrid
 
                     InitialiseSimCap();
                     SimulatorCapability = SimulatorCapability.Trim();
-                    m_log.InfoFormat("[SimianExternalCaps] using {0} as simulator capability",SimulatorCapability);
+                    m_log.InfoFormat("[SimianExternalCaps] using {0} as simulator capability", SimulatorCapability);
                 }
             }
             catch (Exception e)
             {
-                m_log.ErrorFormat("[SimianExternalCaps] initialization error: {0}",e.Message);
+                m_log.ErrorFormat("[SimianExternalCaps] initialization error: {0}", e.Message);
                 return;
             }
         }
@@ -135,7 +133,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
             m_log.WarnFormat("[SimianExternalCaps] no method specified for simulator capability");
         }
 
-#endregion
+        #endregion
 
         public static String SimulatorCapability = UUID.Zero.ToString();
         public static OSDMap PostToService(string url, NameValueCollection data)

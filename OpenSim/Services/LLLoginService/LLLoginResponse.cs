@@ -25,20 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using OpenSim.Framework;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
-
-using OpenSim.Framework;
-using OpenSim.Services.Interfaces;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 using FriendInfo = OpenSim.Services.Interfaces.FriendInfo;
-
-using log4net;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
+using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 using OSDArray = OpenMetaverse.StructuredData.OSDArray;
 using OSDMap = OpenMetaverse.StructuredData.OSDMap;
 
@@ -196,7 +194,7 @@ namespace OpenSim.Services.LLLoginService
 
         private string currency;
         private string classifiedFee;
-        private int    maxAgentGroups;
+        private int maxAgentGroups;
 
         static LLLoginResponse()
         {
@@ -235,7 +233,7 @@ namespace OpenSim.Services.LLLoginService
             string where, string startlocation, Vector3 position, Vector3 lookAt, List<InventoryItemBase> gestures, string message,
 
             GridRegion home, IPEndPoint clientIP, string mapTileURL, string profileURL, string openIDURL, string searchURL, string currency,
-            string DSTZone, string destinationsURL, string avatarsURL, UUID realID, string classifiedFee,int maxAgentGroups)
+            string DSTZone, string destinationsURL, string avatarsURL, UUID realID, string classifiedFee, int maxAgentGroups)
             : this()
         {
             FillOutInventoryData(invSkel, libService);
@@ -401,7 +399,7 @@ namespace OpenSim.Services.LLLoginService
 
         private void FillOutSeedCap(AgentCircuitData aCircuit, GridRegion destination, IPEndPoint ipepClient)
         {
-            SeedCapability =  destination.ServerURI + CapsUtil.GetCapsSeedPath(aCircuit.CapsPath);
+            SeedCapability = destination.ServerURI + CapsUtil.GetCapsSeedPath(aCircuit.CapsPath);
         }
 
         private void SetDefaultValues()
@@ -413,21 +411,21 @@ namespace OpenSim.Services.LLLoginService
             // The problem here is that US/Pacific (or even the Olsen America/Los_Angeles) is not universal across
             // windows, mac and various distributions of linux, introducing another element of consistency.
             // The server operator needs to be able to control this setting
-//            try
-//            {
-//                // First try to fetch DST from Pacific Standard Time, because this is
-//                // the one expected by the viewer. "US/Pacific" is the string to search
-//                // on linux and mac, and should work also on Windows (to confirm)
-//                gridTimeZone = TimeZoneInfo.FindSystemTimeZoneById("US/Pacific");
-//            }
-//            catch (Exception e)
-//            {
-//                m_log.WarnFormat(
-//                    "[TIMEZONE]: {0} Falling back to system time. System time should be set to Pacific Standard Time to provide the expected time",
-//                    e.Message);
+            //            try
+            //            {
+            //                // First try to fetch DST from Pacific Standard Time, because this is
+            //                // the one expected by the viewer. "US/Pacific" is the string to search
+            //                // on linux and mac, and should work also on Windows (to confirm)
+            //                gridTimeZone = TimeZoneInfo.FindSystemTimeZoneById("US/Pacific");
+            //            }
+            //            catch (Exception e)
+            //            {
+            //                m_log.WarnFormat(
+            //                    "[TIMEZONE]: {0} Falling back to system time. System time should be set to Pacific Standard Time to provide the expected time",
+            //                    e.Message);
 
-                gridTimeZone = TimeZoneInfo.Local;
-//            }
+            gridTimeZone = TimeZoneInfo.Local;
+            //            }
 
             DST = gridTimeZone.IsDaylightSavingTime(DateTime.Now) ? "Y" : "N";
 
@@ -464,19 +462,19 @@ namespace OpenSim.Services.LLLoginService
                     + "r" + userProfile.homelookat.Z.ToString()
                     + "]}";
             lookAt = "[r0.99949799999999999756,r0.03166859999999999814,r0]";
-            RegionX = (uint) 255232;
-            RegionY = (uint) 254976;
+            RegionX = (uint)255232;
+            RegionY = (uint)254976;
 
             // Classifieds;
-            AddClassifiedCategory((Int32) 1, "Shopping");
-            AddClassifiedCategory((Int32) 2, "Land Rental");
-            AddClassifiedCategory((Int32) 3, "Property Rental");
-            AddClassifiedCategory((Int32) 4, "Special Attraction");
-            AddClassifiedCategory((Int32) 5, "New Products");
-            AddClassifiedCategory((Int32) 6, "Employment");
-            AddClassifiedCategory((Int32) 7, "Wanted");
-            AddClassifiedCategory((Int32) 8, "Service");
-            AddClassifiedCategory((Int32) 9, "Personal");
+            AddClassifiedCategory((Int32)1, "Shopping");
+            AddClassifiedCategory((Int32)2, "Land Rental");
+            AddClassifiedCategory((Int32)3, "Property Rental");
+            AddClassifiedCategory((Int32)4, "Special Attraction");
+            AddClassifiedCategory((Int32)5, "New Products");
+            AddClassifiedCategory((Int32)6, "Employment");
+            AddClassifiedCategory((Int32)7, "Wanted");
+            AddClassifiedCategory((Int32)8, "Service");
+            AddClassifiedCategory((Int32)9, "Personal");
 
             SessionID = UUID.Random();
             SecureSessionID = UUID.Random();
@@ -522,7 +520,7 @@ namespace OpenSim.Services.LLLoginService
                 AddToUIConfig("allow_first_life", allowFirstLife);
                 uiConfig.Add(uiConfigHash);
 
-                responseData["sim_port"] = (Int32) SimPort;
+                responseData["sim_port"] = (Int32)SimPort;
                 responseData["sim_ip"] = SimAddress;
                 responseData["http_port"] = (Int32)SimHttpPort;
 
@@ -531,7 +529,7 @@ namespace OpenSim.Services.LLLoginService
                 responseData["session_id"] = SessionID.ToString();
                 responseData["secure_session_id"] = SecureSessionID.ToString();
                 responseData["circuit_code"] = CircuitCode;
-                responseData["seconds_since_epoch"] = (Int32) (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
+                responseData["seconds_since_epoch"] = (Int32)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
                 responseData["login-flags"] = loginFlags;
                 responseData["global-textures"] = globalTextures;
                 responseData["seed_capability"] = seedCapability;
@@ -829,7 +827,7 @@ namespace OpenSim.Services.LLLoginService
         protected virtual ArrayList GetInventoryLibrary(ILibraryService library)
         {
             Dictionary<UUID, InventoryFolderImpl> rootFolders = library.GetAllFolders();
-//            m_log.DebugFormat("[LLOGIN]: Library has {0} folders", rootFolders.Count);
+            //            m_log.DebugFormat("[LLOGIN]: Library has {0} folders", rootFolders.Count);
             //Dictionary<UUID, InventoryFolderImpl> rootFolders = new Dictionary<UUID,InventoryFolderImpl>();
             ArrayList folderHashes = new ArrayList();
 

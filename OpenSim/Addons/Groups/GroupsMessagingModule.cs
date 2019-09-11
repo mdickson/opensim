@@ -25,10 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -38,8 +34,12 @@ using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-using PresenceInfo = OpenSim.Services.Interfaces.PresenceInfo;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
+using PresenceInfo = OpenSim.Services.Interfaces.PresenceInfo;
 
 namespace OpenSim.Groups
 {
@@ -312,10 +312,10 @@ namespace OpenSim.Groups
 
             groupMembers = groupMembers.Where(gmd => onlineAgentsUuidSet.Contains(gmd.AgentID.ToString())).ToList();
 
-//            if (m_debugEnabled)
-//                    m_log.DebugFormat(
-//                        "[Groups.Messaging]: SendMessageToGroup called for group {0} with {1} visible members, {2} online",
-//                        groupID, groupMembersCount, groupMembers.Count());
+            //            if (m_debugEnabled)
+            //                    m_log.DebugFormat(
+            //                        "[Groups.Messaging]: SendMessageToGroup called for group {0} with {1} visible members, {2} online",
+            //                        groupID, groupMembersCount, groupMembers.Count());
 
             im.imSessionID = groupID.Guid;
             im.fromGroup = true;
@@ -396,7 +396,7 @@ namespace OpenSim.Groups
                         // We have to create a new IM structure because the transfer module
                         // uses async send
                         GridInstantMessage msg = new GridInstantMessage(im, true);
-                        m_msgTransferModule.SendInstantMessage(msg, delegate(bool success) { });
+                        m_msgTransferModule.SendInstantMessage(msg, delegate (bool success) { });
                     }
                 }
                 else

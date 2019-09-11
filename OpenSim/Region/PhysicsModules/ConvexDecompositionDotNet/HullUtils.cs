@@ -1085,10 +1085,10 @@ namespace OpenSim.Region.PhysicsModules.ConvexDecompositionDotNet
                     currDotm = float3.dot(p[i], dir);
                     m = i;
                     break;
-               }
+                }
             }
 
-            if(m == -1)
+            if (m == -1)
             {
                 Debug.Assert(false);
                 return m;
@@ -1107,7 +1107,7 @@ namespace OpenSim.Region.PhysicsModules.ConvexDecompositionDotNet
                 }
             }
 
-//            Debug.Assert(m != -1);
+            //            Debug.Assert(m != -1);
             return m;
         }
 

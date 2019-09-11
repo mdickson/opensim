@@ -142,7 +142,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain.PaintBrushes
         {
             Moore,
             VonNeumann
-        } ;
+        };
 
         #endregion
 
@@ -153,13 +153,13 @@ namespace OpenSim.Region.CoreModules.World.Terrain.PaintBrushes
         {
             strength = TerrainUtil.MetersToSphericalStrength(strength);
 
-            int x,y;
+            int x, y;
 
             for (x = startX; x <= endX; x++)
             {
                 for (y = startY; y <= endY; y++)
                 {
-                    if (!mask[x,y])
+                    if (!mask[x, y])
                         continue;
 
                     double z = TerrainUtil.SphericalFactor(x, y, rx, ry, strength);

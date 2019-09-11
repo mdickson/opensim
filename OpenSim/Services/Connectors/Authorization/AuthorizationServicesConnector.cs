@@ -26,14 +26,11 @@
  */
 
 using log4net;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using Nini.Config;
 using OpenSim.Framework;
 using OpenSim.Services.Interfaces;
-using OpenMetaverse;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Services.Connectors
 {
@@ -81,7 +78,7 @@ namespace OpenSim.Services.Connectors
 
             // this dictates what happens if the remote service fails, if the service fails and the value is true
             // the user is authorized for the region.
-            bool responseOnFailure = authorizationConfig.GetBoolean("ResponseOnFailure",true);
+            bool responseOnFailure = authorizationConfig.GetBoolean("ResponseOnFailure", true);
 
             m_ResponseOnFailure = responseOnFailure;
             m_log.Info("[AUTHORIZATION CONNECTOR]: AuthorizationService initialized");

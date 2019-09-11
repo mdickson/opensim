@@ -25,12 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using System;
 using System.Collections.Generic;
-using System.Xml;
 using System.Xml.Serialization;
-
-using OpenMetaverse;
 
 namespace OpenSim.Framework
 {
@@ -807,21 +805,21 @@ namespace OpenSim.Framework
             return landData;
         }
 
-//        public void ToXml(XmlWriter xmlWriter)
-//        {
-//            serializer.Serialize(xmlWriter, this);
-//        }
+        //        public void ToXml(XmlWriter xmlWriter)
+        //        {
+        //            serializer.Serialize(xmlWriter, this);
+        //        }
 
         /// <summary>
         /// Restore a LandData object from the serialized xml representation.
         /// </summary>
         /// <param name="xmlReader"></param>
         /// <returns></returns>
-//        public static LandData FromXml(XmlReader xmlReader)
-//        {
-//            LandData land = (LandData)serializer.Deserialize(xmlReader);
-//
-//            return land;
-//        }
+        //        public static LandData FromXml(XmlReader xmlReader)
+        //        {
+        //            LandData land = (LandData)serializer.Deserialize(xmlReader);
+        //
+        //            return land;
+        //        }
     }
 }

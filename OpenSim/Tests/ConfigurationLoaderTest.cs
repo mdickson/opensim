@@ -25,11 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.IO;
 using Nini.Config;
 using NUnit.Framework;
 using OpenSim.Framework;
 using OpenSim.Tests.Common;
+using System.IO;
 
 namespace OpenSim.Tests
 {

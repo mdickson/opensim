@@ -29,10 +29,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using log4net;
-using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Data;
 
 namespace OpenSim.Data.Null
 {
@@ -46,17 +42,17 @@ namespace OpenSim.Data.Null
         {
             List<T> entities = inputEntities;
 
-                entities
-                    = entities.Where(
-                        e =>
-                        {
-                            FieldInfo fi = typeof(T).GetField(field);
-                            if (fi == null)
-                                throw new NotImplementedException(string.Format("No field {0} for val {1}", field, val));
+            entities
+                = entities.Where(
+                    e =>
+                    {
+                        FieldInfo fi = typeof(T).GetField(field);
+                        if (fi == null)
+                            throw new NotImplementedException(string.Format("No field {0} for val {1}", field, val));
 
-                            return fi.GetValue(e).ToString() == val;
-                        }
-                    ).ToList();
+                        return fi.GetValue(e).ToString() == val;
+                    }
+                ).ToList();
 
             return entities;
         }
@@ -67,17 +63,17 @@ namespace OpenSim.Data.Null
 
             for (int i = 0; i < vals.Length; i++)
             {
-                    entities.AddRange (inputEntities.Where(
-                        e =>
-                        {
-                            FieldInfo fi = typeof(T).GetField(field);
-                            if (fi == null)
-                                throw new NotImplementedException(string.Format("No field {0} for val {1}", field, vals[i]));
+                entities.AddRange(inputEntities.Where(
+                    e =>
+                    {
+                        FieldInfo fi = typeof(T).GetField(field);
+                        if (fi == null)
+                            throw new NotImplementedException(string.Format("No field {0} for val {1}", field, vals[i]));
 
-                            return fi.GetValue(e).ToString() == vals[i];
-                        }
-                    ).ToList()
-                    );
+                        return fi.GetValue(e).ToString() == vals[i];
+                    }
+                ).ToList()
+                );
             }
             return entities;
         }

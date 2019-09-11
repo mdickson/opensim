@@ -82,7 +82,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
             if (String.IsNullOrEmpty(word)) return false;
             if (word.Length < 2) return false;
             if (word.StartsWith("ll")) return false;
-            char first = word.ToCharArray(0,1)[0];
+            char first = word.ToCharArray(0, 1)[0];
             if (first >= 'A' && first <= 'Z') return false;
 
             return (reservedWords.BinarySearch(word) >= 0);

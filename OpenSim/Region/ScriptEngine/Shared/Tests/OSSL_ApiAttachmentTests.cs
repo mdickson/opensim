@@ -25,25 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using log4net;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
-using OpenMetaverse.Assets;
-using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
 using OpenSim.Region.CoreModules.Avatar.Attachments;
 using OpenSim.Region.CoreModules.Framework.InventoryAccess;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.ScriptEngine.Shared;
 using OpenSim.Region.ScriptEngine.Shared.Api;
-using OpenSim.Region.ScriptEngine.Shared.Instance;
 using OpenSim.Services.Interfaces;
 using OpenSim.Tests.Common;
+using System;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Tests
 {
@@ -90,7 +83,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestOsForceAttachToAvatarFromInventory()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string taskInvObjItemName = "sphere";
             UUID taskInvObjItemId = UUID.Parse("00000000-0000-0000-0000-100000000000");
@@ -105,7 +98,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
             OSSL_Api osslApi = new OSSL_Api();
             osslApi.Initialize(m_engine, inWorldObj.RootPart, scriptItem);
 
-//            SceneObjectGroup sog1 = SceneHelpers.CreateSceneObject(1, ua1.PrincipalID);
+            //            SceneObjectGroup sog1 = SceneHelpers.CreateSceneObject(1, ua1.PrincipalID);
 
             // Create an object embedded inside the first
             TaskInventoryHelpers.AddSceneObject(m_scene.AssetService, inWorldObj.RootPart, taskInvObjItemName, taskInvObjItemId, ua1.PrincipalID);
@@ -136,7 +129,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestOsForceAttachToAvatarFromInventoryNotObject()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string taskInvObjItemName = "sphere";
             UUID taskInvObjItemId = UUID.Parse("00000000-0000-0000-0000-100000000000");
@@ -182,7 +175,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestOsForceAttachToOtherAvatarFromInventory()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string taskInvObjItemName = "sphere";
             UUID taskInvObjItemId = UUID.Parse("00000000-0000-0000-0000-100000000000");

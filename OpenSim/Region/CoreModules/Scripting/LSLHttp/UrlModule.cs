@@ -25,12 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Collections;
-using System.Reflection;
-using System.Net;
-using System.Net.Sockets;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -40,6 +34,11 @@ using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Net;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
 {
@@ -222,7 +221,7 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
         {
             UUID urlcode = UUID.Random();
 
-            if(!m_enabled)
+            if (!m_enabled)
             {
                 engine.PostScriptEvent(itemID, "http_request", new Object[] { urlcode.ToString(), "URL_REQUEST_DENIED", m_ErrorStr });
                 return urlcode;
@@ -261,9 +260,9 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
                 args.Type = PollServiceEventArgs.EventType.LslHttp;
                 m_HttpServer.AddPollServiceHTTPHandler(uri, args);
 
-//                m_log.DebugFormat(
-//                    "[URL MODULE]: Set up incoming request url {0} for {1} in {2} {3}",
-//                    uri, itemID, host.Name, host.LocalId);
+                //                m_log.DebugFormat(
+                //                    "[URL MODULE]: Set up incoming request url {0} for {1} in {2} {3}",
+                //                    uri, itemID, host.Name, host.LocalId);
 
                 engine.PostScriptEvent(itemID, "http_request", new Object[] { urlcode.ToString(), "URL_REQUEST_GRANTED", url });
             }
@@ -275,9 +274,9 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
         {
             UUID urlcode = UUID.Random();
 
-            if(!m_enabled)
+            if (!m_enabled)
             {
-                engine.PostScriptEvent(itemID, "http_request", new Object[] { urlcode.ToString(), "URL_REQUEST_DENIED",  m_ErrorStr });
+                engine.PostScriptEvent(itemID, "http_request", new Object[] { urlcode.ToString(), "URL_REQUEST_DENIED", m_ErrorStr });
                 return urlcode;
             }
 
@@ -319,9 +318,9 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
                 args.Type = PollServiceEventArgs.EventType.LslHttp;
                 m_HttpsServer.AddPollServiceHTTPHandler(uri, args);
 
-//                m_log.DebugFormat(
-//                    "[URL MODULE]: Set up incoming secure request url {0} for {1} in {2} {3}",
-//                    uri, itemID, host.Name, host.LocalId);
+                //                m_log.DebugFormat(
+                //                    "[URL MODULE]: Set up incoming secure request url {0} for {1} in {2} {3}",
+                //                    uri, itemID, host.Name, host.LocalId);
 
                 engine.PostScriptEvent(itemID, "http_request", new Object[] { urlcode.ToString(), "URL_REQUEST_GRANTED", url });
             }
@@ -346,9 +345,9 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
                         m_RequestMap.Remove(req);
                 }
 
-//                m_log.DebugFormat(
-//                    "[URL MODULE]: Releasing url {0} for {1} in {2}",
-//                    url, data.itemID, data.hostID);
+                //                m_log.DebugFormat(
+                //                    "[URL MODULE]: Releasing url {0} for {1} in {2}",
+                //                    url, data.itemID, data.hostID);
 
                 RemoveUrl(data);
                 m_UrlMap.Remove(url);
@@ -437,7 +436,7 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
 
         public void ScriptRemoved(UUID itemID)
         {
-//            m_log.DebugFormat("[URL MODULE]: Removing script {0}", itemID);
+            //            m_log.DebugFormat("[URL MODULE]: Removing script {0}", itemID);
 
             lock (m_UrlMap)
             {
@@ -490,9 +489,9 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
         protected void RemoveUrl(UrlData data)
         {
             if (data.isSsl)
-                m_HttpsServer.RemovePollServiceHTTPHandler("", "/lslhttps/"+data.urlcode.ToString()+"/");
+                m_HttpsServer.RemovePollServiceHTTPHandler("", "/lslhttps/" + data.urlcode.ToString() + "/");
             else
-                m_HttpServer.RemovePollServiceHTTPHandler("", "/lslhttp/"+data.urlcode.ToString()+"/");
+                m_HttpServer.RemovePollServiceHTTPHandler("", "/lslhttp/" + data.urlcode.ToString() + "/");
         }
 
         protected Hashtable NoEvents(UUID requestID, UUID sessionID)
@@ -534,7 +533,7 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
 
         protected bool HasEvents(UUID requestID, UUID sessionID)
         {
-            UrlData url=null;
+            UrlData url = null;
 
             lock (m_RequestMap)
             {
@@ -573,11 +572,11 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
                 {
                     url = m_RequestMap[requestID];
                     m_RequestMap.Remove(requestID);
-                    if(url != null)
+                    if (url != null)
                     {
                         lock (url.requests)
                         {
-                            if(url.requests.ContainsKey(requestID))
+                            if (url.requests.ContainsKey(requestID))
                                 url.requests.Remove(requestID);
                         }
                     }
@@ -593,7 +592,7 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
             lock (m_RequestMap)
             {
                 if (!m_RequestMap.ContainsKey(requestID))
-                    return NoEvents(requestID,sessionID);
+                    return NoEvents(requestID, sessionID);
                 url = m_RequestMap[requestID];
             }
             lock (url.requests)
@@ -602,7 +601,7 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
             }
 
             if (!requestData.requestDone)
-                return NoEvents(requestID,sessionID);
+                return NoEvents(requestID, sessionID);
 
             Hashtable response = new Hashtable();
 
@@ -647,7 +646,7 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
                 {
                     Hashtable headers = (Hashtable)request["headers"];
 
-//                    string uri_full = "http://" + ExternalHostNameForLSL + ":" + m_HttpServer.Port.ToString() + uri;// "/lslhttp/" + urlcode.ToString() + "/";
+                    //                    string uri_full = "http://" + ExternalHostNameForLSL + ":" + m_HttpServer.Port.ToString() + uri;// "/lslhttp/" + urlcode.ToString() + "/";
 
                     int pos1 = uri.IndexOf("/");// /lslhttp
                     int pos2 = uri.IndexOf("/", pos1 + 1);// /lslhttp/
@@ -716,8 +715,8 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
                                     else
                                     {
                                         queryString = queryString + val + "&";
+                                    }
                                 }
-                            }
                             }
                             if (queryString.Length > 1)
                                 queryString = queryString.Substring(0, queryString.Length - 1);
@@ -747,7 +746,7 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
                     url.engine.PostScriptEvent(url.itemID, "http_request", new Object[] { requestID.ToString(), request["http-method"].ToString(), request["body"].ToString() });
 
                     //send initial response?
-//                    Hashtable response = new Hashtable();
+                    //                    Hashtable response = new Hashtable();
 
                     return;
 

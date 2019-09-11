@@ -25,17 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using log4net;
 using Nini.Config;
 
 namespace OpenSim.Framework.ServiceAuth
 {
     public class ServiceAuth
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public static IServiceAuth Create(IConfigSource config, string section)
         {
@@ -56,8 +52,8 @@ namespace OpenSim.Framework.ServiceAuth
                     break;
             }
 
-//            foreach (IServiceAuth auth in compoundAuth.GetAuthentors())
-//                m_log.DebugFormat("[SERVICE AUTH]: Configured authenticator {0}", auth.Name);
+            //            foreach (IServiceAuth auth in compoundAuth.GetAuthentors())
+            //                m_log.DebugFormat("[SERVICE AUTH]: Configured authenticator {0}", auth.Name);
 
             if (compoundAuth.Count > 0)
                 return compoundAuth;

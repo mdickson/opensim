@@ -25,95 +25,91 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using OpenMetaverse.StructuredData;
+using System.Collections.Generic;
 
 namespace OpenSim.Framework.Monitoring
 {
-// A statistic that wraps a counter.
-// Built this way mostly so histograms and history can be created.
-public class CounterStat : Stat
-{
-    private SortedDictionary<string, EventHistogram> m_histograms;
-    private object counterLock = new object();
-
-    public CounterStat(
-                        string shortName,
-                        string name,
-                        string description,
-                        string unitName,
-                        string category,
-                        string container,
-                        StatVerbosity verbosity)
-        : base(shortName, name, description, unitName, category, container, StatType.Push, null, verbosity)
+    // A statistic that wraps a counter.
+    // Built this way mostly so histograms and history can be created.
+    public class CounterStat : Stat
     {
-        m_histograms = new SortedDictionary<string, EventHistogram>();
-    }
+        private SortedDictionary<string, EventHistogram> m_histograms;
+        private object counterLock = new object();
 
-    // Histograms are presumably added at intialization time and the list does not change thereafter.
-    // Thus no locking of the histogram list.
-    public void AddHistogram(string histoName, EventHistogram histo)
-    {
-        m_histograms.Add(histoName, histo);
-    }
-
-    public delegate void ProcessHistogram(string name, EventHistogram histo);
-    public void ForEachHistogram(ProcessHistogram process)
-    {
-        foreach (KeyValuePair<string, EventHistogram> kvp in m_histograms)
+        public CounterStat(
+                            string shortName,
+                            string name,
+                            string description,
+                            string unitName,
+                            string category,
+                            string container,
+                            StatVerbosity verbosity)
+            : base(shortName, name, description, unitName, category, container, StatType.Push, null, verbosity)
         {
-            process(kvp.Key, kvp.Value);
+            m_histograms = new SortedDictionary<string, EventHistogram>();
         }
-    }
 
-    public void Event()
-    {
-        this.Event(1);
-    }
-
-    // Count the underlying counter.
-    public void Event(int cnt)
-    {
-        lock (counterLock)
+        // Histograms are presumably added at intialization time and the list does not change thereafter.
+        // Thus no locking of the histogram list.
+        public void AddHistogram(string histoName, EventHistogram histo)
         {
-            base.Value += cnt;
+            m_histograms.Add(histoName, histo);
+        }
 
-            foreach (EventHistogram histo in m_histograms.Values)
+        public delegate void ProcessHistogram(string name, EventHistogram histo);
+        public void ForEachHistogram(ProcessHistogram process)
+        {
+            foreach (KeyValuePair<string, EventHistogram> kvp in m_histograms)
             {
-                histo.Event(cnt);
+                process(kvp.Key, kvp.Value);
             }
         }
-    }
 
-    // CounterStat is a basic stat plus histograms
-    public override OSDMap ToOSDMap()
-    {
-        // Get the foundational instance
-        OSDMap map = base.ToOSDMap();
+        public void Event()
+        {
+            this.Event(1);
+        }
 
-        map["StatType"] = "CounterStat";
-
-        // If there are any histograms, add a new field that is an array of histograms as OSDMaps
-        if (m_histograms.Count > 0)
+        // Count the underlying counter.
+        public void Event(int cnt)
         {
             lock (counterLock)
             {
-                if (m_histograms.Count > 0)
+                base.Value += cnt;
+
+                foreach (EventHistogram histo in m_histograms.Values)
                 {
-                    OSDArray histos = new OSDArray();
-                    foreach (EventHistogram histo in m_histograms.Values)
-                    {
-                        histos.Add(histo.GetHistogramAsOSDMap());
-                    }
-                    map.Add("Histograms", histos);
+                    histo.Event(cnt);
                 }
             }
         }
-        return map;
+
+        // CounterStat is a basic stat plus histograms
+        public override OSDMap ToOSDMap()
+        {
+            // Get the foundational instance
+            OSDMap map = base.ToOSDMap();
+
+            map["StatType"] = "CounterStat";
+
+            // If there are any histograms, add a new field that is an array of histograms as OSDMaps
+            if (m_histograms.Count > 0)
+            {
+                lock (counterLock)
+                {
+                    if (m_histograms.Count > 0)
+                    {
+                        OSDArray histos = new OSDArray();
+                        foreach (EventHistogram histo in m_histograms.Values)
+                        {
+                            histos.Add(histo.GetHistogramAsOSDMap());
+                        }
+                        map.Add("Histograms", histos);
+                    }
+                }
+            }
+            return map;
+        }
     }
-}
 }

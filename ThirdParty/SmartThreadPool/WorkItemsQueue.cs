@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 
 namespace Amib.Threading.Internal
@@ -136,7 +135,7 @@ namespace Amib.Threading.Internal
             // WaitForWorkItem() method to indicate timeout or cancel
             if (null == workItem)
             {
-                throw new ArgumentNullException("workItem" , "workItem cannot be null");
+                throw new ArgumentNullException("workItem", "workItem cannot be null");
             }
 
             bool enqueue = true;
@@ -144,7 +143,7 @@ namespace Amib.Threading.Internal
             // First check if there is a waiter waiting for work item. During
             // the check, timed out waiters are ignored. If there is no
             // waiter then the work item is queued.
-            lock(this)
+            lock (this)
             {
                 ValidateNotDisposed();
 
@@ -153,7 +152,7 @@ namespace Amib.Threading.Internal
                     return false;
                 }
 
-                while(_waitersCount > 0)
+                while (_waitersCount > 0)
                 {
                     // Dequeue a waiter.
                     WaiterEntry waiterEntry = PopWaiter();
@@ -221,7 +220,7 @@ namespace Amib.Threading.Internal
             }
 
             // Prepare array of wait handle for the WaitHandle.WaitAny()
-            WaitHandle [] waitHandles = new WaitHandle[] {
+            WaitHandle[] waitHandles = new WaitHandle[] {
                                                                 waiterEntry.WaitHandle,
                                                                 cancelEvent };
 
@@ -237,7 +236,7 @@ namespace Amib.Threading.Internal
                 millisecondsTimeout,
                 true);
 
-            lock(this)
+            lock (this)
             {
                 // success is true if it got a work item.
                 bool success = (0 == index);
@@ -254,7 +253,7 @@ namespace Amib.Threading.Internal
 
                     // On timeout remove the waiter from the queue.
                     // Note that the complexity is O(1).
-                    if(timeout)
+                    if (timeout)
                     {
                         RemoveWaiter(waiterEntry, false);
                     }
@@ -284,7 +283,7 @@ namespace Amib.Threading.Internal
         /// </summary>
         private void Cleanup()
         {
-            lock(this)
+            lock (this)
             {
                 // Deactivate only once
                 if (!_isWorkItemsQueueActive)
@@ -295,7 +294,7 @@ namespace Amib.Threading.Internal
                 // Don't queue more work items
                 _isWorkItemsQueueActive = false;
 
-                foreach(WorkItem workItem in _workItems)
+                foreach (WorkItem workItem in _workItems)
                 {
                     workItem.DisposeOfState();
                 }
@@ -311,7 +310,7 @@ namespace Amib.Threading.Internal
                 // Tell the waiters that they were timed out.
                 // It won't signal them to exit, but to ignore their
                 // next work item.
-                while(_waitersCount > 0)
+                while (_waitersCount > 0)
                 {
                     WaiterEntry waiterEntry = PopWaiter();
                     waiterEntry.Timeout();
@@ -539,7 +538,7 @@ namespace Amib.Threading.Internal
             /// The method fails if Timeout() preceded its call
             public bool Signal(WorkItem workItem)
             {
-                lock(this)
+                lock (this)
                 {
                     if (!_isTimedout)
                     {
@@ -559,7 +558,7 @@ namespace Amib.Threading.Internal
             /// The method fails if Signal() preceded its call
             public bool Timeout()
             {
-                lock(this)
+                lock (this)
                 {
                     // Time out can happen only if the waiter wasn't marked as
                     // signaled
@@ -632,7 +631,7 @@ namespace Amib.Threading.Internal
 
         private void ValidateNotDisposed()
         {
-            if(_isDisposed)
+            if (_isDisposed)
             {
                 throw new ObjectDisposedException(GetType().ToString(), "The SmartThreadPool has been shutdown");
             }

@@ -25,28 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using log4net.Config;
-using NUnit.Framework;
-using NUnit.Framework.Constraints;
-using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Tests.Common;
-using System.Data.Common;
-using log4net;
-
+using Mono.Data.Sqlite;
 // DBMS-specific:
 using MySql.Data.MySqlClient;
+using NUnit.Framework;
+using OpenMetaverse;
 using OpenSim.Data.MySQL;
-
-using Mono.Data.Sqlite;
 using OpenSim.Data.SQLite;
+using OpenSim.Framework;
+using OpenSim.Tests.Common;
+using System.Collections.Generic;
+using System.Data.Common;
 
 namespace OpenSim.Data.Tests
 {
     [TestFixture(Description = "Asset store tests (SQLite)")]
-    public class SQLiteAssetTests :  AssetTests<SqliteConnection, SQLiteAssetData>
+    public class SQLiteAssetTests : AssetTests<SqliteConnection, SQLiteAssetData>
     {
     }
 

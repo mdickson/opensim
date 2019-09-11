@@ -25,24 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using Nini.Config;
 using log4net;
-using System;
-using System.Reflection;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml;
-using System.Xml.Serialization;
-using System.Collections.Generic;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Services.UserAccountService;
+using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Framework.ServiceAuth;
-using OpenMetaverse;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
+using OpenSim.Services.UserAccountService;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Xml;
 
 namespace OpenSim.Server.Handlers.UserAccounts
 {
@@ -55,7 +51,7 @@ namespace OpenSim.Server.Handlers.UserAccounts
         private bool m_AllowSetAccount = false;
 
         public UserAccountServerPostHandler(IUserAccountService service)
-            : this(service, null, null) {}
+            : this(service, null, null) { }
 
         public UserAccountServerPostHandler(IUserAccountService service, IConfig config, IServiceAuth auth) :
                 base("POST", "/accounts", auth)
@@ -73,7 +69,7 @@ namespace OpenSim.Server.Handlers.UserAccounts
                 IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
             string body;
-            using(StreamReader sr = new StreamReader(requestData))
+            using (StreamReader sr = new StreamReader(requestData))
                 body = sr.ReadToEnd();
             body = body.Trim();
 
@@ -235,7 +231,7 @@ namespace OpenSim.Server.Handlers.UserAccounts
                 int i = 0;
                 foreach (UserAccount acc in accounts)
                 {
-                    if(acc == null)
+                    if (acc == null)
                         continue;
                     Dictionary<string, object> rinfoDict = acc.ToKeyValuePairs();
                     result["account" + i] = rinfoDict;
@@ -305,7 +301,7 @@ namespace OpenSim.Server.Handlers.UserAccounts
 
         byte[] CreateUser(Dictionary<string, object> request)
         {
-            if (! request.ContainsKey("FirstName")
+            if (!request.ContainsKey("FirstName")
                     && request.ContainsKey("LastName")
                     && request.ContainsKey("Password"))
                 return FailureResult();

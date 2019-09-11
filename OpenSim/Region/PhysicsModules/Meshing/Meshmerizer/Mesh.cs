@@ -25,13 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
+using OpenSim.Region.PhysicsModules.SharedBase;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using OpenSim.Region.PhysicsModules.SharedBase;
-using PrimMesher;
-using OpenMetaverse;
 
 namespace OpenSim.Region.PhysicsModule.Meshing
 {
@@ -376,9 +375,9 @@ namespace OpenSim.Region.PhysicsModule.Meshing
                 if (v == null)
                     continue;
                 float x, y, z;
-                x = v.X*matrix[0, 0] + v.Y*matrix[1, 0] + v.Z*matrix[2, 0];
-                y = v.X*matrix[0, 1] + v.Y*matrix[1, 1] + v.Z*matrix[2, 1];
-                z = v.X*matrix[0, 2] + v.Y*matrix[1, 2] + v.Z*matrix[2, 2];
+                x = v.X * matrix[0, 0] + v.Y * matrix[1, 0] + v.Z * matrix[2, 0];
+                y = v.X * matrix[0, 1] + v.Y * matrix[1, 1] + v.Z * matrix[2, 1];
+                z = v.X * matrix[0, 2] + v.Y * matrix[1, 2] + v.Z * matrix[2, 2];
                 v.X = x + offset[0];
                 v.Y = y + offset[1];
                 v.Z = z + offset[2];

@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
@@ -33,6 +32,7 @@ using OpenSim.Framework;
 using OpenSim.Server.Base;
 using OpenSim.Services.Interfaces;
 using OpenSim.Tests.Common;
+using System;
 
 namespace OpenSim.Services.InventoryService.Tests
 {
@@ -106,7 +106,7 @@ namespace OpenSim.Services.InventoryService.Tests
         public void TestUpdateItem()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string creatorId = TestHelpers.ParseTail(0x1).ToString();
             UUID ownerId = TestHelpers.ParseTail(0x2);

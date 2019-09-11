@@ -25,19 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-
-using Nini.Config;
-using Mono.Addins;
-
-using OpenMetaverse;
-
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
 
 // using log4net;
 // using System.Reflection;
@@ -381,23 +378,23 @@ namespace OpenSim.Region.CoreModules.Scripting.WorldComm
             if (channel == DEBUG_CHANNEL)
                 return;
 
-            if(target == UUID.Zero)
+            if (target == UUID.Zero)
                 return;
 
             // Is target an avatar?
             ScenePresence sp = m_scene.GetScenePresence(target);
             if (sp != null)
             {
-                 // Send message to avatar
+                // Send message to avatar
                 if (channel == 0)
                 {
-                   // Channel 0 goes to viewer ONLY
+                    // Channel 0 goes to viewer ONLY
                     m_scene.SimChat(Utils.StringToBytes(msg), ChatTypeEnum.Direct, 0, pos, name, id, target, false, false);
                     return;
                 }
 
                 // for now messages to prims don't cross regions
-                if(sp.IsChildAgent)
+                if (sp.IsChildAgent)
                     return;
 
                 List<SceneObjectGroup> attachments = sp.GetAttachments();
@@ -412,7 +409,7 @@ namespace OpenSim.Region.CoreModules.Scripting.WorldComm
                     if (!sog.IsDeleted)
                     {
                         SceneObjectPart[] parts = sog.Parts;
-                        foreach(SceneObjectPart p in parts)
+                        foreach (SceneObjectPart p in parts)
                             targets.Add(p.UUID);
                     }
                 }
@@ -720,7 +717,7 @@ namespace OpenSim.Region.CoreModules.Scripting.WorldComm
                 }
             }
 
-            if(handles.Count >= m_maxhandles)
+            if (handles.Count >= m_maxhandles)
                 return -1;
 
             // Note: 0 is NOT a valid handle for llListen() to return

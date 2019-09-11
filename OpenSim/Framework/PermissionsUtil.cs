@@ -25,11 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 using log4net;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Framework
 {
@@ -70,8 +68,8 @@ namespace OpenSim.Framework
         public static void ApplyFoldedPermissions(uint foldedSourcePerms, ref uint targetPerms)
         {
             uint folded = foldedSourcePerms & (uint)PermissionMask.FoldedMask;
-            if(folded == 0 || folded == (uint)PermissionMask.FoldedMask) // invalid we need to ignore, or nothing to do
-                return; 
+            if (folded == 0 || folded == (uint)PermissionMask.FoldedMask) // invalid we need to ignore, or nothing to do
+                return;
 
             folded <<= (int)PermissionMask.FoldingShift;
             folded |= ~(uint)PermissionMask.UnfoldedMask;
@@ -85,8 +83,8 @@ namespace OpenSim.Framework
         public static void ApplyNoModFoldedPermissions(uint foldedSourcePerms, ref uint target)
         {
             uint folded = foldedSourcePerms & (uint)PermissionMask.FoldedMask;
-            if(folded == 0 || folded == (uint)PermissionMask.FoldedMask) // invalid we need to ignore, or nothing to do
-                return; 
+            if (folded == 0 || folded == (uint)PermissionMask.FoldedMask) // invalid we need to ignore, or nothing to do
+                return;
 
             folded <<= (int)PermissionMask.FoldingShift;
             folded |= (~(uint)PermissionMask.UnfoldedMask | (uint)PermissionMask.Modify);
@@ -101,7 +99,7 @@ namespace OpenSim.Framework
             uint tmp = perms;
 
             // C & T rule
-            if((tmp & (uint)(PermissionMask.Copy | PermissionMask.Transfer)) == 0)
+            if ((tmp & (uint)(PermissionMask.Copy | PermissionMask.Transfer)) == 0)
                 tmp |= (uint)PermissionMask.Transfer;
 
             // unlock

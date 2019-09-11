@@ -25,26 +25,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.Packets;
+using OpenMetaverse.StructuredData;
+using OpenSim.Framework;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using log4net;
-using Nini.Config;
-using Mono.Addins;
-using OpenMetaverse;
-using OpenMetaverse.Messages.Linden;
-using OpenMetaverse.Packets;
-using OpenMetaverse.StructuredData;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using Caps=OpenSim.Framework.Capabilities.Caps;
+using Caps = OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Region.ClientStack.Linden
 {
@@ -235,7 +232,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 {
                     m_log.WarnFormat(
                             "[EVENTQUEUE]: (Enqueue) No queue found for agent {0} in region {1}",
-                            avatarID,  m_scene.Name);
+                            avatarID, m_scene.Name);
                 }
             }
             catch (NullReferenceException e)
@@ -361,9 +358,9 @@ namespace OpenSim.Region.ClientStack.Linden
                 }
             }
 
-        caps.RegisterPollHandler(
-            "EventQueueGet",
-                new PollServiceEventArgs(null, GenerateEqgCapPath(eventQueueGetUUID), HasEvents, GetEvents, NoEvents, Drop, agentID, SERVER_EQ_TIME_NO_EVENTS));
+            caps.RegisterPollHandler(
+                "EventQueueGet",
+                    new PollServiceEventArgs(null, GenerateEqgCapPath(eventQueueGetUUID), HasEvents, GetEvents, NoEvents, Drop, agentID, SERVER_EQ_TIME_NO_EVENTS));
         }
 
         public bool HasEvents(UUID requestID, UUID agentID)
@@ -408,7 +405,7 @@ namespace OpenSim.Region.ClientStack.Linden
             if (queue == null)
                 return NoEvents(requestID, pAgentId);
 
-            OSD element = null;;
+            OSD element = null; ;
             OSDArray array = new OSDArray();
             int thisID = 0;
             bool negativeID = false;
@@ -462,7 +459,7 @@ namespace OpenSim.Region.ClientStack.Linden
             Hashtable responsedata = new Hashtable();
             responsedata["int_response_code"] = 200;
             responsedata["content_type"] = "application/xml";
-//string tt = OSDParser.SerializeLLSDXmlString(events);
+            //string tt = OSDParser.SerializeLLSDXmlString(events);
             responsedata["bin_response_data"] = Encoding.UTF8.GetBytes(OSDParser.SerializeLLSDXmlString(events));
 
             //m_log.DebugFormat("[EVENTQUEUE]: sending response for {0} in region {1}: {2}", pAgentId, m_scene.RegionInfo.RegionName, responsedata["str_response_string"]);
@@ -481,26 +478,26 @@ namespace OpenSim.Region.ClientStack.Linden
             return responsedata;
         }
 
-/* this is not a event message
-        public void DisableSimulator(ulong handle, UUID avatarID)
-        {
-            OSD item = EventQueueHelper.DisableSimulator(handle);
-            Enqueue(item, avatarID);
-        }
-*/
+        /* this is not a event message
+                public void DisableSimulator(ulong handle, UUID avatarID)
+                {
+                    OSD item = EventQueueHelper.DisableSimulator(handle);
+                    Enqueue(item, avatarID);
+                }
+        */
         public StringBuilder StartEvent(string eventName)
         {
             StringBuilder sb = new StringBuilder(256);
             LLSDxmlEncode.AddMap(sb);
             LLSDxmlEncode.AddElem("message", eventName, sb);
-                LLSDxmlEncode.AddMap("body", sb);
+            LLSDxmlEncode.AddMap("body", sb);
 
             return sb;
         }
 
         public string EndEvent(StringBuilder sb)
         {
-                LLSDxmlEncode.AddEndMap(sb); // close body
+            LLSDxmlEncode.AddEndMap(sb); // close body
             LLSDxmlEncode.AddEndMap(sb); // close event
             return sb.ToString();
         }
@@ -513,11 +510,11 @@ namespace OpenSim.Region.ClientStack.Linden
 
             StringBuilder sb = StartEvent("EnableSimulator");
             LLSDxmlEncode.AddArrayAndMap("SimulatorInfo", sb);
-                LLSDxmlEncode.AddElem("Handle", handle, sb);
-                LLSDxmlEncode.AddElem("IP", endPoint.Address.GetAddressBytes(), sb);
-                LLSDxmlEncode.AddElem("Port", endPoint.Port, sb);
-                LLSDxmlEncode.AddElem("RegionSizeX", (uint)regionSizeX, sb);
-                LLSDxmlEncode.AddElem("RegionSizeY", (uint)regionSizeY, sb);
+            LLSDxmlEncode.AddElem("Handle", handle, sb);
+            LLSDxmlEncode.AddElem("IP", endPoint.Address.GetAddressBytes(), sb);
+            LLSDxmlEncode.AddElem("Port", endPoint.Port, sb);
+            LLSDxmlEncode.AddElem("RegionSizeX", (uint)regionSizeX, sb);
+            LLSDxmlEncode.AddElem("RegionSizeY", (uint)regionSizeY, sb);
             LLSDxmlEncode.AddEndMapAndArray(sb);
 
             OSD item = new OSDllsdxml(EndEvent(sb));
@@ -564,16 +561,16 @@ namespace OpenSim.Region.ClientStack.Linden
             StringBuilder sb = StartEvent("TeleportFinish");
 
             LLSDxmlEncode.AddArrayAndMap("Info", sb);
-                LLSDxmlEncode.AddElem("AgentID", avatarID, sb);
-                LLSDxmlEncode.AddElem("LocationID", (uint)4, sb); // TODO what is this?
-                LLSDxmlEncode.AddElem("SimIP", regionExternalEndPoint.Address.GetAddressBytes(), sb);
-                LLSDxmlEncode.AddElem("SimPort", regionExternalEndPoint.Port, sb);
-                LLSDxmlEncode.AddElem("RegionHandle", regionHandle, sb);
-                LLSDxmlEncode.AddElem("SeedCapability", capsURL, sb);
-                LLSDxmlEncode.AddElem("SimAccess",(int)simAccess, sb);
-                LLSDxmlEncode.AddElem("TeleportFlags", flags, sb);
-                LLSDxmlEncode.AddElem("RegionSizeX", (uint)regionSizeX, sb);
-                LLSDxmlEncode.AddElem("RegionSizeY", (uint)regionSizeY, sb);
+            LLSDxmlEncode.AddElem("AgentID", avatarID, sb);
+            LLSDxmlEncode.AddElem("LocationID", (uint)4, sb); // TODO what is this?
+            LLSDxmlEncode.AddElem("SimIP", regionExternalEndPoint.Address.GetAddressBytes(), sb);
+            LLSDxmlEncode.AddElem("SimPort", regionExternalEndPoint.Port, sb);
+            LLSDxmlEncode.AddElem("RegionHandle", regionHandle, sb);
+            LLSDxmlEncode.AddElem("SeedCapability", capsURL, sb);
+            LLSDxmlEncode.AddElem("SimAccess", (int)simAccess, sb);
+            LLSDxmlEncode.AddElem("TeleportFlags", flags, sb);
+            LLSDxmlEncode.AddElem("RegionSizeX", (uint)regionSizeX, sb);
+            LLSDxmlEncode.AddElem("RegionSizeY", (uint)regionSizeY, sb);
             LLSDxmlEncode.AddEndMapAndArray(sb);
 
             OSD ev = new OSDllsdxml(EndEvent(sb));
@@ -591,22 +588,22 @@ namespace OpenSim.Region.ClientStack.Linden
             StringBuilder sb = StartEvent("CrossedRegion");
 
             LLSDxmlEncode.AddArrayAndMap("AgentData", sb);
-                LLSDxmlEncode.AddElem("AgentID", avatarID, sb);
-                LLSDxmlEncode.AddElem("SessionID", sessionID, sb);
+            LLSDxmlEncode.AddElem("AgentID", avatarID, sb);
+            LLSDxmlEncode.AddElem("SessionID", sessionID, sb);
             LLSDxmlEncode.AddEndMapAndArray(sb);
 
             LLSDxmlEncode.AddArrayAndMap("Info", sb);
-                LLSDxmlEncode.AddElem("LookAt", lookAt, sb);
-                LLSDxmlEncode.AddElem("Position", pos, sb);
+            LLSDxmlEncode.AddElem("LookAt", lookAt, sb);
+            LLSDxmlEncode.AddElem("Position", pos, sb);
             LLSDxmlEncode.AddEndMapAndArray(sb);
 
             LLSDxmlEncode.AddArrayAndMap("RegionData", sb);
-                LLSDxmlEncode.AddElem("RegionHandle", handle, sb);
-                LLSDxmlEncode.AddElem("SeedCapability", capsURL, sb);
-                LLSDxmlEncode.AddElem("SimIP", newRegionExternalEndPoint.Address.GetAddressBytes(), sb);
-                LLSDxmlEncode.AddElem("SimPort", newRegionExternalEndPoint.Port, sb);
-                LLSDxmlEncode.AddElem("RegionSizeX", (uint)regionSizeX, sb);
-                LLSDxmlEncode.AddElem("RegionSizeY", (uint)regionSizeY, sb);
+            LLSDxmlEncode.AddElem("RegionHandle", handle, sb);
+            LLSDxmlEncode.AddElem("SeedCapability", capsURL, sb);
+            LLSDxmlEncode.AddElem("SimIP", newRegionExternalEndPoint.Address.GetAddressBytes(), sb);
+            LLSDxmlEncode.AddElem("SimPort", newRegionExternalEndPoint.Port, sb);
+            LLSDxmlEncode.AddElem("RegionSizeX", (uint)regionSizeX, sb);
+            LLSDxmlEncode.AddElem("RegionSizeY", (uint)regionSizeY, sb);
             LLSDxmlEncode.AddEndMapAndArray(sb);
 
             OSD ev = new OSDllsdxml(EndEvent(sb));
@@ -674,7 +671,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 LLSDxmlEncode.AddEndArray(sb);
 
                 LLSDxmlEncode.AddArray("NewGroupData", sb);
-                foreach(bool b in lstInProfiles)
+                foreach (bool b in lstInProfiles)
                 {
                     LLSDxmlEncode.AddMap(sb);
                     LLSDxmlEncode.AddElem("ListInProfile", b, sb);
@@ -697,10 +694,10 @@ namespace OpenSim.Region.ClientStack.Linden
         {
             StringBuilder sb = StartEvent("ScriptRunningReply");
             LLSDxmlEncode.AddArrayAndMap("Script", sb);
-                LLSDxmlEncode.AddElem("ObjectID", objectID, sb);
-                LLSDxmlEncode.AddElem("ItemID", itemID, sb);
-                LLSDxmlEncode.AddElem("Running", running, sb);
-                LLSDxmlEncode.AddElem("Mono", true, sb);
+            LLSDxmlEncode.AddElem("ObjectID", objectID, sb);
+            LLSDxmlEncode.AddElem("ItemID", itemID, sb);
+            LLSDxmlEncode.AddElem("Running", running, sb);
+            LLSDxmlEncode.AddElem("Mono", true, sb);
             LLSDxmlEncode.AddEndMapAndArray(sb);
 
             OSDllsdxml item = new OSDllsdxml(EndEvent(sb));
@@ -708,16 +705,16 @@ namespace OpenSim.Region.ClientStack.Linden
         }
 
         public void partPhysicsProperties(uint localID, byte physhapetype,
-                        float density, float friction, float bounce, float gravmod,UUID avatarID)
+                        float density, float friction, float bounce, float gravmod, UUID avatarID)
         {
             StringBuilder sb = StartEvent("ObjectPhysicsProperties");
             LLSDxmlEncode.AddArrayAndMap("ObjectData", sb);
-                LLSDxmlEncode.AddElem("LocalID", (int)localID, sb);
-                LLSDxmlEncode.AddElem("Density", density, sb);
-                LLSDxmlEncode.AddElem("Friction", friction, sb);
-                LLSDxmlEncode.AddElem("GravityMultiplier", gravmod, sb);
-                LLSDxmlEncode.AddElem("Restitution", bounce, sb);
-                LLSDxmlEncode.AddElem("PhysicsShapeType", (int)physhapetype, sb);
+            LLSDxmlEncode.AddElem("LocalID", (int)localID, sb);
+            LLSDxmlEncode.AddElem("Density", density, sb);
+            LLSDxmlEncode.AddElem("Friction", friction, sb);
+            LLSDxmlEncode.AddElem("GravityMultiplier", gravmod, sb);
+            LLSDxmlEncode.AddElem("Restitution", bounce, sb);
+            LLSDxmlEncode.AddElem("PhysicsShapeType", (int)physhapetype, sb);
             LLSDxmlEncode.AddEndMapAndArray(sb);
 
             OSDllsdxml item = new OSDllsdxml(EndEvent(sb));

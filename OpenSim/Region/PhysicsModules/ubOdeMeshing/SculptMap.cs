@@ -27,7 +27,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -96,7 +95,7 @@ namespace PrimMesher
                     for (int x = 0; x < width; x++)
                     {
                         if (smallMap)
-                            c = bm.GetPixel(x,  y < height ? y : y - 1);
+                            c = bm.GetPixel(x, y < height ? y : y - 1);
                         else
                             c = bm.GetPixel(x * 2, y < height ? y * 2 : y * 2 - 1);
 
@@ -128,7 +127,7 @@ namespace PrimMesher
 
             width++;
             height++;
-            if(needsScaling)
+            if (needsScaling)
                 bm.Dispose();
         }
 

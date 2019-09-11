@@ -25,21 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using Nini.Config;
-using NUnit.Framework;
-using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Region.CoreModules.Framework.EntityTransfer;
-using OpenSim.Region.CoreModules.Framework.InventoryAccess;
-using OpenSim.Region.CoreModules.ServiceConnectorsOut.Simulation;
-using OpenSim.Region.CoreModules.World.Permissions;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
-using OpenSim.Tests.Common;
-
 namespace OpenSim.Region.Framework.Scenes.Tests
 {
     /*

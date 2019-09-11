@@ -29,20 +29,20 @@
 // for cases where we already need to know the low level detail
 // and so using something like OSD or even protbuf is just a pure waste
 
+using OpenMetaverse;
 using System;
 using System.Globalization;
 using System.Text;
-using OpenMetaverse;
 
 namespace OpenSim.Framework
 {
     public static class LLSDxmlEncode
     {
-        static readonly  DateTime depoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        static readonly DateTime depoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         public static void AddStart(StringBuilder sb, bool addxmlversion = false)
         {
-            if(addxmlversion)
+            if (addxmlversion)
                 sb.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><llsd>"); // legacy llsd xml name still valid
             else
                 sb.Append("<llsd>");
@@ -54,7 +54,7 @@ namespace OpenSim.Framework
         public static StringBuilder Start(int size = 256, bool addxmlversion = false)
         {
             StringBuilder sb = new StringBuilder(size);
-            if(addxmlversion)
+            if (addxmlversion)
                 sb.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><llsd>"); // legacy llsd xml name still valid
             else
                 sb.Append("<llsd>");
@@ -117,7 +117,7 @@ namespace OpenSim.Framework
 
         public static void AddElem(bool e, StringBuilder sb)
         {
-            if(e)
+            if (e)
                 sb.Append("<boolean>1</boolean>");
             else
                 sb.Append("<boolean />");
@@ -125,31 +125,31 @@ namespace OpenSim.Framework
 
         public static void AddElem(byte e, StringBuilder sb)
         {
-            if(e == 0)
+            if (e == 0)
                 sb.Append("<integer />");
             else
             {
                 sb.Append("<integer>");
-                sb.Append(e.ToString());     
+                sb.Append(e.ToString());
                 sb.Append("</integer>");
             }
         }
 
         public static void AddElem(byte[] e, StringBuilder sb)
         {
-            if(e == null || e.Length == 0)
+            if (e == null || e.Length == 0)
                 sb.Append("binary />");
             else
             {
                 sb.Append("<binary>"); // encode64 is default
-                sb.Append(Convert.ToBase64String(e,Base64FormattingOptions.None));     
+                sb.Append(Convert.ToBase64String(e, Base64FormattingOptions.None));
                 sb.Append("</binary>");
             }
         }
 
         public static void AddElem(int e, StringBuilder sb)
         {
-            if(e == 0)
+            if (e == 0)
                 sb.Append("<integer />");
             else
             {
@@ -171,7 +171,7 @@ namespace OpenSim.Framework
 
         public static void AddElem(float e, StringBuilder sb)
         {
-            if(e == 0)
+            if (e == 0)
                 sb.Append("<real />");
             else
             {
@@ -185,7 +185,7 @@ namespace OpenSim.Framework
         {
             sb.Append("<array>");
 
-            if(e.X == 0)
+            if (e.X == 0)
                 sb.Append("<real />");
             else
             {
@@ -194,7 +194,7 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if(e.Y == 0)
+            if (e.Y == 0)
                 sb.Append("<real /></array>");
             else
             {
@@ -208,7 +208,7 @@ namespace OpenSim.Framework
         {
             sb.Append("<array>");
 
-            if(e.X == 0)
+            if (e.X == 0)
                 sb.Append("<real />");
             else
             {
@@ -217,7 +217,7 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if(e.Y == 0)
+            if (e.Y == 0)
                 sb.Append("<real />");
             else
             {
@@ -226,7 +226,7 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if(e.Z == 0)
+            if (e.Z == 0)
                 sb.Append("<real /></array>");
             else
             {
@@ -240,7 +240,7 @@ namespace OpenSim.Framework
         {
             sb.Append("<array><key>x</key>");
 
-            if(e.X == 0)
+            if (e.X == 0)
                 sb.Append("<real />");
             else
             {
@@ -249,7 +249,7 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if(e.Y == 0)
+            if (e.Y == 0)
                 sb.Append("<real />");
             else
             {
@@ -257,7 +257,7 @@ namespace OpenSim.Framework
                 sb.Append(e.Y.ToString(CultureInfo.InvariantCulture));
                 sb.Append("</real>");
             }
-            if(e.Z == 0)
+            if (e.Z == 0)
                 sb.Append("<real />");
             else
             {
@@ -266,7 +266,7 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if(e.W == 0)
+            if (e.W == 0)
                 sb.Append("<real /></array>");
             else
             {
@@ -278,7 +278,7 @@ namespace OpenSim.Framework
 
         public static void AddElem(double e, StringBuilder sb)
         {
-            if(e == 0)
+            if (e == 0)
                 sb.Append("<real />");
             else
             {
@@ -290,19 +290,19 @@ namespace OpenSim.Framework
 
         public static void AddElem(UUID e, StringBuilder sb)
         {
-            if(e == UUID.Zero)
+            if (e == UUID.Zero)
                 sb.Append("<uuid />");
             else
             {
                 sb.Append("<uuid>");
-                EscapeToXML(e.ToString(), sb);     
+                EscapeToXML(e.ToString(), sb);
                 sb.Append("</uuid>");
             }
         }
 
         public static void AddElem(string e, StringBuilder sb)
         {
-            if(String.IsNullOrEmpty(e))
+            if (String.IsNullOrEmpty(e))
                 sb.Append("<string />");
             else
             {
@@ -314,15 +314,15 @@ namespace OpenSim.Framework
 
         public static void AddRawElem(string e, StringBuilder sb)
         {
-            if(String.IsNullOrEmpty(e))
+            if (String.IsNullOrEmpty(e))
                 return;
 
-            sb.Append(e);     
+            sb.Append(e);
         }
 
         public static void AddElem(Uri e, StringBuilder sb)
         {
-            if(e == null)
+            if (e == null)
             {
                 sb.Append("<uri />");
                 return;
@@ -334,12 +334,12 @@ namespace OpenSim.Framework
             else
                 s = e.ToString();
 
-            if(String.IsNullOrEmpty(s))
+            if (String.IsNullOrEmpty(s))
                 sb.Append("<uri />");
             else
             {
                 sb.Append("<uri>");
-                sb.Append(s);     
+                sb.Append(s);
                 sb.Append("</uri>");
             }
         }
@@ -347,25 +347,25 @@ namespace OpenSim.Framework
         public static void AddElem(DateTime e, StringBuilder sb)
         {
             DateTime u = e.ToUniversalTime();
-            if(u == depoch)
+            if (u == depoch)
             {
                 sb.Append("<date />");
                 return;
-            }    
+            }
             string format;
-            if(u.Hour == 0 && u.Minute == 0 && u.Second == 0)
+            if (u.Hour == 0 && u.Minute == 0 && u.Second == 0)
                 format = "yyyy-MM-dd";
             else if (u.Millisecond > 0)
                 format = "yyyy-MM-ddTHH:mm:ss.ffZ";
             else
                 format = "yyyy-MM-ddTHH:mm:ssZ";
             sb.Append("<date>");
-            sb.Append(u.ToString(format,CultureInfo.InvariantCulture));
+            sb.Append(u.ToString(format, CultureInfo.InvariantCulture));
             sb.Append("</date>");
         }
 
-//************ key value *******************
-// assumes name is a valid llsd key
+        //************ key value *******************
+        // assumes name is a valid llsd key
 
         public static void AddMap(string name, StringBuilder sb)
         {
@@ -417,7 +417,7 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key>");
 
-            if(e)
+            if (e)
                 sb.Append("<boolean>1</boolean>");
             else
                 sb.Append("<boolean />");
@@ -429,7 +429,7 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key>");
 
-            if(e == 0)
+            if (e == 0)
                 sb.Append("<integer />");
             else
             {
@@ -445,12 +445,12 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key>");
 
-            if(e == null || e.Length == 0)
+            if (e == null || e.Length == 0)
                 sb.Append("binary />");
             else
             {
                 sb.Append("<binary>"); // encode64 is default
-                sb.Append(Convert.ToBase64String(e,Base64FormattingOptions.None));
+                sb.Append(Convert.ToBase64String(e, Base64FormattingOptions.None));
                 sb.Append("</binary>");
             }
         }
@@ -461,7 +461,7 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key>");
 
-            if(e == 0)
+            if (e == 0)
                 sb.Append("<integer />");
             else
             {
@@ -487,12 +487,12 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key>");
 
-            if(e == 0)
+            if (e == 0)
                 sb.Append("<real />");
             else
             {
                 sb.Append("<real>");
-                sb.Append(e.ToString(CultureInfo.InvariantCulture));     
+                sb.Append(e.ToString(CultureInfo.InvariantCulture));
                 sb.Append("</real>");
             }
         }
@@ -503,7 +503,7 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key><array>>");
 
-            if(e.X == 0)
+            if (e.X == 0)
                 sb.Append("<real />");
             else
             {
@@ -512,7 +512,7 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if(e.Y == 0)
+            if (e.Y == 0)
                 sb.Append("<real /></array>");
             else
             {
@@ -528,7 +528,7 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key><array>");
 
-            if(e.X == 0)
+            if (e.X == 0)
                 sb.Append("<real />");
             else
             {
@@ -537,7 +537,7 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if(e.Y == 0)
+            if (e.Y == 0)
                 sb.Append("<real />");
             else
             {
@@ -546,7 +546,7 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if(e.Z == 0)
+            if (e.Z == 0)
                 sb.Append("<real /></array>");
             else
             {
@@ -562,7 +562,7 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key><array>");
 
-            if(e.X == 0)
+            if (e.X == 0)
                 sb.Append("<real />");
             else
             {
@@ -571,7 +571,7 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if(e.Y == 0)
+            if (e.Y == 0)
                 sb.Append("<real />");
             else
             {
@@ -579,7 +579,7 @@ namespace OpenSim.Framework
                 sb.Append(e.Y.ToString(CultureInfo.InvariantCulture));
                 sb.Append("</real>");
             }
-            if(e.Z == 0)
+            if (e.Z == 0)
                 sb.Append("<real />");
             else
             {
@@ -588,7 +588,7 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if(e.W == 0)
+            if (e.W == 0)
                 sb.Append("<real /></array>");
             else
             {
@@ -604,7 +604,7 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key>");
 
-            if(e == 0)
+            if (e == 0)
                 sb.Append("<real />");
             else
             {
@@ -620,12 +620,12 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key>");
 
-            if(e == UUID.Zero)
+            if (e == UUID.Zero)
                 sb.Append("<uuid />");
             else
             {
                 sb.Append("<uuid>");
-                EscapeToXML(e.ToString(), sb);     
+                EscapeToXML(e.ToString(), sb);
                 sb.Append("</uuid>");
             }
         }
@@ -636,7 +636,7 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key>");
 
-            if(String.IsNullOrEmpty(e))
+            if (String.IsNullOrEmpty(e))
                 sb.Append("<string />");
             else
             {
@@ -663,7 +663,7 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key>");
 
-            if(e == null)
+            if (e == null)
             {
                 sb.Append("<uri />");
                 return;
@@ -675,12 +675,12 @@ namespace OpenSim.Framework
             else
                 s = e.ToString();
 
-            if(String.IsNullOrEmpty(s))
+            if (String.IsNullOrEmpty(s))
                 sb.Append("<uri />");
             else
             {
                 sb.Append("<uri>");
-                sb.Append(s);     
+                sb.Append(s);
                 sb.Append("</uri>");
             }
         }
@@ -692,20 +692,20 @@ namespace OpenSim.Framework
             sb.Append("</key>");
 
             DateTime u = e.ToUniversalTime();
-            if(u == depoch)
+            if (u == depoch)
             {
                 sb.Append("<date />");
                 return;
-            }    
+            }
             string format;
-            if(u.Hour == 0 && u.Minute == 0 && u.Second == 0)
+            if (u.Hour == 0 && u.Minute == 0 && u.Second == 0)
                 format = "yyyy-MM-dd";
             else if (u.Millisecond > 0)
                 format = "yyyy-MM-ddTHH:mm:ss.ffZ";
             else
                 format = "yyyy-MM-ddTHH:mm:ssZ";
             sb.Append("<date>");
-            sb.Append(u.ToString(format,CultureInfo.InvariantCulture));
+            sb.Append(u.ToString(format, CultureInfo.InvariantCulture));
             sb.Append("</date>");
         }
 

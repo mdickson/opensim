@@ -25,24 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
 using log4net;
-using Nini.Config;
-using Nwc.XmlRpc;
 using Mono.Addins;
+using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
 using OpenSim.Services.Connectors.Hypergrid;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using FriendInfo = OpenSim.Services.Interfaces.FriendInfo;
-using PresenceInfo = OpenSim.Services.Interfaces.PresenceInfo;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
+using PresenceInfo = OpenSim.Services.Interfaces.PresenceInfo;
 
 namespace OpenSim.Region.CoreModules.Avatar.Friends
 {
@@ -162,7 +159,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
 
         protected override bool CacheFriends(IClientAPI client)
         {
-//            m_log.DebugFormat("[HGFRIENDS MODULE]: Entered CacheFriends for {0}", client.Name);
+            //            m_log.DebugFormat("[HGFRIENDS MODULE]: Entered CacheFriends for {0}", client.Name);
 
             if (base.CacheFriends(client))
             {
@@ -171,7 +168,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
                 if (m_Friends[agentID].Refcount == 1)
                 {
                     IUserManagement uMan = m_Scenes[0].RequestModuleInterface<IUserManagement>();
-                    if(uMan == null)
+                    if (uMan == null)
                         return true;
                     // We need to preload the user management cache with the names
                     // of foreign friends, just like we do with SOPs' creators
@@ -185,25 +182,25 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
                                 string url = string.Empty, first = string.Empty, last = string.Empty, tmp = string.Empty;
                                 if (Util.ParseUniversalUserIdentifier(finfo.Friend, out id, out url, out first, out last, out tmp))
                                 {
-//                                    m_log.DebugFormat("[HGFRIENDS MODULE]: caching {0}", finfo.Friend);
+                                    //                                    m_log.DebugFormat("[HGFRIENDS MODULE]: caching {0}", finfo.Friend);
                                     uMan.AddUser(id, url + ";" + first + " " + last);
                                 }
                             }
                         }
                     }
 
-//                    m_log.DebugFormat("[HGFRIENDS MODULE]: Exiting CacheFriends for {0} since detected root agent", client.Name);
+                    //                    m_log.DebugFormat("[HGFRIENDS MODULE]: Exiting CacheFriends for {0} since detected root agent", client.Name);
                     return true;
                 }
             }
 
-//            m_log.DebugFormat("[HGFRIENDS MODULE]: Exiting CacheFriends for {0} since detected not root agent", client.Name);
+            //            m_log.DebugFormat("[HGFRIENDS MODULE]: Exiting CacheFriends for {0} since detected not root agent", client.Name);
             return false;
         }
 
         public override bool SendFriendsOnlineIfNeeded(IClientAPI client)
         {
-//            m_log.DebugFormat("[HGFRIENDS MODULE]: Entering SendFriendsOnlineIfNeeded for {0}", client.Name);
+            //            m_log.DebugFormat("[HGFRIENDS MODULE]: Entering SendFriendsOnlineIfNeeded for {0}", client.Name);
 
             if (base.SendFriendsOnlineIfNeeded(client))
             {
@@ -217,20 +214,20 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
                         foreach (FriendInfo f in friends)
                         {
                             int rights = f.TheirFlags;
-                            if(rights != -1 )
+                            if (rights != -1)
                                 client.SendChangeUserRights(new UUID(f.Friend), client.AgentId, rights);
                         }
                     }
                 }
             }
 
-//            m_log.DebugFormat("[HGFRIENDS MODULE]: Exiting SendFriendsOnlineIfNeeded for {0}", client.Name);
+            //            m_log.DebugFormat("[HGFRIENDS MODULE]: Exiting SendFriendsOnlineIfNeeded for {0}", client.Name);
             return false;
         }
 
         protected override void GetOnlineFriends(UUID userID, List<string> friendList, /*collector*/ List<UUID> online)
         {
-//            m_log.DebugFormat("[HGFRIENDS MODULE]: Entering GetOnlineFriends for {0}", userID);
+            //            m_log.DebugFormat("[HGFRIENDS MODULE]: Entering GetOnlineFriends for {0}", userID);
 
             List<string> fList = new List<string>();
             foreach (string s in friendList)
@@ -253,7 +250,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
                     online.Add(presenceID);
             }
 
-//            m_log.DebugFormat("[HGFRIENDS MODULE]: Exiting GetOnlineFriends for {0}", userID);
+            //            m_log.DebugFormat("[HGFRIENDS MODULE]: Exiting GetOnlineFriends for {0}", userID);
         }
 
         protected override void StatusNotify(List<FriendInfo> friendList, UUID userID, bool online)
@@ -295,7 +292,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
 
             m_StatusNotifier.Notify(userID, friendsPerDomain, online);
 
-//            m_log.DebugFormat("[HGFRIENDS MODULE]: Exiting StatusNotify for {0}", userID);
+            //            m_log.DebugFormat("[HGFRIENDS MODULE]: Exiting StatusNotify for {0}", userID);
         }
 
         protected override bool GetAgentInfo(UUID scopeID, string fid, out UUID agentID, out string first, out string last)
@@ -423,12 +420,12 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
         protected override void StoreBackwards(UUID friendID, UUID agentID)
         {
             bool agentIsLocal = true;
-//            bool friendIsLocal = true;
+            //            bool friendIsLocal = true;
 
             if (UserManagementModule != null)
             {
                 agentIsLocal = UserManagementModule.IsLocalGridUser(agentID);
-//                friendIsLocal = UserManagementModule.IsLocalGridUser(friendID);
+                //                friendIsLocal = UserManagementModule.IsLocalGridUser(friendID);
             }
 
             // Is the requester a local user?
@@ -540,8 +537,8 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
 
                     friendFriendService = m_uMan.GetUserServerURL(friendID, "FriendsServerURI");
 
-        //            m_log.DebugFormat("[HGFRIENDS MODULE] HG Friendship! thisUUI={0}; friendUUI={1}; foreignThisFriendService={2}; foreignFriendFriendService={3}",
-        //              agentUUI, friendUUI, agentFriendService, friendFriendService);
+                    //            m_log.DebugFormat("[HGFRIENDS MODULE] HG Friendship! thisUUI={0}; friendUUI={1}; foreignThisFriendService={2}; foreignFriendFriendService={3}",
+                    //              agentUUI, friendUUI, agentFriendService, friendFriendService);
 
                 }
 
@@ -555,14 +552,14 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
 
                 //if (!confirming)
                 //{
-                    // store in the foreign friends service a reference to the local agent
-                    HGFriendsServicesConnector friendsConn = null;
-                    if (friendClientCircuit != null) // the friend is here, validate session
-                        friendsConn = new HGFriendsServicesConnector(friendFriendService, friendClientCircuit.SessionID, friendClientCircuit.ServiceSessionID);
-                    else // the friend is not here, he initiated the request in his home world
-                        friendsConn = new HGFriendsServicesConnector(friendFriendService);
+                // store in the foreign friends service a reference to the local agent
+                HGFriendsServicesConnector friendsConn = null;
+                if (friendClientCircuit != null) // the friend is here, validate session
+                    friendsConn = new HGFriendsServicesConnector(friendFriendService, friendClientCircuit.SessionID, friendClientCircuit.ServiceSessionID);
+                else // the friend is not here, he initiated the request in his home world
+                    friendsConn = new HGFriendsServicesConnector(friendFriendService);
 
-                    friendsConn.NewFriendship(friendID, agentUUID);
+                friendsConn.NewFriendship(friendID, agentUUID);
                 //}
             }
             else if (friendIsLocal) // 'friend' is local,  agent is foreigner

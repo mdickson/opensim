@@ -60,7 +60,8 @@ namespace OpenSim.Framework
             EstateManagers = 10
         }
 
-        [Flags]public enum TeleportFlags : uint
+        [Flags]
+        public enum TeleportFlags : uint
         {
             /// <summary>No flags set, or teleport failed</summary>
             Default = 0,

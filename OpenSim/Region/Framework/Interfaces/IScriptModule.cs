@@ -25,17 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using OpenMetaverse;
 
 namespace OpenSim.Region.Framework.Interfaces
 {
     public delegate void ScriptRemoved(UUID script);
     public delegate void ObjectRemoved(UUID prim);
 
-    public interface IScriptModule: INonSharedRegionModule
+    public interface IScriptModule : INonSharedRegionModule
     {
         /// <summary>
         /// Triggered when a script is removed from the script module.

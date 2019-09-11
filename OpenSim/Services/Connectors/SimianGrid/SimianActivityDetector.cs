@@ -25,13 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
+using log4net;
+using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-using OpenMetaverse;
-using log4net;
+using System.Reflection;
 
 namespace OpenSim.Services.Connectors.SimianGrid
 {
@@ -66,7 +65,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
         public void OnMakeRootAgent(ScenePresence sp)
         {
             m_log.DebugFormat("[SIMIAN ACTIVITY DETECTOR]: Detected root presence {0} in {1}", sp.UUID, sp.Scene.RegionInfo.RegionName);
-            Util.FireAndForget(delegate(object o)
+            Util.FireAndForget(delegate (object o)
             {
                 m_GridUserService.SetLastPosition(sp.UUID.ToString(), sp.ControllingClient.SessionId, sp.Scene.RegionInfo.RegionID, sp.AbsolutePosition, sp.Lookat);
             }, null, "SimianActivityDetector.SetLastPositionOnMakeRootAgent");
@@ -82,7 +81,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
             if (client.SceneAgent.IsChildAgent)
                 return;
 
-//            m_log.DebugFormat("[ACTIVITY DETECTOR]: Detected client logout {0} in {1}", client.AgentId, client.Scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[ACTIVITY DETECTOR]: Detected client logout {0} in {1}", client.AgentId, client.Scene.RegionInfo.RegionName);
             m_GridUserService.LoggedOut(
                 client.AgentId.ToString(), client.SessionId, client.Scene.RegionInfo.RegionID,
                 client.SceneAgent.AbsolutePosition, client.SceneAgent.Lookat);
@@ -91,7 +90,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
         void OnEnteringNewParcel(ScenePresence sp, int localLandID, UUID regionID)
         {
             // Asynchronously update the position stored in the session table for this agent
-            Util.FireAndForget(delegate(object o)
+            Util.FireAndForget(delegate (object o)
             {
                 m_GridUserService.SetLastPosition(sp.UUID.ToString(), sp.ControllingClient.SessionId, sp.Scene.RegionInfo.RegionID, sp.AbsolutePosition, sp.Lookat);
             }, null, "SimianActivityDetector.SetLastPositionOnEnteringNewParcel");

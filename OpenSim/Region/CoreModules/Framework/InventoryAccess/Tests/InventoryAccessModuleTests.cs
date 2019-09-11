@@ -25,23 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Threading;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
-using OpenSim.Data;
 using OpenSim.Framework;
-using OpenSim.Framework.Serialization;
-using OpenSim.Framework.Serialization.External;
 using OpenSim.Region.CoreModules.Avatar.Inventory.Archiver;
-using OpenSim.Region.CoreModules.Framework.InventoryAccess;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Scenes.Serialization;
-using OpenSim.Services.Interfaces;
 using OpenSim.Tests.Common;
 
 namespace OpenSim.Region.CoreModules.Framework.InventoryAccess.Tests
@@ -83,67 +72,67 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess.Tests
         [Test]
         public void TestRezCoalescedObject()
         {
-/*
-            TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            /*
+                        TestHelpers.InMethod();
+            //            log4net.Config.XmlConfigurator.Configure();
 
-            // Create asset
-            SceneObjectGroup object1 = SceneHelpers.CreateSceneObject(1, m_userId, "Object1", 0x20);
-            object1.AbsolutePosition = new Vector3(15, 30, 45);
+                        // Create asset
+                        SceneObjectGroup object1 = SceneHelpers.CreateSceneObject(1, m_userId, "Object1", 0x20);
+                        object1.AbsolutePosition = new Vector3(15, 30, 45);
 
-            SceneObjectGroup object2 = SceneHelpers.CreateSceneObject(1, m_userId, "Object2", 0x40);
-            object2.AbsolutePosition = new Vector3(25, 50, 75);
+                        SceneObjectGroup object2 = SceneHelpers.CreateSceneObject(1, m_userId, "Object2", 0x40);
+                        object2.AbsolutePosition = new Vector3(25, 50, 75);
 
-            CoalescedSceneObjects coa = new CoalescedSceneObjects(m_userId, object1, object2);
+                        CoalescedSceneObjects coa = new CoalescedSceneObjects(m_userId, object1, object2);
 
-            UUID asset1Id = UUID.Parse("00000000-0000-0000-0000-000000000060");
-            AssetBase asset1 = AssetHelpers.CreateAsset(asset1Id, coa);
-            m_scene.AssetService.Store(asset1);
+                        UUID asset1Id = UUID.Parse("00000000-0000-0000-0000-000000000060");
+                        AssetBase asset1 = AssetHelpers.CreateAsset(asset1Id, coa);
+                        m_scene.AssetService.Store(asset1);
 
-            // Create item
-            UUID item1Id = UUID.Parse("00000000-0000-0000-0000-000000000080");
-            string item1Name = "My Little Dog";
-            InventoryItemBase item1 = new InventoryItemBase();
-            item1.Name = item1Name;
-            item1.AssetID = asset1.FullID;
-            item1.ID = item1Id;
-            InventoryFolderBase objsFolder
-                = InventoryArchiveUtils.FindFoldersByPath(m_scene.InventoryService, m_userId, "Objects")[0];
-            item1.Folder = objsFolder.ID;
-            item1.Flags |= (uint)InventoryItemFlags.ObjectHasMultipleItems;
-            m_scene.AddInventoryItem(item1);
+                        // Create item
+                        UUID item1Id = UUID.Parse("00000000-0000-0000-0000-000000000080");
+                        string item1Name = "My Little Dog";
+                        InventoryItemBase item1 = new InventoryItemBase();
+                        item1.Name = item1Name;
+                        item1.AssetID = asset1.FullID;
+                        item1.ID = item1Id;
+                        InventoryFolderBase objsFolder
+                            = InventoryArchiveUtils.FindFoldersByPath(m_scene.InventoryService, m_userId, "Objects")[0];
+                        item1.Folder = objsFolder.ID;
+                        item1.Flags |= (uint)InventoryItemFlags.ObjectHasMultipleItems;
+                        m_scene.AddInventoryItem(item1);
 
-            SceneObjectGroup so
-                = m_iam.RezObject(
-                    m_tc, item1Id, new Vector3(100, 100, 100), Vector3.Zero, UUID.Zero, 1, false, false, false, UUID.Zero, false);
+                        SceneObjectGroup so
+                            = m_iam.RezObject(
+                                m_tc, item1Id, new Vector3(100, 100, 100), Vector3.Zero, UUID.Zero, 1, false, false, false, UUID.Zero, false);
 
-            Assert.That(so, Is.Not.Null);
+                        Assert.That(so, Is.Not.Null);
 
-            Assert.That(m_scene.SceneGraph.GetTotalObjectsCount(), Is.EqualTo(2));
+                        Assert.That(m_scene.SceneGraph.GetTotalObjectsCount(), Is.EqualTo(2));
 
-            SceneObjectPart retrievedObj1Part = m_scene.GetSceneObjectPart(object1.Name);
-            Assert.That(retrievedObj1Part, Is.Null);
+                        SceneObjectPart retrievedObj1Part = m_scene.GetSceneObjectPart(object1.Name);
+                        Assert.That(retrievedObj1Part, Is.Null);
 
-            retrievedObj1Part = m_scene.GetSceneObjectPart(item1.Name);
-            Assert.That(retrievedObj1Part, Is.Not.Null);
-            Assert.That(retrievedObj1Part.Name, Is.EqualTo(item1.Name));
+                        retrievedObj1Part = m_scene.GetSceneObjectPart(item1.Name);
+                        Assert.That(retrievedObj1Part, Is.Not.Null);
+                        Assert.That(retrievedObj1Part.Name, Is.EqualTo(item1.Name));
 
-            // Bottom of coalescence is placed on ground, hence we end up with 100.5 rather than 85 since the bottom
-            // object is unit square.
-            Assert.That(retrievedObj1Part.AbsolutePosition, Is.EqualTo(new Vector3(95, 90, 100.5f)));
+                        // Bottom of coalescence is placed on ground, hence we end up with 100.5 rather than 85 since the bottom
+                        // object is unit square.
+                        Assert.That(retrievedObj1Part.AbsolutePosition, Is.EqualTo(new Vector3(95, 90, 100.5f)));
 
-            SceneObjectPart retrievedObj2Part = m_scene.GetSceneObjectPart(object2.Name);
-            Assert.That(retrievedObj2Part, Is.Not.Null);
-            Assert.That(retrievedObj2Part.Name, Is.EqualTo(object2.Name));
-            Assert.That(retrievedObj2Part.AbsolutePosition, Is.EqualTo(new Vector3(105, 110, 130.5f)));
-*/
+                        SceneObjectPart retrievedObj2Part = m_scene.GetSceneObjectPart(object2.Name);
+                        Assert.That(retrievedObj2Part, Is.Not.Null);
+                        Assert.That(retrievedObj2Part.Name, Is.EqualTo(object2.Name));
+                        Assert.That(retrievedObj2Part.AbsolutePosition, Is.EqualTo(new Vector3(105, 110, 130.5f)));
+            */
         }
 
         [Test]
         public void TestRezObject()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             // Create asset
             SceneObjectGroup object1 = SceneHelpers.CreateSceneObject(1, m_userId, "My Little Dog Object", 0x40);

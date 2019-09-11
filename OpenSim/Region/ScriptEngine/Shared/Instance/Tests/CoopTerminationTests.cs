@@ -25,18 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Region.CoreModules.Scripting.WorldComm;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.ScriptEngine.XEngine;
 using OpenSim.Tests.Common;
+using System;
+using System.Threading;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Instance.Tests
 {
@@ -74,7 +70,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance.Tests
             m_stoppedEvent = new AutoResetEvent(false);
 
             //AppDomain.CurrentDomain.SetData("APPBASE", Environment.CurrentDirectory + "/bin");
-//            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
+            //            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
             m_xEngine = new OpenSim.Region.ScriptEngine.XEngine.XEngine();
             m_xEngine.DebugLevel = 1;
 
@@ -100,7 +96,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance.Tests
             xEngineConfig.Set("WriteScriptSourceToDebugFile", true);
 
             // Set to false if we need to debug test so the old scripts don't get wiped before each separate test
-//            xEngineConfig.Set("DeleteScriptsOnStartup", false);
+            //            xEngineConfig.Set("DeleteScriptsOnStartup", false);
 
             // This is not currently used at all for co-op termination.  Bumping up to demonstrate that co-op termination
             // has an effect - without it tests will fail due to a 120 second wait for the event to finish.
@@ -122,7 +118,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance.Tests
         public void TestStopOnLongSleep()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string script =
 @"default
@@ -141,7 +137,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance.Tests
         public void TestNoStopOnSingleStatementForLoop()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string script =
 @"default
@@ -160,7 +156,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance.Tests
         public void TestStopOnLongSingleStatementForLoop()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string script =
 @"default
@@ -181,7 +177,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance.Tests
         public void TestStopOnLongCompoundStatementForLoop()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string script =
 @"default
@@ -205,7 +201,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance.Tests
         public void TestNoStopOnSingleStatementWhileLoop()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string script =
 @"default
@@ -224,7 +220,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance.Tests
         public void TestStopOnLongSingleStatementWhileLoop()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string script =
 @"default
@@ -246,7 +242,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance.Tests
         public void TestStopOnLongCompoundStatementWhileLoop()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string script =
 @"default
@@ -270,7 +266,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance.Tests
         public void TestNoStopOnSingleStatementDoWhileLoop()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string script =
 @"default
@@ -291,7 +287,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance.Tests
         public void TestStopOnLongSingleStatementDoWhileLoop()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string script =
 @"default
@@ -313,7 +309,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance.Tests
         public void TestStopOnLongCompoundStatementDoWhileLoop()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string script =
 @"default
@@ -358,11 +354,11 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance.Tests
 
         // Disabling for now as these are not particularly useful tests (since they fail due to stack overflow before
         // termination can even be tried.
-//        [Test]
+        //        [Test]
         public void TestStopOnInfiniteUserFunctionCallLoop()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string script =
 @"
@@ -390,11 +386,11 @@ default
 
         // Disabling for now as these are not particularly useful tests (since they fail due to stack overflow before
         // termination can even be tried.
-//        [Test]
+        //        [Test]
         public void TestStopOnInfiniteManualEventCallLoop()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string script =
 @"default
@@ -414,15 +410,15 @@ default
 
         private SceneObjectPart CreateScript(string script, string itemName, UUID userId)
         {
-//            UUID objectId = TestHelpers.ParseTail(0x100);
-//            UUID itemId = TestHelpers.ParseTail(0x3);
+            //            UUID objectId = TestHelpers.ParseTail(0x100);
+            //            UUID itemId = TestHelpers.ParseTail(0x3);
 
             SceneObjectGroup so
                 = SceneHelpers.CreateSceneObject(1, userId, string.Format("Object for {0}", itemName), 0x100);
             m_scene.AddNewSceneObject(so, true);
 
             InventoryItemBase itemTemplate = new InventoryItemBase();
-//            itemTemplate.ID = itemId;
+            //            itemTemplate.ID = itemId;
             itemTemplate.Name = itemName;
             itemTemplate.Folder = so.UUID;
             itemTemplate.InvType = (int)InventoryType.LSL;
@@ -438,8 +434,8 @@ default
             m_chatMessagesThreshold = 2;
 
             UUID userId = TestHelpers.ParseTail(0x1);
-//            UUID objectId = TestHelpers.ParseTail(0x100);
-//            UUID itemId = TestHelpers.ParseTail(0x3);
+            //            UUID objectId = TestHelpers.ParseTail(0x100);
+            //            UUID itemId = TestHelpers.ParseTail(0x3);
             string itemName = "TestNoStop";
 
             SceneObjectPart partWhereRezzed = CreateScript(script, itemName, userId);
@@ -465,8 +461,8 @@ default
             m_chatMessagesThreshold = 1;
 
             UUID userId = TestHelpers.ParseTail(0x1);
-//            UUID objectId = TestHelpers.ParseTail(0x100);
-//            UUID itemId = TestHelpers.ParseTail(0x3);
+            //            UUID objectId = TestHelpers.ParseTail(0x100);
+            //            UUID itemId = TestHelpers.ParseTail(0x3);
             string itemName = "TestStop";
 
             SceneObjectPart partWhereRezzed = CreateScript(script, itemName, userId);

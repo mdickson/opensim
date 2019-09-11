@@ -25,15 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
-using log4net;
-using OpenMetaverse;
-using OpenSim.Framework;
 using Npgsql;
-using NpgsqlTypes;
+using OpenMetaverse;
+using System;
 
 
 namespace OpenSim.Data.PGSQL
@@ -44,7 +38,7 @@ namespace OpenSim.Data.PGSQL
     public class PGSQLAvatarData : PGSQLGenericTableHandler<AvatarBaseData>,
             IAvatarData
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public PGSQLAvatarData(string connectionString, string realm) :
                 base(connectionString, realm, "Avatar")

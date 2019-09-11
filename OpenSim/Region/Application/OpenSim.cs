@@ -25,31 +25,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Threading;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Timers;
-using System.Net;
 using log4net;
 using NDesk.Options;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Console;
-using OpenSim.Framework.Servers;
 using OpenSim.Framework.Monitoring;
+using OpenSim.Framework.Servers;
+using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-using OpenSim.Framework.Servers.HttpServer;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Reflection;
+using System.Runtime;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace OpenSim
 {
@@ -102,7 +99,7 @@ namespace OpenSim
                 if (startupConfig.GetString("console", String.Empty) == String.Empty)
                     m_gui = startupConfig.GetBoolean("gui", false);
                 else
-                    m_consoleType= startupConfig.GetString("console", String.Empty);
+                    m_consoleType = startupConfig.GetString("console", String.Empty);
 
                 if (networkConfig != null)
                     m_consolePort = (uint)networkConfig.GetInt("console_port", 0);
@@ -118,7 +115,7 @@ namespace OpenSim
                 if (!String.IsNullOrEmpty(asyncCallMethodStr) && Utils.EnumTryParse<FireAndForgetMethod>(asyncCallMethodStr, out asyncCallMethod))
                     Util.FireAndForgetMethod = asyncCallMethod;
 
-                stpMinThreads = startupConfig.GetInt("MinPoolThreads", 2 );
+                stpMinThreads = startupConfig.GetInt("MinPoolThreads", 2);
                 stpMaxThreads = startupConfig.GetInt("MaxPoolThreads", 25);
                 m_consolePrompt = startupConfig.GetString("ConsolePrompt", @"Region (\R) ");
 
@@ -131,7 +128,7 @@ namespace OpenSim
 
             m_log.Info("[OPENSIM MAIN]: Using async_call_method " + Util.FireAndForgetMethod);
 
-            m_log.InfoFormat("[OPENSIM MAIN] Running GC in {0} mode", GCSettings.IsServerGC ? "server":"workstation");
+            m_log.InfoFormat("[OPENSIM MAIN] Running GC in {0} mode", GCSettings.IsServerGC ? "server" : "workstation");
         }
 
 #if (_MONO)
@@ -194,15 +191,15 @@ namespace OpenSim
             {
                 switch (m_consoleType)
                 {
-                case "basic":
-                    m_console = new CommandConsole("Region");
-                    break;
-                case "rest":
-                    m_console = new RemoteConsole("Region");
-                    break;
-                default:
-                    m_console = new LocalConsole("Region", Config.Configs["Startup"]);
-                    break;
+                    case "basic":
+                        m_console = new CommandConsole("Region");
+                        break;
+                    case "rest":
+                        m_console = new RemoteConsole("Region");
+                        break;
+                    default:
+                        m_console = new LocalConsole("Region", Config.Configs["Startup"]);
+                        break;
                 }
             }
 
@@ -248,9 +245,9 @@ namespace OpenSim
             // For now, start at the 'root' level by default
             if (SceneManager.Scenes.Count == 1) // If there is only one region, select it
                 ChangeSelectedRegion("region",
-                                     new string[] {"change", "region", SceneManager.Scenes[0].RegionInfo.RegionName});
+                                     new string[] { "change", "region", SceneManager.Scenes[0].RegionInfo.RegionName });
             else
-                ChangeSelectedRegion("region", new string[] {"change", "region", "root"});
+                ChangeSelectedRegion("region", new string[] { "change", "region", "root" });
 
             //Run Startup Commands
             if (String.IsNullOrEmpty(m_startupCommandsFile))
@@ -267,7 +264,7 @@ namespace OpenSim
             {
                 m_scriptTimer = new System.Timers.Timer();
                 m_scriptTimer.Enabled = true;
-                m_scriptTimer.Interval = m_timeInterval*1000;
+                m_scriptTimer.Interval = m_timeInterval * 1000;
                 m_scriptTimer.Elapsed += RunAutoTimerScript;
             }
         }
@@ -350,7 +347,7 @@ namespace OpenSim
                                           //"save oar [-v|--version=<N>] [-p|--profile=<url>] [<OAR path>]",
                                           "save oar [-h|--home=<url>] [--noassets] [--publish] [--perm=<permissions>] [--all] [<OAR path>]",
                                           "Save a region's data to an OAR archive.",
-//                                          "-v|--version=<N> generates scene objects as per older versions of the serialization (e.g. -v=0)" + Environment.NewLine
+                                          //                                          "-v|--version=<N> generates scene objects as per older versions of the serialization (e.g. -v=0)" + Environment.NewLine
                                           "-h|--home=<url> adds the url of the profile service to the saved user information.\n"
                                           + "--noassets stops assets being saved to the OAR.\n"
                                           + "--publish saves an OAR stripped of owner and last owner information.\n"
@@ -642,9 +639,9 @@ namespace OpenSim
 
             Vector3 center = new Vector3(centerX, centerY, 0.0f);
 
-            SceneManager.ForEachSelectedScene(delegate(Scene scene)
+            SceneManager.ForEachSelectedScene(delegate (Scene scene)
             {
-                scene.ForEachSOG(delegate(SceneObjectGroup sog)
+                scene.ForEachSOG(delegate (SceneObjectGroup sog)
                 {
                     if (!sog.IsAttachment)
                     {
@@ -671,9 +668,9 @@ namespace OpenSim
 
             float minZ = float.MaxValue;
 
-            SceneManager.ForEachSelectedScene(delegate(Scene scene)
+            SceneManager.ForEachSelectedScene(delegate (Scene scene)
             {
-                scene.ForEachSOG(delegate(SceneObjectGroup sog)
+                scene.ForEachSOG(delegate (SceneObjectGroup sog)
                 {
                     if (!sog.IsAttachment)
                     {
@@ -683,9 +680,9 @@ namespace OpenSim
                 });
             });
 
-            SceneManager.ForEachSelectedScene(delegate(Scene scene)
+            SceneManager.ForEachSelectedScene(delegate (Scene scene)
             {
-                scene.ForEachSOG(delegate(SceneObjectGroup sog)
+                scene.ForEachSOG(delegate (SceneObjectGroup sog)
                 {
                     if (!sog.IsAttachment)
                     {
@@ -723,9 +720,9 @@ namespace OpenSim
 
             Vector3 offset = new Vector3(xOFfset, yOffset, zOffset);
 
-            SceneManager.ForEachSelectedScene(delegate(Scene scene)
+            SceneManager.ForEachSelectedScene(delegate (Scene scene)
             {
-                scene.ForEachSOG(delegate(SceneObjectGroup sog)
+                scene.ForEachSOG(delegate (SceneObjectGroup sog)
                 {
                     if (!sog.IsAttachment)
                         sog.UpdateGroupPosition(sog.AbsolutePosition + offset);
@@ -877,14 +874,14 @@ namespace OpenSim
             string regionName = (SceneManager.CurrentScene == null ? "root" : SceneManager.CurrentScene.RegionInfo.RegionName);
             MainConsole.Instance.Output(String.Format("Currently selected region is {0}", regionName));
 
-//            m_log.DebugFormat("Original prompt is {0}", m_consolePrompt);
+            //            m_log.DebugFormat("Original prompt is {0}", m_consolePrompt);
             string prompt = m_consolePrompt;
 
             // Replace "\R" with the region name
             // Replace "\\" with "\"
             prompt = m_consolePromptRegex.Replace(prompt, m =>
             {
-//                m_log.DebugFormat("Matched {0}", m.Groups[2].Value);
+                //                m_log.DebugFormat("Matched {0}", m.Groups[2].Value);
                 if (m.Groups[2].Value == "R")
                     return m.Groups[1].Value + regionName;
                 else
@@ -928,7 +925,8 @@ namespace OpenSim
                     if (showParams.Length > 1 && showParams[1] == "full")
                     {
                         agents = SceneManager.GetCurrentScenePresences();
-                    } else
+                    }
+                    else
                     {
                         agents = SceneManager.GetCurrentSceneAvatars();
                     }
@@ -948,7 +946,8 @@ namespace OpenSim
                         if (regionInfo == null)
                         {
                             regionName = "Unresolvable";
-                        } else
+                        }
+                        else
                         {
                             regionName = regionInfo.RegionName;
                         }
@@ -1033,7 +1032,7 @@ namespace OpenSim
 
                 case "ratings":
                     SceneManager.ForEachScene(
-                    delegate(Scene scene)
+                    delegate (Scene scene)
                     {
                         string rating = "";
                         if (scene.RegionInfo.RegionSettings.Maturity == 1)
@@ -1099,7 +1098,7 @@ namespace OpenSim
                     c =>
                         {
                             bool child = false;
-                            if(c.SceneAgent != null && c.SceneAgent.IsChildAgent)
+                            if (c.SceneAgent != null && c.SceneAgent.IsChildAgent)
                                 child = true;
                             cdt.AddRow(
                             s.Name,
@@ -1180,7 +1179,7 @@ namespace OpenSim
                         {
                             loadOffset.Z = (float)Convert.ToDecimal(cmdparams[6], Culture.NumberFormatInfo);
                         }
-                        MainConsole.Instance.Output(String.Format("loadOffsets <X,Y,Z> = <{0},{1},{2}>",loadOffset.X,loadOffset.Y,loadOffset.Z));
+                        MainConsole.Instance.Output(String.Format("loadOffsets <X,Y,Z> = <{0},{1},{2}>", loadOffset.X, loadOffset.Y, loadOffset.Z));
                     }
                 }
                 SceneManager.LoadCurrentSceneFromXml(cmdparams[2], generateNewIDS, loadOffset);
@@ -1303,7 +1302,7 @@ namespace OpenSim
                     // concatenate it all to "name"
                     StringBuilder sb = new StringBuilder(args[3]);
                     for (int i = 4; i < args.Length; i++)
-                        sb.Append (" " + args[i]);
+                        sb.Append(" " + args[i]);
                     string estateName = sb.ToString().Trim();
 
                     // send it off for processing.
@@ -1424,7 +1423,7 @@ namespace OpenSim
                         // everything after the estate ID is "name"
                         StringBuilder sb = new StringBuilder(args[4]);
                         for (int i = 5; i < args.Length; i++)
-                            sb.Append (" " + args[i]);
+                            sb.Append(" " + args[i]);
 
                         string estateName = sb.ToString();
 
@@ -1446,7 +1445,7 @@ namespace OpenSim
 
         private void EstateLinkRegionCommand(string module, string[] args)
         {
-            int estateId =-1;
+            int estateId = -1;
             UUID regionId = UUID.Zero;
             Scene scene = null;
             string response = null;
@@ -1455,9 +1454,9 @@ namespace OpenSim
             {
                 response = "No estate specified.";
             }
-            else if (!int.TryParse(args [3], out estateId))
+            else if (!int.TryParse(args[3], out estateId))
             {
-                response = String.Format("\"{0}\" is not a valid ID for an Estate", args [3]);
+                response = String.Format("\"{0}\" is not a valid ID for an Estate", args[3]);
             }
             else if (args.Length == 4)
             {
@@ -1465,12 +1464,12 @@ namespace OpenSim
             }
             else if (!UUID.TryParse(args[4], out regionId))
             {
-                response = String.Format("\"{0}\" is not a valid UUID for a Region", args [4]);
+                response = String.Format("\"{0}\" is not a valid UUID for a Region", args[4]);
             }
             else if (!SceneManager.TryGetScene(regionId, out scene))
             {
                 // region may exist, but on a different sim.
-                response = String.Format("No access to Region \"{0}\"", args [4]);
+                response = String.Format("No access to Region \"{0}\"", args[4]);
             }
 
             if (response != null)
@@ -1486,12 +1485,12 @@ namespace OpenSim
             {
                 estateModule.TriggerRegionInfoChange();
                 estateModule.sendRegionHandshakeToAll();
-                response = String.Format ("Region {0} is now attached to estate {1}", regionId, estateId);
+                response = String.Format("Region {0} is now attached to estate {1}", regionId, estateId);
             }
 
             // give the user some feedback
             if (response != null)
-                MainConsole.Instance.Output (response);
+                MainConsole.Instance.Output(response);
         }
 
         #endregion

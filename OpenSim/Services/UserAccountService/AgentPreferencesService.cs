@@ -25,15 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Data;
-using OpenSim.Framework;
 using OpenSim.Services.Interfaces;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Services.UserAccountService
 {

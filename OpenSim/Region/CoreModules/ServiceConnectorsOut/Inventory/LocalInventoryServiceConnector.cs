@@ -28,18 +28,16 @@
 using log4net;
 using Mono.Addins;
 using Nini.Config;
-
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Monitoring;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using OpenSim.Framework;
-using OpenSim.Framework.Monitoring;
-using OpenSim.Data;
-using OpenSim.Server.Base;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
-using OpenMetaverse;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Inventory
 {
@@ -260,9 +258,9 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Inventory
 
         public bool AddItem(InventoryItemBase item)
         {
-//            m_log.DebugFormat(
-//                "[LOCAL INVENTORY SERVICES CONNECTOR]: Adding inventory item {0} to user {1} folder {2}",
-//                item.Name, item.Owner, item.Folder);
+            //            m_log.DebugFormat(
+            //                "[LOCAL INVENTORY SERVICES CONNECTOR]: Adding inventory item {0} to user {1} folder {2}",
+            //                item.Name, item.Owner, item.Folder);
 
             return m_InventoryService.AddItem(item);
         }
@@ -294,15 +292,15 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Inventory
 
         public InventoryItemBase GetItem(UUID principalID, UUID itemID)
         {
-//            m_log.DebugFormat("[LOCAL INVENTORY SERVICES CONNECTOR]: Requesting inventory item {0}", item.ID);
+            //            m_log.DebugFormat("[LOCAL INVENTORY SERVICES CONNECTOR]: Requesting inventory item {0}", item.ID);
 
-//            UUID requestedItemId = item.ID;
+            //            UUID requestedItemId = item.ID;
 
             InventoryItemBase item = m_InventoryService.GetItem(principalID, itemID);
 
-//            if (null == item)
-//                m_log.ErrorFormat(
-//                    "[LOCAL INVENTORY SERVICES CONNECTOR]: Could not find item with id {0}", requestedItemId);
+            //            if (null == item)
+            //                m_log.ErrorFormat(
+            //                    "[LOCAL INVENTORY SERVICES CONNECTOR]: Could not find item with id {0}", requestedItemId);
 
             return item;
         }

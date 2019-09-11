@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using Mono.Addins;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Mono.Addins;
 
 // Information about this assembly is defined by the following
 // attributes.
@@ -35,19 +35,19 @@ using Mono.Addins;
 // change them to the information which is associated with the assembly
 // you compile.
 
-[assembly : AssemblyTitle("OdePlugin")]
-[assembly : AssemblyDescription("")]
-[assembly : AssemblyConfiguration("")]
-[assembly : AssemblyCompany("http://opensimulator.org")]
-[assembly : AssemblyProduct("OdePlugin")]
-[assembly : AssemblyCopyright("Copyright (c) OpenSimulator.org Developers")]
-[assembly : AssemblyTrademark("")]
-[assembly : AssemblyCulture("")]
+[assembly: AssemblyTitle("OdePlugin")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("http://opensimulator.org")]
+[assembly: AssemblyProduct("OdePlugin")]
+[assembly: AssemblyCopyright("Copyright (c) OpenSimulator.org Developers")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
 
 // This sets the default COM visibility of types in the assembly to invisible.
 // If you need to expose a type to COM, use [ComVisible(true)] on that type.
 
-[assembly : ComVisible(false)]
+[assembly: ComVisible(false)]
 
 // The assembly version has following format :
 //
@@ -56,7 +56,7 @@ using Mono.Addins;
 // You can specify all values by your own or you can build default build and revision
 // numbers with the '*' character (the default):
 
-[assembly : AssemblyVersion(OpenSim.VersionInfo.AssemblyVersionNumber)]
+[assembly: AssemblyVersion(OpenSim.VersionInfo.AssemblyVersionNumber)]
 
 [assembly: Addin("OpenSim.Region.PhysicsModule.ODE", OpenSim.VersionInfo.VersionNumber)]
 [assembly: AddinDependency("OpenSim.Region.Framework", OpenSim.VersionInfo.VersionNumber)]

@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.PhysicsModules.SharedBase;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using OpenSim.Framework;
-using OpenSim.Region.PhysicsModules.SharedBase;
-using log4net;
-using OpenMetaverse;
 
 namespace OpenSim.Region.PhysicsModule.ubOde
 {
@@ -79,9 +79,9 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             SafeNativeMethods.GeomSetCategoryBits(ray, 0);
             Box = SafeNativeMethods.CreateBox(IntPtr.Zero, 1.0f, 1.0f, 1.0f);
             SafeNativeMethods.GeomSetCategoryBits(Box, 0);
-            Sphere = SafeNativeMethods.CreateSphere(IntPtr.Zero,1.0f);
+            Sphere = SafeNativeMethods.CreateSphere(IntPtr.Zero, 1.0f);
             SafeNativeMethods.GeomSetCategoryBits(Sphere, 0);
-            Plane = SafeNativeMethods.CreatePlane(IntPtr.Zero, 0f,0f,1f,1f);
+            Plane = SafeNativeMethods.CreatePlane(IntPtr.Zero, 0f, 0f, 1f, 1f);
             SafeNativeMethods.GeomSetCategoryBits(Sphere, 0);
         }
 
@@ -104,7 +104,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                 return 0;
 
             if (m_scene.ContactgeomsArray == IntPtr.Zero || ray == IntPtr.Zero)
-                // oops something got wrong or scene isn't ready still
+            // oops something got wrong or scene isn't ready still
             {
                 m_PendingRequests.Clear();
                 return 0;
@@ -238,7 +238,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                                 catflags |= CollisionCategories.Space;
                                 SafeNativeMethods.GeomSetCollideBits(Plane, (uint)catflags);
                                 SafeNativeMethods.GeomSetCategoryBits(Plane, (uint)catflags);
-                                doPlane(req,IntPtr.Zero);
+                                doPlane(req, IntPtr.Zero);
                             }
                             else
                             {
@@ -254,12 +254,12 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                         if (req.callbackMethod is ProbePlaneCallback)
                         {
                             SafeNativeMethods.GeomSetCollideBits(Plane, (uint)CollisionCategories.All);
-                            doPlane(req,geom);
+                            doPlane(req, geom);
                         }
                         else
                         {
                             SafeNativeMethods.GeomSetCollideBits(ray, (uint)CollisionCategories.All);
-                            doGeomRay(req,geom);
+                            doGeomRay(req, geom);
                         }
                     }
                 }
@@ -297,7 +297,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
         }
 
         private const RayFilterFlags FilterActiveSpace = RayFilterFlags.agent | RayFilterFlags.physical | RayFilterFlags.LSLPhantom;
-//        private const RayFilterFlags FilterStaticSpace = RayFilterFlags.water | RayFilterFlags.land | RayFilterFlags.nonphysical | RayFilterFlags.LSLPhanton;
+        //        private const RayFilterFlags FilterStaticSpace = RayFilterFlags.water | RayFilterFlags.land | RayFilterFlags.nonphysical | RayFilterFlags.LSLPhanton;
         private const RayFilterFlags FilterStaticSpace = RayFilterFlags.water | RayFilterFlags.nonphysical | RayFilterFlags.LSLPhantom;
 
         private void doSpaceRay(ODERayRequest req)
@@ -318,7 +318,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                 {
                     Vector3 t = req.Normal * req.length;
                     float tmp = t.X * t.X + t.Y * t.Y;
-                    if(tmp > 2500)
+                    if (tmp > 2500)
                     {
                         float tmp2 = req.length * req.length - tmp + 2500;
                         tmp2 = (float)Math.Sqrt(tmp2);
@@ -343,7 +343,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                 {
                     foreach (ContactResult cResult in m_contactResults)
                     {
-                        if(cResult.Depth < distance)
+                        if (cResult.Depth < distance)
                         {
                             closestcontact = cResult.Pos;
                             hitConsumerID = cResult.ConsumerID;
@@ -395,7 +395,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                 ((ProbeSphereCallback)req.callbackMethod)(cresult);
         }
 
-        private void doPlane(ODERayRequest req,IntPtr geom)
+        private void doPlane(ODERayRequest req, IntPtr geom)
         {
             // Collide tests
             if (geom == IntPtr.Zero)
@@ -448,7 +448,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                 {
                     foreach (ContactResult cResult in m_contactResults)
                     {
-                        if(cResult.Depth < distance )
+                        if (cResult.Depth < distance)
                         {
                             closestcontact = cResult.Pos;
                             hitConsumerID = cResult.ConsumerID;
@@ -490,10 +490,10 @@ namespace OpenSim.Region.PhysicsModule.ubOde
         // This is the standard Near. g1 is the ray
         private void near(IntPtr space, IntPtr g1, IntPtr g2)
         {
-             if (g2 == IntPtr.Zero || g1 == g2)
+            if (g2 == IntPtr.Zero || g1 == g2)
                 return;
 
-             if (m_contactResults.Count >= CurrentMaxCount)
+            if (m_contactResults.Count >= CurrentMaxCount)
                 return;
 
             if (SafeNativeMethods.GeomIsSpace(g2))
@@ -522,12 +522,12 @@ namespace OpenSim.Region.PhysicsModule.ubOde
 
             if (count == 0)
                 return;
-/*
-            uint cat1 = d.GeomGetCategoryBits(g1);
-            uint cat2 = d.GeomGetCategoryBits(g2);
-            uint col1 = d.GeomGetCollideBits(g1);
-            uint col2 = d.GeomGetCollideBits(g2);
-*/
+            /*
+                        uint cat1 = d.GeomGetCategoryBits(g1);
+                        uint cat2 = d.GeomGetCategoryBits(g2);
+                        uint col1 = d.GeomGetCollideBits(g1);
+                        uint col2 = d.GeomGetCollideBits(g2);
+            */
 
             uint ID = 0;
             PhysicsActor p2 = null;

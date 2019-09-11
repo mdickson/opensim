@@ -25,17 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Region.CoreModules.Scripting.WorldComm;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Tests.Common;
+using System.Threading;
 
 namespace OpenSim.Region.ScriptEngine.XEngine.Tests
 {
@@ -54,7 +50,7 @@ namespace OpenSim.Region.ScriptEngine.XEngine.Tests
         public void Init()
         {
             //AppDomain.CurrentDomain.SetData("APPBASE", Environment.CurrentDirectory + "/bin");
-//            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
+            //            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
             m_xEngine = new XEngine();
 
             IniConfigSource configSource = new IniConfigSource();
@@ -89,15 +85,15 @@ namespace OpenSim.Region.ScriptEngine.XEngine.Tests
             TestHelpers.EnableLogging();
 
             UUID userId = TestHelpers.ParseTail(0x1);
-//            UUID objectId = TestHelpers.ParseTail(0x100);
-//            UUID itemId = TestHelpers.ParseTail(0x3);
+            //            UUID objectId = TestHelpers.ParseTail(0x100);
+            //            UUID itemId = TestHelpers.ParseTail(0x3);
             string itemName = "TestStartScript() Item";
 
             SceneObjectGroup so = SceneHelpers.CreateSceneObject(1, userId, "TestStartScriptPart_", 0x100);
             m_scene.AddNewSceneObject(so, true);
 
             InventoryItemBase itemTemplate = new InventoryItemBase();
-//            itemTemplate.ID = itemId;
+            //            itemTemplate.ID = itemId;
             itemTemplate.Name = itemName;
             itemTemplate.Folder = so.UUID;
             itemTemplate.InvType = (int)InventoryType.LSL;
@@ -120,7 +116,7 @@ namespace OpenSim.Region.ScriptEngine.XEngine.Tests
 
         private void OnChatFromWorld(object sender, OSChatMessage oscm)
         {
-//            Console.WriteLine("Got chat [{0}]", oscm.Message);
+            //            Console.WriteLine("Got chat [{0}]", oscm.Message);
 
             m_osChatMessageReceived = oscm;
             m_chatEvent.Set();

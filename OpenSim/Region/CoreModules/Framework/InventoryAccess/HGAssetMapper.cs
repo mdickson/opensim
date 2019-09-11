@@ -25,22 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Threading;
-using System.Xml;
-
 using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Serialization.External;
-
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Scenes.Serialization;
-using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 //using HyperGrid.Framework;
 //using OpenSim.Region.Communications.Hypergrid;
@@ -53,7 +46,7 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         // This maps between inventory server urls and inventory server clients
-//        private Dictionary<string, InventoryClient> m_inventoryServers = new Dictionary<string, InventoryClient>();
+        //        private Dictionary<string, InventoryClient> m_inventoryServers = new Dictionary<string, InventoryClient>();
 
         private Scene m_scene;
         private string m_HomeURI;
@@ -153,7 +146,8 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
                 m_log.DebugFormat("[HG ASSET MAPPER]: Asset server {0} did not accept {1}", url, asset.ID);
                 return false;
             }
-            else {
+            else
+            {
                 m_log.DebugFormat("[HG ASSET MAPPER]: Posted copy of asset {0} from local asset server to {1}", asset1.ID, url);
                 return true;
             }
@@ -163,12 +157,12 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
         {
             //to.Data        = from.Data; // don't copy this, it's copied elsewhere
             to.Description = from.Description;
-            to.FullID      = from.FullID;
-            to.ID          = from.ID;
-            to.Local       = from.Local;
-            to.Name        = from.Name;
-            to.Temporary   = from.Temporary;
-            to.Type        = from.Type;
+            to.FullID = from.FullID;
+            to.ID = from.ID;
+            to.Local = from.Local;
+            to.Name = from.Name;
+            to.Temporary = from.Temporary;
+            to.Type = from.Type;
 
         }
 
@@ -192,7 +186,7 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
 
         protected string RewriteSOP(string xmlData)
         {
-//            Console.WriteLine("Input XML [{0}]", xmlData);
+            //            Console.WriteLine("Input XML [{0}]", xmlData);
             return ExternalRepresentationUtils.RewriteSOP(xmlData, m_scene.Name, m_HomeURI, m_scene.UserAccountService, m_scene.RegionInfo.ScopeID);
 
         }

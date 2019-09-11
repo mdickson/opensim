@@ -25,21 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using log4net;
 using Mono.Addins;
-using NDesk.Options;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Framework.Monitoring;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace OpenSim.Region.CoreModules.Avatars.Commands
 {
@@ -49,7 +43,7 @@ namespace OpenSim.Region.CoreModules.Avatars.Commands
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "UserCommandsModule")]
     public class UserCommandsModule : ISharedRegionModule
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public const string TeleportUserCommandSyntax = "teleport user <first-name> <last-name> <destination>";
 
@@ -67,22 +61,22 @@ namespace OpenSim.Region.CoreModules.Avatars.Commands
 
         public void Initialise(IConfigSource source)
         {
-//            m_log.DebugFormat("[USER COMMANDS MODULE]: INITIALIZED MODULE");
+            //            m_log.DebugFormat("[USER COMMANDS MODULE]: INITIALIZED MODULE");
         }
 
         public void PostInitialise()
         {
-//            m_log.DebugFormat("[USER COMMANDS MODULE]: POST INITIALIZED MODULE");
+            //            m_log.DebugFormat("[USER COMMANDS MODULE]: POST INITIALIZED MODULE");
         }
 
         public void Close()
         {
-//            m_log.DebugFormat("[USER COMMANDS MODULE]: CLOSED MODULE");
+            //            m_log.DebugFormat("[USER COMMANDS MODULE]: CLOSED MODULE");
         }
 
         public void AddRegion(Scene scene)
         {
-//            m_log.DebugFormat("[USER COMMANDS MODULE]: REGION {0} ADDED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[USER COMMANDS MODULE]: REGION {0} ADDED", scene.RegionInfo.RegionName);
 
             lock (m_scenes)
                 m_scenes[scene.RegionInfo.RegionID] = scene;
@@ -100,7 +94,7 @@ namespace OpenSim.Region.CoreModules.Avatars.Commands
 
         public void RemoveRegion(Scene scene)
         {
-//            m_log.DebugFormat("[USER COMMANDS MODULE]: REGION {0} REMOVED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[USER COMMANDS MODULE]: REGION {0} REMOVED", scene.RegionInfo.RegionName);
 
             lock (m_scenes)
                 m_scenes.Remove(scene.RegionInfo.RegionID);
@@ -108,7 +102,7 @@ namespace OpenSim.Region.CoreModules.Avatars.Commands
 
         public void RegionLoaded(Scene scene)
         {
-//            m_log.DebugFormat("[USER COMMANDS MODULE]: REGION {0} LOADED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[USER COMMANDS MODULE]: REGION {0} LOADED", scene.RegionInfo.RegionName);
         }
 
         private ScenePresence GetUser(string firstName, string lastName)
@@ -151,7 +145,7 @@ namespace OpenSim.Region.CoreModules.Avatars.Commands
                 return;
             }
 
-//            MainConsole.Instance.OutputFormat("rawDestination [{0}]", rawDestination);
+            //            MainConsole.Instance.OutputFormat("rawDestination [{0}]", rawDestination);
 
             Match m = WithinRegionDestinationRegex.Match(rawDestination);
 

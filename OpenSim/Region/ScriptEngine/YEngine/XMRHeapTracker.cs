@@ -31,7 +31,6 @@ using System.Reflection.Emit;
 
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
 using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
-using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
 using LSL_Rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
 using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
@@ -55,7 +54,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public HeapTrackerBase(XMRInstAbstract inst)
         {
-            if(inst == null)
+            if (inst == null)
                 throw new ArgumentNullException("inst");
             instance = inst;
             usage = 0;
@@ -65,7 +64,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     /**
      * Wrapper around lists to keep track of how much memory they use.
      */
-    public class HeapTrackerList: HeapTrackerBase
+    public class HeapTrackerList : HeapTrackerBase
     {
         private static FieldInfo listValueField = typeof(HeapTrackerList).GetField("value");
         private static MethodInfo listSaveMethod = typeof(HeapTrackerList).GetMethod("Save");
@@ -74,7 +73,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public LSL_List value;
 
-        public HeapTrackerList(XMRInstAbstract inst) : base(inst) {}
+        public HeapTrackerList(XMRInstAbstract inst) : base(inst) { }
 
         // generate CIL code to pop the value ie store in value
         //  input:
@@ -151,7 +150,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     /**
      * Wrapper around objects to keep track of how much memory they use.
      */
-    public class HeapTrackerObject: HeapTrackerBase
+    public class HeapTrackerObject : HeapTrackerBase
     {
         private static FieldInfo objectValueField = typeof(HeapTrackerObject).GetField("value");
         private static MethodInfo objectSaveMethod = typeof(HeapTrackerObject).GetMethod("Save");
@@ -230,51 +229,51 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         // public so it can be used by XMRArray
         public static int Size(object obj)
         {
-            if(obj == null)
+            if (obj == null)
                 return 0;
 
-            if(obj is char)
+            if (obj is char)
                 return HT_CHAR;
-            if(obj is Delegate)
+            if (obj is Delegate)
                 return HT_DELE;
-            if(obj is double)
+            if (obj is double)
                 return HT_DOUB;
-            if(obj is float)
+            if (obj is float)
                 return HT_SING;
-            if(obj is int)
+            if (obj is int)
                 return HT_INT;
-            if(obj is LSL_Float) // lsl floats are stupid doubles
+            if (obj is LSL_Float) // lsl floats are stupid doubles
                 return HT_DOUB;
-            if(obj is LSL_Integer)
+            if (obj is LSL_Integer)
                 return HT_INT;
-            if(obj is LSL_List)
+            if (obj is LSL_List)
                 return ((LSL_List)obj).Size;
-            if(obj is LSL_Rotation)
+            if (obj is LSL_Rotation)
                 return HT_ROT;
-            if(obj is LSL_String)
+            if (obj is LSL_String)
                 return ((LSL_String)obj).m_string.Length * HT_CHAR;
-            if(obj is LSL_Vector)
+            if (obj is LSL_Vector)
                 return HT_VEC;
-            if(obj is string)
+            if (obj is string)
                 return ((string)obj).Length * HT_CHAR;
-            if(obj is XMR_Array)
+            if (obj is XMR_Array)
                 return 0;
-            if(obj is XMRArrayListKey)
+            if (obj is XMRArrayListKey)
                 return ((XMRArrayListKey)obj).Size;
-            if(obj is XMRSDTypeClObj)
+            if (obj is XMRSDTypeClObj)
                 return 0;
 
-            if(obj is Array)
+            if (obj is Array)
             {
                 Array ar = (Array)obj;
                 int len = ar.Length;
-                if(len == 0)
+                if (len == 0)
                     return 0;
                 Type et = ar.GetType().GetElementType();
-                if(et.IsValueType)
+                if (et.IsValueType)
                     return Size(ar.GetValue(0)) * len;
                 int size = 0;
-                for(int i = 0; i < len; i++)
+                for (int i = 0; i < len; i++)
                 {
                     size += Size(ar.GetValue(i));
                 }
@@ -288,7 +287,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     /**
      * Wrapper around strings to keep track of how much memory they use.
      */
-    public class HeapTrackerString: HeapTrackerBase
+    public class HeapTrackerString : HeapTrackerBase
     {
         private static FieldInfo stringValueField = typeof(HeapTrackerString).GetField("value");
         private static MethodInfo stringRestoreMethod = typeof(HeapTrackerString).GetMethod("Restore");
@@ -316,7 +315,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             ilGen.Emit(errorAt, OpCodes.Call, stringRestoreMethod);
         }
-        
+
         public static void GenFree(Token errorAt, ScriptMyILGen ilGen)
         {
             ilGen.Emit(errorAt, OpCodes.Call, stringFreeMethod);

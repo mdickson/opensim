@@ -25,6 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using HttpServer;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,7 +33,6 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
-using HttpServer;
 
 namespace OpenSim.Framework.Servers.HttpServer
 {
@@ -121,7 +121,7 @@ namespace OpenSim.Framework.Servers.HttpServer
             "upgrade: websocket\r\n" +
             "Connection: Upgrade\r\n" +
             "sec-websocket-accept: {0}\r\n\r\n";// +
-           //"{1}";
+                                                //"{1}";
 
         private const string HandshakeDeclineText =
             "HTTP/1.1 {0} {1}\r\n" +
@@ -309,7 +309,7 @@ namespace OpenSim.Framework.Servers.HttpServer
         private void SendUpgradeSuccess(string pHandshakeResponse)
         {
             // Create a new websocket state so we can keep track of data in between network reads.
-            WebSocketState socketState = new WebSocketState() { ReceivedBytes = new List<byte>(), Header = WebsocketFrameHeader.HeaderDefault(), FrameComplete = true};
+            WebSocketState socketState = new WebSocketState() { ReceivedBytes = new List<byte>(), Header = WebsocketFrameHeader.HeaderDefault(), FrameComplete = true };
 
             byte[] bhandshakeResponse = Encoding.UTF8.GetBytes(pHandshakeResponse);
 
@@ -353,7 +353,7 @@ namespace OpenSim.Framework.Servers.HttpServer
         /// </summary>
         /// <param name="pCode">HTTP Status reflecting the reason why</param>
         /// <param name="pMessage">Textual reason for the upgrade fail</param>
-        private void FailUpgrade(OSHttpStatusCode pCode, string pMessage )
+        private void FailUpgrade(OSHttpStatusCode pCode, string pMessage)
         {
             string handshakeResponse = string.Format(HandshakeDeclineText, (int)pCode, pMessage.Replace("\n", string.Empty).Replace("\r", string.Empty));
             byte[] bhandshakeResponse = Encoding.UTF8.GetBytes(handshakeResponse);
@@ -363,7 +363,7 @@ namespace OpenSim.Framework.Servers.HttpServer
 
             UpgradeFailedDelegate d = OnUpgradeFailed;
             if (d != null)
-                d(this,new UpgradeFailedEventArgs());
+                d(this, new UpgradeFailedEventArgs());
         }
 
 
@@ -410,7 +410,7 @@ namespace OpenSim.Framework.Servers.HttpServer
                         if (headerread)
                         {
                             _socketState.FrameComplete = false;
-                            if (pheader.PayloadLen > (ulong) _maxPayloadBytes)
+                            if (pheader.PayloadLen > (ulong)_maxPayloadBytes)
                             {
                                 Close("Invalid Payload size");
 
@@ -418,26 +418,26 @@ namespace OpenSim.Framework.Servers.HttpServer
                             }
                             if (pheader.PayloadLen > 0)
                             {
-                                if ((int) pheader.PayloadLen > _bufferPosition - offset)
+                                if ((int)pheader.PayloadLen > _bufferPosition - offset)
                                 {
                                     byte[] writebytes = new byte[_bufferPosition - offset];
 
-                                    Buffer.BlockCopy(_buffer, offset, writebytes, 0, (int) _bufferPosition - offset);
-                                    _socketState.ExpectedBytes = (int) pheader.PayloadLen;
+                                    Buffer.BlockCopy(_buffer, offset, writebytes, 0, (int)_bufferPosition - offset);
+                                    _socketState.ExpectedBytes = (int)pheader.PayloadLen;
                                     _socketState.ReceivedBytes.AddRange(writebytes);
                                     _socketState.Header = pheader; // We need to add the header so that we can unmask it
-                                    offset += (int) _bufferPosition - offset;
+                                    offset += (int)_bufferPosition - offset;
                                 }
                                 else
                                 {
                                     byte[] writebytes = new byte[pheader.PayloadLen];
-                                    Buffer.BlockCopy(_buffer, offset, writebytes, 0, (int) pheader.PayloadLen);
+                                    Buffer.BlockCopy(_buffer, offset, writebytes, 0, (int)pheader.PayloadLen);
                                     WebSocketReader.Mask(pheader.Mask, writebytes);
                                     pheader.IsMasked = false;
                                     _socketState.FrameComplete = true;
                                     _socketState.ReceivedBytes.AddRange(writebytes);
                                     _socketState.Header = pheader;
-                                    offset += (int) pheader.PayloadLen;
+                                    offset += (int)pheader.PayloadLen;
                                 }
                             }
                             else
@@ -466,19 +466,19 @@ namespace OpenSim.Framework.Servers.HttpServer
                         {
                             byte[] writebytes = new byte[_bufferPosition];
 
-                            Buffer.BlockCopy(_buffer, offset, writebytes, 0, (int) _bufferPosition);
+                            Buffer.BlockCopy(_buffer, offset, writebytes, 0, (int)_bufferPosition);
                             _socketState.ReceivedBytes.AddRange(writebytes);
                             _socketState.Header = frameHeader; // We need to add the header so that we can unmask it
-                            offset += (int) _bufferPosition;
+                            offset += (int)_bufferPosition;
                         }
                         else
                         {
                             byte[] writebytes = new byte[_bufferPosition];
-                            Buffer.BlockCopy(_buffer, offset, writebytes, 0, (int) _bufferPosition);
+                            Buffer.BlockCopy(_buffer, offset, writebytes, 0, (int)_bufferPosition);
                             _socketState.FrameComplete = true;
                             _socketState.ReceivedBytes.AddRange(writebytes);
                             _socketState.Header = frameHeader;
-                            offset += (int) _bufferPosition;
+                            offset += (int)_bufferPosition;
                         }
                         if (_socketState.FrameComplete)
                         {
@@ -493,7 +493,7 @@ namespace OpenSim.Framework.Servers.HttpServer
                 if (offset > 0)
                 {
                     // If the buffer is maxed out..  we can just move the cursor.   Nothing to move to the beginning.
-                    if (offset <_buffer.Length)
+                    if (offset < _buffer.Length)
                         Buffer.BlockCopy(_buffer, offset, _buffer, 0, _bufferPosition - offset);
                     _bufferPosition -= offset;
                 }
@@ -543,7 +543,7 @@ namespace OpenSim.Framework.Servers.HttpServer
                 _receiveDone.Set();
                 _initialMsgTimeout = 0;
             }
-            WebSocketFrame dataMessageFrame = new WebSocketFrame() { Header = WebsocketFrameHeader.HeaderDefault(), WebSocketPayload = data};
+            WebSocketFrame dataMessageFrame = new WebSocketFrame() { Header = WebsocketFrameHeader.HeaderDefault(), WebSocketPayload = data };
             dataMessageFrame.Header.IsEnd = true;
             dataMessageFrame.Header.Opcode = WebSocketReader.OpCode.Binary;
             SendSocket(dataMessageFrame.ToBytes());
@@ -603,19 +603,19 @@ namespace OpenSim.Framework.Servers.HttpServer
             if (_networkContext.Stream != null)
             {
                 if (_networkContext.Stream.CanWrite)
-            {
-                byte[] messagedata = Encoding.UTF8.GetBytes(message);
-                WebSocketFrame closeResponseFrame = new WebSocketFrame()
-                                                        {
-                                                            Header = WebsocketFrameHeader.HeaderDefault(),
-                                                            WebSocketPayload = messagedata
-                                                        };
-                closeResponseFrame.Header.Opcode = WebSocketReader.OpCode.Close;
-                closeResponseFrame.Header.PayloadLen = (ulong) messagedata.Length;
-                closeResponseFrame.Header.IsEnd = true;
-                SendSocket(closeResponseFrame.ToBytes());
-            }
+                {
+                    byte[] messagedata = Encoding.UTF8.GetBytes(message);
+                    WebSocketFrame closeResponseFrame = new WebSocketFrame()
+                    {
+                        Header = WebsocketFrameHeader.HeaderDefault(),
+                        WebSocketPayload = messagedata
+                    };
+                    closeResponseFrame.Header.Opcode = WebSocketReader.OpCode.Close;
+                    closeResponseFrame.Header.PayloadLen = (ulong)messagedata.Length;
+                    closeResponseFrame.Header.IsEnd = true;
+                    SendSocket(closeResponseFrame.ToBytes());
                 }
+            }
             CloseDelegate closeD = OnClose;
             if (closeD != null)
             {
@@ -637,7 +637,7 @@ namespace OpenSim.Framework.Servers.HttpServer
                 WebSocketReader.Mask(psocketState.Header.Mask, unmask);
                 psocketState.ReceivedBytes = new List<byte>(unmask);
             }
-            if (psocketState.Header.Opcode != WebSocketReader.OpCode.Continue  && _initialMsgTimeout > 0)
+            if (psocketState.Header.Opcode != WebSocketReader.OpCode.Continue && _initialMsgTimeout > 0)
             {
                 _receiveDone.Set();
                 _initialMsgTimeout = 0;
@@ -651,7 +651,7 @@ namespace OpenSim.Framework.Servers.HttpServer
                         pingD(this, new PingEventArgs());
                     }
 
-                    WebSocketFrame pongFrame = new WebSocketFrame(){Header = WebsocketFrameHeader.HeaderDefault(),WebSocketPayload = new byte[0]};
+                    WebSocketFrame pongFrame = new WebSocketFrame() { Header = WebsocketFrameHeader.HeaderDefault(), WebSocketPayload = new byte[0] };
                     pongFrame.Header.Opcode = WebSocketReader.OpCode.Pong;
                     pongFrame.Header.IsEnd = true;
                     SendSocket(pongFrame.ToBytes());
@@ -661,18 +661,18 @@ namespace OpenSim.Framework.Servers.HttpServer
                     PongDelegate pongD = OnPong;
                     if (pongD != null)
                     {
-                        pongD(this, new PongEventArgs(){PingResponseMS = Util.EnvironmentTickCountSubtract(Util.EnvironmentTickCount(),_pingtime)});
+                        pongD(this, new PongEventArgs() { PingResponseMS = Util.EnvironmentTickCountSubtract(Util.EnvironmentTickCount(), _pingtime) });
                     }
                     break;
                 case WebSocketReader.OpCode.Binary:
                     if (!psocketState.Header.IsEnd) // Not done, so we need to store this and wait for the end frame.
                     {
                         psocketState.ContinuationFrame = new WebSocketFrame
-                                                             {
-                                                                 Header = psocketState.Header,
-                                                                 WebSocketPayload =
+                        {
+                            Header = psocketState.Header,
+                            WebSocketPayload =
                                                                      psocketState.ReceivedBytes.ToArray()
-                                                             };
+                        };
                     }
                     else
                     {
@@ -680,7 +680,7 @@ namespace OpenSim.Framework.Servers.HttpServer
                         DataDelegate dataD = OnData;
                         if (dataD != null)
                         {
-                            dataD(this,new WebsocketDataEventArgs(){Data = psocketState.ReceivedBytes.ToArray()});
+                            dataD(this, new WebsocketDataEventArgs() { Data = psocketState.ReceivedBytes.ToArray() });
                         }
                     }
                     break;
@@ -688,11 +688,11 @@ namespace OpenSim.Framework.Servers.HttpServer
                     if (!psocketState.Header.IsEnd) // Not done, so we need to store this and wait for the end frame.
                     {
                         psocketState.ContinuationFrame = new WebSocketFrame
-                                                             {
-                                                                 Header = psocketState.Header,
-                                                                 WebSocketPayload =
+                        {
+                            Header = psocketState.Header,
+                            WebSocketPayload =
                                                                      psocketState.ReceivedBytes.ToArray()
-                                                             };
+                        };
                     }
                     else
                     {
@@ -708,7 +708,7 @@ namespace OpenSim.Framework.Servers.HttpServer
                 case WebSocketReader.OpCode.Continue:  // Continuation.  Multiple frames worth of data for one message.   Only valid when not using Control Opcodes
                     //Console.WriteLine("currhead " + psocketState.Header.IsEnd);
                     //Console.WriteLine("Continuation! " + psocketState.ContinuationFrame.Header.IsEnd);
-                    byte[] combineddata = new byte[psocketState.ReceivedBytes.Count+psocketState.ContinuationFrame.WebSocketPayload.Length];
+                    byte[] combineddata = new byte[psocketState.ReceivedBytes.Count + psocketState.ContinuationFrame.WebSocketPayload.Length];
                     byte[] newdata = psocketState.ReceivedBytes.ToArray();
                     Buffer.BlockCopy(psocketState.ContinuationFrame.WebSocketPayload, 0, combineddata, 0, psocketState.ContinuationFrame.WebSocketPayload.Length);
                     Buffer.BlockCopy(newdata, 0, combineddata,
@@ -960,7 +960,7 @@ dec   0                   1                   2                   3
          *   When reading these, the frames are possibly fragmented and interleaved with control frames
          *   the fragmented frames are not interleaved with data frames.  Just control frames
          */
-        public static readonly WebSocketFrame DefaultFrame = new WebSocketFrame(){Header = new WebsocketFrameHeader(),WebSocketPayload = new byte[0]};
+        public static readonly WebSocketFrame DefaultFrame = new WebSocketFrame() { Header = new WebsocketFrameHeader(), WebSocketPayload = new byte[0] };
         public WebsocketFrameHeader Header;
         public byte[] WebSocketPayload;
 
@@ -1015,10 +1015,10 @@ byt   0               1               2               3
             IsMasked = true;
             Mask = 0;
             Opcode = WebSocketReader.OpCode.Close;
-  //        PayloadLeft = 0;
+            //        PayloadLeft = 0;
             PayloadLen = 0;
-  //        ExtensionDataLength = 0;
-  //        ApplicationDataLength = 0;
+            //        ExtensionDataLength = 0;
+            //        ApplicationDataLength = 0;
 
         }
 
@@ -1033,14 +1033,14 @@ byt   0               1               2               3
             List<byte> result = new List<byte>();
 
             // Squeeze in our opcode and our ending bit.
-            result.Add((byte)((byte)Opcode | (IsEnd?0x80:0x00) ));
+            result.Add((byte)((byte)Opcode | (IsEnd ? 0x80 : 0x00)));
 
             // Again with the three different byte interpretations of size..
 
             //bytesize
             if (PayloadLen <= 125)
             {
-                result.Add((byte) PayloadLen);
+                result.Add((byte)PayloadLen);
             } //Uint16
             else if (PayloadLen <= ushort.MaxValue)
             {
@@ -1073,17 +1073,17 @@ byt   0               1               2               3
         public static WebsocketFrameHeader HeaderDefault()
         {
             return new WebsocketFrameHeader
-                       {
-                           //CurrentMaskIndex = 0,
-                           IsEnd = false,
-                           IsMasked = true,
-                           Mask = 0,
-                           Opcode = WebSocketReader.OpCode.Close,
-                           //PayloadLeft = 0,
-                           PayloadLen = 0,
- //                          ExtensionDataLength = 0,
- //                          ApplicationDataLength = 0
-                       };
+            {
+                //CurrentMaskIndex = 0,
+                IsEnd = false,
+                IsMasked = true,
+                Mask = 0,
+                Opcode = WebSocketReader.OpCode.Close,
+                //PayloadLeft = 0,
+                PayloadLen = 0,
+                //                          ExtensionDataLength = 0,
+                //                          ApplicationDataLength = 0
+            };
         }
     }
 

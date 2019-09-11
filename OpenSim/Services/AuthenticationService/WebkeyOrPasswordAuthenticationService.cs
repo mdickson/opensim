@@ -25,17 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using OpenMetaverse;
-using OpenSim.Services.Interfaces;
 using log4net;
 using Nini.Config;
-using System.Reflection;
+using OpenMetaverse;
 using OpenSim.Data;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Services.AuthenticationService
 {
@@ -50,7 +47,7 @@ namespace OpenSim.Services.AuthenticationService
             : base(config)
         {
             m_svcChecks["web_login_key"] = new WebkeyAuthenticationService(config);
-            m_svcChecks["password"]      = new PasswordAuthenticationService(config);
+            m_svcChecks["password"] = new PasswordAuthenticationService(config);
         }
 
         public string Authenticate(UUID principalID, string password, int lifetime)

@@ -25,11 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
 using OpenMetaverse;
-
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using System.Collections.Generic;
 
 namespace OpenSim.Tests.Common
 {
@@ -38,83 +37,83 @@ namespace OpenSim.Tests.Common
     /// </summary>
     public static class UserAccountHelpers
     {
-//        /// <summary>
-//        /// Create a test user with a standard inventory
-//        /// </summary>
-//        /// <param name="commsManager"></param>
-//        /// <param name="callback">
-//        /// Callback to invoke when inventory has been loaded.  This is required because
-//        /// loading may be asynchronous, even on standalone
-//        /// </param>
-//        /// <returns></returns>
-//        public static CachedUserInfo CreateUserWithInventory(
-//            CommunicationsManager commsManager, OnInventoryReceivedDelegate callback)
-//        {
-//            UUID userId = UUID.Parse("00000000-0000-0000-0000-000000000099");
-//            return CreateUserWithInventory(commsManager, userId, callback);
-//        }
-//
-//        /// <summary>
-//        /// Create a test user with a standard inventory
-//        /// </summary>
-//        /// <param name="commsManager"></param>
-//        /// <param name="userId">User ID</param>
-//        /// <param name="callback">
-//        /// Callback to invoke when inventory has been loaded.  This is required because
-//        /// loading may be asynchronous, even on standalone
-//        /// </param>
-//        /// <returns></returns>
-//        public static CachedUserInfo CreateUserWithInventory(
-//            CommunicationsManager commsManager, UUID userId, OnInventoryReceivedDelegate callback)
-//        {
-//            return CreateUserWithInventory(commsManager, "Bill", "Bailey", userId, callback);
-//        }
-//
-//        /// <summary>
-//        /// Create a test user with a standard inventory
-//        /// </summary>
-//        /// <param name="commsManager"></param>
-//        /// <param name="firstName">First name of user</param>
-//        /// <param name="lastName">Last name of user</param>
-//        /// <param name="userId">User ID</param>
-//        /// <param name="callback">
-//        /// Callback to invoke when inventory has been loaded.  This is required because
-//        /// loading may be asynchronous, even on standalone
-//        /// </param>
-//        /// <returns></returns>
-//        public static CachedUserInfo CreateUserWithInventory(
-//            CommunicationsManager commsManager, string firstName, string lastName,
-//            UUID userId, OnInventoryReceivedDelegate callback)
-//        {
-//            return CreateUserWithInventory(commsManager, firstName, lastName, "troll", userId, callback);
-//        }
-//
-//        /// <summary>
-//        /// Create a test user with a standard inventory
-//        /// </summary>
-//        /// <param name="commsManager"></param>
-//        /// <param name="firstName">First name of user</param>
-//        /// <param name="lastName">Last name of user</param>
-//        /// <param name="password">Password</param>
-//        /// <param name="userId">User ID</param>
-//        /// <param name="callback">
-//        /// Callback to invoke when inventory has been loaded.  This is required because
-//        /// loading may be asynchronous, even on standalone
-//        /// </param>
-//        /// <returns></returns>
-//        public static CachedUserInfo CreateUserWithInventory(
-//            CommunicationsManager commsManager, string firstName, string lastName, string password,
-//            UUID userId, OnInventoryReceivedDelegate callback)
-//        {
-//            LocalUserServices lus = (LocalUserServices)commsManager.UserService;
-//            lus.AddUser(firstName, lastName, password, "bill@bailey.com", 1000, 1000, userId);
-//
-//            CachedUserInfo userInfo = commsManager.UserProfileCacheService.GetUserDetails(userId);
-//            userInfo.OnInventoryReceived += callback;
-//            userInfo.FetchInventory();
-//
-//            return userInfo;
-//        }
+        //        /// <summary>
+        //        /// Create a test user with a standard inventory
+        //        /// </summary>
+        //        /// <param name="commsManager"></param>
+        //        /// <param name="callback">
+        //        /// Callback to invoke when inventory has been loaded.  This is required because
+        //        /// loading may be asynchronous, even on standalone
+        //        /// </param>
+        //        /// <returns></returns>
+        //        public static CachedUserInfo CreateUserWithInventory(
+        //            CommunicationsManager commsManager, OnInventoryReceivedDelegate callback)
+        //        {
+        //            UUID userId = UUID.Parse("00000000-0000-0000-0000-000000000099");
+        //            return CreateUserWithInventory(commsManager, userId, callback);
+        //        }
+        //
+        //        /// <summary>
+        //        /// Create a test user with a standard inventory
+        //        /// </summary>
+        //        /// <param name="commsManager"></param>
+        //        /// <param name="userId">User ID</param>
+        //        /// <param name="callback">
+        //        /// Callback to invoke when inventory has been loaded.  This is required because
+        //        /// loading may be asynchronous, even on standalone
+        //        /// </param>
+        //        /// <returns></returns>
+        //        public static CachedUserInfo CreateUserWithInventory(
+        //            CommunicationsManager commsManager, UUID userId, OnInventoryReceivedDelegate callback)
+        //        {
+        //            return CreateUserWithInventory(commsManager, "Bill", "Bailey", userId, callback);
+        //        }
+        //
+        //        /// <summary>
+        //        /// Create a test user with a standard inventory
+        //        /// </summary>
+        //        /// <param name="commsManager"></param>
+        //        /// <param name="firstName">First name of user</param>
+        //        /// <param name="lastName">Last name of user</param>
+        //        /// <param name="userId">User ID</param>
+        //        /// <param name="callback">
+        //        /// Callback to invoke when inventory has been loaded.  This is required because
+        //        /// loading may be asynchronous, even on standalone
+        //        /// </param>
+        //        /// <returns></returns>
+        //        public static CachedUserInfo CreateUserWithInventory(
+        //            CommunicationsManager commsManager, string firstName, string lastName,
+        //            UUID userId, OnInventoryReceivedDelegate callback)
+        //        {
+        //            return CreateUserWithInventory(commsManager, firstName, lastName, "troll", userId, callback);
+        //        }
+        //
+        //        /// <summary>
+        //        /// Create a test user with a standard inventory
+        //        /// </summary>
+        //        /// <param name="commsManager"></param>
+        //        /// <param name="firstName">First name of user</param>
+        //        /// <param name="lastName">Last name of user</param>
+        //        /// <param name="password">Password</param>
+        //        /// <param name="userId">User ID</param>
+        //        /// <param name="callback">
+        //        /// Callback to invoke when inventory has been loaded.  This is required because
+        //        /// loading may be asynchronous, even on standalone
+        //        /// </param>
+        //        /// <returns></returns>
+        //        public static CachedUserInfo CreateUserWithInventory(
+        //            CommunicationsManager commsManager, string firstName, string lastName, string password,
+        //            UUID userId, OnInventoryReceivedDelegate callback)
+        //        {
+        //            LocalUserServices lus = (LocalUserServices)commsManager.UserService;
+        //            lus.AddUser(firstName, lastName, password, "bill@bailey.com", 1000, 1000, userId);
+        //
+        //            CachedUserInfo userInfo = commsManager.UserProfileCacheService.GetUserDetails(userId);
+        //            userInfo.OnInventoryReceived += callback;
+        //            userInfo.FetchInventory();
+        //
+        //            return userInfo;
+        //        }
 
         public static UserAccount CreateUserWithInventory(Scene scene)
         {

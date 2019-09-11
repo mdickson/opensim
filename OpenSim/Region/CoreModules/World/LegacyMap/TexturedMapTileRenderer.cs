@@ -25,23 +25,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Reflection;
 using log4net;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.Imaging;
 using OpenSim.Framework;
-using OpenSim.Region.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.World.LegacyMap
 {
     // Hue, Saturation, Value; used for color-interpolation
-    struct HSV {
+    struct HSV
+    {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public float h;
@@ -104,18 +104,18 @@ namespace OpenSim.Region.CoreModules.World.LegacyMap
 
             switch (sector)
             {
-            case 0:
-                return Color.FromArgb(vi, ti, pi);
-            case 1:
-                return Color.FromArgb(qi, vi, pi);
-            case 2:
-                return Color.FromArgb(pi, vi, ti);
-            case 3:
-                return Color.FromArgb(pi, qi, vi);
-            case 4:
-                return Color.FromArgb(ti, pi, vi);
-            default:
-                return Color.FromArgb(vi, pi, qi);
+                case 0:
+                    return Color.FromArgb(vi, ti, pi);
+                case 1:
+                    return Color.FromArgb(qi, vi, pi);
+                case 2:
+                    return Color.FromArgb(pi, vi, ti);
+                case 3:
+                    return Color.FromArgb(pi, qi, vi);
+                case 4:
+                    return Color.FromArgb(ti, pi, vi);
+                default:
+                    return Color.FromArgb(vi, pi, qi);
             }
         }
     }
@@ -157,14 +157,14 @@ namespace OpenSim.Region.CoreModules.World.LegacyMap
             m_config = source;
 
             string[] configSections = new string[] { "Map", "Startup" };
-            
+
             m_color_water = System.Drawing.ColorTranslator.FromHtml(Util.GetConfigVarFromSections<string>(m_config, "MapColorWater", configSections, "#1D475F"));
             m_color_1 = System.Drawing.ColorTranslator.FromHtml(Util.GetConfigVarFromSections<string>(m_config, "MapColor1", configSections, "#A58976"));
             m_color_2 = System.Drawing.ColorTranslator.FromHtml(Util.GetConfigVarFromSections<string>(m_config, "MapColor2", configSections, "#455931"));
             m_color_3 = System.Drawing.ColorTranslator.FromHtml(Util.GetConfigVarFromSections<string>(m_config, "MapColor3", configSections, "#A29A8D"));
             m_color_4 = System.Drawing.ColorTranslator.FromHtml(Util.GetConfigVarFromSections<string>(m_config, "MapColor4", configSections, "#C8C8C8"));
 
-            m_mapping = new Dictionary<UUID,Color>();
+            m_mapping = new Dictionary<UUID, Color>();
             m_mapping.Add(defaultTerrainTexture1, m_color_1);
             m_mapping.Add(defaultTerrainTexture2, m_color_2);
             m_mapping.Add(defaultTerrainTexture3, m_color_3);
@@ -235,7 +235,8 @@ namespace OpenSim.Region.CoreModules.World.LegacyMap
 
         // return either the average color of the texture, or the defaultColor if the texturID is invalid
         // or the texture couldn't be found
-        private Color computeAverageColor(UUID textureID, Color defaultColor) {
+        private Color computeAverageColor(UUID textureID, Color defaultColor)
+        {
             if (textureID == UUID.Zero) return defaultColor; // not set
             if (m_mapping.ContainsKey(textureID)) return m_mapping[textureID]; // one of the predefined textures
 
@@ -255,12 +256,14 @@ namespace OpenSim.Region.CoreModules.World.LegacyMap
         // f(0) = 0, f(0.5) = 0.5, f(1) = 1,
         // f'(x) = 0 at x = 0 and x = 1; f'(0.5) = 1.5,
         // f''(0.5) = 0, f''(x) != 0 for x != 0.5
-        private float S(float v) {
+        private float S(float v)
+        {
             return (v * v * (3f - 2f * v));
         }
 
         // interpolate two colors in HSV space and return the resulting color
-        private HSV interpolateHSV(ref HSV c1, ref HSV c2, float ratio) {
+        private HSV interpolateHSV(ref HSV c1, ref HSV c2, float ratio)
+        {
             if (ratio <= 0f) return c1;
             if (ratio >= 1f) return c2;
 
@@ -277,9 +280,10 @@ namespace OpenSim.Region.CoreModules.World.LegacyMap
 
         // the heigthfield might have some jumps in values. Rendered land is smooth, though,
         // as a slope is rendered at that place. So average 4 neighbour values to emulate that.
-        private float getHeight(ITerrainChannel hm, int x, int y) {
+        private float getHeight(ITerrainChannel hm, int x, int y)
+        {
             if (x < (hm.Width - 1) && y < (hm.Height - 1))
-                return (float)(hm[x, y] * .444 + (hm[x + 1, y] + hm[x, y + 1]) * .222 + hm[x + 1, y +1] * .112);
+                return (float)(hm[x, y] * .444 + (hm[x + 1, y] + hm[x, y + 1]) * .222 + hm[x + 1, y + 1] * .112);
             else
                 return (float)hm[x, y];
         }

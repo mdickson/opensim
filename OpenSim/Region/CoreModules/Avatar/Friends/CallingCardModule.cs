@@ -25,17 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-using Mono.Addins;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using PermissionMask = OpenSim.Framework.PermissionMask;
 
 namespace OpenSim.Region.CoreModules.Avatar.Friends
@@ -139,11 +139,11 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
             {
                 transferModule.SendInstantMessage(new GridInstantMessage(
                         client.Scene, client.AgentId,
-                        client.FirstName+" "+client.LastName,
+                        client.FirstName + " " + client.LastName,
                         destID, (byte)211, false,
                         String.Empty,
                         transactionID, false, new Vector3(), new byte[0], true),
-                        delegate(bool success) {} );
+                        delegate (bool success) { });
             }
         }
 

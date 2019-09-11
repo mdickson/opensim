@@ -25,14 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 using HttpServer;
 using log4net;
 using OpenMetaverse;
+using System;
+using System.Collections;
+using System.Reflection;
+using System.Text;
 
 namespace OpenSim.Framework.Servers.HttpServer
 {
@@ -45,28 +44,28 @@ namespace OpenSim.Framework.Servers.HttpServer
         public readonly IHttpRequest Request;
         public readonly int RequestTime;
         public readonly UUID RequestID;
-        public int  contextHash;
+        public int contextHash;
 
-/*
-        private void GenContextHash()
-        {
+        /*
+                private void GenContextHash()
+                {
 
-            Random rnd = new Random();
-            contextHash = 0;
-            if (Request.Headers["remote_addr"] != null)
-                contextHash = (Request.Headers["remote_addr"]).GetHashCode() << 16;
-            else
-                contextHash = rnd.Next() << 16;
-            if (Request.Headers["remote_port"] != null)
-            {
-                string[] strPorts = Request.Headers["remote_port"].Split(new char[] { ',' });
-                contextHash += Int32.Parse(strPorts[0]);
-            }
-            else
-                contextHash += rnd.Next() & 0xffff;
+                    Random rnd = new Random();
+                    contextHash = 0;
+                    if (Request.Headers["remote_addr"] != null)
+                        contextHash = (Request.Headers["remote_addr"]).GetHashCode() << 16;
+                    else
+                        contextHash = rnd.Next() << 16;
+                    if (Request.Headers["remote_port"] != null)
+                    {
+                        string[] strPorts = Request.Headers["remote_port"].Split(new char[] { ',' });
+                        contextHash += Int32.Parse(strPorts[0]);
+                    }
+                    else
+                        contextHash += rnd.Next() & 0xffff;
 
-        }
-*/
+                }
+        */
         public PollServiceHttpRequest(
             PollServiceEventArgs pPollServiceArgs, IHttpClientContext pHttpContext, IHttpRequest pRequest)
         {
@@ -75,7 +74,7 @@ namespace OpenSim.Framework.Servers.HttpServer
             Request = pRequest;
             RequestTime = System.Environment.TickCount;
             RequestID = UUID.Random();
-//            GenContextHash();
+            //            GenContextHash();
             contextHash = HttpContext.contextID;
         }
 
@@ -103,7 +102,7 @@ namespace OpenSim.Framework.Servers.HttpServer
             try
             {
                 //m_log.Info("[BASE HTTP SERVER]: Doing HTTP Grunt work with response");
-                if(responsedata["int_response_code"] != null)
+                if (responsedata["int_response_code"] != null)
                     responsecode = (int)responsedata["int_response_code"];
 
                 if (responsedata["bin_response_data"] != null)
@@ -163,7 +162,7 @@ namespace OpenSim.Framework.Servers.HttpServer
                     response.AddHeader(header, headerdata[header].ToString());
             }
 
-            if(buffer == null)
+            if (buffer == null)
             {
                 if (!(contentType.Contains("image")
                     || contentType.Contains("x-shockwave-flash")
@@ -193,7 +192,7 @@ namespace OpenSim.Framework.Servers.HttpServer
 
             try
             {
-                if(rangeLen > 0)
+                if (rangeLen > 0)
                 {
                     response.RawBufferStart = rangeStart;
                     response.RawBufferLen = rangeLen;
@@ -208,11 +207,11 @@ namespace OpenSim.Framework.Servers.HttpServer
             }
             catch (Exception ex)
             {
-                if(ex is System.Net.Sockets.SocketException)
+                if (ex is System.Net.Sockets.SocketException)
                 {
                     // only mute connection reset by peer so we are not totally blind for now
-                    if(((System.Net.Sockets.SocketException)ex).SocketErrorCode != System.Net.Sockets.SocketError.ConnectionReset)
-                         m_log.Warn("[POLL SERVICE WORKER THREAD]: Error ", ex);
+                    if (((System.Net.Sockets.SocketException)ex).SocketErrorCode != System.Net.Sockets.SocketError.ConnectionReset)
+                        m_log.Warn("[POLL SERVICE WORKER THREAD]: Error ", ex);
                 }
                 else
                     m_log.Warn("[POLL SERVICE WORKER THREAD]: Error ", ex);
@@ -240,7 +239,7 @@ namespace OpenSim.Framework.Servers.HttpServer
             OSHttpResponse response
                 = new OSHttpResponse(new HttpResponse(HttpContext, Request));
 
-            if(Request.Body.CanRead)
+            if (Request.Body.CanRead)
                 Request.Body.Dispose();
 
             response.ContentLength64 = 0;

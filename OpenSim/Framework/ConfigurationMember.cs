@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Reflection;
 using System.Xml;
-using log4net;
-using OpenMetaverse;
 //using OpenSim.Framework.Console;
 
 namespace OpenSim.Framework
@@ -509,7 +509,7 @@ namespace OpenSim.Framework
                         if (typeInterface != null)
                         {
                             plug =
-                                (IGenericConfig) Activator.CreateInstance(pluginAssembly.GetType(pluginType.ToString()));
+                                (IGenericConfig)Activator.CreateInstance(pluginAssembly.GetType(pluginType.ToString()));
                         }
                     }
                 }

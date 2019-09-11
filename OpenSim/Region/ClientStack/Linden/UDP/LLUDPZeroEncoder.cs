@@ -25,11 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Text;
-using OpenSim.Framework;
-using Nini.Config;
 using OpenMetaverse;
+using OpenSim.Framework;
+using System;
 
 namespace OpenSim.Region.ClientStack.LindenUDP
 {
@@ -99,7 +97,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
         public unsafe int Finish()
         {
-            if(zerocount > 0)
+            if (zerocount > 0)
             {
                 m_dest[pos++] = 0x00;
                 m_dest[pos++] = (byte)zerocount;
@@ -291,10 +289,10 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
             byte[] data = Util.UTF8.GetBytes(str);
             int len = data.Length;
-            if(NullTerm)
+            if (NullTerm)
                 --len;
 
-            if(len <= maxlen)
+            if (len <= maxlen)
             {
                 AddByte((byte)(len + 1));
                 AddBytes(data, len);
@@ -326,7 +324,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
             if (str.Length > maxchars)
             {
-                data = Util.UTF8.GetBytes(str.Substring(0,maxchars));
+                data = Util.UTF8.GetBytes(str.Substring(0, maxchars));
             }
             else
             {

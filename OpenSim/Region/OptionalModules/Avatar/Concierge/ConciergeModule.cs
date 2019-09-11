@@ -25,16 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -42,9 +32,18 @@ using Nwc.XmlRpc;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Servers;
+using OpenSim.Region.CoreModules.Avatar.Chat;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.CoreModules.Avatar.Chat;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace OpenSim.Region.OptionalModules.Avatar.Concierge
 {
@@ -53,7 +52,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.Concierge
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-//        private const int DEBUG_CHANNEL = 2147483647; use base value
+        //        private const int DEBUG_CHANNEL = 2147483647; use base value
 
         private new List<IScene> m_scenes = new List<IScene>();
         private List<IScene> m_conciergedScenes = new List<IScene>();
@@ -100,7 +99,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.Concierge
                 }
                 else
                 {
-                    m_replacingChatModule  = !configSource.Configs["Chat"].GetBoolean("enabled", true);
+                    m_replacingChatModule = !configSource.Configs["Chat"].GetBoolean("enabled", true);
                 }
             }
             catch (Exception)
@@ -372,7 +371,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.Concierge
                                           scene.RegionInfo.RegionID,
                                           DateTime.UtcNow.ToString("s")));
 
-            scene.ForEachRootScenePresence(delegate(ScenePresence sp)
+            scene.ForEachRootScenePresence(delegate (ScenePresence sp)
             {
                 list.Append(String.Format("    <avatar name=\"{0}\" uuid=\"{1}\" />\n", sp.Name, sp.UUID));
             });
@@ -389,7 +388,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.Concierge
 
 
             BrokerState bs = new BrokerState(uri, payload, updatePost);
-            bs.Timer = new Timer(delegate(object state)
+            bs.Timer = new Timer(delegate (object state)
                                  {
                                      BrokerState b = state as BrokerState;
                                      b.Poster.Abort();
@@ -460,7 +459,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.Concierge
 
                         if (resp.ContentLength > 0)
                         {
-                            using(StreamReader content = new StreamReader(resp.GetResponseStream()))
+                            using (StreamReader content = new StreamReader(resp.GetResponseStream()))
                                 m_log.ErrorFormat("[Concierge] response from {0} content:     {1}", bs.Uri, content.ReadToEnd());
                         }
                     }
@@ -546,13 +545,13 @@ namespace OpenSim.Region.OptionalModules.Avatar.Concierge
             c.Scene = agent.Scene;
 
             agent.ControllingClient.SendChatMessage(
-                msg, (byte) ChatTypeEnum.Say, PosOfGod, m_whoami, UUID.Zero, UUID.Zero,
+                msg, (byte)ChatTypeEnum.Say, PosOfGod, m_whoami, UUID.Zero, UUID.Zero,
                  (byte)ChatSourceType.Object, (byte)ChatAudibleLevel.Fully);
         }
 
         private static void checkStringParameters(XmlRpcRequest request, string[] param)
         {
-            Hashtable requestData = (Hashtable) request.Params[0];
+            Hashtable requestData = (Hashtable)request.Params[0];
             foreach (string p in param)
             {
                 if (!requestData.Contains(p))
@@ -585,7 +584,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.Concierge
                     throw new Exception("empty parameter \"welcome\"");
 
                 string regionName = (string)requestData["region"];
-                IScene scene = m_scenes.Find(delegate(IScene s) { return s.RegionInfo.RegionName == regionName; });
+                IScene scene = m_scenes.Find(delegate (IScene s) { return s.RegionInfo.RegionName == regionName; });
                 if (scene == null)
                     throw new Exception(String.Format("unknown region \"{0}\"", regionName));
 

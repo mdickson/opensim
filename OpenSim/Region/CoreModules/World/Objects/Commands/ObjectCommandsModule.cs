@@ -25,25 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml;
-using log4net;
 using Mono.Addins;
 using NDesk.Options;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Console;
-using OpenSim.Framework.Monitoring;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.Framework.Scenes.Serialization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace OpenSim.Region.CoreModules.World.Objects.Commands
 {
@@ -53,7 +49,7 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "ObjectCommandsModule")]
     public class ObjectCommandsModule : INonSharedRegionModule
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private Scene m_scene;
         private ICommandConsole m_console;
@@ -64,22 +60,22 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
 
         public void Initialise(IConfigSource source)
         {
-//            m_log.DebugFormat("[OBJECT COMMANDS MODULE]: INITIALIZED MODULE");
+            //            m_log.DebugFormat("[OBJECT COMMANDS MODULE]: INITIALIZED MODULE");
         }
 
         public void PostInitialise()
         {
-//            m_log.DebugFormat("[OBJECT COMMANDS MODULE]: POST INITIALIZED MODULE");
+            //            m_log.DebugFormat("[OBJECT COMMANDS MODULE]: POST INITIALIZED MODULE");
         }
 
         public void Close()
         {
-//            m_log.DebugFormat("[OBJECT COMMANDS MODULE]: CLOSED MODULE");
+            //            m_log.DebugFormat("[OBJECT COMMANDS MODULE]: CLOSED MODULE");
         }
 
         public void AddRegion(Scene scene)
         {
-//            m_log.DebugFormat("[OBJECT COMMANDS MODULE]: REGION {0} ADDED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[OBJECT COMMANDS MODULE]: REGION {0} ADDED", scene.RegionInfo.RegionName);
 
             m_scene = scene;
             m_console = MainConsole.Instance;
@@ -208,12 +204,12 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
 
         public void RemoveRegion(Scene scene)
         {
-//            m_log.DebugFormat("[OBJECTS COMMANDS MODULE]: REGION {0} REMOVED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[OBJECTS COMMANDS MODULE]: REGION {0} REMOVED", scene.RegionInfo.RegionName);
         }
 
         public void RegionLoaded(Scene scene)
         {
-//            m_log.DebugFormat("[OBJECTS COMMANDS MODULE]: REGION {0} LOADED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[OBJECTS COMMANDS MODULE]: REGION {0} LOADED", scene.RegionInfo.RegionName);
         }
 
         /// <summary>
@@ -264,7 +260,7 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
                 return;
 
             bool showFull = false;
-            OptionSet options = new OptionSet().Add("full", v => showFull = v != null );
+            OptionSet options = new OptionSet().Add("full", v => showFull = v != null);
 
             List<string> mainParams = options.Parse(cmdparams);
 
@@ -288,7 +284,7 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
 
             if (so == null)
             {
-//                m_console.OutputFormat("No part found with uuid {0}", objectUuid);
+                //                m_console.OutputFormat("No part found with uuid {0}", objectUuid);
                 return;
             }
 
@@ -306,8 +302,8 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
             bool showFull = false;
             bool useRegex = false;
             OptionSet options = new OptionSet();
-            options.Add("full", v => showFull = v != null );
-            options.Add("regex", v => useRegex = v != null );
+            options.Add("full", v => showFull = v != null);
+            options.Add("regex", v => useRegex = v != null);
 
             List<string> mainParams = options.Parse(cmdparams);
 
@@ -366,7 +362,7 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
                 return;
 
             bool showFull = false;
-            OptionSet options = new OptionSet().Add("full", v => showFull = v != null );
+            OptionSet options = new OptionSet().Add("full", v => showFull = v != null);
 
             List<string> mainParams = options.Parse(cmdparams);
 
@@ -392,9 +388,9 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
             if (!(m_console.ConsoleScene == null || m_console.ConsoleScene == m_scene))
                 return;
 
-//            bool showFull = false;
+            //            bool showFull = false;
             OptionSet options = new OptionSet();
-//            options.Add("full", v => showFull = v != null );
+            //            options.Add("full", v => showFull = v != null );
 
             List<string> mainParams = options.Parse(cmdparams);
 
@@ -418,7 +414,7 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
 
             if (sop == null)
             {
-//                m_console.OutputFormat("No part found with uuid {0}", objectUuid);
+                //                m_console.OutputFormat("No part found with uuid {0}", objectUuid);
                 return;
             }
 
@@ -433,9 +429,9 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
             if (!(m_console.ConsoleScene == null || m_console.ConsoleScene == m_scene))
                 return;
 
-//            bool showFull = false;
+            //            bool showFull = false;
             OptionSet options = new OptionSet();
-//            options.Add("full", v => showFull = v != null );
+            //            options.Add("full", v => showFull = v != null );
 
             List<string> mainParams = options.Parse(cmdparams);
 
@@ -472,11 +468,11 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
             if (!(m_console.ConsoleScene == null || m_console.ConsoleScene == m_scene))
                 return;
 
-//            bool showFull = false;
+            //            bool showFull = false;
             bool useRegex = false;
             OptionSet options = new OptionSet();
-//            options.Add("full", v => showFull = v != null );
-            options.Add("regex", v => useRegex = v != null );
+            //            options.Add("full", v => showFull = v != null );
+            options.Add("regex", v => useRegex = v != null);
 
             List<string> mainParams = options.Parse(cmdparams);
 
@@ -528,7 +524,7 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
 
             if (so == null)
             {
-//                m_console.OutputFormat("No part found with uuid {0}", objectUuid);
+                //                m_console.OutputFormat("No part found with uuid {0}", objectUuid);
                 return;
             }
 
@@ -608,7 +604,7 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
             cdl.AddRow("Description", sop.Description);
             cdl.AddRow("Local ID", sop.LocalId);
             cdl.AddRow("UUID", sop.UUID);
-            cdl.AddRow("Location",  string.Format("{0} @ {1}", sop.AbsolutePosition, sop.ParentGroup.Scene.Name));
+            cdl.AddRow("Location", string.Format("{0} @ {1}", sop.AbsolutePosition, sop.ParentGroup.Scene.Name));
             cdl.AddRow(
                 "Parent",
                 sop.IsRoot ? "Is Root" : string.Format("{0} {1}", sop.ParentGroup.Name, sop.ParentGroup.UUID));
@@ -766,8 +762,8 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
                             deletes.Add(g);
                     });
 
-        //                if (deletes.Count == 0)
-        //                    m_console.OutputFormat("No objects were found with owner {0}", match);
+                    //                if (deletes.Count == 0)
+                    //                    m_console.OutputFormat("No objects were found with owner {0}", match);
 
                     break;
 
@@ -783,8 +779,8 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
                             deletes.Add(g);
                     });
 
-        //                if (deletes.Count == 0)
-        //                    m_console.OutputFormat("No objects were found with creator {0}", match);
+                    //                if (deletes.Count == 0)
+                    //                    m_console.OutputFormat("No objects were found with creator {0}", match);
 
                     break;
 
@@ -803,10 +799,10 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
                     else
                         so = m_scene.GetSceneObjectGroup(localId);
 
-                    if (so!= null)
+                    if (so != null)
                     {
                         deletes.Add(so);
-                        if(so.IsAttachment)
+                        if (so.IsAttachment)
                         {
                             requireConfirmation = true;
                             m_console.Output("Warning: object with uuid {0} is a attachment", null, uuid);
@@ -889,7 +885,7 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
         private List<SceneObjectGroup> GetDeleteCandidatesByName(string module, string[] cmdparams)
         {
             bool useRegex = false;
-            OptionSet options = new OptionSet().Add("regex", v=> useRegex = v != null );
+            OptionSet options = new OptionSet().Add("regex", v => useRegex = v != null);
 
             List<string> mainParams = options.Parse(cmdparams);
 
@@ -907,11 +903,11 @@ namespace OpenSim.Region.CoreModules.World.Objects.Commands
             if (useRegex)
             {
                 Regex nameRegex = new Regex(name);
-                searchAction = so => { if (nameRegex.IsMatch(so.Name)) {if(!so.IsAttachment) sceneObjects.Add(so);}};
+                searchAction = so => { if (nameRegex.IsMatch(so.Name)) { if (!so.IsAttachment) sceneObjects.Add(so); } };
             }
             else
             {
-                searchAction = so => { if (so.Name == name) {if(!so.IsAttachment) sceneObjects.Add(so);}};
+                searchAction = so => { if (so.Name == name) { if (!so.IsAttachment) sceneObjects.Add(so); } };
             }
 
             m_scene.ForEachSOG(searchAction);

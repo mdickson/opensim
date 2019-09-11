@@ -2,14 +2,14 @@
  * AJLDuarte 2012
  */
 
-using System;
-using System.Collections.Concurrent;
-using System.Threading;
-using OpenSim.Framework;
-using OpenSim.Region.PhysicsModules.SharedBase;
 using log4net;
 using Nini.Config;
 using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.PhysicsModules.SharedBase;
+using System;
+using System.Collections.Concurrent;
+using System.Threading;
 
 namespace OpenSim.Region.PhysicsModule.ubOde
 {
@@ -89,7 +89,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             {
                 meshSculptedPrim = pConfig.GetBoolean("mesh_sculpted_prim", meshSculptedPrim);
                 meshSculptLOD = pConfig.GetFloat("mesh_lod", meshSculptLOD);
-                MinSizeToMeshmerize =  pConfig.GetFloat("mesh_min_size", MinSizeToMeshmerize);
+                MinSizeToMeshmerize = pConfig.GetFloat("mesh_min_size", MinSizeToMeshmerize);
                 MeshSculptphysicalLOD = pConfig.GetFloat("mesh_physical_lod", MeshSculptphysicalLOD);
             }
             m_running = true;
@@ -103,10 +103,10 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             m_mesher.ExpireFileCache();
             ODEPhysRepData nextRep;
 
-            while(m_running)
+            while (m_running)
             {
                 workQueue.TryTake(out nextRep, -1);
-                if(!m_running)
+                if (!m_running)
                     return;
                 if (nextRep == null)
                     continue;
@@ -134,7 +134,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             try
             {
                 m_thread.Abort();
- //               workQueue.Dispose();
+                //               workQueue.Dispose();
             }
             catch
             {
@@ -285,7 +285,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             // check sculpts or meshs
 
             Vector3 scale = pbs.Scale;
-            if(scale.X <= MinSizeToMeshmerize &&
+            if (scale.X <= MinSizeToMeshmerize &&
                scale.Y <= MinSizeToMeshmerize &&
                scale.Z <= MinSizeToMeshmerize)
             {
@@ -306,7 +306,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
 
             // convex shapes have no holes
             ushort profilehollow = pbs.ProfileHollow;
-            if(repData.shapetype == 2)
+            if (repData.shapetype == 2)
                 profilehollow = 0;
 
             // if it's a standard box or sphere with no cuts, hollows, twist or top shear, return false since ODE can use an internal representation for the prim
@@ -470,7 +470,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             }
 
             pbs.SculptData = Utils.EmptyBytes;
-            return ;
+            return;
         }
 
         public void GetMesh(ODEPhysRepData repData)
@@ -559,7 +559,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             Vector3 _size = repData.size;
 
             float volume = _size.X * _size.Y * _size.Z; // default
-            if(repData.isTooSmall)
+            if (repData.isTooSmall)
             {
                 repData.volume = volume;
                 return;
@@ -902,7 +902,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             if (repData.assetID == null)
                 return;
 
-            UUID assetID = (UUID) repData.assetID;
+            UUID assetID = (UUID)repData.assetID;
             if (assetID == UUID.Zero)
                 return;
 
@@ -924,8 +924,8 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                     if (repData.pbs.SculptTexture != repData.assetID)
                         return;
 
-//                    repData.pbs.SculptData = new byte[asset.Data.Length];
-//                    asset.Data.CopyTo(repData.pbs.SculptData,0);
+                    //                    repData.pbs.SculptData = new byte[asset.Data.Length];
+                    //                    asset.Data.CopyTo(repData.pbs.SculptData,0);
                     repData.pbs.SculptData = asset.Data;
                     repData.meshState = MeshState.AssetOK;
                     m_worker.AssetLoaded(repData);

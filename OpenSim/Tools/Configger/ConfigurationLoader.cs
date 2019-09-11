@@ -25,14 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Threading;
 using System.Xml;
-using log4net;
-using Nini.Config;
 
 namespace OpenSim.Tools.Configger
 {
@@ -127,7 +126,7 @@ namespace OpenSim.Tools.Configger
                 Environment.Exit(1);
             }
 
-            for (int i = 0 ; i < sources.Count ; i++)
+            for (int i = 0; i < sources.Count; i++)
             {
                 if (ReadConfig(sources[i]))
                     iniFileExists = true;

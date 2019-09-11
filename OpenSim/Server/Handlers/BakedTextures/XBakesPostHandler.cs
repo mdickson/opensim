@@ -25,27 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using Nini.Config;
-using log4net;
-using System;
-using System.Reflection;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml;
-using System.Xml.Serialization;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Framework;
-using OpenSim.Framework.ServiceAuth;
 using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Framework.ServiceAuth;
+using OpenSim.Services.Interfaces;
+using System.IO;
 
 namespace OpenSim.Server.Handlers.BakedTextures
 {
     public class BakesServerPostHandler : BaseStreamHandler
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private IBakedTextureService m_BakesService;
 
@@ -65,8 +54,8 @@ namespace OpenSim.Server.Handlers.BakedTextures
                 return new byte[0];
             }
 
-            using(StreamReader sr = new StreamReader(request))
-                m_BakesService.Store(p[0],sr.ReadToEnd());
+            using (StreamReader sr = new StreamReader(request))
+                m_BakesService.Store(p[0], sr.ReadToEnd());
 
             return new byte[0];
         }

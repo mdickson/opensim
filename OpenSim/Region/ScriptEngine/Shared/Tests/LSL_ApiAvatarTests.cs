@@ -25,28 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using log4net;
 using Nini.Config;
 using NUnit.Framework;
-using OpenMetaverse;
-using OpenMetaverse.Assets;
-using OpenMetaverse.StructuredData;
-using OpenSim.Framework;
-using OpenSim.Region.CoreModules.Avatar.AvatarFactory;
-using OpenSim.Region.OptionalModules.World.NPC;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.ScriptEngine.Shared;
-using OpenSim.Region.ScriptEngine.Shared.Api;
-using OpenSim.Region.ScriptEngine.Shared.Instance;
-using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
-using OpenSim.Services.Interfaces;
 using OpenSim.Tests.Common;
-using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
-using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Tests
 {
@@ -86,75 +68,75 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         [Test]
         public void TestllSetLinkPrimitiveParamsForAgent()
         {
-/* siting avatars position changed
-            TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            /* siting avatars position changed
+                        TestHelpers.InMethod();
+            //            TestHelpers.EnableLogging();
 
-            UUID userId = TestHelpers.ParseTail(0x1);
+                        UUID userId = TestHelpers.ParseTail(0x1);
 
-            SceneObjectPart part = SceneHelpers.AddSceneObject(m_scene).RootPart;
-            part.RotationOffset = new Quaternion(0.7071068f, 0, 0, 0.7071068f);
+                        SceneObjectPart part = SceneHelpers.AddSceneObject(m_scene).RootPart;
+                        part.RotationOffset = new Quaternion(0.7071068f, 0, 0, 0.7071068f);
 
-            LSL_Api apiGrp1 = new LSL_Api();
-            apiGrp1.Initialize(m_engine, part, null);
+                        LSL_Api apiGrp1 = new LSL_Api();
+                        apiGrp1.Initialize(m_engine, part, null);
 
-            ScenePresence sp = SceneHelpers.AddScenePresence(m_scene, userId);
+                        ScenePresence sp = SceneHelpers.AddScenePresence(m_scene, userId);
 
-            // sp has to be less than 10 meters away from 0, 0, 0 (default part position)
-            Vector3 startPos = new Vector3(3, 2, 1);
-            sp.AbsolutePosition = startPos;
+                        // sp has to be less than 10 meters away from 0, 0, 0 (default part position)
+                        Vector3 startPos = new Vector3(3, 2, 1);
+                        sp.AbsolutePosition = startPos;
 
-            sp.HandleAgentRequestSit(sp.ControllingClient, sp.UUID, part.UUID, Vector3.Zero);
+                        sp.HandleAgentRequestSit(sp.ControllingClient, sp.UUID, part.UUID, Vector3.Zero);
 
-            int entityUpdates = 0;
-            ((TestClient)sp.ControllingClient).OnReceivedEntityUpdate += (entity, flags) => { if (entity is ScenePresence) { entityUpdates++; }};
+                        int entityUpdates = 0;
+                        ((TestClient)sp.ControllingClient).OnReceivedEntityUpdate += (entity, flags) => { if (entity is ScenePresence) { entityUpdates++; }};
 
-            // Test position
-            {
-                Vector3 newPos = new Vector3(1, 2, 3);
-                apiGrp1.llSetLinkPrimitiveParams(2, new LSL_Types.list(ScriptBaseClass.PRIM_POSITION, newPos));
+                        // Test position
+                        {
+                            Vector3 newPos = new Vector3(1, 2, 3);
+                            apiGrp1.llSetLinkPrimitiveParams(2, new LSL_Types.list(ScriptBaseClass.PRIM_POSITION, newPos));
 
-                Assert.That(sp.OffsetPosition, Is.EqualTo(newPos));
+                            Assert.That(sp.OffsetPosition, Is.EqualTo(newPos));
 
-                m_scene.Update(1);
-                Assert.That(entityUpdates, Is.EqualTo(1));
-            }
+                            m_scene.Update(1);
+                            Assert.That(entityUpdates, Is.EqualTo(1));
+                        }
 
-            // Test small reposition
-            {
-                Vector3 newPos = new Vector3(1.001f, 2, 3);
-                apiGrp1.llSetLinkPrimitiveParams(2, new LSL_Types.list(ScriptBaseClass.PRIM_POSITION, newPos));
+                        // Test small reposition
+                        {
+                            Vector3 newPos = new Vector3(1.001f, 2, 3);
+                            apiGrp1.llSetLinkPrimitiveParams(2, new LSL_Types.list(ScriptBaseClass.PRIM_POSITION, newPos));
 
-                Assert.That(sp.OffsetPosition, Is.EqualTo(newPos));
+                            Assert.That(sp.OffsetPosition, Is.EqualTo(newPos));
 
-                m_scene.Update(1);
-                Assert.That(entityUpdates, Is.EqualTo(2));
-            }
+                            m_scene.Update(1);
+                            Assert.That(entityUpdates, Is.EqualTo(2));
+                        }
 
-            // Test world rotation
-            {
-                Quaternion newRot = new Quaternion(0, 0.7071068f, 0, 0.7071068f);
-                apiGrp1.llSetLinkPrimitiveParams(2, new LSL_Types.list(ScriptBaseClass.PRIM_ROTATION, newRot));
+                        // Test world rotation
+                        {
+                            Quaternion newRot = new Quaternion(0, 0.7071068f, 0, 0.7071068f);
+                            apiGrp1.llSetLinkPrimitiveParams(2, new LSL_Types.list(ScriptBaseClass.PRIM_ROTATION, newRot));
 
-                Assert.That(
-                    sp.Rotation, new QuaternionToleranceConstraint(part.GetWorldRotation() * newRot, 0.000001));
+                            Assert.That(
+                                sp.Rotation, new QuaternionToleranceConstraint(part.GetWorldRotation() * newRot, 0.000001));
 
-                m_scene.Update(1);
-                Assert.That(entityUpdates, Is.EqualTo(3));
-            }
+                            m_scene.Update(1);
+                            Assert.That(entityUpdates, Is.EqualTo(3));
+                        }
 
-            // Test local rotation
-            {
-                Quaternion newRot = new Quaternion(0, 0.7071068f, 0, 0.7071068f);
-                apiGrp1.llSetLinkPrimitiveParams(2, new LSL_Types.list(ScriptBaseClass.PRIM_ROT_LOCAL, newRot));
+                        // Test local rotation
+                        {
+                            Quaternion newRot = new Quaternion(0, 0.7071068f, 0, 0.7071068f);
+                            apiGrp1.llSetLinkPrimitiveParams(2, new LSL_Types.list(ScriptBaseClass.PRIM_ROT_LOCAL, newRot));
 
-                Assert.That(
-                    sp.Rotation, new QuaternionToleranceConstraint(newRot, 0.000001));
+                            Assert.That(
+                                sp.Rotation, new QuaternionToleranceConstraint(newRot, 0.000001));
 
-                m_scene.Update(1);
-                Assert.That(entityUpdates, Is.EqualTo(4));
-            }
-*/
+                            m_scene.Update(1);
+                            Assert.That(entityUpdates, Is.EqualTo(4));
+                        }
+            */
         }
     }
 }

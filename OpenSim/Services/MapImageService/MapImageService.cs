@@ -29,22 +29,18 @@
  * https://github.com/openmetaversefoundation/simiangrid/
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Net;
 using System.Reflection;
 using System.Threading;
-
-using Nini.Config;
-using log4net;
-using OpenMetaverse;
-
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Services.Interfaces;
 
 
 namespace OpenSim.Services.MapImageService
@@ -101,7 +97,7 @@ namespace OpenSim.Services.MapImageService
                         m_WaterBitmap = new Bitmap(m_WaterTileFile);
                         using (MemoryStream ms = new MemoryStream())
                         {
-                            m_WaterBitmap.Save(ms,ImageFormat.Jpeg);
+                            m_WaterBitmap.Save(ms, ImageFormat.Jpeg);
                             ms.Seek(0, SeekOrigin.Begin);
                             m_WaterBytes = ms.ToArray();
                         }
@@ -312,7 +308,7 @@ namespace OpenSim.Services.MapImageService
 
         private bool CreateTile(uint zoomLevel, int x, int y, UUID scopeID)
         {
-//            m_log.DebugFormat("[MAP IMAGE SERVICE]: Create tile for {0} {1}, zoom {2}", x, y, zoomLevel);
+            //            m_log.DebugFormat("[MAP IMAGE SERVICE]: Create tile for {0} {1}, zoom {2}", x, y, zoomLevel);
             int prevWidth = (int)Math.Pow(2, (double)zoomLevel - 2);
             int thisWidth = (int)Math.Pow(2, (double)zoomLevel - 1);
 

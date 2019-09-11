@@ -25,13 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
 using log4net;
-using Mono.Addins;
 using Nini.Config;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Reflection;
 
 // You will need to uncomment these lines if you are adding a region module to some other assembly which does not already
 // specify its assembly.  Otherwise, the region modules in the assembly will not be picked up when OpenSimulator scans

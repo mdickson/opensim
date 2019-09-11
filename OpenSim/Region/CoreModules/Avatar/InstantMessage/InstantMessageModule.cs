@@ -24,10 +24,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Timers;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -36,6 +32,9 @@ using OpenSim.Framework;
 using OpenSim.Framework.Client;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
 {
@@ -146,13 +145,13 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
         }
 
         #endregion
-/*
-        public virtual void OnViewerInstantMessage(IClientAPI client, GridInstantMessage im)
-        {
-            im.fromAgentName = client.FirstName + " " + client.LastName;
-            OnInstantMessage(client, im);
-        }
-*/
+        /*
+                public virtual void OnViewerInstantMessage(IClientAPI client, GridInstantMessage im)
+                {
+                    im.fromAgentName = client.FirstName + " " + client.LastName;
+                    OnInstantMessage(client, im);
+                }
+        */
         public virtual void OnInstantMessage(IClientAPI client, GridInstantMessage im)
         {
             byte dialog = im.dialog;
@@ -195,7 +194,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
             if (m_TransferModule != null)
             {
                 m_TransferModule.SendInstantMessage(im,
-                    delegate(bool success)
+                    delegate (bool success)
                     {
                         if (dialog == (uint)InstantMessageDialog.StartTyping ||
                             dialog == (uint)InstantMessageDialog.StopTyping ||
@@ -211,7 +210,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
                                     null, new UUID(im.fromAgentID), "System",
                                     new UUID(im.toAgentID),
                                     (byte)InstantMessageDialog.BusyAutoResponse,
-                                    "Unable to send instant message. "+
+                                    "Unable to send instant message. " +
                                     "User is not logged in.", false,
                                     new Vector3()));
                         }

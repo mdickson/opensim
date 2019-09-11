@@ -26,13 +26,6 @@
  */
 
 using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using log4net;
-using pCampBot.Interfaces;
 
 namespace pCampBot
 {
@@ -43,7 +36,7 @@ namespace pCampBot
     /// </summary>
     public class PhysicsBehaviour2 : AbstractBehaviour
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public PhysicsBehaviour2()
         {
@@ -76,7 +69,7 @@ namespace pCampBot
         private void MyTurnToward(Vector3 target)
         {
             Quaternion between = Vector3.RotationBetween(Vector3.UnitX, Vector3.Normalize(target - Bot.Client.Self.SimPosition));
-            Quaternion rot = between ;
+            Quaternion rot = between;
 
             Bot.Client.Self.Movement.BodyRotation = rot;
             Bot.Client.Self.Movement.HeadRotation = rot;

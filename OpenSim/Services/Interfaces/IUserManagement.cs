@@ -25,10 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-
 using OpenMetaverse;
+using System.Collections.Generic;
 
 namespace OpenSim.Services.Interfaces
 {
@@ -42,7 +40,7 @@ namespace OpenSim.Services.Interfaces
         string GetUserUUI(UUID uuid);
         bool GetUserUUI(UUID userID, out string uui);
         string GetUserServerURL(UUID uuid, string serverType);
-        Dictionary<UUID,string> GetUsersNames(string[] ids, UUID scopeID);
+        Dictionary<UUID, string> GetUsersNames(string[] ids, UUID scopeID);
 
         /// <summary>
         /// Get user ID by the given name.
