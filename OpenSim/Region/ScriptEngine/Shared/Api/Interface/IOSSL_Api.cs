@@ -27,7 +27,7 @@
 
 using key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
-using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
+using LSL_Rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
 using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
 using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
@@ -550,5 +550,6 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         LSL_String osGetInventoryDesc(LSL_String itemNameOrId);
         LSL_Key osGetLastChangedEventKey();
         LSL_Float osGetPSTWallclock();
+        LSL_Rotation osSlerp(LSL_Rotation a, LSL_Rotation b, LSL_Float amount);
     }
 }

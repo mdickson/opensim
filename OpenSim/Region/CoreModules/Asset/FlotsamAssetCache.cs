@@ -1247,6 +1247,8 @@ namespace OpenSim.Region.CoreModules.Asset
         {
             AssetBase asset;
             Get(id, out asset);
+            if (asset == null)
+                return null;
             return asset.Metadata;
         }
 
@@ -1254,6 +1256,8 @@ namespace OpenSim.Region.CoreModules.Asset
         {
             AssetBase asset;
             Get(id, out asset);
+            if (asset == null)
+                return null;
             return asset.Data;
         }
 
