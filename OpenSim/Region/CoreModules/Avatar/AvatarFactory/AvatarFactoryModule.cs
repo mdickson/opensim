@@ -33,7 +33,6 @@ using System.Threading;
 using System.Text;
 using System.Timers;
 using log4net;
-using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
@@ -41,11 +40,8 @@ using OpenSim.Framework.Monitoring;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
-using System.Timers;
+
+using Mono.Addins;
 using PermissionMask = OpenSim.Framework.PermissionMask;
 
 namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
