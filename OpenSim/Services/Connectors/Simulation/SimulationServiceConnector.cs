@@ -110,6 +110,8 @@ namespace OpenSim.Services.Connectors.Simulation
             try
             {
                 OSDMap args = aCircuit.PackAgentCircuitData(ctx);
+                if(ctx == null)
+                    ctx = new EntityTransferContext();
                 args["context"] = ctx.Pack();
                 PackData(args, source, aCircuit, destination, flags);
 

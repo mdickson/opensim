@@ -48,6 +48,7 @@ namespace OpenSim.Region.CoreModules.Framework.EntityTransfer
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly string LogHeader = "[ENTITY TRANSFER MODULE]";
+        private static readonly string OutfitTPError = "destination region does not support the Outfit you are wearing. Please retry with a simpler one";
 
         public const bool WaitForAgentArrivedAtDestinationDefault = true;
 
@@ -711,6 +712,17 @@ namespace OpenSim.Region.CoreModules.Framework.EntityTransfer
                 m_log.DebugFormat(
                     "[ENTITY TRANSFER MODULE]: {0} was stopped from teleporting from {1} to {2} because: {3}",
                     sp.Name, sp.Scene.Name, finalDestination.RegionName, reason);
+
+                return;
+            }
+
+            if (!sp.Appearance.CanTeleport(ctx.OutboundVersion))
+            {
+                sp.ControllingClient.SendTeleportFailed(OutfitTPError);
+
+                m_log.DebugFormat(
+                    "[ENTITY TRANSFER MODULE]: {0} was stopped from teleporting from {1} to {2} because: {3}",
+                    sp.Name, sp.Scene.Name, finalDestination.RegionName, "incompatible wearable");
 
                 return;
             }
@@ -1484,6 +1496,13 @@ namespace OpenSim.Region.CoreModules.Framework.EntityTransfer
                 m_bannedRegionCache.Add(destinyHandle, agentID, 30.0, 30.0);
                 return false;
             }
+            if (!agent.Appearance.CanTeleport(ctx.OutboundVersion))
+            {
+                reason = OutfitTPError;
+                m_bannedRegionCache.Add(destinyHandle, agentID, 30.0, 30.0);
+                return false;
+            }
+
             return true;
         }
 
@@ -1540,7 +1559,6 @@ namespace OpenSim.Region.CoreModules.Framework.EntityTransfer
                     failureReason = "Access Denied";
                 return null;
             }
-
             return neighbourRegion;
         }
 
@@ -1592,6 +1610,12 @@ namespace OpenSim.Region.CoreModules.Framework.EntityTransfer
             {
                 if (!agent.IsDeleted && failureReason != String.Empty && agent.ControllingClient != null)
                     agent.ControllingClient.SendAlertMessage(failureReason);
+                return agent;
+            }
+            if (!agent.Appearance.CanTeleport(ctx.OutboundVersion))
+            {
+                if (agent.ControllingClient != null)
+                    agent.ControllingClient.SendAlertMessage(OutfitTPError);
                 return agent;
             }
 
@@ -2596,7 +2620,7 @@ namespace OpenSim.Region.CoreModules.Framework.EntityTransfer
                 string reason = String.Empty;
 
                 EntityTransferContext ctx = new EntityTransferContext();
-                bool regionAccepted = scene.SimulationService.CreateAgent(reg, reg, agentCircData, (uint)TeleportFlags.Default, ctx, out reason);
+                bool regionAccepted = scene.SimulationService.CreateAgent(reg, reg, agentCircData, (uint)TeleportFlags.Default, null, out reason);
 
                 if (regionAccepted)
                 {

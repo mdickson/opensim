@@ -985,11 +985,13 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             //RegionInfo4 block
 
             //RegionFlagsExtended
-            zc.AddZeros(1); // we dont have this
-                            //zc.AddByte(1); 
-                            //zc.AddUInt64(regionFlags); // we have nothing other base flags
+            //zc.AddZeros(1); // if we dont have this else
+            zc.AddByte(1); 
+            zc.AddUInt64(regionFlags); // we have nothing other base flags
                             //RegionProtocols
-                            //zc.AddUInt64(0); // bit 0 signals server side texture baking"
+                // bit 0 signals server side texture baking
+                // bit 63 signals more than 6 baked textures support"
+            zc.AddUInt64(1UL << 63);
 
             buf.DataLength = zc.Finish();
             m_udpServer.SendUDPPacket(m_udpClient, buf, ThrottleOutPacketType.Unknown);
@@ -4430,7 +4432,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 //0xff, 0xff, 0, 1, 158 // ID 158 (low frequency bigendian) zeroencoded
                 };
 
-        public void SendAppearance(UUID targetID, byte[] visualParams, byte[] textureEntry)
+        public void SendAppearance(UUID targetID, byte[] visualParams, byte[] textureEntry, float hover)
         {
             // doing post zero encode, because odds of beeing bad are not that low
             UDPPacketBuffer buf = m_udpServer.GetNewUDPBuffer(m_udpClient.RemoteEndPoint);
@@ -4465,7 +4467,10 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             // no AppearanceData
             data[pos++] = 0;
             // no AppearanceHover
-            data[pos++] = 0;
+            data[pos++] = 1;
+            Utils.FloatToBytesSafepos(0, data, pos); pos += 4;
+            Utils.FloatToBytesSafepos(0, data, pos); pos += 4;
+            Utils.FloatToBytesSafepos(hover, data, pos); pos += 4;
 
             buf.DataLength = pos;
             m_udpServer.SendUDPPacket(m_udpClient, buf, ThrottleOutPacketType.Task | ThrottleOutPacketType.HighPriority, null, false, true);

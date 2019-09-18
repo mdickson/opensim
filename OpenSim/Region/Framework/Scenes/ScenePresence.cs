@@ -4354,8 +4354,7 @@ namespace OpenSim.Region.Framework.Scenes
 
         public void SendAppearanceToAgentNF(ScenePresence avatar)
         {
-            avatar.ControllingClient.SendAppearance(
-                UUID, Appearance.VisualParams, Appearance.Texture.GetBytes());
+            avatar.ControllingClient.SendAppearance(UUID, Appearance.VisualParams, Appearance.Texture.GetBakesBytes(), Appearance.AvatarPreferencesHoverZ);
         }
 
         public void SendAnimPackToAgent(ScenePresence p)
