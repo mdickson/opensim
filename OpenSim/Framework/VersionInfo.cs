@@ -29,7 +29,7 @@ namespace OpenSim
 {
     public class VersionInfo
     {
-        public const string VersionNumber = "0.9.1.08302019";
+        public const string VersionNumber = "0.9.1.10082019";
         public const string AssemblyVersionNumber = "0.9.1.0";
 
         public const Flavour VERSION_FLAVOUR = Flavour.Release;
@@ -75,7 +75,7 @@ namespace OpenSim
         /// The protocol version that we will use for outgoing transfers
         /// Valid values are
         /// "SIMULATION/0.3"
-        ///   - This is the latest, and it supports teleports to variable-sized regions
+        ///   - supports teleports to variable-sized regions
         ///   - Older versions can teleport to this one, but only if the destination region
         ///     is 256x256
         /// "SIMULATION/0.2"

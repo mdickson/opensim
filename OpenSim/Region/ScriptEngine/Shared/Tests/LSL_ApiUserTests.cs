@@ -110,10 +110,10 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
                 m_engine.PostedEvents.Clear();
             }
 
-            apiGrp1.LlRequestAgentDataCacheTimeoutMs = 1;
+            apiGrp1.LlRequestAgentDataCacheTimeoutMs = 20;
 
             // Make absolutely sure that we should trigger cache timeout.
-            Thread.Sleep(apiGrp1.LlRequestAgentDataCacheTimeoutMs + 1);
+            Thread.Sleep(apiGrp1.LlRequestAgentDataCacheTimeoutMs + 50);
 
             {
                 apiGrp1.llRequestAgentData(userId.ToString(), ScriptBaseClass.DATA_ONLINE);
@@ -133,7 +133,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
 
             m_scene.CloseAgent(userId, false);
 
-            Thread.Sleep(apiGrp1.LlRequestAgentDataCacheTimeoutMs + 1 + 1);
+            Thread.Sleep(apiGrp1.LlRequestAgentDataCacheTimeoutMs + 50);
 
             {
                 apiGrp1.llRequestAgentData(userId.ToString(), ScriptBaseClass.DATA_ONLINE);

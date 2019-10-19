@@ -1405,5 +1405,14 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
             return m_OSSL_Functions.osSlerp(a, b, amount);
         }
 
+        public void osResetAllScripts(LSL_Integer allLinkSet)
+        {
+            m_OSSL_Functions.osResetAllScripts(allLinkSet);
+        }
+
+        public LSL_Integer osIsNotValidNumber(LSL_Float v)
+        {
+            return m_OSSL_Functions.osIsNotValidNumber(v);
+        }
     }
 }
