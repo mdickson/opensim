@@ -178,10 +178,10 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                 if(m_osslconfig == null)
                     m_osslconfig = m_ScriptEngine.Config;
 
-                if (m_osslconfig.GetBoolean("AllowOSFunctions", false))
+                if (m_osslconfig.GetBoolean("AllowOSFunctions", true))
                 {
-                m_OSFunctionsEnabled = true;
-                // m_log.Warn("[OSSL] OSSL FUNCTIONS ENABLED");
+                    m_OSFunctionsEnabled = true;
+                    // m_log.Warn("[OSSL] OSSL FUNCTIONS ENABLED");
                 }
 
                 m_PermissionErrortoOwner = m_osslconfig.GetBoolean("PermissionErrorToOwner", m_PermissionErrortoOwner);
@@ -5665,6 +5665,18 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
 
             m_ScriptEngine.ApiResetScript(me);
 
+        }
+
+        public LSL_Integer osIsNotValidNumber(LSL_Float v)
+        {
+            double d = v;
+            if (double.IsNaN(d))
+                return 1;
+            if (double.IsNegativeInfinity(d))
+                return 2;
+            if (double.IsPositiveInfinity(d))
+                return 3;
+            return 0;
         }
     }
 }
