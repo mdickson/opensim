@@ -25,26 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Timers;
-using Timer = System.Timers.Timer;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.ClientStack.Linden;
 using OpenSim.Region.CoreModules.Framework.EntityTransfer;
-using OpenSim.Region.CoreModules.World.Serialiser;
 using OpenSim.Region.CoreModules.ServiceConnectorsOut.Simulation;
 using OpenSim.Tests.Common;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using OpenSim.Services.Interfaces;
 
 namespace OpenSim.Region.Framework.Scenes.Tests
 {
@@ -54,45 +43,45 @@ namespace OpenSim.Region.Framework.Scenes.Tests
     [TestFixture]
     public class ScenePresenceAgentTests : OpenSimTestCase
     {
-//        public Scene scene, scene2, scene3;
-//        public UUID agent1, agent2, agent3;
-//        public static Random random;
-//        public ulong region1, region2, region3;
-//        public AgentCircuitData acd1;
-//        public TestClient testclient;
+        //        public Scene scene, scene2, scene3;
+        //        public UUID agent1, agent2, agent3;
+        //        public static Random random;
+        //        public ulong region1, region2, region3;
+        //        public AgentCircuitData acd1;
+        //        public TestClient testclient;
 
-//        [TestFixtureSetUp]
-//        public void Init()
-//        {
-////            TestHelpers.InMethod();
-////
-////            SceneHelpers sh = new SceneHelpers();
-////
-////            scene = sh.SetupScene("Neighbour x", UUID.Random(), 1000, 1000);
-////            scene2 = sh.SetupScene("Neighbour x+1", UUID.Random(), 1001, 1000);
-////            scene3 = sh.SetupScene("Neighbour x-1", UUID.Random(), 999, 1000);
-////
-////            ISharedRegionModule interregionComms = new LocalSimulationConnectorModule();
-////            interregionComms.Initialise(new IniConfigSource());
-////            interregionComms.PostInitialise();
-////            SceneHelpers.SetupSceneModules(scene, new IniConfigSource(), interregionComms);
-////            SceneHelpers.SetupSceneModules(scene2, new IniConfigSource(), interregionComms);
-////            SceneHelpers.SetupSceneModules(scene3, new IniConfigSource(), interregionComms);
-//
-////            agent1 = UUID.Random();
-////            agent2 = UUID.Random();
-////            agent3 = UUID.Random();
-//
-////            region1 = scene.RegionInfo.RegionHandle;
-////            region2 = scene2.RegionInfo.RegionHandle;
-////            region3 = scene3.RegionInfo.RegionHandle;
-//        }
+        //        [TestFixtureSetUp]
+        //        public void Init()
+        //        {
+        ////            TestHelpers.InMethod();
+        ////
+        ////            SceneHelpers sh = new SceneHelpers();
+        ////
+        ////            scene = sh.SetupScene("Neighbour x", UUID.Random(), 1000, 1000);
+        ////            scene2 = sh.SetupScene("Neighbour x+1", UUID.Random(), 1001, 1000);
+        ////            scene3 = sh.SetupScene("Neighbour x-1", UUID.Random(), 999, 1000);
+        ////
+        ////            ISharedRegionModule interregionComms = new LocalSimulationConnectorModule();
+        ////            interregionComms.Initialise(new IniConfigSource());
+        ////            interregionComms.PostInitialise();
+        ////            SceneHelpers.SetupSceneModules(scene, new IniConfigSource(), interregionComms);
+        ////            SceneHelpers.SetupSceneModules(scene2, new IniConfigSource(), interregionComms);
+        ////            SceneHelpers.SetupSceneModules(scene3, new IniConfigSource(), interregionComms);
+        //
+        ////            agent1 = UUID.Random();
+        ////            agent2 = UUID.Random();
+        ////            agent3 = UUID.Random();
+        //
+        ////            region1 = scene.RegionInfo.RegionHandle;
+        ////            region2 = scene2.RegionInfo.RegionHandle;
+        ////            region3 = scene3.RegionInfo.RegionHandle;
+        //        }
 
         [Test]
         public void TestCreateRootScenePresence()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID spUuid = TestHelpers.ParseTail(0x1);
 
@@ -120,7 +109,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public void TestDupeCompleteMovementCalls()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID spUuid = TestHelpers.ParseTail(0x1);
 
@@ -153,7 +142,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public void TestCreateDuplicateRootScenePresence()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID spUuid = TestHelpers.ParseTail(0x1);
 
@@ -187,7 +176,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public void TestCloseClient()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             TestScene scene = new SceneHelpers().SetupScene();
             ScenePresence sp = SceneHelpers.AddScenePresence(scene, TestHelpers.ParseTail(0x1));
@@ -198,14 +187,14 @@ namespace OpenSim.Region.Framework.Scenes.Tests
             Assert.That(scene.AuthenticateHandler.GetAgentCircuitData(sp.UUID), Is.Null);
             Assert.That(scene.AuthenticateHandler.GetAgentCircuits().Count, Is.EqualTo(0));
 
-//            TestHelpers.DisableLogging();
+            //            TestHelpers.DisableLogging();
         }
 
         [Test]
         public void TestCreateChildScenePresence()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             LocalSimulationConnectorModule lsc = new LocalSimulationConnectorModule();
 
@@ -261,9 +250,9 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public void TestChildAgentEstablishedInNeighbour()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
-//            UUID agent1Id = UUID.Parse("00000000-0000-0000-0000-000000000001");
+            //            UUID agent1Id = UUID.Parse("00000000-0000-0000-0000-000000000001");
 
             TestScene myScene1 = new SceneHelpers().SetupScene("Neighbour y", UUID.Random(), 1000, 1000);
             TestScene myScene2 = new SceneHelpers().SetupScene("Neighbour y + 1", UUID.Random(), 1001, 1000);
@@ -280,12 +269,12 @@ namespace OpenSim.Region.Framework.Scenes.Tests
             EventQueueGetModule eqgm2 = new EventQueueGetModule();
             SceneHelpers.SetupSceneModules(myScene2, configSource, etm, eqgm2);
 
-//            SceneHelpers.AddScenePresence(myScene1, agent1Id);
-//            ScenePresence childPresence = myScene2.GetScenePresence(agent1);
-//
-//            // TODO: Need to do a fair amount of work to allow synchronous establishment of child agents
-//            Assert.That(childPresence, Is.Not.Null);
-//            Assert.That(childPresence.IsChildAgent, Is.True);
+            //            SceneHelpers.AddScenePresence(myScene1, agent1Id);
+            //            ScenePresence childPresence = myScene2.GetScenePresence(agent1);
+            //
+            //            // TODO: Need to do a fair amount of work to allow synchronous establishment of child agents
+            //            Assert.That(childPresence, Is.Not.Null);
+            //            Assert.That(childPresence.IsChildAgent, Is.True);
         }
     }
 }

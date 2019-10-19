@@ -25,9 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace OpenSim.Framework.Console
@@ -92,7 +90,7 @@ namespace OpenSim.Framework.Console
         public void AddToStringBuilder(StringBuilder sb)
         {
             string formatString = GetFormatString();
-//            System.Console.WriteLine("FORMAT STRING [{0}]", formatString);
+            //            System.Console.WriteLine("FORMAT STRING [{0}]", formatString);
 
             // columns
             sb.AppendFormat(formatString, Columns.ConvertAll(c => c.Header).ToArray());

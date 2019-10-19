@@ -25,24 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Xml;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using log4net;
-using OpenSim.Framework;
 using Nini.Config;
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace OpenSim.Framework.Console
 {
     public class Commands : ICommands
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Encapsulates a command that can be invoked from the console
@@ -250,25 +243,25 @@ namespace OpenSim.Framework.Console
             }
         }
 
-//        private List<string> CollectHelp(Dictionary<string, object> dict)
-//        {
-//            List<string> result = new List<string>();
-//
-//            foreach (KeyValuePair<string, object> kvp in dict)
-//            {
-//                if (kvp.Value is Dictionary<string, Object>)
-//                {
-//                    result.AddRange(CollectHelp((Dictionary<string, Object>)kvp.Value));
-//                }
-//                else
-//                {
-//                    if (((CommandInfo)kvp.Value).long_help != String.Empty)
-//                        result.Add(((CommandInfo)kvp.Value).help_text+" - "+
-//                                ((CommandInfo)kvp.Value).long_help);
-//                }
-//            }
-//            return result;
-//        }
+        //        private List<string> CollectHelp(Dictionary<string, object> dict)
+        //        {
+        //            List<string> result = new List<string>();
+        //
+        //            foreach (KeyValuePair<string, object> kvp in dict)
+        //            {
+        //                if (kvp.Value is Dictionary<string, Object>)
+        //                {
+        //                    result.AddRange(CollectHelp((Dictionary<string, Object>)kvp.Value));
+        //                }
+        //                else
+        //                {
+        //                    if (((CommandInfo)kvp.Value).long_help != String.Empty)
+        //                        result.Add(((CommandInfo)kvp.Value).help_text+" - "+
+        //                                ((CommandInfo)kvp.Value).long_help);
+        //                }
+        //            }
+        //            return result;
+        //        }
 
         /// <summary>
         /// Add a command to those which can be invoked from the console.
@@ -352,7 +345,7 @@ namespace OpenSim.Framework.Console
                     m_modulesCommands[module] = commands;
                 }
 
-//                m_log.DebugFormat("[COMMAND CONSOLE]: Adding to category {0} command {1}", module, command);
+                //                m_log.DebugFormat("[COMMAND CONSOLE]: Adding to category {0} command {1}", module, command);
                 commands.Add(info);
             }
         }
@@ -394,7 +387,7 @@ namespace OpenSim.Framework.Console
                 else
                 {
                     break;
-//                    return new string[] {"<cr>"};
+                    //                    return new string[] {"<cr>"};
                 }
             }
 
@@ -420,7 +413,7 @@ namespace OpenSim.Framework.Console
             }
 
             if (current.ContainsKey(String.Empty))
-                return new string[] { "Command help: "+((CommandInfo)current[String.Empty]).help_text};
+                return new string[] { "Command help: " + ((CommandInfo)current[String.Empty]).help_text };
 
             return new string[] { new List<string>(current.Keys)[0] };
         }
@@ -518,11 +511,11 @@ namespace OpenSim.Framework.Console
             ProcessTreeLevel(tree, root, doc);
 
             if (!tree.ContainsKey("help"))
-                tree["help"] = (object) new Dictionary<string, object>();
+                tree["help"] = (object)new Dictionary<string, object>();
             ((Dictionary<string, object>)tree["help"])[String.Empty] = help;
 
             if (!tree.ContainsKey("quit"))
-                tree["quit"] = (object) new Dictionary<string, object>();
+                tree["quit"] = (object)new Dictionary<string, object>();
             ((Dictionary<string, object>)tree["quit"])[String.Empty] = quit;
 
             return root;
@@ -591,11 +584,11 @@ namespace OpenSim.Framework.Console
             ReadTreeLevel(tree, root, fn);
 
             if (!tree.ContainsKey("help"))
-                tree["help"] = (object) new Dictionary<string, object>();
+                tree["help"] = (object)new Dictionary<string, object>();
             ((Dictionary<string, object>)tree["help"])[String.Empty] = help;
 
             if (!tree.ContainsKey("quit"))
-                tree["quit"] = (object) new Dictionary<string, object>();
+                tree["quit"] = (object)new Dictionary<string, object>();
             ((Dictionary<string, object>)tree["quit"])[String.Empty] = quit;
         }
 
@@ -612,40 +605,40 @@ namespace OpenSim.Framework.Console
             {
                 switch (part.Name)
                 {
-                case "Level":
-                    name = ((XmlElement)part).GetAttribute("Name");
-                    next = new Dictionary<string, object>();
-                    level[name] = next;
-                    ReadTreeLevel(next, part, fn);
-                    break;
-                case "Command":
-                    cmdL = part.ChildNodes;
-                    c = new CommandInfo();
-                    foreach (XmlNode cmdPart in cmdL)
-                    {
-                        switch (cmdPart.Name)
+                    case "Level":
+                        name = ((XmlElement)part).GetAttribute("Name");
+                        next = new Dictionary<string, object>();
+                        level[name] = next;
+                        ReadTreeLevel(next, part, fn);
+                        break;
+                    case "Command":
+                        cmdL = part.ChildNodes;
+                        c = new CommandInfo();
+                        foreach (XmlNode cmdPart in cmdL)
                         {
-                        case "Module":
-                            c.module = cmdPart.InnerText;
-                            break;
-                        case "Shared":
-                            c.shared = Convert.ToBoolean(cmdPart.InnerText);
-                            break;
-                        case "HelpText":
-                            c.help_text = cmdPart.InnerText;
-                            break;
-                        case "LongHelp":
-                            c.long_help = cmdPart.InnerText;
-                            break;
-                        case "Description":
-                            c.descriptive_help = cmdPart.InnerText;
-                            break;
+                            switch (cmdPart.Name)
+                            {
+                                case "Module":
+                                    c.module = cmdPart.InnerText;
+                                    break;
+                                case "Shared":
+                                    c.shared = Convert.ToBoolean(cmdPart.InnerText);
+                                    break;
+                                case "HelpText":
+                                    c.help_text = cmdPart.InnerText;
+                                    break;
+                                case "LongHelp":
+                                    c.long_help = cmdPart.InnerText;
+                                    break;
+                                case "Description":
+                                    c.descriptive_help = cmdPart.InnerText;
+                                    break;
+                            }
                         }
-                    }
-                    c.fn = new List<CommandDelegate>();
-                    c.fn.Add(fn);
-                    level[String.Empty] = c;
-                    break;
+                        c.fn = new List<CommandDelegate>();
+                        c.fn.Add(fn);
+                        level[String.Empty] = c;
+                        break;
                 }
             }
         }
@@ -664,13 +657,13 @@ namespace OpenSim.Framework.Console
 
             int index;
 
-            string[] unquoted = text.Split(new char[] {'"'});
+            string[] unquoted = text.Split(new char[] { '"' });
 
-            for (index = 0 ; index < unquoted.Length ; index++)
+            for (index = 0; index < unquoted.Length; index++)
             {
                 if (index % 2 == 0)
                 {
-                    string[] words = unquoted[index].Split(new char[] {' '});
+                    string[] words = unquoted[index].Split(new char[] { ' ' });
 
                     bool option = false;
                     foreach (string w in words)
@@ -720,7 +713,7 @@ namespace OpenSim.Framework.Console
     /// </summary>
     public class CommandConsole : ConsoleBase, ICommandConsole
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public event OnOutputDelegate OnOutput;
 
@@ -780,7 +773,7 @@ namespace OpenSim.Framework.Console
                 {
                     int i;
 
-                    for (i=0 ; i < cmd.Length ; i++)
+                    for (i = 0; i < cmd.Length; i++)
                     {
                         if (cmd[i].Contains(" "))
                             cmd[i] = "\"" + cmd[i] + "\"";

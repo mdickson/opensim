@@ -25,14 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
 using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Reflection;
-using System.Text;
-using log4net;
 
 namespace OpenSim.Framework
 {
@@ -58,7 +57,7 @@ namespace OpenSim.Framework
         }
 
         // IPv4Address, Subnet
-        static readonly Dictionary<IPAddress,IPAddress> m_subnets = new Dictionary<IPAddress, IPAddress>();
+        static readonly Dictionary<IPAddress, IPAddress> m_subnets = new Dictionary<IPAddress, IPAddress>();
 
         public static IPAddress GetIPFor(IPAddress user, IPAddress simulator)
         {
@@ -151,7 +150,7 @@ namespace OpenSim.Framework
 
                 bool valid = true;
 
-                for (int i=0;i<subnetBytes.Length;i++)
+                for (int i = 0; i < subnetBytes.Length; i++)
                 {
                     if ((localBytes[i] & subnetBytes[i]) != (destBytes[i] & subnetBytes[i]))
                     {

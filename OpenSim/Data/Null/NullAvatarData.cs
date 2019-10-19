@@ -25,12 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Data;
+using System.Collections.Generic;
 
 namespace OpenSim.Data.Null
 {
@@ -66,8 +62,8 @@ namespace OpenSim.Data.Null
         {
             if (m_DataByUUID.ContainsKey(principalID) && m_DataByUUID[principalID].Data.ContainsKey(name))
             {
-                    m_DataByUUID[principalID].Data.Remove(name);
-                    return true;
+                m_DataByUUID[principalID].Data.Remove(name);
+                return true;
             }
 
             return false;

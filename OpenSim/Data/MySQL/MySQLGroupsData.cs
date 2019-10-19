@@ -25,16 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-
-using OpenSim.Framework;
-using OpenSim.Data.MySQL;
-
-using OpenMetaverse;
 using MySql.Data.MySqlClient;
+using OpenMetaverse;
+using OpenSim.Framework;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Data.MySQL
 {
@@ -90,7 +85,7 @@ namespace OpenSim.Data.MySQL
             else
                 pattern = string.Format("Name LIKE '%{0}%'", MySqlHelper.EscapeString(pattern));
 
-            return m_Groups.Get(string.Format("ShowInList=1 AND ({0}) ORDER BY Name LIMIT 100", pattern));
+            return m_Groups.Get(string.Format("ShowInList=1 AND ({0})", pattern));
         }
 
         public bool DeleteGroup(UUID groupID)
@@ -228,7 +223,7 @@ namespace OpenSim.Data.MySQL
 
         public bool DeleteRoleMember(RoleMembershipData data)
         {
-            return m_RoleMembership.Delete(new string[] { "GroupID", "RoleID", "PrincipalID"},
+            return m_RoleMembership.Delete(new string[] { "GroupID", "RoleID", "PrincipalID" },
                                            new string[] { data.GroupID.ToString(), data.RoleID.ToString(), data.PrincipalID });
         }
 

@@ -25,16 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 using Mono.Data.SqliteClient;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Framework.Monitoring;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
 
 
 namespace OpenSim.Region.UserStatistics
@@ -55,8 +53,8 @@ namespace OpenSim.Region.UserStatistics
             List<Scene> m_scene = (List<Scene>)pParams["Scenes"];
 
             stats_default_page_values mData = rep_DefaultReport_data(conn, m_scene);
-            mData.sim_stat_data = (Dictionary<UUID,USimStatsData>)pParams["SimStats"];
-            mData.stats_reports = (Dictionary<string, IStatsController>) pParams["Reports"];
+            mData.sim_stat_data = (Dictionary<UUID, USimStatsData>)pParams["SimStats"];
+            mData.stats_reports = (Dictionary<string, IStatsController>)pParams["Reports"];
 
             Hashtable nh = new Hashtable();
             nh.Add("hdata", mData);
@@ -67,7 +65,7 @@ namespace OpenSim.Region.UserStatistics
 
         public string RenderView(Hashtable pModelResult)
         {
-            stats_default_page_values mData = (stats_default_page_values) pModelResult["hdata"];
+            stats_default_page_values mData = (stats_default_page_values)pModelResult["hdata"];
             return rep_Default_report_view(mData);
         }
 
@@ -245,8 +243,9 @@ TD.align_top { vertical-align: top; }
         /// </summary>
         /// <param name="pModelResult"></param>
         /// <returns></returns>
-        public string RenderJson(Hashtable pModelResult) {
-            stats_default_page_values values = (stats_default_page_values) pModelResult["hdata"];
+        public string RenderJson(Hashtable pModelResult)
+        {
+            stats_default_page_values values = (stats_default_page_values)pModelResult["hdata"];
 
             OSDMap summaryInfo = new OSDMap();
             summaryInfo.Add("totalUsers", new OSDString(values.total_num_users.ToString()));

@@ -24,18 +24,16 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Client;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
 {
@@ -57,7 +55,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
         private string m_RestURL = String.Empty;
         IMessageTransferModule m_TransferModule = null;
         private bool m_ForwardOfflineGroupMessages = true;
-        private Dictionary<IClientAPI, List<UUID>> m_repliesSent= new Dictionary<IClientAPI, List<UUID>>();
+        private Dictionary<IClientAPI, List<UUID>> m_repliesSent = new Dictionary<IClientAPI, List<UUID>>();
 
         public void Initialise(IConfigSource config)
         {
@@ -246,7 +244,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
                     return;
             }
 
-            if(m_UseNewAvnCode)
+            if (m_UseNewAvnCode)
             {
                 Scene scene = FindScene(new UUID(im.fromAgentID));
                 if (scene == null)
@@ -254,7 +252,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
 
                 UUID scopeID = scene.RegionInfo.ScopeID;
                 SendReply reply = SynchronousRestObjectRequester.MakeRequest<GridInstantMessage, SendReply>(
-                    "POST", m_RestURL+"/SaveMessage/?scope=" + scopeID.ToString(), im, 20000);
+                    "POST", m_RestURL + "/SaveMessage/?scope=" + scopeID.ToString(), im, 20000);
 
                 if (im.dialog == (byte)InstantMessageDialog.MessageFromAgent)
                 {
@@ -272,7 +270,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
                         case 0: // Normal
                             break;
                         case 1: // Only once per user
-                           if (m_repliesSent.ContainsKey(client) && m_repliesSent[client].Contains(new UUID(im.toAgentID)))
+                            if (m_repliesSent.ContainsKey(client) && m_repliesSent[client].Contains(new UUID(im.toAgentID)))
                                 sendReply = false;
                             else
                             {
@@ -297,7 +295,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
             else
             {
                 bool success = SynchronousRestObjectRequester.MakeRequest<GridInstantMessage, bool>(
-                    "POST", m_RestURL+"/SaveMessage/", im, 20000);
+                    "POST", m_RestURL + "/SaveMessage/", im, 20000);
 
                 if (im.dialog == (byte)InstantMessageDialog.MessageFromAgent)
                 {
@@ -309,7 +307,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
                         null, new UUID(im.toAgentID),
                         "System", new UUID(im.fromAgentID),
                         (byte)InstantMessageDialog.MessageFromAgent,
-                        "User is not logged in. "+
+                        "User is not logged in. " +
                         (success ? "Message saved." : "Message not saved"),
                         false, new Vector3()));
                 }

@@ -25,14 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.IO;
-using System.Reflection;
-using OpenMetaverse;
 using log4net;
+using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Xml;
 using PermissionMask = OpenSim.Framework.PermissionMask;
 
@@ -113,9 +112,9 @@ namespace OpenSim.Region.Framework.Scenes
         /// <returns></returns>
         public bool AddInventoryItem(UUID agentID, uint localID, InventoryItemBase item, UUID copyItemID, bool withModRights = true)
         {
-//            m_log.DebugFormat(
-//                "[PRIM INVENTORY]: Adding inventory item {0} from {1} to part with local ID {2}",
-//                item.Name, remoteClient.Name, localID);
+            //            m_log.DebugFormat(
+            //                "[PRIM INVENTORY]: Adding inventory item {0} from {1} to part with local ID {2}",
+            //                item.Name, remoteClient.Name, localID);
 
             UUID newItemId = (copyItemID != UUID.Zero) ? copyItemID : item.ID;
 
@@ -167,17 +166,17 @@ namespace OpenSim.Region.Framework.Scenes
 
             taskItem.Flags = item.Flags;
 
-//                m_log.DebugFormat(
-//                    "[PRIM INVENTORY]: Flags are 0x{0:X} for item {1} added to part {2} by {3}",
-//                    taskItem.Flags, taskItem.Name, localID, remoteClient.Name);
+            //                m_log.DebugFormat(
+            //                    "[PRIM INVENTORY]: Flags are 0x{0:X} for item {1} added to part {2} by {3}",
+            //                    taskItem.Flags, taskItem.Name, localID, remoteClient.Name);
 
             // TODO: These are pending addition of those fields to TaskInventoryItem
-//                taskItem.SalePrice = item.SalePrice;
-//                taskItem.SaleType = item.SaleType;
+            //                taskItem.SalePrice = item.SalePrice;
+            //                taskItem.SaleType = item.SaleType;
             taskItem.CreationDate = (uint)item.CreationDate;
-                
+
             bool addFromAllowedDrop;
-            if(withModRights)
+            if (withModRights)
                 addFromAllowedDrop = false;
             else
                 addFromAllowedDrop = (part.ParentGroup.RootPart.GetEffectiveObjectFlags() & (uint)PrimFlags.AllowInventoryDrop) != 0;
@@ -260,14 +259,14 @@ namespace OpenSim.Region.Framework.Scenes
         // in case of doubt call InvalidateDeepEffectivePerms(), it only costs a bit more cpu time
         public void InvalidateEffectivePerms()
         {
-            lock(m_PermissionsLock)
+            lock (m_PermissionsLock)
                 m_EffectivePermsInvalid = true;
         }
 
         // should called when parts chanced and their contents where accounted for
         public void InvalidateDeepEffectivePerms()
         {
-            lock(m_PermissionsLock)
+            lock (m_PermissionsLock)
             {
                 m_DeepEffectivePermsInvalid = true;
                 m_EffectivePermsInvalid = true;
@@ -279,9 +278,9 @@ namespace OpenSim.Region.Framework.Scenes
         {
             get
             {
-                lock(m_PermissionsLock)
+                lock (m_PermissionsLock)
                 {
-                    if(m_EffectivePermsInvalid)
+                    if (m_EffectivePermsInvalid)
                         AggregatePerms();
                     return m_EffectiveEveryOnePerms;
                 }
@@ -293,9 +292,9 @@ namespace OpenSim.Region.Framework.Scenes
         {
             get
             {
-                lock(m_PermissionsLock)
+                lock (m_PermissionsLock)
                 {
-                    if(m_EffectivePermsInvalid)
+                    if (m_EffectivePermsInvalid)
                         AggregatePerms();
                     return m_EffectiveGroupPerms;
                 }
@@ -307,9 +306,9 @@ namespace OpenSim.Region.Framework.Scenes
         {
             get
             {
-                lock(m_PermissionsLock)
+                lock (m_PermissionsLock)
                 {
-                    if(m_EffectivePermsInvalid)
+                    if (m_EffectivePermsInvalid)
                         AggregatePerms();
                     return m_EffectiveGroupOrEveryOnePerms;
                 }
@@ -321,9 +320,9 @@ namespace OpenSim.Region.Framework.Scenes
         {
             get
             {
-                lock(m_PermissionsLock)
+                lock (m_PermissionsLock)
                 {
-                    if(m_EffectivePermsInvalid)
+                    if (m_EffectivePermsInvalid)
                         AggregatePerms();
                     return m_EffectiveOwnerPerms;
                 }
@@ -332,7 +331,7 @@ namespace OpenSim.Region.Framework.Scenes
 
         public void AggregatePerms()
         {
-            lock(m_PermissionsLock)
+            lock (m_PermissionsLock)
             {
                 // aux
                 const uint allmask = (uint)PermissionMask.AllEffective;
@@ -357,24 +356,24 @@ namespace OpenSim.Region.Framework.Scenes
                 {
                     SceneObjectPart part = parts[i];
 
-                    if(m_DeepEffectivePermsInvalid)
+                    if (m_DeepEffectivePermsInvalid)
                         part.AggregatedInnerPermsForGroup();
 
-                    owner &= part.AggregatedInnerOwnerPerms; 
+                    owner &= part.AggregatedInnerOwnerPerms;
                     group &= part.AggregatedInnerGroupPerms;
-                    if(newobj)
+                    if (newobj)
                         group &= part.AggregatedInnerGroupPerms;
-                    if(newobj)
+                    if (newobj)
                         everyone &= part.AggregatedInnerEveryonePerms;
                 }
                 // recover modify and move
                 rootOwnerPerms &= movemodmask;
                 owner |= rootOwnerPerms;
-                if((owner & copytransfermast) == 0)
+                if ((owner & copytransfermast) == 0)
                     owner |= (uint)PermissionMask.Transfer;
 
                 owner &= basePerms;
-                if(owner != m_EffectiveOwnerPerms)
+                if (owner != m_EffectiveOwnerPerms)
                 {
                     needUpdate = true;
                     m_EffectiveOwnerPerms = owner;
@@ -385,14 +384,14 @@ namespace OpenSim.Region.Framework.Scenes
                 // recover modify and move
                 rootGroupPerms &= movemodmask;
                 group |= rootGroupPerms;
-                if(noBaseTransfer)
-                    group &=~(uint)PermissionMask.Copy;
+                if (noBaseTransfer)
+                    group &= ~(uint)PermissionMask.Copy;
                 else
                     group |= ownertransfermask;
 
                 uint groupOrEveryone = group;
                 uint tmpPerms = group & owner;
-                if(tmpPerms != m_EffectiveGroupPerms)
+                if (tmpPerms != m_EffectiveGroupPerms)
                 {
                     needUpdate = true;
                     m_EffectiveGroupPerms = tmpPerms;
@@ -402,22 +401,22 @@ namespace OpenSim.Region.Framework.Scenes
                 rootEveryonePerms &= (uint)PermissionMask.Move;
                 everyone |= rootEveryonePerms;
                 everyone &= ~(uint)PermissionMask.Modify;
-                if(noBaseTransfer)
-                    everyone &=~(uint)PermissionMask.Copy;
+                if (noBaseTransfer)
+                    everyone &= ~(uint)PermissionMask.Copy;
                 else
                     everyone |= ownertransfermask;
 
                 groupOrEveryone |= everyone;
 
-                tmpPerms = everyone  & owner;
-                if(tmpPerms != m_EffectiveEveryOnePerms)
+                tmpPerms = everyone & owner;
+                if (tmpPerms != m_EffectiveEveryOnePerms)
                 {
                     needUpdate = true;
                     m_EffectiveEveryOnePerms = tmpPerms;
                 }
 
-                tmpPerms = groupOrEveryone  & owner;
-                if(tmpPerms != m_EffectiveGroupOrEveryOnePerms)
+                tmpPerms = groupOrEveryone & owner;
+                if (tmpPerms != m_EffectiveGroupOrEveryOnePerms)
                 {
                     needUpdate = true;
                     m_EffectiveGroupOrEveryOnePerms = tmpPerms;
@@ -425,15 +424,15 @@ namespace OpenSim.Region.Framework.Scenes
 
                 m_DeepEffectivePermsInvalid = false;
                 m_EffectivePermsInvalid = false;
-              
-                if(needUpdate)
+
+                if (needUpdate)
                     RootPart.ScheduleFullUpdate();
             }
         }
 
         public uint CurrentAndFoldedNextPermissions()
         {
-            uint perms=(uint)(PermissionMask.Modify |
+            uint perms = (uint)(PermissionMask.Modify |
                               PermissionMask.Copy |
                               PermissionMask.Move |
                               PermissionMask.Transfer |
@@ -463,7 +462,7 @@ namespace OpenSim.Region.Framework.Scenes
 
         public void ApplyNextOwnerPermissions()
         {
-//            m_log.DebugFormat("[PRIM INVENTORY]: Applying next owner permissions to {0} {1}", Name, UUID);
+            //            m_log.DebugFormat("[PRIM INVENTORY]: Applying next owner permissions to {0} {1}", Name, UUID);
 
             SceneObjectPart[] parts = m_parts.GetArray();
             for (int i = 0; i < parts.Length; i++)

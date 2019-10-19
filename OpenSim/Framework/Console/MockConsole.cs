@@ -25,12 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Threading;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml;
 using Nini.Config;
+using System.Collections.Generic;
+using System.Xml;
 
 namespace OpenSim.Framework.Console
 {
@@ -51,20 +48,24 @@ namespace OpenSim.Framework.Console
 
         public string DefaultPrompt { get; set; }
 
-        public void Prompt() {}
+        public void Prompt() { }
 
-        public void RunCommand(string cmd) {}
+        public void RunCommand(string cmd) { }
 
         public string ReadLine(string p, bool isCommand, bool e) { return ""; }
 
-        public IScene ConsoleScene {
+        public IScene ConsoleScene
+        {
             get { return null; }
-            set {}
+            set { }
         }
 
-        public void Output(string format, string level, params object[] components) {}
+        public void Output(string format, params object[] components) { }
+        public void Output(string format, string level, params object[] components) { }
 
         public string Prompt(string p) { return ""; }
+        public string Prompt(string p, string def) { return ""; }
+        public string Prompt(string p, List<char> excludedCharacters) { return ""; }
         public string Prompt(string p, string def, List<char> excludedCharacters, bool echo) { return ""; }
 
         public string Prompt(string prompt, string defaultresponse, List<string> options) { return ""; }
@@ -76,10 +77,10 @@ namespace OpenSim.Framework.Console
 
     public class MockCommands : ICommands
     {
-        public void FromXml(XmlElement root, CommandDelegate fn) {}
+        public void FromXml(XmlElement root, CommandDelegate fn) { }
         public List<string> GetHelp(string[] cmd) { return null; }
-        public void AddCommand(string module, bool shared, string command, string help, string longhelp, CommandDelegate fn) {}
-        public void AddCommand(string module, bool shared, string command, string help, string longhelp, string descriptivehelp, CommandDelegate fn) {}
+        public void AddCommand(string module, bool shared, string command, string help, string longhelp, CommandDelegate fn) { }
+        public void AddCommand(string module, bool shared, string command, string help, string longhelp, string descriptivehelp, CommandDelegate fn) { }
         public string[] FindNextOption(string[] cmd, bool term) { return null; }
         public bool HasCommand(string cmd) { return false; }
         public string[] Resolve(string[] cmd) { return null; }

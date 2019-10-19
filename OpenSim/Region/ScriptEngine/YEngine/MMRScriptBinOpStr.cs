@@ -25,15 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
-using OpenSim.Region.ScriptEngine.Yengine;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Text;
 using System.Text.RegularExpressions;
+using OpenSim.Region.ScriptEngine.Shared;
 
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
 using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
@@ -120,6 +117,10 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         private static MethodInfo infoMethVecDivInt = GetBinOpsMethod("MethVecDivInt", new Type[] { typeof(LSL_Vector), typeof(int) });
         private static MethodInfo infoMethVecMulRot = GetBinOpsMethod("MethVecMulRot", new Type[] { typeof(LSL_Vector), typeof(LSL_Rotation) });
         private static MethodInfo infoMethVecDivRot = GetBinOpsMethod("MethVecDivRot", new Type[] { typeof(LSL_Vector), typeof(LSL_Rotation) });
+        private static MethodInfo infoMethDoubleDivDouble = GetBinOpsMethod("MethDoubleDivDouble", new Type[] { typeof(Double), typeof(Double) });
+        private static MethodInfo infoMethLongDivLong = GetBinOpsMethod("MethLongDivLong", new Type[] { typeof(long), typeof(long) });
+        private static MethodInfo infoMethDoubleModDouble = GetBinOpsMethod("MethDoubleModDouble", new Type[] { typeof(Double), typeof(Double) });
+        private static MethodInfo infoMethLongModLong = GetBinOpsMethod("MethLongModLong", new Type[] { typeof(long), typeof(long) });
 
         private static MethodInfo GetBinOpsMethod(string name, Type[] types)
         {
@@ -145,9 +146,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
              * Get the && and || all out of the way...
              * Simply cast their left and right operands to boolean then process.
              */
-            for(int i = 0; i < booltypes.Length; i++)
+            for (int i = 0; i < booltypes.Length; i++)
             {
-                for(int j = 0; j < booltypes.Length; j++)
+                for (int j = 0; j < booltypes.Length; j++)
                 {
                     bos.Add(booltypes[i] + "&&" + booltypes[j],
                              new BinOpStr(typeof(bool), BinOpStrAndAnd));
@@ -225,7 +226,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             // This lets us do things like 3.5 * (x > 0).
 
             Dictionary<string, BinOpStr> bos2 = new Dictionary<string, BinOpStr>();
-            foreach(KeyValuePair<string, BinOpStr> kvp in bos)
+            foreach (KeyValuePair<string, BinOpStr> kvp in bos)
             {
                 string key = kvp.Key;
                 BinOpStr val = kvp.Value;
@@ -233,36 +234,36 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
             Regex wordReg = new Regex("\\w+");
             Regex opReg = new Regex("\\W+");
-            foreach(KeyValuePair<string, BinOpStr> kvp in bos)
+            foreach (KeyValuePair<string, BinOpStr> kvp in bos)
             {
                 string key = kvp.Key;
                 BinOpStr val = kvp.Value;
                 MatchCollection matches = wordReg.Matches(key);
-                if(matches.Count != 2)
+                if (matches.Count != 2)
                     continue;
                 Match opM = opReg.Match(key);
-                if(!opM.Success)
+                if (!opM.Success)
                     continue;
                 string left = matches[0].Value;
                 string right = matches[1].Value;
                 string op = opM.Value;
                 string key2;
-                if(left == "integer" && right == "integer")
+                if (left == "integer" && right == "integer")
                 {
                     key2 = "bool" + op + "bool";
-                    if(!bos2.ContainsKey(key2))
+                    if (!bos2.ContainsKey(key2))
                         bos2.Add(key2, val);
                     key2 = "bool" + op + "integer";
-                    if(!bos2.ContainsKey(key2))
+                    if (!bos2.ContainsKey(key2))
                         bos2.Add(key2, val);
                     key2 = "integer" + op + "bool";
-                    if(!bos2.ContainsKey(key2))
+                    if (!bos2.ContainsKey(key2))
                         bos2.Add(key2, val);
                 }
                 else
                 {
                     key2 = key.Replace("integer", "bool");
-                    if(!bos2.ContainsKey(key2))
+                    if (!bos2.ContainsKey(key2))
                         bos2.Add(key2, val);
                 }
             }
@@ -589,7 +590,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             result.PopPre(scg, errorAt);
             left.PushVal(scg, errorAt, tokenTypeFloat);
             right.PushVal(scg, errorAt, tokenTypeFloat);
-            scg.ilGen.Emit(errorAt, OpCodes.Div);
+            //scg.ilGen.Emit(errorAt, OpCodes.Div);
+            scg.ilGen.Emit(errorAt, OpCodes.Call, infoMethDoubleDivDouble);
             result.PopPost(scg, errorAt, tokenTypeFloat);
         }
 
@@ -598,7 +600,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             result.PopPre(scg, errorAt);
             left.PushVal(scg, errorAt, tokenTypeFloat);
             right.PushVal(scg, errorAt, tokenTypeFloat);
-            scg.ilGen.Emit(errorAt, OpCodes.Rem);
+            //scg.ilGen.Emit(errorAt, OpCodes.Rem);
+            scg.ilGen.Emit(errorAt, OpCodes.Call, infoMethDoubleModDouble);
             result.PopPost(scg, errorAt, tokenTypeFloat);
         }
 
@@ -694,7 +697,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             result.PopPre(scg, errorAt);
             left.PushVal(scg, errorAt, tokenTypeFloat);
             right.PushVal(scg, errorAt, tokenTypeFloat);
-            scg.ilGen.Emit(errorAt, OpCodes.Div);
+            //scg.ilGen.Emit(errorAt, OpCodes.Div);
+            scg.ilGen.Emit(errorAt, OpCodes.Call, infoMethDoubleDivDouble);
             result.PopPost(scg, errorAt, tokenTypeFloat);
         }
 
@@ -703,7 +707,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             result.PopPre(scg, errorAt);
             left.PushVal(scg, errorAt, tokenTypeFloat);
             right.PushVal(scg, errorAt, tokenTypeFloat);
-            scg.ilGen.Emit(errorAt, OpCodes.Rem);
+            //scg.ilGen.Emit(errorAt, OpCodes.Rem);
+            scg.ilGen.Emit(errorAt, OpCodes.Call, infoMethDoubleModDouble);
             result.PopPost(scg, errorAt, tokenTypeFloat);
         }
 
@@ -917,7 +922,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             scg.ilGen.Emit(errorAt, OpCodes.Conv_I8);
             right.PushVal(scg, errorAt, tokenTypeInt);
             scg.ilGen.Emit(errorAt, OpCodes.Conv_I8);
-            scg.ilGen.Emit(errorAt, OpCodes.Div);
+            //scg.ilGen.Emit(errorAt, OpCodes.Div);
+            scg.ilGen.Emit(errorAt, OpCodes.Call, infoMethLongDivLong);
             scg.ilGen.Emit(errorAt, OpCodes.Conv_I4);
             result.PopPost(scg, errorAt, tokenTypeInt);
         }
@@ -931,7 +937,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             scg.ilGen.Emit(errorAt, OpCodes.Conv_I8);
             right.PushVal(scg, errorAt, tokenTypeInt);
             scg.ilGen.Emit(errorAt, OpCodes.Conv_I8);
-            scg.ilGen.Emit(errorAt, OpCodes.Rem);
+            //scg.ilGen.Emit(errorAt, OpCodes.Rem);
+            scg.ilGen.Emit(errorAt, OpCodes.Call, infoMethLongModLong);
             scg.ilGen.Emit(errorAt, OpCodes.Conv_I4);
             result.PopPost(scg, errorAt, tokenTypeInt);
         }
@@ -1572,6 +1579,46 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public static LSL_Vector MethVecDivRot(LSL_Vector left, LSL_Rotation right)
         {
             return left / right;
+        }
+
+        public static double MethDoubleDivDouble(double a, double b)
+        {
+            double r = a / b;
+            if (double.IsNaN(r) || double.IsInfinity(r))
+                throw new ScriptException("Division by Zero");
+            return r;
+        }
+
+        public static long MethLongDivLong(long a, long b)
+        {
+            try
+            {
+                return a / b;
+            }
+            catch (DivideByZeroException)
+            {
+                throw new ScriptException("Division by Zero");
+            }
+        }
+
+        public static double MethDoubleModDouble(double a, double b)
+        {
+            double r = a % b;
+            if (double.IsNaN(r) || double.IsInfinity(r))
+                throw new ScriptException("Division by Zero");
+            return r;
+        }
+
+        public static long MethLongModLong(long a, long b)
+        {
+            try
+            {
+                return a % b;
+            }
+            catch (DivideByZeroException)
+            {
+                throw new ScriptException("Division by Zero");
+            }
         }
     }
 }

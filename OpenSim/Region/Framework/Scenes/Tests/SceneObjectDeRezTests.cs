@@ -25,9 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
@@ -36,9 +33,9 @@ using OpenSim.Region.CoreModules.Framework.EntityTransfer;
 using OpenSim.Region.CoreModules.Framework.InventoryAccess;
 using OpenSim.Region.CoreModules.ServiceConnectorsOut.Simulation;
 using OpenSim.Region.CoreModules.World.Permissions;
-using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
 using OpenSim.Tests.Common;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.Framework.Scenes.Tests
 {
@@ -100,12 +97,12 @@ namespace OpenSim.Region.Framework.Scenes.Tests
 
             // Check that object isn't deleted until we crank the sogd handle.
             SceneObjectPart retrievedPart = scene.GetSceneObjectPart(so.LocalId);
-//            Assert.That(retrievedPart, Is.Not.Null);
-//            Assert.That(retrievedPart.ParentGroup.IsDeleted, Is.False);
+            //            Assert.That(retrievedPart, Is.Not.Null);
+            //            Assert.That(retrievedPart.ParentGroup.IsDeleted, Is.False);
 
             sogd.InventoryDeQueueAndDelete();
 
-//            SceneObjectPart retrievedPart2 = scene.GetSceneObjectPart(so.LocalId);
+            //            SceneObjectPart retrievedPart2 = scene.GetSceneObjectPart(so.LocalId);
             Assert.That(retrievedPart, Is.Null);
         }
 
@@ -116,7 +113,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public void TestDeRezSceneObjectToAgents()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             SceneHelpers sh = new SceneHelpers();
             TestScene sceneA = sh.SetupScene("sceneA", TestHelpers.ParseTail(0x100), 1000, 1000);
@@ -165,7 +162,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public void TestDeRezSceneObjectNotOwner()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             UUID userId = UUID.Parse("10000000-0000-0000-0000-000000000001");
             UUID objectOwnerId = UUID.Parse("20000000-0000-0000-0000-000000000001");
@@ -203,7 +200,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public void TestDeleteSceneObjectAsyncToUserInventory()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID agentId = UUID.Parse("00000000-0000-0000-0000-000000000001");
             string myObjectName = "Fred";
@@ -231,10 +228,10 @@ namespace OpenSim.Region.Framework.Scenes.Tests
             IClientAPI client = SceneHelpers.AddScenePresence(scene, agentId).ControllingClient;
             scene.DeRezObjects(client, new List<uint>() { so.LocalId }, UUID.Zero, DeRezAction.Take, folder1.ID);
 
-//            SceneObjectPart retrievedPart = scene.GetSceneObjectPart(so.LocalId);
+            //            SceneObjectPart retrievedPart = scene.GetSceneObjectPart(so.LocalId);
 
-//            Assert.That(retrievedPart, Is.Not.Null);
-//            Assert.That(so.IsDeleted, Is.False);
+            //            Assert.That(retrievedPart, Is.Not.Null);
+            //            Assert.That(so.IsDeleted, Is.False);
 
             sogd.InventoryDeQueueAndDelete();
 
@@ -243,7 +240,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
             SceneObjectPart retrievedPart2 = scene.GetSceneObjectPart(so.LocalId);
             Assert.That(retrievedPart2, Is.Null);
 
-//            SceneSetupHelpers.DeleteSceneObjectAsync(scene, part, DeRezAction.Take, userInfo.RootFolder.ID, client);
+            //            SceneSetupHelpers.DeleteSceneObjectAsync(scene, part, DeRezAction.Take, userInfo.RootFolder.ID, client);
 
             InventoryItemBase retrievedItem
                 = UserInventoryHelpers.GetInventoryItem(
@@ -253,8 +250,8 @@ namespace OpenSim.Region.Framework.Scenes.Tests
             Assert.That(retrievedItem, Is.Not.Null);
 
             // Check that the taken part has actually disappeared
-//            SceneObjectPart retrievedPart = scene.GetSceneObjectPart(part.LocalId);
-//            Assert.That(retrievedPart, Is.Null);
+            //            SceneObjectPart retrievedPart = scene.GetSceneObjectPart(part.LocalId);
+            //            Assert.That(retrievedPart, Is.Null);
         }
     }
 }

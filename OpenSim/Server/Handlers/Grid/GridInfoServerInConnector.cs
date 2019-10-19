@@ -25,13 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using log4net;
-using OpenMetaverse;
 using Nini.Config;
-using OpenSim.Framework;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Server.Handlers.Base;
 
@@ -39,7 +33,7 @@ namespace OpenSim.Server.Handlers.Grid
 {
     public class GridInfoServerInConnector : ServiceConnector
     {
-//        private string m_ConfigName = "GridInfoService";
+        //        private string m_ConfigName = "GridInfoService";
 
         public GridInfoServerInConnector(IConfigSource config, IHttpServer server, string configName) :
             base(config, server, configName)

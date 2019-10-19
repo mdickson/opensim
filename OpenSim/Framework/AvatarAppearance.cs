@@ -25,13 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
+using log4net;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using log4net;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Framework
 {
@@ -51,27 +50,28 @@ namespace OpenSim.Framework
 
         // this is viewer capabilities and weared things dependent
         // should be only used as initial default value ( V1 viewers )
-        public readonly static int VISUALPARAM_COUNT = 218;
+        public const int VISUALPARAM_COUNT = 218;
 
-//        public readonly static int TEXTURE_COUNT = 21
-        // 21 bad, make it be updated as libovm gets update
-        // also keeping in sync with it
-        public readonly static int TEXTURE_COUNT = Primitive.TextureEntry.MAX_FACES;
+        // regions and viewer compatibility
+        public readonly static int TEXTURE_COUNT = 45;
+        public const int TEXTURE_COUNT_PV7 = 26;
+        public const int BAKES_COUNT_PV7 = 6;
+        public const int MAXWEARABLE_PV7 = 16;
+        public const int MAXWEARABLE_LEGACY = 15;
 
-        public readonly static byte[] BAKE_INDICES = new byte[] { 8, 9, 10, 11, 19, 20 };
+        public readonly static byte[] BAKE_INDICES = new byte[] { 8, 9, 10, 11, 19, 20, 40, 41, 42, 43, 44 };
 
         protected int m_serial = 0;
         protected byte[] m_visualparams;
         protected Primitive.TextureEntry m_texture;
         protected AvatarWearable[] m_wearables;
         protected Dictionary<int, List<AvatarAttachment>> m_attachments;
-        protected float m_avatarHeight = 0;
+        protected WearableCacheItem[] m_cacheitems;
         protected Vector3 m_avatarSize = new Vector3(0.45f, 0.6f, 1.9f); // sl Z cloud value
         protected Vector3 m_avatarBoxSize = new Vector3(0.45f, 0.6f, 1.9f);
+        protected float m_avatarHeight = 0;
         protected float m_avatarFeetOffset = 0;
         protected float m_avatarAnimOffset = 0;
-        protected WearableCacheItem[] m_cacheitems;
-        protected bool m_cacheItemsDirty = true;
 
         public virtual int Serial
         {
@@ -105,7 +105,7 @@ namespace OpenSim.Framework
             get { return m_texture; }
             set
             {
-//                m_log.DebugFormat("[AVATAR APPEARANCE]: Set TextureEntry to {0}", value);
+                //                m_log.DebugFormat("[AVATAR APPEARANCE]: Set TextureEntry to {0}", value);
                 m_texture = value;
             }
         }
@@ -128,36 +128,32 @@ namespace OpenSim.Framework
             set { m_cacheitems = value; }
         }
 
-        public virtual bool WearableCacheItemsDirty
-        {
-            get { return m_cacheItemsDirty; }
-            set { m_cacheItemsDirty = value; }
-        }
+        public virtual float AvatarPreferencesHoverZ { get; set; }
 
         public AvatarAppearance()
         {
-//            m_log.WarnFormat("[AVATAR APPEARANCE]: create empty appearance");
+            //            m_log.WarnFormat("[AVATAR APPEARANCE]: create empty appearance");
 
             m_serial = 0;
             SetDefaultWearables();
             SetDefaultTexture();
             SetDefaultParams();
-//            SetHeight();
-            SetSize(new Vector3(0.45f,0.6f,1.9f));
+            //            SetHeight();
+            SetSize(new Vector3(0.45f, 0.6f, 1.9f));
             m_attachments = new Dictionary<int, List<AvatarAttachment>>();
         }
 
         public AvatarAppearance(OSDMap map)
         {
-//            m_log.WarnFormat("[AVATAR APPEARANCE]: create appearance from OSDMap");
+            //            m_log.WarnFormat("[AVATAR APPEARANCE]: create appearance from OSDMap");
 
             Unpack(map);
-//            SetHeight(); done in Unpack
+            //            SetHeight(); done in Unpack
         }
 
         public AvatarAppearance(AvatarWearable[] wearables, Primitive.TextureEntry textureEntry, byte[] visualParams)
         {
-//            m_log.WarnFormat("[AVATAR APPEARANCE] create initialized appearance");
+            //            m_log.WarnFormat("[AVATAR APPEARANCE] create initialized appearance");
 
             m_serial = 0;
 
@@ -176,14 +172,14 @@ namespace OpenSim.Framework
             else
                 SetDefaultParams();
 
-//            SetHeight();
-            if(m_avatarHeight == 0)
-                SetSize(new Vector3(0.45f,0.6f,1.9f));
+            //            SetHeight();
+            if (m_avatarHeight == 0)
+                SetSize(new Vector3(0.45f, 0.6f, 1.9f));
 
             m_attachments = new Dictionary<int, List<AvatarAttachment>>();
         }
 
-        public AvatarAppearance(AvatarAppearance appearance): this(appearance, true,true)
+        public AvatarAppearance(AvatarAppearance appearance) : this(appearance, true, true)
         {
         }
 
@@ -194,7 +190,7 @@ namespace OpenSim.Framework
 
         public AvatarAppearance(AvatarAppearance appearance, bool copyWearables, bool copyBaked)
         {
-//            m_log.WarnFormat("[AVATAR APPEARANCE] create from an existing appearance");
+            //            m_log.WarnFormat("[AVATAR APPEARANCE] create from an existing appearance");
 
             if (appearance == null)
             {
@@ -202,14 +198,16 @@ namespace OpenSim.Framework
                 SetDefaultWearables();
                 SetDefaultTexture();
                 SetDefaultParams();
-//                SetHeight();
+                //                SetHeight();
                 SetSize(new Vector3(0.45f, 0.6f, 1.9f));
+                AvatarPreferencesHoverZ = 0;
                 m_attachments = new Dictionary<int, List<AvatarAttachment>>();
 
                 return;
             }
 
             m_serial = appearance.Serial;
+            AvatarPreferencesHoverZ = appearance.AvatarPreferencesHoverZ;
 
             if (copyWearables && (appearance.Wearables != null))
             {
@@ -219,8 +217,8 @@ namespace OpenSim.Framework
                     m_wearables[i] = new AvatarWearable();
                     AvatarWearable wearable = appearance.Wearables[i];
                     for (int j = 0; j < wearable.Count; j++)
-                            m_wearables[i].Add(wearable[j].ItemID, wearable[j].AssetID);
-                 }
+                        m_wearables[i].Add(wearable[j].ItemID, wearable[j].AssetID);
+                }
             }
             else
                 ClearWearables();
@@ -228,7 +226,7 @@ namespace OpenSim.Framework
             m_texture = null;
             if (appearance.Texture != null)
             {
-                byte[] tbytes = appearance.Texture.GetBytes();
+                byte[] tbytes = appearance.Texture.GetBakesBytes();
                 m_texture = new Primitive.TextureEntry(tbytes,0,tbytes.Length);
                 if (copyBaked && appearance.m_cacheitems != null)
                     m_cacheitems = (WearableCacheItem[])appearance.m_cacheitems.Clone();
@@ -240,7 +238,7 @@ namespace OpenSim.Framework
             if (appearance.VisualParams != null)
                 m_visualparams = (byte[])appearance.VisualParams.Clone();
 
-//            m_avatarHeight = appearance.m_avatarHeight;
+            //            m_avatarHeight = appearance.m_avatarHeight;
             SetSize(appearance.AvatarSize);
 
             // Copy the attachment, force append mode since that ensures consistency
@@ -251,14 +249,14 @@ namespace OpenSim.Framework
 
         public void GetAssetsFrom(AvatarAppearance app)
         {
-            int len =  m_wearables.Length;
-            if(len > app.m_wearables.Length)
+            int len = m_wearables.Length;
+            if (len > app.m_wearables.Length)
                 len = app.m_wearables.Length;
 
             for (int i = 0; i < len; i++)
             {
-                int count =  m_wearables[i].Count;
-                if(count > app.m_wearables[i].Count)
+                int count = m_wearables[i].Count;
+                if (count > app.m_wearables[i].Count)
                     count = app.m_wearables[i].Count;
 
                 for (int j = 0; j < count; j++)
@@ -290,11 +288,12 @@ namespace OpenSim.Framework
         /// </summary>
         public virtual void ResetAppearance()
         {
-//            m_log.WarnFormat("[AVATAR APPEARANCE]: Reset appearance");
+            //            m_log.WarnFormat("[AVATAR APPEARANCE]: Reset appearance");
 
             m_serial = 0;
 
             SetDefaultTexture();
+            AvatarPreferencesHoverZ = 0;
 
             //for (int i = 0; i < BAKE_INDICES.Length; i++)
             // {
@@ -305,11 +304,11 @@ namespace OpenSim.Framework
 
         protected virtual void SetDefaultParams()
         {
-            m_visualparams = new byte[] { 33,61,85,23,58,127,63,85,63,42,0,85,63,36,85,95,153,63,34,0,63,109,88,132,63,136,81,85,103,136,127,0,150,150,150,127,0,0,0,0,0,127,0,0,255,127,114,127,99,63,127,140,127,127,0,0,0,191,0,104,0,0,0,0,0,0,0,0,0,145,216,133,0,127,0,127,170,0,0,127,127,109,85,127,127,63,85,42,150,150,150,150,150,150,150,25,150,150,150,0,127,0,0,144,85,127,132,127,85,0,127,127,127,127,127,127,59,127,85,127,127,106,47,79,127,127,204,2,141,66,0,0,127,127,0,0,0,0,127,0,159,0,0,178,127,36,85,131,127,127,127,153,95,0,140,75,27,127,127,0,150,150,198,0,0,63,30,127,165,209,198,127,127,153,204,51,51,255,255,255,204,0,255,150,150,150,150,150,150,150,150,150,150,0,150,150,150,150,150,0,127,127,150,150,150,150,150,150,150,150,0,0,150,51,132,150,150,150 };
-//            for (int i = 0; i < VISUALPARAM_COUNT; i++)
-//            {
-//                m_visualparams[i] = 150;
-//            }
+            m_visualparams = new byte[] { 33, 61, 85, 23, 58, 127, 63, 85, 63, 42, 0, 85, 63, 36, 85, 95, 153, 63, 34, 0, 63, 109, 88, 132, 63, 136, 81, 85, 103, 136, 127, 0, 150, 150, 150, 127, 0, 0, 0, 0, 0, 127, 0, 0, 255, 127, 114, 127, 99, 63, 127, 140, 127, 127, 0, 0, 0, 191, 0, 104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 145, 216, 133, 0, 127, 0, 127, 170, 0, 0, 127, 127, 109, 85, 127, 127, 63, 85, 42, 150, 150, 150, 150, 150, 150, 150, 25, 150, 150, 150, 0, 127, 0, 0, 144, 85, 127, 132, 127, 85, 0, 127, 127, 127, 127, 127, 127, 59, 127, 85, 127, 127, 106, 47, 79, 127, 127, 204, 2, 141, 66, 0, 0, 127, 127, 0, 0, 0, 0, 127, 0, 159, 0, 0, 178, 127, 36, 85, 131, 127, 127, 127, 153, 95, 0, 140, 75, 27, 127, 127, 0, 150, 150, 198, 0, 0, 63, 30, 127, 165, 209, 198, 127, 127, 153, 204, 51, 51, 255, 255, 255, 204, 0, 255, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 0, 150, 150, 150, 150, 150, 0, 127, 127, 150, 150, 150, 150, 150, 150, 150, 150, 0, 0, 150, 51, 132, 150, 150, 150 };
+            //            for (int i = 0; i < VISUALPARAM_COUNT; i++)
+            //            {
+            //                m_visualparams[i] = 150;
+            //            }
         }
 
         /// <summary>
@@ -330,9 +329,6 @@ namespace OpenSim.Framework
         protected virtual void SetDefaultTexture()
         {
             m_texture = new Primitive.TextureEntry(new UUID(AppearanceManager.DEFAULT_AVATAR_TEXTURE));
-
-            // for (uint i = 0; i < TEXTURE_COUNT; i++)
-            //     m_texture.CreateFace(i).TextureID = new UUID(AppearanceManager.DEFAULT_AVATAR_TEXTURE);
         }
 
         /// <summary>
@@ -347,31 +343,31 @@ namespace OpenSim.Framework
             if (textureEntry == null)
                 return false;
 
-            // There are much simpler versions of this copy that could be
-            // made. We determine if any of the textures actually
-            // changed to know if the appearance should be saved later
             bool changed = false;
-            for (uint i = 0; i < AvatarAppearance.TEXTURE_COUNT; i++)
-            {
-                Primitive.TextureEntryFace newface = textureEntry.FaceTextures[i];
-                Primitive.TextureEntryFace oldface = m_texture.FaceTextures[i];
+            Primitive.TextureEntryFace newface;
+            Primitive.TextureEntryFace tmpFace;
 
-                if (newface == null)
+            //make sure textureEntry.DefaultTexture is the unused one(DEFAULT_AVATAR_TEXTURE).
+            Primitive.TextureEntry converted = new Primitive.TextureEntry(AppearanceManager.DEFAULT_AVATAR_TEXTURE);
+            for (uint i = 0; i < TEXTURE_COUNT; ++i)
+            {
+                newface = textureEntry.GetFace(i);
+                if (newface.TextureID != AppearanceManager.DEFAULT_AVATAR_TEXTURE)
                 {
-                    if (oldface == null)
-                        continue;
+                    tmpFace = converted.GetFace(i);
+                    tmpFace.TextureID = newface.TextureID; // we need a full high level copy, assuming all other parameters are the same.
+                    if (m_texture.FaceTextures[i] == null || newface.TextureID != m_texture.FaceTextures[i].TextureID)
+                        changed = true;
                 }
                 else
-                {
-                    if (oldface != null && oldface.TextureID == newface.TextureID)
+                {   if (m_texture.FaceTextures[i] == null)
                         continue;
+                    if(m_texture.FaceTextures[i].TextureID != AppearanceManager.DEFAULT_AVATAR_TEXTURE)
+                        changed = true;
                 }
-
-                changed = true;
             }
-
-            m_texture = textureEntry;
-
+            if(changed)
+                m_texture = converted;
             return changed;
         }
 
@@ -416,8 +412,8 @@ namespace OpenSim.Framework
                 }
             }
             // Reset the height if the visual parameters actually changed
-//           if (changed)
-//                SetHeight();
+            //           if (changed)
+            //                SetHeight();
 
             return changed;
         }
@@ -433,20 +429,20 @@ namespace OpenSim.Framework
         /// </summary>
         public virtual void SetHeight()
         {
-/*
-            // Start with shortest possible female avatar height
-            m_avatarHeight = 1.14597f;
-            // Add offset for male avatars
-            if (m_visualparams[(int)VPElement.SHAPE_MALE] != 0)
-                m_avatarHeight += 0.0848f;
-            // Add offsets for visual params
-            m_avatarHeight += 0.516945f * (float)m_visualparams[(int)VPElement.SHAPE_HEIGHT]          / 255.0f
-                            + 0.08117f  * (float)m_visualparams[(int)VPElement.SHAPE_HEAD_SIZE]       / 255.0f
-                            + 0.3836f   * (float)m_visualparams[(int)VPElement.SHAPE_LEG_LENGTH]      / 255.0f
-                            + 0.07f     * (float)m_visualparams[(int)VPElement.SHOES_PLATFORM_HEIGHT] / 255.0f
-                            + 0.08f     * (float)m_visualparams[(int)VPElement.SHOES_HEEL_HEIGHT]     / 255.0f
-                            + 0.076f    * (float)m_visualparams[(int)VPElement.SHAPE_NECK_LENGTH]     / 255.0f;
-*/
+            /*
+                        // Start with shortest possible female avatar height
+                        m_avatarHeight = 1.14597f;
+                        // Add offset for male avatars
+                        if (m_visualparams[(int)VPElement.SHAPE_MALE] != 0)
+                            m_avatarHeight += 0.0848f;
+                        // Add offsets for visual params
+                        m_avatarHeight += 0.516945f * (float)m_visualparams[(int)VPElement.SHAPE_HEIGHT]          / 255.0f
+                                        + 0.08117f  * (float)m_visualparams[(int)VPElement.SHAPE_HEAD_SIZE]       / 255.0f
+                                        + 0.3836f   * (float)m_visualparams[(int)VPElement.SHAPE_LEG_LENGTH]      / 255.0f
+                                        + 0.07f     * (float)m_visualparams[(int)VPElement.SHOES_PLATFORM_HEIGHT] / 255.0f
+                                        + 0.08f     * (float)m_visualparams[(int)VPElement.SHOES_HEEL_HEIGHT]     / 255.0f
+                                        + 0.076f    * (float)m_visualparams[(int)VPElement.SHAPE_NECK_LENGTH]     / 255.0f;
+            */
         }
 
         public void SetSize(Vector3 avSize)
@@ -479,14 +475,14 @@ namespace OpenSim.Framework
 
         public virtual void SetWearable(int wearableId, AvatarWearable wearable)
         {
-// DEBUG ON
-//          m_log.WarnFormat("[AVATARAPPEARANCE] set wearable {0} --> {1}:{2}",wearableId,wearable.ItemID,wearable.AssetID);
-// DEBUG OFF
+            // DEBUG ON
+            //          m_log.WarnFormat("[AVATARAPPEARANCE] set wearable {0} --> {1}:{2}",wearableId,wearable.ItemID,wearable.AssetID);
+            // DEBUG OFF
             if (wearableId >= m_wearables.Length)
             {
                 int currentLength = m_wearables.Length;
                 Array.Resize(ref m_wearables, wearableId + 1);
-                for (int i = currentLength ; i < m_wearables.Length ; i++)
+                for (int i = currentLength; i < m_wearables.Length; i++)
                     m_wearables[i] = new AvatarWearable();
             }
             m_wearables[wearableId].Clear();
@@ -494,32 +490,32 @@ namespace OpenSim.Framework
                 m_wearables[wearableId].Add(wearable[i].ItemID, wearable[i].AssetID);
         }
 
-// DEBUG ON
+        // DEBUG ON
         public override String ToString()
         {
             String s = "";
 
-            s += String.Format("Serial: {0}\n",m_serial);
+            s += String.Format("Serial: {0}\n", m_serial);
 
             for (uint i = 0; i < AvatarAppearance.TEXTURE_COUNT; i++)
                 if (m_texture.FaceTextures[i] != null)
-                    s += String.Format("Texture: {0} --> {1}\n",i,m_texture.FaceTextures[i].TextureID);
+                    s += String.Format("Texture: {0} --> {1}\n", i, m_texture.FaceTextures[i].TextureID);
 
             foreach (AvatarWearable awear in m_wearables)
             {
                 for (int i = 0; i < awear.Count; i++)
-                    s += String.Format("Wearable: item={0}, asset={1}\n",awear[i].ItemID,awear[i].AssetID);
+                    s += String.Format("Wearable: item={0}, asset={1}\n", awear[i].ItemID, awear[i].AssetID);
             }
 
             s += "Visual Params: ";
             //            for (uint j = 0; j < AvatarAppearance.VISUALPARAM_COUNT; j++)
             for (uint j = 0; j < m_visualparams.Length; j++)
-                s += String.Format("{0},",m_visualparams[j]);
+                s += String.Format("{0},", m_visualparams[j]);
             s += "\n";
 
             return s;
         }
-// DEBUG OFF
+        // DEBUG OFF
 
         /// <summary>
         /// Get a list of the attachments.
@@ -543,9 +539,9 @@ namespace OpenSim.Framework
 
         internal void AppendAttachment(AvatarAttachment attach)
         {
-//            m_log.DebugFormat(
-//                "[AVATAR APPEARNCE]: Appending itemID={0}, assetID={1} at {2}",
-//                attach.ItemID, attach.AssetID, attach.AttachPoint);
+            //            m_log.DebugFormat(
+            //                "[AVATAR APPEARNCE]: Appending itemID={0}, assetID={1} at {2}",
+            //                attach.ItemID, attach.AssetID, attach.AttachPoint);
 
             lock (m_attachments)
             {
@@ -564,9 +560,9 @@ namespace OpenSim.Framework
 
         internal void ReplaceAttachment(AvatarAttachment attach)
         {
-//            m_log.DebugFormat(
-//                "[AVATAR APPEARANCE]: Replacing itemID={0}, assetID={1} at {2}",
-//                attach.ItemID, attach.AssetID, attach.AttachPoint);
+            //            m_log.DebugFormat(
+            //                "[AVATAR APPEARANCE]: Replacing itemID={0}, assetID={1} at {2}",
+            //                attach.ItemID, attach.AssetID, attach.AttachPoint);
 
             lock (m_attachments)
             {
@@ -592,9 +588,9 @@ namespace OpenSim.Framework
         /// </returns>
         public bool SetAttachment(int attachpoint, UUID item, UUID asset)
         {
-//            m_log.DebugFormat(
-//                "[AVATAR APPEARANCE]: Setting attachment at {0} with item ID {1}, asset ID {2}",
-//                 attachpoint, item, asset);
+            //            m_log.DebugFormat(
+            //                "[AVATAR APPEARANCE]: Setting attachment at {0} with item ID {1}, asset ID {2}",
+            //                 attachpoint, item, asset);
 
             if (attachpoint == 0)
                 return false;
@@ -621,9 +617,9 @@ namespace OpenSim.Framework
                 AvatarAttachment existingAttachment = GetAttachmentForItem(item);
                 if (existingAttachment != null)
                 {
-//                    m_log.DebugFormat(
-//                        "[AVATAR APPEARANCE]: Found existing attachment for {0}, asset {1} at point {2}",
-//                        existingAttachment.ItemID, existingAttachment.AssetID, existingAttachment.AttachPoint);
+                    //                    m_log.DebugFormat(
+                    //                        "[AVATAR APPEARANCE]: Found existing attachment for {0}, asset {1} at point {2}",
+                    //                        existingAttachment.ItemID, existingAttachment.AssetID, existingAttachment.AttachPoint);
 
                     if (existingAttachment.AssetID != UUID.Zero && existingAttachment.AttachPoint == (attachpoint & 0x7F))
                     {
@@ -650,7 +646,7 @@ namespace OpenSim.Framework
                 }
                 else
                 {
-                    ReplaceAttachment(new AvatarAttachment(attachpoint,item, asset));
+                    ReplaceAttachment(new AvatarAttachment(attachpoint, item, asset));
                 }
             }
 
@@ -668,7 +664,7 @@ namespace OpenSim.Framework
             {
                 foreach (KeyValuePair<int, List<AvatarAttachment>> kvp in m_attachments)
                 {
-                    int index = kvp.Value.FindIndex(delegate(AvatarAttachment a) { return a.ItemID == itemID; });
+                    int index = kvp.Value.FindIndex(delegate (AvatarAttachment a) { return a.ItemID == itemID; });
                     if (index >= 0)
                         return kvp.Value[index];
                 }
@@ -683,7 +679,7 @@ namespace OpenSim.Framework
             {
                 foreach (KeyValuePair<int, List<AvatarAttachment>> kvp in m_attachments)
                 {
-                    int index = kvp.Value.FindIndex(delegate(AvatarAttachment a) { return a.ItemID == itemID; });
+                    int index = kvp.Value.FindIndex(delegate (AvatarAttachment a) { return a.ItemID == itemID; });
                     if (index >= 0)
                         return kvp.Key;
                 }
@@ -697,12 +693,12 @@ namespace OpenSim.Framework
             {
                 foreach (KeyValuePair<int, List<AvatarAttachment>> kvp in m_attachments)
                 {
-                    int index = kvp.Value.FindIndex(delegate(AvatarAttachment a) { return a.ItemID == itemID; });
+                    int index = kvp.Value.FindIndex(delegate (AvatarAttachment a) { return a.ItemID == itemID; });
                     if (index >= 0)
                     {
-//                        m_log.DebugFormat(
-//                            "[AVATAR APPEARANCE]: Detaching attachment {0}, index {1}, point {2}",
-//                            m_attachments[kvp.Key][index].ItemID, index, m_attachments[kvp.Key][index].AttachPoint);
+                        //                        m_log.DebugFormat(
+                        //                            "[AVATAR APPEARANCE]: Detaching attachment {0}, index {1}, point {2}",
+                        //                            m_attachments[kvp.Key][index].ItemID, index, m_attachments[kvp.Key][index].AttachPoint);
 
                         // Remove it from the list of attachments at that attach point
                         m_attachments[kvp.Key].RemoveAt(index);
@@ -736,42 +732,130 @@ namespace OpenSim.Framework
 
             data["serial"] = OSD.FromInteger(m_serial);
             data["height"] = OSD.FromReal(m_avatarHeight);
+            data["aphz"] = OSD.FromReal(AvatarPreferencesHoverZ);
+
+            if (m_texture == null)
+                return data;
+
+            bool sendPV8 = false;
 
             // Wearables
-            //
-            // This will send as many or as few wearables as we have, unless a count
-            // is given. Used for legacy (pre 0.4) versions.
-            int count = ctx.WearablesCount;
-            if (ctx.WearablesCount == -1)
-                count = m_wearables.Length;
-            OSDArray wears = new OSDArray(count);
-            for (int i = 0; i < count; i++)
+            OSDArray wears;
+            int count;
+            if (ctx == null)
+                count = MAXWEARABLE_LEGACY;
+            else
             {
-                AvatarWearable dummyWearable = new AvatarWearable();
-
-                if (i < m_wearables.Length)
-                    wears.Add(m_wearables[i].Pack());
+                if(ctx.OutboundVersion >= 0.8)
+                {
+                    sendPV8 = true;
+                    count = m_wearables.Length;
+                }
+                else if (ctx.OutboundVersion >= 0.6)
+                    count = MAXWEARABLE_PV7;
                 else
-                    wears.Add(dummyWearable.Pack());
+                    count = MAXWEARABLE_LEGACY;
+
+                if (sendPV8 && count > MAXWEARABLE_PV7)
+                {
+                    wears = new OSDArray(count - MAXWEARABLE_PV7);
+                    for (int i = MAXWEARABLE_PV7; i < count; ++i)
+                        wears.Add(m_wearables[i].Pack());
+
+                    data["wrbls8"] = wears;
+                    count = MAXWEARABLE_PV7;
+                }
             }
+
+            if(count > m_wearables.Length)
+                count = m_wearables.Length;
+
+            wears = new OSDArray(count);
+            for (int i = 0; i < count; ++i)
+                wears.Add(m_wearables[i].Pack());
             data["wearables"] = wears;
 
             // Avatar Textures
-            OSDArray textures = new OSDArray(AvatarAppearance.TEXTURE_COUNT);
-            for (uint i = 0; i < AvatarAppearance.TEXTURE_COUNT; i++)
+            OSDArray textures;
+            if (sendPV8)
             {
-                if (m_texture.FaceTextures[i] != null)
-                    textures.Add(OSD.FromUUID(m_texture.FaceTextures[i].TextureID));
-                else
-                    textures.Add(OSD.FromUUID(AppearanceManager.DEFAULT_AVATAR_TEXTURE));
+                byte[] te = m_texture.GetBakesBytes();
+                data["te8"] = OSD.FromBinary(te);
             }
-            data["textures"] = textures;
+            else
+            {
+                textures = new OSDArray(TEXTURE_COUNT_PV7);
+                for (uint i = 0; i < TEXTURE_COUNT_PV7; ++i)
+                    textures.Add(OSD.FromUUID(m_texture.GetFace(i).TextureID));
+                data["textures"] = textures;
+            }
 
             if (m_cacheitems != null)
             {
-                OSDArray baked = WearableCacheItem.BakedToOSD(m_cacheitems);
-                if (baked != null)
+                OSDArray baked = WearableCacheItem.BakedToOSD(m_cacheitems, 0, BAKES_COUNT_PV7);
+                if (baked != null && baked.Count > 0)
                     data["bakedcache"] = baked;
+                baked = WearableCacheItem.BakedToOSD(m_cacheitems, BAKES_COUNT_PV7, -1);
+                if (baked != null && baked.Count > 0)
+                    data["bc8"] = baked;
+            }
+
+            // Visual Parameters
+            OSDBinary visualparams = new OSDBinary(m_visualparams);
+            data["visualparams"] = visualparams;
+
+            lock (m_attachments)
+            {
+                // Attachments
+                OSDArray attachs = new OSDArray(m_attachments.Count);
+                foreach (AvatarAttachment attach in GetAttachments())
+                    attachs.Add(attach.Pack());
+                data["attachments"] = attachs;
+            }
+
+            return data;
+        }
+
+        public OSDMap PackForNotecard()
+        {
+            OSDMap data = new OSDMap();
+
+            data["serial"] = OSD.FromInteger(m_serial);
+            data["height"] = OSD.FromReal(m_avatarHeight);
+            data["aphz"] = OSD.FromReal(AvatarPreferencesHoverZ);
+
+            // old regions may not like missing/empty wears
+            OSDArray wears = new OSDArray(MAXWEARABLE_LEGACY);
+            for (int i = 0; i< MAXWEARABLE_LEGACY; ++i)
+                wears.Add(new OSDArray());
+            data["wearables"] = wears;
+
+            // Avatar Textures
+            OSDArray textures;
+
+            // allow old regions to still see something
+            textures = new OSDArray(TEXTURE_COUNT_PV7);
+            textures.Add(OSD.FromUUID(AppearanceManager.DEFAULT_AVATAR_TEXTURE));
+            for (uint i = 1; i < TEXTURE_COUNT_PV7; ++i)
+                textures.Add(OSD.FromUUID(m_texture.GetFace(i).TextureID));
+            data["textures"] = textures;
+
+            bool needExtra = false;
+            for (int i = BAKES_COUNT_PV7; i < BAKE_INDICES.Length; ++i)
+            {
+                int idx = BAKE_INDICES[i];
+                if (m_texture.FaceTextures[idx] == null)
+                    continue;
+                if (m_texture.FaceTextures[idx].TextureID == AppearanceManager.DEFAULT_AVATAR_TEXTURE ||
+                        m_texture.FaceTextures[idx].TextureID == UUID.Zero)
+                    continue;
+                needExtra = true;
+            }
+
+            if (needExtra)
+            {
+                byte[] te = m_texture.GetBakesBytes();
+                data["te8"] = OSD.FromBinary(te);
             }
 
             // Visual Parameters
@@ -801,7 +885,7 @@ namespace OpenSim.Framework
             SetDefaultParams();
             m_attachments = new Dictionary<int, List<AvatarAttachment>>();
 
-            if(data == null)
+            if (data == null)
             {
                 m_log.Warn("[AVATAR APPEARANCE]: data to unpack is null");
                 return;
@@ -810,48 +894,87 @@ namespace OpenSim.Framework
             OSD tmpOSD;
             if (data.TryGetValue("serial", out tmpOSD))
                 m_serial = tmpOSD.AsInteger();
+            if(data.TryGetValue("aphz", out tmpOSD))
+                AvatarPreferencesHoverZ = (float)tmpOSD.AsReal();
             if (data.TryGetValue("height", out tmpOSD))
-//                m_avatarHeight = (float)data["height"].AsReal();
-                SetSize(new Vector3(0.45f,0.6f, (float)tmpOSD.AsReal()));
+                SetSize(new Vector3(0.45f, 0.6f, (float)tmpOSD.AsReal()));
 
             try
             {
                 // Wearables
+                OSD tmpOSD8;
+                OSDArray wears8 = null;
+                int wears8Count = 0;
+
+                if (data.TryGetValue("wrbls8", out tmpOSD8) && (tmpOSD8 is OSDArray))
+                {
+                    wears8 = (OSDArray)tmpOSD8;
+                    wears8Count = wears8.Count;
+                }
+
                 if (data.TryGetValue("wearables", out tmpOSD) && (tmpOSD is OSDArray))
                 {
                     OSDArray wears = (OSDArray)tmpOSD;
-                    m_wearables = new AvatarWearable[wears.Count];
-
-                    for (int i = 0; i < wears.Count; i++)
-                        m_wearables[i] = new AvatarWearable((OSDArray)wears[i]);
-                }
-                else
-                {
-                    m_log.Warn("[AVATAR APPEARANCE]: failed to unpack wearables");
-                }
-
-                // Avatar Textures
-                if (data.TryGetValue("textures", out tmpOSD) && (tmpOSD is OSDArray))
-                {
-                    OSDArray textures = (OSDArray)tmpOSD;
-                    for (int i = 0; i < AvatarAppearance.TEXTURE_COUNT && i < textures.Count; i++)
+                    if(wears.Count + wears8Count > 0)
                     {
-                        UUID textureID = AppearanceManager.DEFAULT_AVATAR_TEXTURE;
-                        tmpOSD = textures[i];
-                        if (tmpOSD != null)
-                            textureID = tmpOSD.AsUUID();
-                        m_texture.CreateFace((uint)i).TextureID = new UUID(textureID);
+                        m_wearables = new AvatarWearable[wears.Count + wears8Count];
+
+                        for (int i = 0; i < wears.Count; ++i)
+                            m_wearables[i] = new AvatarWearable((OSDArray)wears[i]);
+                        if (wears8Count > 0)
+                        {
+                            for (int i = 0; i < wears8Count; ++i)
+                                m_wearables[i + wears.Count] = new AvatarWearable((OSDArray)wears8[i]);
+                        }
                     }
                 }
-                else
+
+                if (data.TryGetValue("te8", out tmpOSD))
                 {
-                    m_log.Warn("[AVATAR APPEARANCE]: failed to unpack textures");
+                    byte[] teb = tmpOSD.AsBinary();
+                    Primitive.TextureEntry te = new Primitive.TextureEntry(teb, 0, teb.Length);
+                    m_texture = te;
+                }
+                else if (data.TryGetValue("textures", out tmpOSD) && (tmpOSD is OSDArray))
+                {
+                    OSDArray textures = (OSDArray)tmpOSD;
+                    for (int i = 0; i < textures.Count && i < TEXTURE_COUNT_PV7; ++i)
+                    {
+                        tmpOSD = textures[i];
+                        if (tmpOSD != null)
+                            m_texture.CreateFace((uint)i).TextureID = tmpOSD.AsUUID();
+                    }
                 }
 
                 if (data.TryGetValue("bakedcache", out tmpOSD) && (tmpOSD is OSDArray))
                 {
                     OSDArray bakedOSDArray = (OSDArray)tmpOSD;
-                    m_cacheitems = WearableCacheItem.BakedFromOSD(bakedOSDArray);
+                    m_cacheitems = WearableCacheItem.GetDefaultCacheItem();
+
+                    bakedOSDArray = (OSDArray)tmpOSD;
+                    foreach (OSDMap item in bakedOSDArray)
+                    {
+                        int idx = item["textureindex"].AsInteger();
+                        if (idx < 0 || idx >= m_cacheitems.Length)
+                            continue;
+                        m_cacheitems[idx].CacheId = item["cacheid"].AsUUID();
+                        m_cacheitems[idx].TextureID = item["textureid"].AsUUID();
+                        m_cacheitems[idx].TextureAsset = null;
+                    }
+
+                    if (data.TryGetValue("bc8", out tmpOSD) && (tmpOSD is OSDArray))
+                    {
+                        bakedOSDArray = (OSDArray)tmpOSD;
+                        foreach (OSDMap item in bakedOSDArray)
+                        {
+                            int idx = item["textureindex"].AsInteger();
+                            if (idx < 0 || idx >= m_cacheitems.Length)
+                                continue;
+                            m_cacheitems[idx].CacheId = item["cacheid"].AsUUID();
+                            m_cacheitems[idx].TextureID = item["textureid"].AsUUID();
+                            m_cacheitems[idx].TextureAsset = null;
+                        }
+                    }
                 }
 
                 // Visual Parameters
@@ -874,9 +997,9 @@ namespace OpenSim.Framework
                         AvatarAttachment att = new AvatarAttachment((OSDMap)attachs[i]);
                         AppendAttachment(att);
 
-//                        m_log.DebugFormat(
-//                            "[AVATAR APPEARANCE]: Unpacked attachment itemID {0}, assetID {1}, point {2}",
-//                            att.ItemID, att.AssetID, att.AttachPoint);
+                        //                        m_log.DebugFormat(
+                        //                            "[AVATAR APPEARANCE]: Unpacked attachment itemID {0}, assetID {1}, point {2}",
+                        //                            att.ItemID, att.AssetID, att.AttachPoint);
                     }
                 }
             }
@@ -887,6 +1010,32 @@ namespace OpenSim.Framework
         }
 
         #endregion
+
+        public bool CanTeleport(float version)
+        {
+            if (version >= 0.8)
+                return true;
+            if (m_wearables.Length <= MAXWEARABLE_PV7)
+                return true;
+            for(int i = MAXWEARABLE_PV7; i < m_wearables.Length; ++i)
+            {
+                if(m_wearables[i].Count > 0)
+                    return false;
+            }
+
+            // also check baked
+            for (int i = BAKES_COUNT_PV7; i < BAKE_INDICES.Length; i++)
+            {
+                int idx = BAKE_INDICES[i];
+                if (m_texture.FaceTextures[idx] == null)
+                    continue;
+                if (m_texture.FaceTextures[idx].TextureID == AppearanceManager.DEFAULT_AVATAR_TEXTURE ||
+                        m_texture.FaceTextures[idx].TextureID == UUID.Zero)
+                    continue;
+                return false;
+            }
+            return true;
+        }
 
         #region VPElement
 
@@ -1699,7 +1848,7 @@ namespace OpenSim.Framework
             /// Breast Part 2
             /// </summary>
             BREAST_PHYSICS_LEFTRIGHT_MAX_EFFECT = 247,
-            BREAST_PHYSICS_LEFTRIGHT_SPRING= 248,
+            BREAST_PHYSICS_LEFTRIGHT_SPRING = 248,
             BREAST_PHYSICS_LEFTRIGHT_GAIN = 249,
             BREAST_PHYSICS_LEFTRIGHT_DAMPING = 250,
 

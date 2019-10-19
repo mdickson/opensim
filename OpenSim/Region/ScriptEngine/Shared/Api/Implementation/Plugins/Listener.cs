@@ -25,14 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using log4net;
 using OpenMetaverse;
-using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.CoreModules.Scripting.WorldComm;
+using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.ScriptEngine.Interfaces;
-using OpenSim.Region.ScriptEngine.Shared;
-using OpenSim.Region.ScriptEngine.Shared.Api;
+using System;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
 {
@@ -91,7 +88,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
             if (m_commsPlugin != null)
                 return m_commsPlugin.GetSerializationData(itemID);
             else
-                return new Object[]{};
+                return new Object[] { };
         }
 
         public void CreateFromData(uint localID, UUID itemID, UUID hostID,

@@ -26,18 +26,15 @@
  */
 
 using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Monitoring;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
-using Nini.Config;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-
-using OpenSim.Framework.Monitoring;
-using OpenSim.Services.Interfaces;
-using OpenSim.Server.Base;
-using OpenMetaverse;
 
 namespace OpenSim.Services.Connectors
 {
@@ -66,7 +63,7 @@ namespace OpenSim.Services.Connectors
         private string m_configName = "InventoryService";
 
         private const double CACHE_EXPIRATION_SECONDS = 20.0;
-        private static ExpiringCache<UUID, InventoryItemBase> m_ItemCache = new ExpiringCache<UUID,InventoryItemBase>();
+        private static ExpiringCache<UUID, InventoryItemBase> m_ItemCache = new ExpiringCache<UUID, InventoryItemBase>();
 
         public XInventoryServicesConnector()
         {
@@ -152,8 +149,8 @@ namespace OpenSim.Services.Connectors
 
         public bool CreateUserInventory(UUID principalID)
         {
-            Dictionary<string,object> ret = MakeRequest("CREATEUSERINVENTORY",
-                    new Dictionary<string,object> {
+            Dictionary<string, object> ret = MakeRequest("CREATEUSERINVENTORY",
+                    new Dictionary<string, object> {
                         { "PRINCIPAL", principalID.ToString() }
                     });
 
@@ -162,8 +159,8 @@ namespace OpenSim.Services.Connectors
 
         public List<InventoryFolderBase> GetInventorySkeleton(UUID principalID)
         {
-            Dictionary<string,object> ret = MakeRequest("GETINVENTORYSKELETON",
-                    new Dictionary<string,object> {
+            Dictionary<string, object> ret = MakeRequest("GETINVENTORYSKELETON",
+                    new Dictionary<string, object> {
                         { "PRINCIPAL", principalID.ToString() }
                     });
 
@@ -189,8 +186,8 @@ namespace OpenSim.Services.Connectors
 
         public InventoryFolderBase GetRootFolder(UUID principalID)
         {
-            Dictionary<string,object> ret = MakeRequest("GETROOTFOLDER",
-                    new Dictionary<string,object> {
+            Dictionary<string, object> ret = MakeRequest("GETROOTFOLDER",
+                    new Dictionary<string, object> {
                         { "PRINCIPAL", principalID.ToString() }
                     });
 
@@ -202,8 +199,8 @@ namespace OpenSim.Services.Connectors
 
         public InventoryFolderBase GetFolderForType(UUID principalID, FolderType type)
         {
-            Dictionary<string,object> ret = MakeRequest("GETFOLDERFORTYPE",
-                    new Dictionary<string,object> {
+            Dictionary<string, object> ret = MakeRequest("GETFOLDERFORTYPE",
+                    new Dictionary<string, object> {
                         { "PRINCIPAL", principalID.ToString() },
                         { "TYPE", ((int)type).ToString() }
                     });
@@ -223,8 +220,8 @@ namespace OpenSim.Services.Connectors
 
             try
             {
-                Dictionary<string,object> ret = MakeRequest("GETFOLDERCONTENT",
-                        new Dictionary<string,object> {
+                Dictionary<string, object> ret = MakeRequest("GETFOLDERCONTENT",
+                        new Dictionary<string, object> {
                             { "PRINCIPAL", principalID.ToString() },
                             { "FOLDER", folderID.ToString() }
                         });
@@ -232,9 +229,9 @@ namespace OpenSim.Services.Connectors
                 if (!CheckReturn(ret))
                     return null;
 
-                Dictionary<string,object> folders = ret.ContainsKey("FOLDERS") ?
-                    (Dictionary<string,object>)ret["FOLDERS"] : null;
-                Dictionary<string,object> items = ret.ContainsKey("ITEMS") ?
+                Dictionary<string, object> folders = ret.ContainsKey("FOLDERS") ?
+                    (Dictionary<string, object>)ret["FOLDERS"] : null;
+                Dictionary<string, object> items = ret.ContainsKey("ITEMS") ?
                     (Dictionary<string, object>)ret["ITEMS"] : null;
 
                 if (folders != null)
@@ -335,8 +332,8 @@ namespace OpenSim.Services.Connectors
 
         public List<InventoryItemBase> GetFolderItems(UUID principalID, UUID folderID)
         {
-            Dictionary<string,object> ret = MakeRequest("GETFOLDERITEMS",
-                    new Dictionary<string,object> {
+            Dictionary<string, object> ret = MakeRequest("GETFOLDERITEMS",
+                    new Dictionary<string, object> {
                         { "PRINCIPAL", principalID.ToString() },
                         { "FOLDER", folderID.ToString() }
                     });
@@ -354,8 +351,8 @@ namespace OpenSim.Services.Connectors
 
         public bool AddFolder(InventoryFolderBase folder)
         {
-            Dictionary<string,object> ret = MakeRequest("ADDFOLDER",
-                    new Dictionary<string,object> {
+            Dictionary<string, object> ret = MakeRequest("ADDFOLDER",
+                    new Dictionary<string, object> {
                         { "ParentID", folder.ParentID.ToString() },
                         { "Type", folder.Type.ToString() },
                         { "Version", folder.Version.ToString() },
@@ -369,8 +366,8 @@ namespace OpenSim.Services.Connectors
 
         public bool UpdateFolder(InventoryFolderBase folder)
         {
-            Dictionary<string,object> ret = MakeRequest("UPDATEFOLDER",
-                    new Dictionary<string,object> {
+            Dictionary<string, object> ret = MakeRequest("UPDATEFOLDER",
+                    new Dictionary<string, object> {
                         { "ParentID", folder.ParentID.ToString() },
                         { "Type", folder.Type.ToString() },
                         { "Version", folder.Version.ToString() },
@@ -384,8 +381,8 @@ namespace OpenSim.Services.Connectors
 
         public bool MoveFolder(InventoryFolderBase folder)
         {
-            Dictionary<string,object> ret = MakeRequest("MOVEFOLDER",
-                    new Dictionary<string,object> {
+            Dictionary<string, object> ret = MakeRequest("MOVEFOLDER",
+                    new Dictionary<string, object> {
                         { "ParentID", folder.ParentID.ToString() },
                         { "ID", folder.ID.ToString() },
                         { "PRINCIPAL", folder.Owner.ToString() }
@@ -401,8 +398,8 @@ namespace OpenSim.Services.Connectors
             foreach (UUID f in folderIDs)
                 slist.Add(f.ToString());
 
-            Dictionary<string,object> ret = MakeRequest("DELETEFOLDERS",
-                    new Dictionary<string,object> {
+            Dictionary<string, object> ret = MakeRequest("DELETEFOLDERS",
+                    new Dictionary<string, object> {
                         { "PRINCIPAL", principalID.ToString() },
                         { "FOLDERS", slist }
                     });
@@ -412,8 +409,8 @@ namespace OpenSim.Services.Connectors
 
         public bool PurgeFolder(InventoryFolderBase folder)
         {
-            Dictionary<string,object> ret = MakeRequest("PURGEFOLDER",
-                    new Dictionary<string,object> {
+            Dictionary<string, object> ret = MakeRequest("PURGEFOLDER",
+                    new Dictionary<string, object> {
                         { "ID", folder.ID.ToString() }
                     });
 
@@ -429,7 +426,7 @@ namespace OpenSim.Services.Connectors
             if (item.CreatorId == null)
                 item.CreatorId = String.Empty;
             Dictionary<string, object> ret = MakeRequest("ADDITEM",
-                    new Dictionary<string,object> {
+                    new Dictionary<string, object> {
                         { "AssetID", item.AssetID.ToString() },
                         { "AssetType", item.AssetType.ToString() },
                         { "Name", item.Name.ToString() },
@@ -460,8 +457,8 @@ namespace OpenSim.Services.Connectors
         {
             if (item.CreatorData == null)
                 item.CreatorData = String.Empty;
-            Dictionary<string,object> ret = MakeRequest("UPDATEITEM",
-                    new Dictionary<string,object> {
+            Dictionary<string, object> ret = MakeRequest("UPDATEITEM",
+                    new Dictionary<string, object> {
                         { "AssetID", item.AssetID.ToString() },
                         { "AssetType", item.AssetType.ToString() },
                         { "Name", item.Name.ToString() },
@@ -505,8 +502,8 @@ namespace OpenSim.Services.Connectors
                 destlist.Add(item.Folder.ToString());
             }
 
-            Dictionary<string,object> ret = MakeRequest("MOVEITEMS",
-                    new Dictionary<string,object> {
+            Dictionary<string, object> ret = MakeRequest("MOVEITEMS",
+                    new Dictionary<string, object> {
                         { "PRINCIPAL", principalID.ToString() },
                         { "IDLIST", idlist },
                         { "DESTLIST", destlist }
@@ -522,8 +519,8 @@ namespace OpenSim.Services.Connectors
             foreach (UUID f in itemIDs)
                 slist.Add(f.ToString());
 
-            Dictionary<string,object> ret = MakeRequest("DELETEITEMS",
-                    new Dictionary<string,object> {
+            Dictionary<string, object> ret = MakeRequest("DELETEITEMS",
+                    new Dictionary<string, object> {
                         { "PRINCIPAL", principalID.ToString() },
                         { "ITEMS", slist }
                     });
@@ -650,8 +647,8 @@ namespace OpenSim.Services.Connectors
 
         public List<InventoryItemBase> GetActiveGestures(UUID principalID)
         {
-            Dictionary<string,object> ret = MakeRequest("GETACTIVEGESTURES",
-                    new Dictionary<string,object> {
+            Dictionary<string, object> ret = MakeRequest("GETACTIVEGESTURES",
+                    new Dictionary<string, object> {
                         { "PRINCIPAL", principalID.ToString() }
                     });
 
@@ -660,7 +657,7 @@ namespace OpenSim.Services.Connectors
 
             List<InventoryItemBase> items = new List<InventoryItemBase>();
 
-            foreach (Object o in ((Dictionary<string,object>)ret["ITEMS"]).Values)
+            foreach (Object o in ((Dictionary<string, object>)ret["ITEMS"]).Values)
                 items.Add(BuildItem((Dictionary<string, object>)o));
 
             return items;
@@ -668,8 +665,8 @@ namespace OpenSim.Services.Connectors
 
         public int GetAssetPermissions(UUID principalID, UUID assetID)
         {
-            Dictionary<string,object> ret = MakeRequest("GETASSETPERMISSIONS",
-                    new Dictionary<string,object> {
+            Dictionary<string, object> ret = MakeRequest("GETASSETPERMISSIONS",
+                    new Dictionary<string, object> {
                         { "PRINCIPAL", principalID.ToString() },
                         { "ASSET", assetID.ToString() }
                     });
@@ -684,7 +681,7 @@ namespace OpenSim.Services.Connectors
                 {
                     int intResult;
 
-                    if (int.TryParse ((string)ret["RESULT"], out intResult))
+                    if (int.TryParse((string)ret["RESULT"], out intResult))
                         return intResult;
                 }
             }
@@ -699,13 +696,13 @@ namespace OpenSim.Services.Connectors
 
         // Helpers
         //
-        private Dictionary<string,object> MakeRequest(string method,
-                Dictionary<string,object> sendData)
+        private Dictionary<string, object> MakeRequest(string method,
+                Dictionary<string, object> sendData)
         {
             // Add "METHOD" as the first key in the dictionary. This ensures that it will be
             // visible even when using partial logging ("debug http all 5").
             Dictionary<string, object> temp = sendData;
-            sendData = new Dictionary<string,object>{ { "METHOD", method } };
+            sendData = new Dictionary<string, object> { { "METHOD", method } };
             foreach (KeyValuePair<string, object> kvp in temp)
                 sendData.Add(kvp.Key, kvp.Value);
 
@@ -732,7 +729,7 @@ namespace OpenSim.Services.Connectors
             return replyData;
         }
 
-        private InventoryFolderBase BuildFolder(Dictionary<string,object> data)
+        private InventoryFolderBase BuildFolder(Dictionary<string, object> data)
         {
             InventoryFolderBase folder = new InventoryFolderBase();
 
@@ -753,7 +750,7 @@ namespace OpenSim.Services.Connectors
             return folder;
         }
 
-        private InventoryItemBase BuildItem(Dictionary<string,object> data)
+        private InventoryItemBase BuildItem(Dictionary<string, object> data)
         {
             InventoryItemBase item = new InventoryItemBase();
 

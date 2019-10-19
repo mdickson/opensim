@@ -63,9 +63,9 @@ namespace OpenSim.Framework
             if (min <= 2)
                 return 2;
 
-            if (Primes[ Primes.Length - 1 ] < min)
+            if (Primes[Primes.Length - 1] < min)
             {
-                for (int i = min | 1 ; i < 0x7FFFFFFF ; i += 2)
+                for (int i = min | 1; i < 0x7FFFFFFF; i += 2)
                 {
                     if (IsPrime(i))
                         return i;
@@ -74,13 +74,13 @@ namespace OpenSim.Framework
                 return -1;
             }
 
-            for (int i = Primes.Length - 2 ; i >= 0 ; i--)
+            for (int i = Primes.Length - 2; i >= 0; i--)
             {
-                if (min == Primes[ i ])
+                if (min == Primes[i])
                     return min;
 
-                if (min > Primes[ i ])
-                    return Primes[ i + 1 ];
+                if (min > Primes[i])
+                    return Primes[i + 1];
             }
 
             return 2;
@@ -102,8 +102,8 @@ namespace OpenSim.Framework
                 // Even number - only prime if 2
                 return candinate == 2;
 
-            int upperBound = (int) Math.Sqrt(candinate);
-            for (int i = 3 ; i < upperBound ; i += 2)
+            int upperBound = (int)Math.Sqrt(candinate);
+            for (int i = 3; i < upperBound; i += 2)
             {
                 if (candinate % i == 0)
                     return false;

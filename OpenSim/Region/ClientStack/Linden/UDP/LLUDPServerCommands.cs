@@ -25,13 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using NDesk.Options;
 using OpenSim.Framework;
 using OpenSim.Framework.Console;
 using OpenSim.Region.Framework.Scenes;
+using System.Collections.Generic;
+using System.Text;
 
 namespace OpenSim.Region.ClientStack.LindenUDP
 {
@@ -48,173 +47,173 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
         public void Register()
         {
-/*
-            m_console.Commands.AddCommand(
-                "Comms", false, "show server throttles",
-                "show server throttles",
-                "Show information about server throttles",
-                HandleShowServerThrottlesCommand);
+            /*
+                        m_console.Commands.AddCommand(
+                            "Comms", false, "show server throttles",
+                            "show server throttles",
+                            "Show information about server throttles",
+                            HandleShowServerThrottlesCommand);
 
-            m_console.Commands.AddCommand(
-                "Debug", false, "debug lludp packet",
-                "debug lludp packet [--default | --all] <level> [<avatar-first-name> <avatar-last-name>]",
-                "Turn on packet debugging.  This logs information when the client stack hands a processed packet off to downstream code or when upstream code first requests that a certain packet be sent.",
-                "If level >  255 then all incoming and outgoing packets are logged.\n"
-                + "If level <= 255 then incoming AgentUpdate and outgoing SimStats and SimulatorViewerTimeMessage packets are not logged.\n"
-                + "If level <= 200 then incoming RequestImage and outgoing ImagePacket, ImageData, LayerData and CoarseLocationUpdate packets are not logged.\n"
-                + "If level <= 100 then incoming ViewerEffect and AgentAnimation and outgoing ViewerEffect and AvatarAnimation packets are not logged.\n"
-                + "If level <=  50 then outgoing ImprovedTerseObjectUpdate packets are not logged.\n"
-                + "If level <= 0 then no packets are logged.\n"
-                + "If --default is specified then the level becomes the default logging level for all subsequent agents.\n"
-                + "If --all is specified then the level becomes the default logging level for all current and subsequent agents.\n"
-                + "In these cases, you cannot also specify an avatar name.\n"
-                + "If an avatar name is given then only packets from that avatar are logged.",
-                HandlePacketCommand);
+                        m_console.Commands.AddCommand(
+                            "Debug", false, "debug lludp packet",
+                            "debug lludp packet [--default | --all] <level> [<avatar-first-name> <avatar-last-name>]",
+                            "Turn on packet debugging.  This logs information when the client stack hands a processed packet off to downstream code or when upstream code first requests that a certain packet be sent.",
+                            "If level >  255 then all incoming and outgoing packets are logged.\n"
+                            + "If level <= 255 then incoming AgentUpdate and outgoing SimStats and SimulatorViewerTimeMessage packets are not logged.\n"
+                            + "If level <= 200 then incoming RequestImage and outgoing ImagePacket, ImageData, LayerData and CoarseLocationUpdate packets are not logged.\n"
+                            + "If level <= 100 then incoming ViewerEffect and AgentAnimation and outgoing ViewerEffect and AvatarAnimation packets are not logged.\n"
+                            + "If level <=  50 then outgoing ImprovedTerseObjectUpdate packets are not logged.\n"
+                            + "If level <= 0 then no packets are logged.\n"
+                            + "If --default is specified then the level becomes the default logging level for all subsequent agents.\n"
+                            + "If --all is specified then the level becomes the default logging level for all current and subsequent agents.\n"
+                            + "In these cases, you cannot also specify an avatar name.\n"
+                            + "If an avatar name is given then only packets from that avatar are logged.",
+                            HandlePacketCommand);
 
-            m_console.Commands.AddCommand(
-                "Debug", false, "debug lludp data out",
-                "debug lludp data out <level> <avatar-first-name> <avatar-last-name>\"",
-                "Turn on debugging for final outgoing data to the given user's client.",
-                "This operates at a much lower level than the packet command and prints out available details when the data is actually sent.\n"
-                + "If level >  0 then information about all outgoing UDP data for this avatar is logged.\n"
-                + "If level <= 0 then no information about outgoing UDP data for this avatar is logged.",
-                HandleDataCommand);
+                        m_console.Commands.AddCommand(
+                            "Debug", false, "debug lludp data out",
+                            "debug lludp data out <level> <avatar-first-name> <avatar-last-name>\"",
+                            "Turn on debugging for final outgoing data to the given user's client.",
+                            "This operates at a much lower level than the packet command and prints out available details when the data is actually sent.\n"
+                            + "If level >  0 then information about all outgoing UDP data for this avatar is logged.\n"
+                            + "If level <= 0 then no information about outgoing UDP data for this avatar is logged.",
+                            HandleDataCommand);
 
-            m_console.Commands.AddCommand(
-                "Debug", false, "debug lludp drop",
-                "debug lludp drop <in|out> <add|remove> <packet-name>",
-                "Drop all in or outbound packets that match the given name",
-                "For test purposes.",
-                HandleDropCommand);
+                        m_console.Commands.AddCommand(
+                            "Debug", false, "debug lludp drop",
+                            "debug lludp drop <in|out> <add|remove> <packet-name>",
+                            "Drop all in or outbound packets that match the given name",
+                            "For test purposes.",
+                            HandleDropCommand);
 
-            m_console.Commands.AddCommand(
-                "Debug",
-                false,
-                "debug lludp start",
-                "debug lludp start <in|out|all>",
-                "Control LLUDP packet processing.",
-                "No effect if packet processing has already started.\n"
-                + "in  - start inbound processing.\n"
-                + "out - start outbound processing.\n"
-                + "all - start in and outbound processing.\n",
-                HandleStartCommand);
+                        m_console.Commands.AddCommand(
+                            "Debug",
+                            false,
+                            "debug lludp start",
+                            "debug lludp start <in|out|all>",
+                            "Control LLUDP packet processing.",
+                            "No effect if packet processing has already started.\n"
+                            + "in  - start inbound processing.\n"
+                            + "out - start outbound processing.\n"
+                            + "all - start in and outbound processing.\n",
+                            HandleStartCommand);
 
-            m_console.Commands.AddCommand(
-                "Debug",
-                false,
-                "debug lludp stop",
-                "debug lludp stop <in|out|all>",
-                "Stop LLUDP packet processing.",
-                "No effect if packet processing has already stopped.\n"
-                + "in  - stop inbound processing.\n"
-                + "out - stop outbound processing.\n"
-                + "all - stop in and outbound processing.\n",
-                HandleStopCommand);
+                        m_console.Commands.AddCommand(
+                            "Debug",
+                            false,
+                            "debug lludp stop",
+                            "debug lludp stop <in|out|all>",
+                            "Stop LLUDP packet processing.",
+                            "No effect if packet processing has already stopped.\n"
+                            + "in  - stop inbound processing.\n"
+                            + "out - stop outbound processing.\n"
+                            + "all - stop in and outbound processing.\n",
+                            HandleStopCommand);
 
-            m_console.Commands.AddCommand(
-                "Debug",
-                false,
-                "debug lludp pool",
-                "debug lludp pool <on|off>",
-                "Turn object pooling within the lludp component on or off.",
-                HandlePoolCommand);
+                        m_console.Commands.AddCommand(
+                            "Debug",
+                            false,
+                            "debug lludp pool",
+                            "debug lludp pool <on|off>",
+                            "Turn object pooling within the lludp component on or off.",
+                            HandlePoolCommand);
 
-            m_console.Commands.AddCommand(
-                "Debug",
-                false,
-                "debug lludp status",
-                "debug lludp status",
-                "Return status of LLUDP packet processing.",
-                HandleStatusCommand);
+                        m_console.Commands.AddCommand(
+                            "Debug",
+                            false,
+                            "debug lludp status",
+                            "debug lludp status",
+                            "Return status of LLUDP packet processing.",
+                            HandleStatusCommand);
 
-            m_console.Commands.AddCommand(
-                "Debug",
-                false,
-                "debug lludp throttles log",
-                "debug lludp throttles log <level> [<avatar-first-name> <avatar-last-name>]",
-                "Change debug logging level for throttles.",
-                "If level >= 0 then throttle debug logging is performed.\n"
-                + "If level <= 0 then no throttle debug logging is performed.",
-                HandleThrottleCommand);
+                        m_console.Commands.AddCommand(
+                            "Debug",
+                            false,
+                            "debug lludp throttles log",
+                            "debug lludp throttles log <level> [<avatar-first-name> <avatar-last-name>]",
+                            "Change debug logging level for throttles.",
+                            "If level >= 0 then throttle debug logging is performed.\n"
+                            + "If level <= 0 then no throttle debug logging is performed.",
+                            HandleThrottleCommand);
 
-            m_console.Commands.AddCommand(
-                "Debug",
-                false,
-                "debug lludp throttles get",
-                "debug lludp throttles get [<avatar-first-name> <avatar-last-name>]",
-                "Return debug settings for throttles.",
-                      "adaptive - true/false, controls adaptive throttle setting.\n"
-                    + "request  - request drip rate in kbps.\n"
-                    + "max      - the max kbps throttle allowed for the specified existing clients.  Use 'debug lludp get new-client-throttle-max' to see the setting for new clients.\n",
-                HandleThrottleGetCommand);
+                        m_console.Commands.AddCommand(
+                            "Debug",
+                            false,
+                            "debug lludp throttles get",
+                            "debug lludp throttles get [<avatar-first-name> <avatar-last-name>]",
+                            "Return debug settings for throttles.",
+                                  "adaptive - true/false, controls adaptive throttle setting.\n"
+                                + "request  - request drip rate in kbps.\n"
+                                + "max      - the max kbps throttle allowed for the specified existing clients.  Use 'debug lludp get new-client-throttle-max' to see the setting for new clients.\n",
+                            HandleThrottleGetCommand);
 
-            m_console.Commands.AddCommand(
-                "Debug",
-                false,
-                "debug lludp throttles set",
-                "debug lludp throttles set <param> <value> [<avatar-first-name> <avatar-last-name>]",
-                "Set a throttle parameter for the given client.",
-                      "adaptive - true/false, controls adaptive throttle setting.\n"
-                    + "current  - current drip rate in kbps.\n"
-                    + "request  - requested drip rate in kbps.\n"
-                    + "max      - the max kbps throttle allowed for the specified existing clients.  Use 'debug lludp set new-client-throttle-max' to change the settings for new clients.\n",
-                HandleThrottleSetCommand);
+                        m_console.Commands.AddCommand(
+                            "Debug",
+                            false,
+                            "debug lludp throttles set",
+                            "debug lludp throttles set <param> <value> [<avatar-first-name> <avatar-last-name>]",
+                            "Set a throttle parameter for the given client.",
+                                  "adaptive - true/false, controls adaptive throttle setting.\n"
+                                + "current  - current drip rate in kbps.\n"
+                                + "request  - requested drip rate in kbps.\n"
+                                + "max      - the max kbps throttle allowed for the specified existing clients.  Use 'debug lludp set new-client-throttle-max' to change the settings for new clients.\n",
+                            HandleThrottleSetCommand);
 
-            m_console.Commands.AddCommand(
-                "Debug",
-                false,
-                "debug lludp get",
-                "debug lludp get",
-                "Get debug parameters for the server.",
-                      "max-scene-throttle      - the current max cumulative kbps provided for this scene to clients.\n"
-                    + "max-new-client-throttle - the max kbps throttle allowed to new clients.   Use 'debug lludp throttles get max' to see the settings for existing clients.",
-                HandleGetCommand);
+                        m_console.Commands.AddCommand(
+                            "Debug",
+                            false,
+                            "debug lludp get",
+                            "debug lludp get",
+                            "Get debug parameters for the server.",
+                                  "max-scene-throttle      - the current max cumulative kbps provided for this scene to clients.\n"
+                                + "max-new-client-throttle - the max kbps throttle allowed to new clients.   Use 'debug lludp throttles get max' to see the settings for existing clients.",
+                            HandleGetCommand);
 
-            m_console.Commands.AddCommand(
-                "Debug",
-                false,
-                "debug lludp set",
-                "debug lludp set <param> <value>",
-                "Set a parameter for the server.",
-                      "max-scene-throttle      - the current max cumulative kbps provided for this scene to clients.\n"
-                    + "max-new-client-throttle - the max kbps throttle allowed to each new client.  Use 'debug lludp throttles set max' to set for existing clients.",
-                HandleSetCommand);
+                        m_console.Commands.AddCommand(
+                            "Debug",
+                            false,
+                            "debug lludp set",
+                            "debug lludp set <param> <value>",
+                            "Set a parameter for the server.",
+                                  "max-scene-throttle      - the current max cumulative kbps provided for this scene to clients.\n"
+                                + "max-new-client-throttle - the max kbps throttle allowed to each new client.  Use 'debug lludp throttles set max' to set for existing clients.",
+                            HandleSetCommand);
 
-            m_console.Commands.AddCommand(
-                "Debug",
-                false,
-                "debug lludp toggle agentupdate",
-                "debug lludp toggle agentupdate",
-                "Toggle whether agentupdate packets are processed or simply discarded.",
-                HandleAgentUpdateCommand);
+                        m_console.Commands.AddCommand(
+                            "Debug",
+                            false,
+                            "debug lludp toggle agentupdate",
+                            "debug lludp toggle agentupdate",
+                            "Toggle whether agentupdate packets are processed or simply discarded.",
+                            HandleAgentUpdateCommand);
 
-            MainConsole.Instance.Commands.AddCommand(
-                "Debug",
-                false,
-                "debug lludp oqre",
-                "debug lludp oqre <start|stop|status>",
-                "Start, stop or get status of OutgoingQueueRefillEngine.",
-                "If stopped then refill requests are processed directly via the threadpool.",
-                HandleOqreCommand);
+                        MainConsole.Instance.Commands.AddCommand(
+                            "Debug",
+                            false,
+                            "debug lludp oqre",
+                            "debug lludp oqre <start|stop|status>",
+                            "Start, stop or get status of OutgoingQueueRefillEngine.",
+                            "If stopped then refill requests are processed directly via the threadpool.",
+                            HandleOqreCommand);
 
-            m_console.Commands.AddCommand(
-                "Debug",
-                false,
-                "debug lludp client get",
-                "debug lludp client get [<avatar-first-name> <avatar-last-name>]",
-                "Get debug parameters for the client.  If no name is given then all client information is returned.",
-                "process-unacked-sends - Do we take action if a sent reliable packet has not been acked.",
-                HandleClientGetCommand);
+                        m_console.Commands.AddCommand(
+                            "Debug",
+                            false,
+                            "debug lludp client get",
+                            "debug lludp client get [<avatar-first-name> <avatar-last-name>]",
+                            "Get debug parameters for the client.  If no name is given then all client information is returned.",
+                            "process-unacked-sends - Do we take action if a sent reliable packet has not been acked.",
+                            HandleClientGetCommand);
 
-            m_console.Commands.AddCommand(
-                "Debug",
-                false,
-                "debug lludp client set",
-                "debug lludp client set <param> <value> [<avatar-first-name> <avatar-last-name>]",
-                "Set a debug parameter for a particular client.  If no name is given then the value is set on all clients.",
-                "process-unacked-sends - Do we take action if a sent reliable packet has not been acked.",
-                HandleClientSetCommand);
-*/
+                        m_console.Commands.AddCommand(
+                            "Debug",
+                            false,
+                            "debug lludp client set",
+                            "debug lludp client set <param> <value> [<avatar-first-name> <avatar-last-name>]",
+                            "Set a debug parameter for a particular client.  If no name is given then the value is set on all clients.",
+                            "process-unacked-sends - Do we take action if a sent reliable packet has not been acked.",
+                            HandleClientSetCommand);
+            */
         }
 
         private void HandleShowServerThrottlesCommand(string module, string[] args)
@@ -276,8 +275,8 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 (throttleRates.Wind * 8) / 1000,
                 (throttleRates.Cloud * 8) / 1000,
                 (throttleRates.Task * 8) / 1000,
-                (throttleRates.Texture  * 8) / 1000,
-                (throttleRates.Asset  * 8) / 1000);
+                (throttleRates.Texture * 8) / 1000,
+                (throttleRates.Asset * 8) / 1000);
 
             return report.ToString();
         }
@@ -285,7 +284,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         protected string GetColumnEntry(string entry, int maxLength, int columnPadding)
         {
             return string.Format(
-                "{0,-" + maxLength +  "}{1,-" + columnPadding + "}",
+                "{0,-" + maxLength + "}{1,-" + columnPadding + "}",
                 entry.Length > maxLength ? entry.Substring(0, maxLength) : entry,
                 "");
         }
@@ -310,16 +309,16 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
             m_udpServer.Scene.ForEachScenePresence(sp =>
                                        {
-                if (sp.Firstname == firstName && sp.Lastname == lastName)
-                {
-                    MainConsole.Instance.Output(
-                        "Data debug for {0} ({1}) set to {2} in {3}",
-                        null,
-                        sp.Name, sp.IsChildAgent ? "child" : "root", level, m_udpServer.Scene.Name);
+                                           if (sp.Firstname == firstName && sp.Lastname == lastName)
+                                           {
+                                               MainConsole.Instance.Output(
+                                                   "Data debug for {0} ({1}) set to {2} in {3}",
+                                                   null,
+                                                   sp.Name, sp.IsChildAgent ? "child" : "root", level, m_udpServer.Scene.Name);
 
-                    ((LLClientView)sp.ControllingClient).UDPClient.DebugDataOutLevel = level;
-                }
-            });
+                                               ((LLClientView)sp.ControllingClient).UDPClient.DebugDataOutLevel = level;
+                                           }
+                                       });
         }
 
         private void HandleThrottleCommand(string module, string[] args)
@@ -423,17 +422,17 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
                 m_udpServer.Scene.ForEachScenePresence(sp =>
                                                        {
-                    if (all || (sp.Firstname == firstName && sp.Lastname == lastName))
-                    {
-                        MainConsole.Instance.Output(
-                            "Setting param {0} to {1} for {2} ({3}) in {4}",
-                            null,
-                            param, newValue, sp.Name, sp.IsChildAgent ? "child" : "root", m_udpServer.Scene.Name);
+                                                           if (all || (sp.Firstname == firstName && sp.Lastname == lastName))
+                                                           {
+                                                               MainConsole.Instance.Output(
+                                                                   "Setting param {0} to {1} for {2} ({3}) in {4}",
+                                                                   null,
+                                                                   param, newValue, sp.Name, sp.IsChildAgent ? "child" : "root", m_udpServer.Scene.Name);
 
-                        LLUDPClient udpClient = ((LLClientView)sp.ControllingClient).UDPClient;
-                        udpClient.FlowThrottle.RequestedDripRate = newCurrentThrottleKbps;
-                    }
-                });
+                                                               LLUDPClient udpClient = ((LLClientView)sp.ControllingClient).UDPClient;
+                                                               udpClient.FlowThrottle.RequestedDripRate = newCurrentThrottleKbps;
+                                                           }
+                                                       });
             }
             else if (param == "max")
             {
@@ -485,24 +484,24 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
             m_udpServer.Scene.ForEachScenePresence(sp =>
              {
-                if (all || (sp.Firstname == firstName && sp.Lastname == lastName))
-                {
-                    m_console.Output(
-                        "Status for {0} ({1}) in {2}",
-                        null,
-                        sp.Name, sp.IsChildAgent ? "child" : "root", m_udpServer.Scene.Name);
+                 if (all || (sp.Firstname == firstName && sp.Lastname == lastName))
+                 {
+                     m_console.Output(
+                         "Status for {0} ({1}) in {2}",
+                         null,
+                         sp.Name, sp.IsChildAgent ? "child" : "root", m_udpServer.Scene.Name);
 
-                    LLUDPClient udpClient = ((LLClientView)sp.ControllingClient).UDPClient;
+                     LLUDPClient udpClient = ((LLClientView)sp.ControllingClient).UDPClient;
 
-                    ConsoleDisplayList cdl = new ConsoleDisplayList();
-                    cdl.AddRow("adaptive", udpClient.FlowThrottle.AdaptiveEnabled);
-                    cdl.AddRow("current", string.Format("{0} kbps", udpClient.FlowThrottle.DripRate * 8 / 1000));
-                    cdl.AddRow("request", string.Format("{0} kbps", udpClient.FlowThrottle.RequestedDripRate * 8 / 1000));
-                    cdl.AddRow("max", string.Format("{0} kbps", udpClient.FlowThrottle.MaxDripRate * 8 / 1000));
+                     ConsoleDisplayList cdl = new ConsoleDisplayList();
+                     cdl.AddRow("adaptive", udpClient.FlowThrottle.AdaptiveEnabled);
+                     cdl.AddRow("current", string.Format("{0} kbps", udpClient.FlowThrottle.DripRate * 8 / 1000));
+                     cdl.AddRow("request", string.Format("{0} kbps", udpClient.FlowThrottle.RequestedDripRate * 8 / 1000));
+                     cdl.AddRow("max", string.Format("{0} kbps", udpClient.FlowThrottle.MaxDripRate * 8 / 1000));
 
-                    m_console.Output(cdl.ToString());
-                }
-            });
+                     m_console.Output(cdl.ToString());
+                 }
+             });
         }
 
         private void HandleGetCommand(string module, string[] args)
@@ -564,58 +563,58 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             m_console.Output("{0} set to {1} in {2}", null, param, rawValue, m_udpServer.Scene.Name);
         }
 
-/* not in use, nothing to set/get from lludp
-        private void HandleClientGetCommand(string module, string[] args)
-        {
-            if (SceneManager.Instance.CurrentScene != null && SceneManager.Instance.CurrentScene != m_udpServer.Scene)
-                return;
-
-            if (args.Length != 4 && args.Length != 6)
-            {
-                MainConsole.Instance.OutputFormat("Usage: debug lludp client get [<avatar-first-name> <avatar-last-name>]");
-                return;
-            }
-
-            string name = null;
-
-            if (args.Length == 6)
-                name = string.Format("{0} {1}", args[4], args[5]);
-
-            m_udpServer.Scene.ForEachScenePresence(
-                sp =>
+        /* not in use, nothing to set/get from lludp
+                private void HandleClientGetCommand(string module, string[] args)
                 {
-                    if ((name == null || sp.Name == name) && sp.ControllingClient is LLClientView)
+                    if (SceneManager.Instance.CurrentScene != null && SceneManager.Instance.CurrentScene != m_udpServer.Scene)
+                        return;
+
+                    if (args.Length != 4 && args.Length != 6)
                     {
-                        LLUDPClient udpClient = ((LLClientView)sp.ControllingClient).UDPClient;
-
-                        m_console.OutputFormat(
-                            "Client debug parameters for {0} ({1}) in {2}",
-                            sp.Name, sp.IsChildAgent ? "child" : "root", m_udpServer.Scene.Name);
+                        MainConsole.Instance.OutputFormat("Usage: debug lludp client get [<avatar-first-name> <avatar-last-name>]");
+                        return;
                     }
-                });
-        }
 
-        private void HandleClientSetCommand(string module, string[] args)
-        {
-            if (SceneManager.Instance.CurrentScene != null && SceneManager.Instance.CurrentScene != m_udpServer.Scene)
-                return;
+                    string name = null;
 
-            if (args.Length != 6 && args.Length != 8)
-            {
-                MainConsole.Instance.OutputFormat("Usage: debug lludp client set <param> <value> [<avatar-first-name> <avatar-last-name>]");
-                return;
-            }
+                    if (args.Length == 6)
+                        name = string.Format("{0} {1}", args[4], args[5]);
 
-            string param = args[4];
-            string rawValue = args[5];
+                    m_udpServer.Scene.ForEachScenePresence(
+                        sp =>
+                        {
+                            if ((name == null || sp.Name == name) && sp.ControllingClient is LLClientView)
+                            {
+                                LLUDPClient udpClient = ((LLClientView)sp.ControllingClient).UDPClient;
 
-            string name = null;
+                                m_console.OutputFormat(
+                                    "Client debug parameters for {0} ({1}) in {2}",
+                                    sp.Name, sp.IsChildAgent ? "child" : "root", m_udpServer.Scene.Name);
+                            }
+                        });
+                }
 
-            if (args.Length == 8)
-                name = string.Format("{0} {1}", args[6], args[7]);
-            // nothing here now
-        }
-*/
+                private void HandleClientSetCommand(string module, string[] args)
+                {
+                    if (SceneManager.Instance.CurrentScene != null && SceneManager.Instance.CurrentScene != m_udpServer.Scene)
+                        return;
+
+                    if (args.Length != 6 && args.Length != 8)
+                    {
+                        MainConsole.Instance.OutputFormat("Usage: debug lludp client set <param> <value> [<avatar-first-name> <avatar-last-name>]");
+                        return;
+                    }
+
+                    string param = args[4];
+                    string rawValue = args[5];
+
+                    string name = null;
+
+                    if (args.Length == 8)
+                        name = string.Format("{0} {1}", args[6], args[7]);
+                    // nothing here now
+                }
+        */
         private void HandlePacketCommand(string module, string[] args)
         {
             if (SceneManager.Instance.CurrentScene != null && SceneManager.Instance.CurrentScene != m_udpServer.Scene)
@@ -661,29 +660,29 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         {
                             m_udpServer.Scene.ForEachScenePresence(sp =>
                                                        {
-                                MainConsole.Instance.Output(
-                                    "Packet debug for {0} ({1}) set to {2} in {3}",
-                                    null,
-                                    sp.Name, sp.IsChildAgent ? "child" : "root", newDebug, m_udpServer.Scene.Name);
+                                                           MainConsole.Instance.Output(
+                                                               "Packet debug for {0} ({1}) set to {2} in {3}",
+                                                               null,
+                                                               sp.Name, sp.IsChildAgent ? "child" : "root", newDebug, m_udpServer.Scene.Name);
 
-                                sp.ControllingClient.DebugPacketLevel = newDebug;
-                            });
+                                                           sp.ControllingClient.DebugPacketLevel = newDebug;
+                                                       });
                         }
                     }
                     else
                     {
                         m_udpServer.Scene.ForEachScenePresence(sp =>
                                                    {
-                            if (name == null || sp.Name == name)
-                            {
-                                MainConsole.Instance.Output(
-                                    "Packet debug for {0} ({1}) set to {2} in {3}",
-                                    null,
-                                    sp.Name, sp.IsChildAgent ? "child" : "root", newDebug, m_udpServer.Scene.Name);
+                                                       if (name == null || sp.Name == name)
+                                                       {
+                                                           MainConsole.Instance.Output(
+                                                               "Packet debug for {0} ({1}) set to {2} in {3}",
+                                                               null,
+                                                               sp.Name, sp.IsChildAgent ? "child" : "root", newDebug, m_udpServer.Scene.Name);
 
-                                sp.ControllingClient.DebugPacketLevel = newDebug;
-                            }
-                        });
+                                                           sp.ControllingClient.DebugPacketLevel = newDebug;
+                                                       }
+                                                   });
                     }
                 }
                 else
@@ -718,13 +717,13 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 m_udpServer.Scene.ForEachScenePresence(
                     sp =>
                     {
-                    LLClientView llcv = (LLClientView)sp.ControllingClient;
+                        LLClientView llcv = (LLClientView)sp.ControllingClient;
 
-                    if (direction == "in")
-                        llcv.AddInPacketToDropSet(packetName);
-                    else if (direction == "out")
-                        llcv.AddOutPacketToDropSet(packetName);
-                }
+                        if (direction == "in")
+                            llcv.AddInPacketToDropSet(packetName);
+                        else if (direction == "out")
+                            llcv.AddOutPacketToDropSet(packetName);
+                    }
                 );
             }
             else if (subCommand == "remove")
@@ -737,13 +736,13 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 m_udpServer.Scene.ForEachScenePresence(
                     sp =>
                     {
-                    LLClientView llcv = (LLClientView)sp.ControllingClient;
+                        LLClientView llcv = (LLClientView)sp.ControllingClient;
 
-                    if (direction == "in")
-                        llcv.RemoveInPacketFromDropSet(packetName);
-                    else if (direction == "out")
-                        llcv.RemoveOutPacketFromDropSet(packetName);
-                }
+                        if (direction == "in")
+                            llcv.RemoveInPacketFromDropSet(packetName);
+                        else if (direction == "out")
+                            llcv.RemoveOutPacketFromDropSet(packetName);
+                    }
                 );
             }
         }

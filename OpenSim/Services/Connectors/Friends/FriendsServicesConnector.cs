@@ -26,18 +26,15 @@
  */
 
 using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
-using Nini.Config;
-using OpenSim.Framework;
-using OpenSim.Framework.ServiceAuth;
-
-using OpenSim.Services.Interfaces;
 using FriendInfo = OpenSim.Services.Interfaces.FriendInfo;
-using OpenSim.Server.Base;
-using OpenMetaverse;
 
 namespace OpenSim.Services.Connectors.Friends
 {
@@ -123,7 +120,7 @@ namespace OpenSim.Services.Connectors.Friends
                     {
                         if (replyData.ContainsKey("result") && (replyData["result"].ToString().ToLower() == "null"))
                         {
-                        return new FriendInfo[0];
+                            return new FriendInfo[0];
                         }
 
                         List<FriendInfo> finfos = new List<FriendInfo>();

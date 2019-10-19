@@ -25,30 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Reflection;
-using System.Text;
-using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using OpenMetaverse.Messages.Linden;
-using Mono.Addins;
 using OpenSim.Framework;
-using OpenSim.Framework.Capabilities;
-using OpenSim.Framework.Console;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Region.CoreModules.Framework.InterfaceCommander;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.PhysicsModules.SharedBase;
-using OpenSim.Services.Interfaces;
-using Caps = OpenSim.Framework.Capabilities.Caps;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
+using System;
 
 namespace OpenSim.Region.CoreModules.World.Land
 {
@@ -73,13 +56,14 @@ namespace OpenSim.Region.CoreModules.World.Land
         {
             m_Config = source;
 
-            IConfig DwellConfig = m_Config.Configs ["Dwell"];
+            IConfig DwellConfig = m_Config.Configs["Dwell"];
 
-            if (DwellConfig == null) {
+            if (DwellConfig == null)
+            {
                 m_Enabled = false;
                 return;
             }
-            m_Enabled = (DwellConfig.GetString ("DwellModule", "DefaultDwellModule") == "DefaultDwellModule");
+            m_Enabled = (DwellConfig.GetString("DwellModule", "DefaultDwellModule") == "DefaultDwellModule");
         }
 
         public void AddRegion(Scene scene)
@@ -121,7 +105,7 @@ namespace OpenSim.Region.CoreModules.World.Land
                 return;
 
             LandData land = parcel.LandData;
-            if(land!= null)
+            if (land != null)
                 client.SendParcelDwellReply(localID, land.GlobalID, land.Dwell);
         }
 
@@ -130,14 +114,14 @@ namespace OpenSim.Region.CoreModules.World.Land
         {
             ILandObject parcel = m_scene.LandChannel.GetLandObject(parcelID);
             if (parcel != null && parcel.LandData != null)
-               return (int)(parcel.LandData.Dwell);
+                return (int)(parcel.LandData.Dwell);
             return 0;
         }
 
         public int GetDwell(LandData land)
         {
             if (land != null)
-               return (int)(land.Dwell);
+                return (int)(land.Dwell);
             return 0;
         }
 

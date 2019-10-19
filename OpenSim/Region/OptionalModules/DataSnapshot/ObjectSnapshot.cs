@@ -25,16 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Xml;
 using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.DataSnapshot.Interfaces;
-using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Xml;
 
 namespace OpenSim.Region.DataSnapshot.Providers
 {
@@ -56,7 +55,7 @@ namespace OpenSim.Region.DataSnapshot.Providers
 
             //To check for staleness, we must catch all incoming client packets.
             m_scene.EventManager.OnNewClient += OnNewClient;
-            m_scene.EventManager.OnParcelPrimCountAdd += delegate(SceneObjectGroup obj) { this.Stale = true; };
+            m_scene.EventManager.OnParcelPrimCountAdd += delegate (SceneObjectGroup obj) { this.Stale = true; };
         }
 
         public void OnNewClient(IClientAPI client)
@@ -66,28 +65,35 @@ namespace OpenSim.Region.DataSnapshot.Providers
 
             client.OnAddPrim += delegate (UUID ownerID, UUID groupID, Vector3 RayEnd, Quaternion rot,
                 PrimitiveBaseShape shape, byte bypassRaycast, Vector3 RayStart, UUID RayTargetID,
-                byte RayEndIsIntersection) { this.Stale = true; };
+                byte RayEndIsIntersection)
+            { this.Stale = true; };
             client.OnLinkObjects += delegate (IClientAPI remoteClient, uint parent, List<uint> children)
                 { this.Stale = true; };
-            client.OnDelinkObjects += delegate(List<uint> primIds, IClientAPI clientApi) { this.Stale = true; };
-            client.OnGrabUpdate += delegate(UUID objectID, Vector3 offset, Vector3 grapPos,
-                IClientAPI remoteClient, List<SurfaceTouchEventArgs> surfaceArgs) { this.Stale = true; };
-            client.OnObjectAttach += delegate(IClientAPI remoteClient, uint objectLocalID, uint AttachmentPt,
-                bool silent) { this.Stale = true; };
-            client.OnObjectDuplicate += delegate(uint localID, Vector3 offset, uint dupeFlags, UUID AgentID,
-                UUID GroupID) { this.Stale = true; };
-            client.OnObjectDuplicateOnRay += delegate(uint localID, uint dupeFlags, UUID AgentID, UUID GroupID,
+            client.OnDelinkObjects += delegate (List<uint> primIds, IClientAPI clientApi) { this.Stale = true; };
+            client.OnGrabUpdate += delegate (UUID objectID, Vector3 offset, Vector3 grapPos,
+                IClientAPI remoteClient, List<SurfaceTouchEventArgs> surfaceArgs)
+            { this.Stale = true; };
+            client.OnObjectAttach += delegate (IClientAPI remoteClient, uint objectLocalID, uint AttachmentPt,
+                bool silent)
+            { this.Stale = true; };
+            client.OnObjectDuplicate += delegate (uint localID, Vector3 offset, uint dupeFlags, UUID AgentID,
+                UUID GroupID)
+            { this.Stale = true; };
+            client.OnObjectDuplicateOnRay += delegate (uint localID, uint dupeFlags, UUID AgentID, UUID GroupID,
                 UUID RayTargetObj, Vector3 RayEnd, Vector3 RayStart, bool BypassRaycast,
-                bool RayEndIsIntersection, bool CopyCenters, bool CopyRotates) { this.Stale = true; };
-            client.OnObjectIncludeInSearch += delegate(IClientAPI remoteClient, bool IncludeInSearch, uint localID)
+                bool RayEndIsIntersection, bool CopyCenters, bool CopyRotates)
+            { this.Stale = true; };
+            client.OnObjectIncludeInSearch += delegate (IClientAPI remoteClient, bool IncludeInSearch, uint localID)
                 { this.Stale = true; };
-            client.OnObjectPermissions += delegate(IClientAPI controller, UUID agentID, UUID sessionID,
-                byte field, uint localId, uint mask, byte set) { this.Stale = true; };
-            client.OnRezObject += delegate(IClientAPI remoteClient, UUID itemID, UUID groupID,
+            client.OnObjectPermissions += delegate (IClientAPI controller, UUID agentID, UUID sessionID,
+                byte field, uint localId, uint mask, byte set)
+            { this.Stale = true; };
+            client.OnRezObject += delegate (IClientAPI remoteClient, UUID itemID, UUID groupID,
                 Vector3 RayEnd,
                 Vector3 RayStart, UUID RayTargetID, byte BypassRayCast, bool RayEndIsIntersection,
                 bool RezSelected,
-                bool RemoveItem, UUID fromTaskID) { this.Stale = true; };
+                bool RemoveItem, UUID fromTaskID)
+            { this.Stale = true; };
         }
 
         public Scene GetParentScene
@@ -110,11 +116,11 @@ namespace OpenSim.Region.DataSnapshot.Providers
                 {
                     SceneObjectGroup obj = (SceneObjectGroup)entity;
 
-//                    m_log.Debug("[DATASNAPSHOT]: Found object " + obj.Name + " in scene");
+                    //                    m_log.Debug("[DATASNAPSHOT]: Found object " + obj.Name + " in scene");
 
                     // libomv will complain about PrimFlags.JointWheel
                     // being obsolete, so we...
-                    #pragma warning disable 0612
+#pragma warning disable 0612
                     if ((obj.RootPart.Flags & PrimFlags.JointWheel) == PrimFlags.JointWheel)
                     {
                         SceneObjectPart m_rootPart = obj.RootPart;
@@ -170,7 +176,7 @@ namespace OpenSim.Region.DataSnapshot.Providers
 
                         parent.AppendChild(xmlobject);
                     }
-                    #pragma warning disable 0612
+#pragma warning disable 0612
                 }
             }
             this.Stale = false;

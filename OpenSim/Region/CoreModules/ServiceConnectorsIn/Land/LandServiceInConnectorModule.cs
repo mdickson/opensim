@@ -25,20 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
-using System.Collections.Generic;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Servers;
-using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using OpenSim.Server.Base;
 using OpenSim.Server.Handlers.Base;
 using OpenSim.Services.Interfaces;
-using OpenMetaverse;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsIn.Land
@@ -77,7 +77,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsIn.Land
             if (!m_Enabled)
                 return;
 
-//            m_log.Info("[LAND IN CONNECTOR]: Starting...");
+            //            m_log.Info("[LAND IN CONNECTOR]: Starting...");
         }
 
         public void Close()
@@ -126,8 +126,8 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsIn.Land
 
         public LandData GetLandData(UUID scopeID, ulong regionHandle, uint x, uint y, out byte regionAccess)
         {
-//            m_log.DebugFormat("[LAND IN CONNECTOR]: GetLandData for {0}. Count = {1}",
-//                regionHandle, m_Scenes.Count);
+            //            m_log.DebugFormat("[LAND IN CONNECTOR]: GetLandData for {0}. Count = {1}",
+            //                regionHandle, m_Scenes.Count);
 
             uint rx = 0, ry = 0;
             Util.RegionHandleToWorldLoc(regionHandle, out rx, out ry);
@@ -136,18 +136,18 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsIn.Land
             foreach (Scene s in m_Scenes)
             {
                 uint t = s.RegionInfo.WorldLocX;
-                if( rx < t)
+                if (rx < t)
                     continue;
                 t += s.RegionInfo.RegionSizeX;
-                if( rx >= t)
+                if (rx >= t)
                     continue;
                 t = s.RegionInfo.WorldLocY;
-                if( ry < t)
+                if (ry < t)
                     continue;
                 t += s.RegionInfo.RegionSizeY;
-                if( ry  < t)
+                if (ry < t)
                 {
-//                    m_log.Debug("[LAND IN CONNECTOR]: Found region to GetLandData from");
+                    //                    m_log.Debug("[LAND IN CONNECTOR]: Found region to GetLandData from");
                     x = rx - s.RegionInfo.WorldLocX;
                     y = ry - s.RegionInfo.WorldLocY;
                     regionAccess = s.RegionInfo.AccessLevel;
@@ -155,7 +155,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsIn.Land
                     IDwellModule dwellModule = s.RequestModuleInterface<IDwellModule>();
                     if (dwellModule != null)
                         land.Dwell = dwellModule.GetDwell(land);
-                    return land; 
+                    return land;
                 }
             }
             m_log.DebugFormat("[LAND IN CONNECTOR]: region handle {0} not found", regionHandle);

@@ -1,23 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Reflection;
-using System.Text;
-using log4net;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Region.CoreModules.Scripting.LSLHttp;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.ScriptEngine.Shared;
 using OpenSim.Region.ScriptEngine.Shared.Api;
 using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
-using OpenSim.Services.Interfaces;
 using OpenSim.Tests.Common;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Tests
 {
@@ -134,136 +123,136 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
             Assert.That(m_engine.PostedEvents.Count, Is.EqualTo(0));
         }
 
-//        [Test]
-//        public void TestLlReleaseUrl()
-//        {
-//            TestHelpers.InMethod();
-//
-//            m_lslApi.llRequestURL();
-//            string returnedUri = m_engine.PostedEvents[m_scriptItem.ItemID][0].Params[2].ToString();
-//
-//            {
-//                // Check that the initial number of URLs is correct
-//                Assert.That(m_lslApi.llGetFreeURLs().value, Is.EqualTo(m_urlModule.TotalUrls - 1));
-//            }
-//
-//            {
-//                // Check releasing a non-url
-//                m_lslApi.llReleaseURL("GARBAGE");
-//                Assert.That(m_lslApi.llGetFreeURLs().value, Is.EqualTo(m_urlModule.TotalUrls - 1));
-//            }
-//
-//            {
-//                // Check releasing a non-existing url
-//                m_lslApi.llReleaseURL("http://example.com");
-//                Assert.That(m_lslApi.llGetFreeURLs().value, Is.EqualTo(m_urlModule.TotalUrls - 1));
-//            }
-//
-//            {
-//                // Check URL release
-//                m_lslApi.llReleaseURL(returnedUri);
-//                Assert.That(m_lslApi.llGetFreeURLs().value, Is.EqualTo(m_urlModule.TotalUrls));
-//
-//                HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(returnedUri);
-//
-//                bool gotExpectedException = false;
-//
-//                try
-//                {
-//                    using (HttpWebResponse webResponse = (HttpWebResponse)webRequest.GetResponse())
-//                    {}
-//                }
-//                catch (WebException e)
-//                {
-//                    using (HttpWebResponse response = (HttpWebResponse)e.Response)
-//                        gotExpectedException = response.StatusCode == HttpStatusCode.NotFound;
-//                }
-//
-//                Assert.That(gotExpectedException, Is.True);
-//            }
-//
-//            {
-//                // Check releasing the same URL again
-//                m_lslApi.llReleaseURL(returnedUri);
-//                Assert.That(m_lslApi.llGetFreeURLs().value, Is.EqualTo(m_urlModule.TotalUrls));
-//            }
-//        }
-//
-//        [Test]
-//        public void TestLlRequestUrl()
-//        {
-//            TestHelpers.InMethod();
-//
-//            string requestId = m_lslApi.llRequestURL();
-//            Assert.That(requestId, Is.Not.EqualTo(UUID.Zero.ToString()));
-//            string returnedUri;
-//
-//            {
-//                // Check that URL is correctly set up
-//                Assert.That(m_lslApi.llGetFreeURLs().value, Is.EqualTo(m_urlModule.TotalUrls - 1));
-//
-//                Assert.That(m_engine.PostedEvents.ContainsKey(m_scriptItem.ItemID));
-//
-//                List<EventParams> events = m_engine.PostedEvents[m_scriptItem.ItemID];
-//                Assert.That(events.Count, Is.EqualTo(1));
-//                EventParams eventParams = events[0];
-//                Assert.That(eventParams.EventName, Is.EqualTo("http_request"));
-//
-//                UUID returnKey;
-//                string rawReturnKey = eventParams.Params[0].ToString();
-//                string method = eventParams.Params[1].ToString();
-//                returnedUri = eventParams.Params[2].ToString();
-//
-//                Assert.That(UUID.TryParse(rawReturnKey, out returnKey), Is.True);
-//                Assert.That(method, Is.EqualTo(ScriptBaseClass.URL_REQUEST_GRANTED));
-//                Assert.That(Uri.IsWellFormedUriString(returnedUri, UriKind.Absolute), Is.True);
-//            }
-//
-//            {
-//                // Check that request to URL works.
-//                string testResponse = "Hello World";
-//
-//                m_engine.ClearPostedEvents();
-//                m_engine.PostEventHook
-//                    += (itemId, evp) => m_lslApi.llHTTPResponse(evp.Params[0].ToString(), 200, testResponse);
-//
-////                Console.WriteLine("Trying {0}", returnedUri);
-//                HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(returnedUri);
-//
-//                AssertHttpResponse(returnedUri, testResponse);
-//
-//                Assert.That(m_engine.PostedEvents.ContainsKey(m_scriptItem.ItemID));
-//
-//                List<EventParams> events = m_engine.PostedEvents[m_scriptItem.ItemID];
-//                Assert.That(events.Count, Is.EqualTo(1));
-//                EventParams eventParams = events[0];
-//                Assert.That(eventParams.EventName, Is.EqualTo("http_request"));
-//
-//                UUID returnKey;
-//                string rawReturnKey = eventParams.Params[0].ToString();
-//                string method = eventParams.Params[1].ToString();
-//                string body = eventParams.Params[2].ToString();
-//
-//                Assert.That(UUID.TryParse(rawReturnKey, out returnKey), Is.True);
-//                Assert.That(method, Is.EqualTo("GET"));
-//                Assert.That(body, Is.EqualTo(""));
-//            }
-//        }
-//
-//        private void AssertHttpResponse(string uri, string expectedResponse)
-//        {
-//            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(uri);
-//
-//            using (HttpWebResponse webResponse = (HttpWebResponse)webRequest.GetResponse())
-//            {
-//                using (Stream stream = webResponse.GetResponseStream())
-//                {
-//                    using (StreamReader reader = new StreamReader(stream))
-//                    {
-//                        Assert.That(reader.ReadToEnd(), Is.EqualTo(expectedResponse));
-//                    }
-//                }
-//            }
-//        }
+        //        [Test]
+        //        public void TestLlReleaseUrl()
+        //        {
+        //            TestHelpers.InMethod();
+        //
+        //            m_lslApi.llRequestURL();
+        //            string returnedUri = m_engine.PostedEvents[m_scriptItem.ItemID][0].Params[2].ToString();
+        //
+        //            {
+        //                // Check that the initial number of URLs is correct
+        //                Assert.That(m_lslApi.llGetFreeURLs().value, Is.EqualTo(m_urlModule.TotalUrls - 1));
+        //            }
+        //
+        //            {
+        //                // Check releasing a non-url
+        //                m_lslApi.llReleaseURL("GARBAGE");
+        //                Assert.That(m_lslApi.llGetFreeURLs().value, Is.EqualTo(m_urlModule.TotalUrls - 1));
+        //            }
+        //
+        //            {
+        //                // Check releasing a non-existing url
+        //                m_lslApi.llReleaseURL("http://example.com");
+        //                Assert.That(m_lslApi.llGetFreeURLs().value, Is.EqualTo(m_urlModule.TotalUrls - 1));
+        //            }
+        //
+        //            {
+        //                // Check URL release
+        //                m_lslApi.llReleaseURL(returnedUri);
+        //                Assert.That(m_lslApi.llGetFreeURLs().value, Is.EqualTo(m_urlModule.TotalUrls));
+        //
+        //                HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(returnedUri);
+        //
+        //                bool gotExpectedException = false;
+        //
+        //                try
+        //                {
+        //                    using (HttpWebResponse webResponse = (HttpWebResponse)webRequest.GetResponse())
+        //                    {}
+        //                }
+        //                catch (WebException e)
+        //                {
+        //                    using (HttpWebResponse response = (HttpWebResponse)e.Response)
+        //                        gotExpectedException = response.StatusCode == HttpStatusCode.NotFound;
+        //                }
+        //
+        //                Assert.That(gotExpectedException, Is.True);
+        //            }
+        //
+        //            {
+        //                // Check releasing the same URL again
+        //                m_lslApi.llReleaseURL(returnedUri);
+        //                Assert.That(m_lslApi.llGetFreeURLs().value, Is.EqualTo(m_urlModule.TotalUrls));
+        //            }
+        //        }
+        //
+        //        [Test]
+        //        public void TestLlRequestUrl()
+        //        {
+        //            TestHelpers.InMethod();
+        //
+        //            string requestId = m_lslApi.llRequestURL();
+        //            Assert.That(requestId, Is.Not.EqualTo(UUID.Zero.ToString()));
+        //            string returnedUri;
+        //
+        //            {
+        //                // Check that URL is correctly set up
+        //                Assert.That(m_lslApi.llGetFreeURLs().value, Is.EqualTo(m_urlModule.TotalUrls - 1));
+        //
+        //                Assert.That(m_engine.PostedEvents.ContainsKey(m_scriptItem.ItemID));
+        //
+        //                List<EventParams> events = m_engine.PostedEvents[m_scriptItem.ItemID];
+        //                Assert.That(events.Count, Is.EqualTo(1));
+        //                EventParams eventParams = events[0];
+        //                Assert.That(eventParams.EventName, Is.EqualTo("http_request"));
+        //
+        //                UUID returnKey;
+        //                string rawReturnKey = eventParams.Params[0].ToString();
+        //                string method = eventParams.Params[1].ToString();
+        //                returnedUri = eventParams.Params[2].ToString();
+        //
+        //                Assert.That(UUID.TryParse(rawReturnKey, out returnKey), Is.True);
+        //                Assert.That(method, Is.EqualTo(ScriptBaseClass.URL_REQUEST_GRANTED));
+        //                Assert.That(Uri.IsWellFormedUriString(returnedUri, UriKind.Absolute), Is.True);
+        //            }
+        //
+        //            {
+        //                // Check that request to URL works.
+        //                string testResponse = "Hello World";
+        //
+        //                m_engine.ClearPostedEvents();
+        //                m_engine.PostEventHook
+        //                    += (itemId, evp) => m_lslApi.llHTTPResponse(evp.Params[0].ToString(), 200, testResponse);
+        //
+        ////                Console.WriteLine("Trying {0}", returnedUri);
+        //                HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(returnedUri);
+        //
+        //                AssertHttpResponse(returnedUri, testResponse);
+        //
+        //                Assert.That(m_engine.PostedEvents.ContainsKey(m_scriptItem.ItemID));
+        //
+        //                List<EventParams> events = m_engine.PostedEvents[m_scriptItem.ItemID];
+        //                Assert.That(events.Count, Is.EqualTo(1));
+        //                EventParams eventParams = events[0];
+        //                Assert.That(eventParams.EventName, Is.EqualTo("http_request"));
+        //
+        //                UUID returnKey;
+        //                string rawReturnKey = eventParams.Params[0].ToString();
+        //                string method = eventParams.Params[1].ToString();
+        //                string body = eventParams.Params[2].ToString();
+        //
+        //                Assert.That(UUID.TryParse(rawReturnKey, out returnKey), Is.True);
+        //                Assert.That(method, Is.EqualTo("GET"));
+        //                Assert.That(body, Is.EqualTo(""));
+        //            }
+        //        }
+        //
+        //        private void AssertHttpResponse(string uri, string expectedResponse)
+        //        {
+        //            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(uri);
+        //
+        //            using (HttpWebResponse webResponse = (HttpWebResponse)webRequest.GetResponse())
+        //            {
+        //                using (Stream stream = webResponse.GetResponseStream())
+        //                {
+        //                    using (StreamReader reader = new StreamReader(stream))
+        //                    {
+        //                        Assert.That(reader.ReadToEnd(), Is.EqualTo(expectedResponse));
+        //                    }
+        //                }
+        //            }
+        //        }
     }
 }

@@ -25,30 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework.Monitoring;
+using OpenSim.Framework.Servers.HttpServer;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Timers;
 using System.Net;
 using System.Net.Security;
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
-using log4net;
-using log4net.Appender;
-using log4net.Core;
-using log4net.Repository;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Framework.Monitoring;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Servers.HttpServer;
-using Timer=System.Timers.Timer;
-using Nini.Config;
+using System.Text;
+using System.Threading;
+using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace OpenSim.Framework.Servers
 {
@@ -100,7 +91,7 @@ namespace OpenSim.Framework.Servers
         {
             if (m_NoVerifyCertChain)
                 sslPolicyErrors &= ~SslPolicyErrors.RemoteCertificateChainErrors;
- 
+
             if (m_NoVerifyCertHostname)
                 sslPolicyErrors &= ~SslPolicyErrors.RemoteCertificateNameMismatch;
 
@@ -108,7 +99,7 @@ namespace OpenSim.Framework.Servers
                 return true;
 
             return false;
-        }             
+        }
         /// <summary>
         /// Must be overriden by child classes for their own server specific startup behaviour.
         /// </summary>
@@ -138,7 +129,7 @@ namespace OpenSim.Framework.Servers
         {
             Watchdog.Enabled = false;
             base.ShutdownSpecific();
-            
+
             MainServer.Stop();
 
             Thread.Sleep(500);
@@ -149,7 +140,7 @@ namespace OpenSim.Framework.Servers
 
             m_log.Info("[SHUTDOWN]: Shutdown processing on main thread complete.  Exiting...");
 
-           if (!SuppressExit)
+            if (!SuppressExit)
                 Environment.Exit(0);
         }
 
@@ -196,7 +187,7 @@ namespace OpenSim.Framework.Servers
             {
                 StartupSpecific();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 m_log.Fatal("Fatal error: " + e.ToString());
                 Environment.Exit(1);
@@ -204,9 +195,9 @@ namespace OpenSim.Framework.Servers
 
             TimeSpan timeTaken = DateTime.Now - m_startuptime;
 
-//            MainConsole.Instance.OutputFormat(
-//                "PLEASE WAIT FOR LOGINS TO BE ENABLED ON REGIONS ONCE SCRIPTS HAVE STARTED.  Non-script portion of startup took {0}m {1}s.",
-//                timeTaken.Minutes, timeTaken.Seconds);
+            //            MainConsole.Instance.OutputFormat(
+            //                "PLEASE WAIT FOR LOGINS TO BE ENABLED ON REGIONS ONCE SCRIPTS HAVE STARTED.  Non-script portion of startup took {0}m {1}s.",
+            //                timeTaken.Minutes, timeTaken.Seconds);
         }
 
         public string osSecret
@@ -220,11 +211,11 @@ namespace OpenSim.Framework.Servers
             // If we catch a request for "callback", wrap the response in the value for jsonp
             if (httpRequest.Query.ContainsKey("callback"))
             {
-                return httpRequest.Query["callback"].ToString() + "(" + StatsManager.SimExtraStats.XReport((DateTime.Now - m_startuptime).ToString() , m_version) + ");";
+                return httpRequest.Query["callback"].ToString() + "(" + StatsManager.SimExtraStats.XReport((DateTime.Now - m_startuptime).ToString(), m_version) + ");";
             }
             else
             {
-                return StatsManager.SimExtraStats.XReport((DateTime.Now - m_startuptime).ToString() , m_version);
+                return StatsManager.SimExtraStats.XReport((DateTime.Now - m_startuptime).ToString(), m_version);
             }
         }
     }

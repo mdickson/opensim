@@ -25,13 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using Mono.Data.SqliteClient;
+using OpenMetaverse;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using Mono.Data.SqliteClient;
-using OpenMetaverse;
-using OpenSim.Framework;
 
 namespace OpenSim.Region.UserStatistics
 {
@@ -51,7 +50,7 @@ namespace OpenSim.Region.UserStatistics
             modeldata.Add("Reports", pParams["Reports"]);
             SqliteConnection dbConn = (SqliteConnection)pParams["DatabaseConnection"];
             List<SessionList> lstSessions = new List<SessionList>();
-            Hashtable requestvars = (Hashtable) pParams["RequestVars"];
+            Hashtable requestvars = (Hashtable)pParams["RequestVars"];
 
 
             string puserUUID = string.Empty;
@@ -119,7 +118,7 @@ namespace OpenSim.Region.UserStatistics
                     UUID userUUID = UUID.Zero;
 
                     SessionList activeSessionList = new SessionList();
-                    activeSessionList.user_id=UUID.Random();
+                    activeSessionList.user_id = UUID.Random();
                     while (sdr.Read())
                     {
                         UUID readUUID = UUID.Parse(sdr["agent_id"].ToString());
@@ -153,7 +152,7 @@ namespace OpenSim.Region.UserStatistics
 
         public string RenderView(Hashtable pModelResult)
         {
-            List<SessionList> lstSession = (List<SessionList>) pModelResult["SessionData"];
+            List<SessionList> lstSession = (List<SessionList>)pModelResult["SessionData"];
             Dictionary<string, IStatsController> reports = (Dictionary<string, IStatsController>)pModelResult["Reports"];
 
             const string STYLESHEET =

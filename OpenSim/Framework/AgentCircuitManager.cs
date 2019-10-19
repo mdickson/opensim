@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
 using OpenMetaverse;
+using System.Collections.Generic;
 
 namespace OpenSim.Framework
 {
@@ -172,16 +172,16 @@ namespace OpenSim.Framework
         {
             lock (m_agentCircuits)
             {
-                if (m_agentCircuits.ContainsKey((uint) agentData.circuitcode))
+                if (m_agentCircuits.ContainsKey((uint)agentData.circuitcode))
                 {
-                    m_agentCircuits[(uint) agentData.circuitcode].firstname = agentData.firstname;
-                    m_agentCircuits[(uint) agentData.circuitcode].lastname = agentData.lastname;
+                    m_agentCircuits[(uint)agentData.circuitcode].firstname = agentData.firstname;
+                    m_agentCircuits[(uint)agentData.circuitcode].lastname = agentData.lastname;
                     m_agentCircuits[(uint)agentData.circuitcode].startpos = agentData.startpos;
                     m_agentCircuits[(uint)agentData.circuitcode].startfar = agentData.startfar;
 
                     // Updated for when we don't know them before calling Scene.NewUserConnection
-                    m_agentCircuits[(uint) agentData.circuitcode].SecureSessionID = agentData.SecureSessionID;
-                    m_agentCircuits[(uint) agentData.circuitcode].SessionID = agentData.SessionID;
+                    m_agentCircuits[(uint)agentData.circuitcode].SecureSessionID = agentData.SecureSessionID;
+                    m_agentCircuits[(uint)agentData.circuitcode].SessionID = agentData.SessionID;
 
                     // m_log.Debug("update user start pos is " + agentData.startpos.X + " , " + agentData.startpos.Y + " , " + agentData.startpos.Z);
                 }

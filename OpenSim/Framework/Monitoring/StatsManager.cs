@@ -25,14 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse.StructuredData;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-
-using OpenSim.Framework;
-using OpenMetaverse.StructuredData;
 
 namespace OpenSim.Framework.Monitoring
 {
@@ -61,12 +58,12 @@ namespace OpenSim.Framework.Monitoring
         public static SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, Stat>>> RegisteredStats
             = new SortedDictionary<string, SortedDictionary<string, SortedDictionary<string, Stat>>>();
 
-//        private static AssetStatsCollector assetStats;
-//        private static UserStatsCollector userStats;
-//        private static SimExtraStatsCollector simExtraStats = new SimExtraStatsCollector();
+        //        private static AssetStatsCollector assetStats;
+        //        private static UserStatsCollector userStats;
+        //        private static SimExtraStatsCollector simExtraStats = new SimExtraStatsCollector();
 
-//        public static AssetStatsCollector AssetStats { get { return assetStats; } }
-//        public static UserStatsCollector UserStats { get { return userStats; } }
+        //        public static AssetStatsCollector AssetStats { get { return assetStats; } }
+        //        public static UserStatsCollector UserStats { get { return userStats; } }
         public static SimExtraStatsCollector SimExtraStats { get; set; }
 
         public static void RegisterConsoleCommands(ICommandConsole console)
@@ -300,7 +297,7 @@ namespace OpenSim.Framework.Monitoring
         public static Hashtable HandleStatsRequest(Hashtable request)
         {
             Hashtable responsedata = new Hashtable();
-//            string regpath = request["uri"].ToString();
+            //            string regpath = request["uri"].ToString();
             int response_code = 200;
             string contenttype = "text/json";
 
@@ -343,27 +340,27 @@ namespace OpenSim.Framework.Monitoring
             return responsedata;
         }
 
-//        /// <summary>
-//        /// Start collecting statistics related to assets.
-//        /// Should only be called once.
-//        /// </summary>
-//        public static AssetStatsCollector StartCollectingAssetStats()
-//        {
-//            assetStats = new AssetStatsCollector();
-//
-//            return assetStats;
-//        }
-//
-//        /// <summary>
-//        /// Start collecting statistics related to users.
-//        /// Should only be called once.
-//        /// </summary>
-//        public static UserStatsCollector StartCollectingUserStats()
-//        {
-//            userStats = new UserStatsCollector();
-//
-//            return userStats;
-//        }
+        //        /// <summary>
+        //        /// Start collecting statistics related to assets.
+        //        /// Should only be called once.
+        //        /// </summary>
+        //        public static AssetStatsCollector StartCollectingAssetStats()
+        //        {
+        //            assetStats = new AssetStatsCollector();
+        //
+        //            return assetStats;
+        //        }
+        //
+        //        /// <summary>
+        //        /// Start collecting statistics related to users.
+        //        /// Should only be called once.
+        //        /// </summary>
+        //        public static UserStatsCollector StartCollectingUserStats()
+        //        {
+        //            userStats = new UserStatsCollector();
+        //
+        //            return userStats;
+        //        }
 
         /// <summary>
         /// Register a statistic.
@@ -412,13 +409,13 @@ namespace OpenSim.Framework.Monitoring
                 if (!TryGetStatParents(stat, out category, out container))
                     return false;
 
-                if(container != null)
+                if (container != null)
                 {
                     container.Remove(stat.ShortName);
-                    if(category != null && container.Count == 0)
+                    if (category != null && container.Count == 0)
                     {
                         category.Remove(stat.Container);
-                        if(category.Count == 0)
+                        if (category.Count == 0)
                             RegisteredStats.Remove(stat.Category);
                     }
                 }

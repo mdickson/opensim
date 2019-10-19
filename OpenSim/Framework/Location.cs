@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using OpenMetaverse;
+using System;
 
 namespace OpenSim.Framework
 {
@@ -44,7 +44,7 @@ namespace OpenSim.Framework
 
         public Location(ulong regionHandle)
         {
-            m_x =  (uint)(regionHandle >> 32);
+            m_x = (uint)(regionHandle >> 32);
             m_y = (uint)(regionHandle & (ulong)uint.MaxValue);
         }
 
@@ -70,7 +70,7 @@ namespace OpenSim.Framework
 
             if (obj is Location)
             {
-                return Equals((Location) obj);
+                return Equals((Location)obj);
             }
 
             return base.Equals(obj);

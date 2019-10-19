@@ -25,8 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Threading;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
@@ -36,6 +34,8 @@ using OpenSim.Region.CoreModules.ServiceConnectorsOut.Simulation;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.ScriptEngine.Shared;
 using OpenSim.Tests.Common;
+using System;
+using System.Threading;
 
 namespace OpenSim.Region.ScriptEngine.XEngine.Tests
 {
@@ -68,7 +68,7 @@ namespace OpenSim.Region.ScriptEngine.XEngine.Tests
         public void TestScriptCrossOnSameSimulator()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID userId = TestHelpers.ParseTail(0x1);
             int sceneObjectIdTail = 0x2;

@@ -25,21 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Security;
-using System.Text;
 using log4net;
-using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Region.CoreModules.Framework.InterfaceCommander;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
+using System.Reflection;
+using System.Text;
 
 namespace OpenSim.Region.CoreModules.World.Estate
 {
@@ -59,7 +49,7 @@ namespace OpenSim.Region.CoreModules.World.Estate
 
         public void Initialise()
         {
-//            m_log.DebugFormat("[ESTATE MODULE]: Setting up estate commands for region {0}", m_module.Scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[ESTATE MODULE]: Setting up estate commands for region {0}", m_module.Scene.RegionInfo.RegionName);
 
             m_module.Scene.AddCommand("Regions", m_module, "set terrain texture",
                                "set terrain texture <number> <uuid> [<x>] [<y>]",
@@ -85,7 +75,7 @@ namespace OpenSim.Region.CoreModules.World.Estate
                 "Estates", m_module, "estate show", "estate show", "Shows all estates on the simulator.", ShowEstatesCommand);
         }
 
-        public void Close() {}
+        public void Close() { }
 
         #region CommandHandlers
         protected void consoleSetTerrainTexture(string module, string[] args)

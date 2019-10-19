@@ -24,10 +24,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System.Collections.Generic;
-using OpenMetaverse;
 using NUnit.Framework;
+using OpenMetaverse;
 using System;
+using System.Collections.Generic;
 
 namespace OpenSim.Framework.Tests
 {
@@ -51,13 +51,13 @@ namespace OpenSim.Framework.Tests
 
             AgentId1 = UUID.Random();
             AgentId2 = UUID.Random();
-            circuitcode1 = (uint) rnd.Next((int)uint.MinValue, int.MaxValue);
-            circuitcode2 = (uint) rnd.Next((int)uint.MinValue, int.MaxValue);
+            circuitcode1 = (uint)rnd.Next((int)uint.MinValue, int.MaxValue);
+            circuitcode2 = (uint)rnd.Next((int)uint.MinValue, int.MaxValue);
             SessionId1 = UUID.Random();
             SessionId2 = UUID.Random();
             UUID BaseFolder = UUID.Random();
             string CapsPath = "http://www.opensimulator.org/Caps/Foo";
-            Dictionary<ulong,string> ChildrenCapsPaths = new Dictionary<ulong, string>();
+            Dictionary<ulong, string> ChildrenCapsPaths = new Dictionary<ulong, string>();
             ChildrenCapsPaths.Add(ulong.MaxValue, "http://www.opensimulator.org/Caps/Foo2");
             string firstname = "CoolAvatarTest";
             string lastname = "test";
@@ -104,7 +104,7 @@ namespace OpenSim.Framework.Tests
         public void AddAgentCircuitTest()
         {
             AgentCircuitManager agentCircuitManager = new AgentCircuitManager();
-            agentCircuitManager.AddNewCircuit(circuitcode1,m_agentCircuitData1);
+            agentCircuitManager.AddNewCircuit(circuitcode1, m_agentCircuitData1);
             agentCircuitManager.AddNewCircuit(circuitcode2, m_agentCircuitData2);
             AgentCircuitData agent = agentCircuitManager.GetAgentCircuitData(circuitcode1);
 

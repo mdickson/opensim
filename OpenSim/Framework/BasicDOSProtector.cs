@@ -24,10 +24,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using log4net;
 
 namespace OpenSim.Framework
 {
@@ -104,7 +104,7 @@ namespace OpenSim.Framework
         public bool IsBlocked(string key)
         {
             bool ret = false;
-             _blockLockSlim.EnterReadLock();
+            _blockLockSlim.EnterReadLock();
             ret = _tempBlocked.ContainsKey(key);
             _blockLockSlim.ExitReadLock();
             return ret;
@@ -158,14 +158,14 @@ namespace OpenSim.Framework
                         {
                             _tempBlocked.Add(clientstring,
                                              Util.EnvironmentTickCount() +
-                                             (int) _options.ForgetTimeSpan.TotalMilliseconds);
+                                             (int)_options.ForgetTimeSpan.TotalMilliseconds);
                             _forgetTimer.Enabled = true;
                             m_log.WarnFormat("[{0}]: client: {1} is blocked for {2} milliseconds based on concurrency, X-ForwardedForAllowed status is {3}, endpoint:{4}", _options.ReportingName, clientstring, _options.ForgetTimeSpan.TotalMilliseconds, _options.AllowXForwardedFor, endpoint);
 
                         }
                         else
                             _tempBlocked[clientstring] = Util.EnvironmentTickCount() +
-                                                         (int) _options.ForgetTimeSpan.TotalMilliseconds;
+                                                         (int)_options.ForgetTimeSpan.TotalMilliseconds;
                         _blockLockSlim.ExitWriteLock();
 
                     }
@@ -195,7 +195,7 @@ namespace OpenSim.Framework
             if (_sessions.ContainsKey(key))
                 _sessions[key] = _sessions[key] + 1;
             else
-                _sessions.Add(key,1);
+                _sessions.Add(key, 1);
             _sessionLockSlim.ExitWriteLock();
         }
         public void ProcessEnd(string key, string endpoint)

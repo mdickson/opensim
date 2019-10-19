@@ -25,18 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Net;
 using OpenMetaverse;
 using OpenMetaverse.Packets;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.CoreModules.World.Estate;
-using log4net;
-using System.Reflection;
-using System.Xml;
+using System;
+using System.Collections.Generic;
+using System.Net;
 
 namespace OpenSim.Region.OptionalModules.World.NPC
 {
@@ -45,7 +41,7 @@ namespace OpenSim.Region.OptionalModules.World.NPC
         public bool SenseAsAgent { get; set; }
         public UUID Owner
         {
-            get { return m_ownerID;}
+            get { return m_ownerID; }
         }
 
         public delegate void ChatToNPC(
@@ -73,7 +69,7 @@ namespace OpenSim.Region.OptionalModules.World.NPC
         private string m_profileAbout = "";
         private UUID m_profileImage = UUID.Zero;
         private string m_born;
-        public List<uint> SelectedObjects {get; private set;}
+        public List<uint> SelectedObjects { get; private set; }
 
         public NPCAvatar(
             string firstname, string lastname, Vector3 position, UUID ownerID, bool senseAsAgent, Scene scene)
@@ -107,8 +103,8 @@ namespace OpenSim.Region.OptionalModules.World.NPC
             get { return m_profileAbout; }
             set
             {
-                if(value.Length > 255)
-                    m_profileAbout = value.Substring(0,255);
+                if (value.Length > 255)
+                    m_profileAbout = value.Substring(0, 255);
                 else
                     m_profileAbout = value;
             }
@@ -182,8 +178,8 @@ namespace OpenSim.Region.OptionalModules.World.NPC
             // Set up the surface args as if the touch is from a client that does not support this
             SurfaceTouchEventArgs surfaceArgs = new SurfaceTouchEventArgs();
             surfaceArgs.FaceIndex = -1; // TOUCH_INVALID_FACE
-            surfaceArgs.Binormal =  Vector3.Zero; // TOUCH_INVALID_VECTOR
-            surfaceArgs.Normal =  Vector3.Zero; // TOUCH_INVALID_VECTOR
+            surfaceArgs.Binormal = Vector3.Zero; // TOUCH_INVALID_VECTOR
+            surfaceArgs.Normal = Vector3.Zero; // TOUCH_INVALID_VECTOR
             surfaceArgs.STCoord = new Vector3(-1.0f, -1.0f, 0.0f); // TOUCH_INVALID_TEXCOORD
             surfaceArgs.UVCoord = surfaceArgs.STCoord; // TOUCH_INVALID_TEXCOORD
             List<SurfaceTouchEventArgs> touchArgs = new List<SurfaceTouchEventArgs>();
@@ -288,7 +284,7 @@ namespace OpenSim.Region.OptionalModules.World.NPC
 
         #region Event Definitions IGNORE
 
-// disable warning: public events constituting public API
+        // disable warning: public events constituting public API
 #pragma warning disable 67
         public event Action<IClientAPI> OnLogout;
         public event ObjectPermissions OnObjectPermissions;
@@ -664,7 +660,7 @@ namespace OpenSim.Region.OptionalModules.World.NPC
         {
         }
 
-        public virtual void SendAppearance(UUID agentID, byte[] visualParams, byte[] textureEntry)
+        public virtual void SendAppearance(UUID agentID, byte[] visualParams, byte[] textureEntry, float hover)
         {
         }
 
@@ -1112,7 +1108,7 @@ namespace OpenSim.Region.OptionalModules.World.NPC
         {
         }
 
-        public void SendLandProperties(int sequence_id, bool snap_selection, int request_result, ILandObject lo, float simObjectBonusFactor,int parcelObjectCapacity, int simObjectCapacity, uint regionFlags)
+        public void SendLandProperties(int sequence_id, bool snap_selection, int request_result, ILandObject lo, float simObjectBonusFactor, int parcelObjectCapacity, int simObjectCapacity, uint regionFlags)
         {
         }
         public void SendLandAccessListData(List<LandAccessEntry> accessList, uint accessFlag, int localLandID)
@@ -1155,19 +1151,19 @@ namespace OpenSim.Region.OptionalModules.World.NPC
         {
         }
 
-        public void SendSetFollowCamProperties (UUID objectID, SortedDictionary<int, float> parameters)
+        public void SendSetFollowCamProperties(UUID objectID, SortedDictionary<int, float> parameters)
         {
         }
 
-        public void SendClearFollowCamProperties (UUID objectID)
+        public void SendClearFollowCamProperties(UUID objectID)
         {
         }
 
-        public void SendRegionHandle (UUID regoinID, ulong handle)
+        public void SendRegionHandle(UUID regoinID, ulong handle)
         {
         }
 
-        public void SendParcelInfo (RegionInfo info, LandData land, UUID parcelID, uint x, uint y)
+        public void SendParcelInfo(RegionInfo info, LandData land, UUID parcelID, uint x, uint y)
         {
         }
 
@@ -1180,7 +1176,7 @@ namespace OpenSim.Region.OptionalModules.World.NPC
             return string.Empty;
         }
 
-        public void SendScriptTeleportRequest (string objName, string simName, Vector3 pos, Vector3 lookAt)
+        public void SendScriptTeleportRequest(string objName, string simName, Vector3 pos, Vector3 lookAt)
         {
         }
 
@@ -1216,19 +1212,19 @@ namespace OpenSim.Region.OptionalModules.World.NPC
         {
         }
 
-        public void SendEventInfoReply (EventData info)
+        public void SendEventInfoReply(EventData info)
         {
         }
 
-        public void SendOfferCallingCard (UUID destID, UUID transactionID)
+        public void SendOfferCallingCard(UUID destID, UUID transactionID)
         {
         }
 
-        public void SendAcceptCallingCard (UUID transactionID)
+        public void SendAcceptCallingCard(UUID transactionID)
         {
         }
 
-        public void SendDeclineCallingCard (UUID transactionID)
+        public void SendDeclineCallingCard(UUID transactionID)
         {
         }
 
@@ -1313,7 +1309,7 @@ namespace OpenSim.Region.OptionalModules.World.NPC
         {
         }
 
-        public void GroupMembershipAddReplace(UUID GroupID,ulong GroupPowers)
+        public void GroupMembershipAddReplace(UUID GroupID, ulong GroupPowers)
         {
         }
 
@@ -1329,7 +1325,7 @@ namespace OpenSim.Region.OptionalModules.World.NPC
         {
         }
 
-        public void SendPickInfoReply(UUID pickID,UUID creatorID, bool topPick, UUID parcelID, string name, string desc, UUID snapshotID, string user, string originalName, string simName, Vector3 posGlobal, int sortOrder, bool enabled)
+        public void SendPickInfoReply(UUID pickID, UUID creatorID, bool topPick, UUID parcelID, string name, string desc, UUID snapshotID, string user, string originalName, string simName, Vector3 posGlobal, int sortOrder, bool enabled)
         {
         }
         #endregion
@@ -1342,15 +1338,15 @@ namespace OpenSim.Region.OptionalModules.World.NPC
         {
         }
 
-        public void SendGroupAccountingDetails(IClientAPI sender,UUID groupID, UUID transactionID, UUID sessionID, int amt)
+        public void SendGroupAccountingDetails(IClientAPI sender, UUID groupID, UUID transactionID, UUID sessionID, int amt)
         {
         }
 
-        public void SendGroupAccountingSummary(IClientAPI sender,UUID groupID, uint moneyAmt, int totalTier, int usedTier)
+        public void SendGroupAccountingSummary(IClientAPI sender, UUID groupID, uint moneyAmt, int totalTier, int usedTier)
         {
         }
 
-        public void SendGroupTransactionsSummaryDetails(IClientAPI sender,UUID groupID, UUID transactionID, UUID sessionID,int amt)
+        public void SendGroupTransactionsSummaryDetails(IClientAPI sender, UUID groupID, UUID transactionID, UUID sessionID, int amt)
         {
         }
 

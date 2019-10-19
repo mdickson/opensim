@@ -25,22 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using System.Reflection;
-using System.Threading;
-using System.Timers;
 using log4net;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
 using OpenMetaverse.Packets;
-using Nini.Config;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
 using pCampBot.Interfaces;
-using Timer = System.Timers.Timer;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Threading;
 using PermissionMask = OpenSim.Framework.PermissionMask;
 
 namespace pCampBot
@@ -312,7 +306,7 @@ namespace pCampBot
             {
                 foreach (IBehaviour behaviour in Behaviours.Values)
                 {
-//                        Thread.Sleep(Random.Next(3000, 10000));
+                    //                        Thread.Sleep(Random.Next(3000, 10000));
 
                     // m_log.DebugFormat("[pCAMPBOT]: For {0} performing action {1}", Name, b.GetType());
                     behaviour.Action();
@@ -365,7 +359,7 @@ namespace pCampBot
                 m_actionThread = new Thread(Action);
                 m_actionThread.Start();
 
-//                    OnConnected(this, EventType.CONNECTED);
+                //                    OnConnected(this, EventType.CONNECTED);
                 if (wear == "save")
                 {
                     SaveDefaultAppearance();
@@ -517,9 +511,9 @@ namespace pCampBot
                     asset.Owner = Client.Self.AgentID;
                     asset.WearableType = GetWearableType(clothing[i]);
                     asset.Encode();
-                    transid = Client.Assets.RequestUpload(asset,true);
+                    transid = Client.Assets.RequestUpload(asset, true);
                     Client.Inventory.RequestCreateItem(clothfolder.UUID, "MyClothing" + i.ToString(), "MyClothing", AssetType.Clothing,
-                         transid, InventoryType.Wearable, asset.WearableType, (OpenMetaverse.PermissionMask)PermissionMask.All, delegate(bool success, InventoryItem item)
+                         transid, InventoryType.Wearable, asset.WearableType, (OpenMetaverse.PermissionMask)PermissionMask.All, delegate (bool success, InventoryItem item)
                     {
                         if (success)
                         {
@@ -541,9 +535,9 @@ namespace pCampBot
                     asset.Owner = Client.Self.AgentID;
                     asset.WearableType = GetWearableType(bodyparts[i]);
                     asset.Encode();
-                    transid = Client.Assets.RequestUpload(asset,true);
+                    transid = Client.Assets.RequestUpload(asset, true);
                     Client.Inventory.RequestCreateItem(clothfolder.UUID, "MyBodyPart" + i.ToString(), "MyBodyPart", AssetType.Bodypart,
-                         transid, InventoryType.Wearable, asset.WearableType, (OpenMetaverse.PermissionMask)PermissionMask.All, delegate(bool success, InventoryItem item)
+                         transid, InventoryType.Wearable, asset.WearableType, (OpenMetaverse.PermissionMask)PermissionMask.All, delegate (bool success, InventoryItem item)
                     {
                         if (success)
                         {
@@ -623,21 +617,21 @@ namespace pCampBot
             m_log.DebugFormat(
                 "[BOT]: Bot {0} disconnected from grid, reason {1}, message {2}", Name, args.Reason, args.Message);
 
-//            m_log.ErrorFormat("Fired Network_OnDisconnected");
+            //            m_log.ErrorFormat("Fired Network_OnDisconnected");
 
-//           if (
-//               (args.Reason == NetworkManager.DisconnectType.SimShutdown
-//                    || args.Reason == NetworkManager.DisconnectType.NetworkTimeout)
-//               && OnDisconnected != null)
+            //           if (
+            //               (args.Reason == NetworkManager.DisconnectType.SimShutdown
+            //                    || args.Reason == NetworkManager.DisconnectType.NetworkTimeout)
+            //               && OnDisconnected != null)
 
 
 
-           if (
-               (args.Reason == NetworkManager.DisconnectType.ClientInitiated
-                    || args.Reason == NetworkManager.DisconnectType.ServerInitiated
-                    || args.Reason == NetworkManager.DisconnectType.NetworkTimeout)
-               && OnDisconnected != null)
-//            if (OnDisconnected != null)
+            if (
+                (args.Reason == NetworkManager.DisconnectType.ClientInitiated
+                     || args.Reason == NetworkManager.DisconnectType.ServerInitiated
+                     || args.Reason == NetworkManager.DisconnectType.NetworkTimeout)
+                && OnDisconnected != null)
+            //            if (OnDisconnected != null)
             {
                 OnDisconnected(this, EventType.DISCONNECTED);
             }
@@ -728,10 +722,10 @@ namespace pCampBot
             lock (Manager.AssetsReceived)
                 Manager.AssetsReceived[asset.AssetID] = true;
 
-//            if (wear == "save")
-//            {
-//                SaveAsset((AssetWearable) asset);
-//            }
+            //            if (wear == "save")
+            //            {
+            //                SaveAsset((AssetWearable) asset);
+            //            }
         }
 
         private void PacketReceivedDebugHandler(object o, PacketReceivedEventArgs args)

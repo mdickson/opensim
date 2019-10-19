@@ -25,20 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenSim.Region.ScriptEngine.Shared;
+using OpenSim.Region.ScriptEngine.Shared.Api;
 using System;
 using System.IO;
 using System.Xml;
-using OpenSim.Region.ScriptEngine.Shared;
-using OpenSim.Region.ScriptEngine.Shared.Api;
-using log4net;
-
-using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
-using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
-using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
-using LSL_Rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
-using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
-using LSL_Vector = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Vector3;
 
 namespace OpenSim.Region.ScriptEngine.Yengine
 {
@@ -81,7 +73,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             // stable.  Setting suspendOnCheckRun tells CheckRun() to suspend
             // and return out so RunOne() will release the lock asap.
             suspendOnCheckRunHold = true;
-            lock(m_RunLock)
+            lock (m_RunLock)
             {
                 m_RunOnePhase = "GetExecutionState enter";
                 CheckRunLockInvariants(true);
@@ -140,7 +132,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
                 // "DetectParams" are returned by llDetected...() script functions
                 // for the currently active event, if any.
-                if(m_DetectParams != null)
+                if (m_DetectParams != null)
                 {
                     XmlElement detParArrayN = doc.CreateElement("", "DetectArray", "");
                     AppendXMLDetectArray(doc, detParArrayN, m_DetectParams);
@@ -158,9 +150,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 //   ...
                 // </EventQueue>
                 XmlElement queuedEventsN = doc.CreateElement("", "EventQueue", "");
-                lock(m_QueueLock)
+                lock (m_QueueLock)
                 {
-                    foreach(EventParams evt in m_EventQueue)
+                    foreach (EventParams evt in m_EventQueue)
                     {
                         XmlElement singleEventN = doc.CreateElement("", "Event", "");
                         singleEventN.SetAttribute("Name", evt.EventName);
@@ -192,9 +184,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
             // scriptStateN represents the contents of the .state file so
             // write the .state file while we are here.
-            using(FileStream fs = File.Create(m_StateFileName))
+            using (FileStream fs = File.Create(m_StateFileName))
             {
-                using(StreamWriter sw = new StreamWriter(fs))
+                using (StreamWriter sw = new StreamWriter(fs))
                     sw.Write(scriptStateN.OuterXml);
             }
 
@@ -222,7 +214,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         private static void AppendXMLDetectArray(XmlDocument doc, XmlElement parent, DetectParams[] detect)
         {
-            foreach(DetectParams d in detect)
+            foreach (DetectParams d in detect)
             {
                 XmlElement detectParamsN = GetXMLDetect(doc, d);
                 parent.AppendChild(detectParamsN);
@@ -285,7 +277,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         private static void AppendXMLObjectArray(XmlDocument doc, XmlNode parent, object[] array, string tag)
         {
-            foreach(object o in array)
+            foreach (object o in array)
             {
                 XmlElement element = GetXMLObject(doc, o, tag);
                 parent.AppendChild(element);
@@ -303,7 +295,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             XmlAttribute typ = doc.CreateAttribute("", "type", "");
             XmlElement n = doc.CreateElement("", tag, "");
 
-            if(o is LSL_List)
+            if (o is LSL_List)
             {
                 typ.Value = "list";
                 n.Attributes.Append(typ);

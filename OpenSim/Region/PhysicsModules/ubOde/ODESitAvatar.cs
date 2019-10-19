@@ -25,10 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 // Ubit Umarov 2012
+using OpenMetaverse;
+using OpenSim.Region.PhysicsModules.SharedBase;
 using System;
 using System.Collections.Generic;
-using OpenSim.Region.PhysicsModules.SharedBase;
-using OpenMetaverse;
 
 namespace OpenSim.Region.PhysicsModule.ubOde
 {
@@ -75,8 +75,8 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             Vector3 geopos = SafeNativeMethods.GeomGetPositionOMV(geom);
             Quaternion geomOri = SafeNativeMethods.GeomGetQuaternionOMV(geom);
 
-//            Vector3 geopos = actor.Position;
-//            Quaternion geomOri = actor.Orientation;
+            //            Vector3 geopos = actor.Position;
+            //            Quaternion geomOri = actor.Orientation;
 
             Quaternion geomInvOri = Quaternion.Conjugate(geomOri);
 
@@ -101,14 +101,14 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             rayResults = m_scene.RaycastActor(actor, avCameraPosition, rayDir, raylen, 1, RaySitFlags);
             if (rayResults.Count == 0)
             {
-/* if this fundamental ray failed, then just fail so user can try another spot and not be sitted far on a big prim
-                d.AABB aabb;
-                d.GeomGetAABB(geom, out aabb);
-                offset = new Vector3(avOffset.X, 0, aabb.MaxZ + avOffset.Z - geopos.Z);
-                ori = geomInvOri;
-                offset *= geomInvOri;
-                PhysicsSitResponse(1, actor.LocalID, offset, ori);
-*/
+                /* if this fundamental ray failed, then just fail so user can try another spot and not be sitted far on a big prim
+                                d.AABB aabb;
+                                d.GeomGetAABB(geom, out aabb);
+                                offset = new Vector3(avOffset.X, 0, aabb.MaxZ + avOffset.Z - geopos.Z);
+                                ori = geomInvOri;
+                                offset *= geomInvOri;
+                                PhysicsSitResponse(1, actor.LocalID, offset, ori);
+                */
                 PhysicsSitResponse(0, actor.LocalID, offset, ori);
                 return;
             }

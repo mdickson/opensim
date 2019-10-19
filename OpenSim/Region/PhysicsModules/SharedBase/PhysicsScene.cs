@@ -25,15 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-
-using log4net;
-using Nini.Config;
-
-using OpenSim.Framework;
 using OpenMetaverse;
+using OpenSim.Framework;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.PhysicsModules.SharedBase
 {
@@ -97,7 +91,7 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
 
     public abstract class PhysicsScene
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// A unique identifying string for this instance of the physics engine.
@@ -406,6 +400,6 @@ namespace OpenSim.Region.PhysicsModules.SharedBase
         }
 
         public virtual void GetResults() { }
-        public virtual bool IsThreaded { get {return false;} }
+        public virtual bool IsThreaded { get { return false; } }
     }
 }

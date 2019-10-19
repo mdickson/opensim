@@ -28,10 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace OpenSim.Framework
 {
     /// <summary>
@@ -59,7 +55,7 @@ namespace OpenSim.Framework
             get
             {
                 int diff = Util.EnvironmentTickCountSubtract(_timeStamp);
-                return (int) diff / 1000;
+                return (int)diff / 1000;
             }
         }
 

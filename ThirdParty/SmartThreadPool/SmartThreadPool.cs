@@ -96,15 +96,14 @@
 
 #endregion
 
+using Amib.Threading.Internal;
 using System;
-using System.Security;
-using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-
-using Amib.Threading.Internal;
+using System.Security;
+using System.Threading;
 
 namespace Amib.Threading
 {
@@ -129,7 +128,7 @@ namespace Amib.Threading
         /// <summary>
         /// Default idle timeout in milliseconds. (One minute)
         /// </summary>
-        public const int DefaultIdleTimeout = 60*1000; // One minute
+        public const int DefaultIdleTimeout = 60 * 1000; // One minute
 
         /// <summary>
         /// Indicate to copy the security context of the caller and then use it in the call. (false)
@@ -528,7 +527,7 @@ namespace Amib.Threading
 
         private static void ValidateCallback(Delegate callback)
         {
-            if(callback.GetInvocationList().Length > 1)
+            if (callback.GetInvocationList().Length > 1)
             {
                 throw new NotSupportedException("SmartThreadPool doesn't support delegates chains");
             }
@@ -650,7 +649,7 @@ namespace Amib.Threading
                 return;
             }
 
-            lock(_workerThreads.SyncRoot)
+            lock (_workerThreads.SyncRoot)
             {
                 // Don't start threads on shut down
                 if (_shutdown)
@@ -658,7 +657,7 @@ namespace Amib.Threading
                     return;
                 }
 
-                for(int i = 0; i < threadsCount; ++i)
+                for (int i = 0; i < threadsCount; ++i)
                 {
                     // Don't create more threads then the upper limit
                     if (_workerThreads.Count >= _stpStartInfo.MaxWorkerThreads)
@@ -719,7 +718,7 @@ namespace Amib.Threading
                 bool bInUseWorkerThreadsWasIncremented = false;
 
                 // Process until shutdown.
-                while(!_shutdown)
+                while (!_shutdown)
                 {
                     // Update the last time this thread was seen alive.
                     // It's good for debugging.
@@ -757,7 +756,7 @@ namespace Amib.Threading
                         // Double lock for quit.
                         if (_workerThreads.Count > _stpStartInfo.MinWorkerThreads)
                         {
-                            lock(_workerThreads.SyncRoot)
+                            lock (_workerThreads.SyncRoot)
                             {
                                 if (_workerThreads.Count > _stpStartInfo.MinWorkerThreads)
                                 {
@@ -821,7 +820,7 @@ namespace Amib.Threading
 
                         ExecuteWorkItem(workItem);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         ex.GetHashCode();
                         // Do nothing
@@ -854,7 +853,7 @@ namespace Amib.Threading
                     }
                 }
             }
-            catch(ThreadAbortException tae)
+            catch (ThreadAbortException tae)
             {
                 tae.GetHashCode();
                 // Handle the abort exception gracfully.
@@ -862,7 +861,7 @@ namespace Amib.Threading
                 Thread.ResetAbort();
 #endif
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.Assert(null != e);
             }
@@ -964,8 +963,8 @@ namespace Amib.Threading
                 pcs.Dispose();
             }
 
-            Thread [] threads;
-            lock(_workerThreads.SyncRoot)
+            Thread[] threads;
+            lock (_workerThreads.SyncRoot)
             {
                 // Shutdown the work items queue
                 _workItemsQueue.Dispose();
@@ -975,7 +974,7 @@ namespace Amib.Threading
                 _shuttingDownEvent.Set();
 
                 // Make a copy of the threads' references in the pool
-                threads = new Thread [_workerThreads.Count];
+                threads = new Thread[_workerThreads.Count];
                 _workerThreads.Keys.CopyTo(threads, 0);
             }
 
@@ -986,7 +985,7 @@ namespace Amib.Threading
             bool timeout = false;
 
             // Each iteration we update the time left for the timeout.
-            foreach(Thread thread in threads)
+            foreach (Thread thread in threads)
             {
                 // Join don't work with negative numbers
                 if (!waitInfinitely && (millisecondsLeft < 0))
@@ -997,13 +996,13 @@ namespace Amib.Threading
 
                 // Wait for the thread to terminate
                 bool success = thread.Join(millisecondsLeft);
-                if(!success)
+                if (!success)
                 {
                     timeout = true;
                     break;
                 }
 
-                if(!waitInfinitely)
+                if (!waitInfinitely)
                 {
                     // Update the time left to wait
                     //TimeSpan ts = DateTime.UtcNow - start;
@@ -1014,7 +1013,7 @@ namespace Amib.Threading
             if (timeout && forceAbort)
             {
                 // Abort the threads in the pool
-                foreach(Thread thread in threads)
+                foreach (Thread thread in threads)
                 {
 
                     if ((thread != null)
@@ -1027,11 +1026,11 @@ namespace Amib.Threading
                         {
                             thread.Abort(); // Shutdown
                         }
-                        catch(SecurityException e)
+                        catch (SecurityException e)
                         {
                             e.GetHashCode();
                         }
-                        catch(ThreadStateException ex)
+                        catch (ThreadStateException ex)
                         {
                             ex.GetHashCode();
                             // In case the thread has been terminated
@@ -1050,7 +1049,7 @@ namespace Amib.Threading
         /// true when every work item in workItemResults has completed; otherwise false.
         /// </returns>
         public static bool WaitAll(
-            IWaitableResult [] waitableResults)
+            IWaitableResult[] waitableResults)
         {
             return WaitAll(waitableResults, Timeout.Infinite, true);
         }
@@ -1067,7 +1066,7 @@ namespace Amib.Threading
         /// true when every work item in workItemResults has completed; otherwise false.
         /// </returns>
         public static bool WaitAll(
-            IWaitableResult [] waitableResults,
+            IWaitableResult[] waitableResults,
             TimeSpan timeout,
             bool exitContext)
         {
@@ -1107,7 +1106,7 @@ namespace Amib.Threading
         /// true when every work item in workItemResults has completed; otherwise false.
         /// </returns>
         public static bool WaitAll(
-            IWaitableResult [] waitableResults,
+            IWaitableResult[] waitableResults,
             int millisecondsTimeout,
             bool exitContext)
         {
@@ -1144,7 +1143,7 @@ namespace Amib.Threading
         /// The array index of the work item result that satisfied the wait, or WaitTimeout if any of the work items has been canceled.
         /// </returns>
         public static int WaitAny(
-            IWaitableResult [] waitableResults)
+            IWaitableResult[] waitableResults)
         {
             return WaitAny(waitableResults, Timeout.Infinite, true);
         }
@@ -1181,7 +1180,7 @@ namespace Amib.Threading
         /// The array index of the work item result that satisfied the wait, or WaitTimeout if no work item result satisfied the wait and a time interval equivalent to millisecondsTimeout has passed or the work item has been canceled.
         /// </returns>
         public static int WaitAny(
-            IWaitableResult [] waitableResults,
+            IWaitableResult[] waitableResults,
             TimeSpan timeout,
             bool exitContext,
             WaitHandle cancelWaitHandle)
@@ -1201,7 +1200,7 @@ namespace Amib.Threading
         /// The array index of the work item result that satisfied the wait, or WaitTimeout if no work item result satisfied the wait and a time interval equivalent to millisecondsTimeout has passed or the work item has been canceled.
         /// </returns>
         public static int WaitAny(
-            IWaitableResult [] waitableResults,
+            IWaitableResult[] waitableResults,
             int millisecondsTimeout,
             bool exitContext)
         {
@@ -1221,7 +1220,7 @@ namespace Amib.Threading
         /// The array index of the work item result that satisfied the wait, or WaitTimeout if no work item result satisfied the wait and a time interval equivalent to millisecondsTimeout has passed or the work item has been canceled.
         /// </returns>
         public static int WaitAny(
-            IWaitableResult [] waitableResults,
+            IWaitableResult[] waitableResults,
             int millisecondsTimeout,
             bool exitContext,
             WaitHandle cancelWaitHandle)
@@ -1447,7 +1446,7 @@ namespace Amib.Threading
 
         public bool IsShuttingdown
         {
-            get { return _shutdown;  }
+            get { return _shutdown; }
         }
 
         /// <summary>
@@ -1494,7 +1493,7 @@ namespace Amib.Threading
 
         private void ValidateNotDisposed()
         {
-            if(_isDisposed)
+            if (_isDisposed)
             {
                 throw new ObjectDisposedException(GetType().ToString(), "The SmartThreadPool has been shutdown");
             }

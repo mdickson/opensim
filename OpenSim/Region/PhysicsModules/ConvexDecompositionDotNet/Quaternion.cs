@@ -127,7 +127,7 @@ namespace OpenSim.Region.PhysicsModules.ConvexDecompositionDotNet
 
         public static Quaternion operator *(Quaternion a, float b)
         {
-            return new Quaternion(a.x *b, a.y *b, a.z *b, a.w *b);
+            return new Quaternion(a.x * b, a.y * b, a.z * b, a.w * b);
         }
 
         public static Quaternion normalize(Quaternion a)

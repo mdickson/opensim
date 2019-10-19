@@ -28,14 +28,13 @@
 using log4net;
 using Mono.Addins;
 using Nini.Config;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using OpenSim.Framework;
-using OpenSim.Server.Base;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using OpenSim.Server.Base;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
 {
@@ -154,7 +153,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
 
         public AssetBase Get(string id)
         {
-//            m_log.DebugFormat("[LOCAL ASSET SERVICES CONNECTOR]: Synchronously requesting asset {0}", id);
+            //            m_log.DebugFormat("[LOCAL ASSET SERVICES CONNECTOR]: Synchronously requesting asset {0}", id);
 
             AssetBase asset = null;
             if (m_Cache != null)
@@ -169,8 +168,8 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
                 if ((m_Cache != null) && (asset != null))
                     m_Cache.Cache(asset);
 
-//                if (null == asset)
-//                    m_log.WarnFormat("[LOCAL ASSET SERVICES CONNECTOR]: Could not synchronously find asset with id {0}", id);
+                //                if (null == asset)
+                //                    m_log.WarnFormat("[LOCAL ASSET SERVICES CONNECTOR]: Could not synchronously find asset with id {0}", id);
             }
 
             return asset;
@@ -178,7 +177,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
 
         public AssetBase GetCached(string id)
         {
-//            m_log.DebugFormat("[LOCAL ASSET SERVICES CONNECTOR]: Cache request for {0}", id);
+            //            m_log.DebugFormat("[LOCAL ASSET SERVICES CONNECTOR]: Cache request for {0}", id);
 
             AssetBase asset = null;
             if (m_Cache != null)
@@ -212,7 +211,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
 
         public byte[] GetData(string id)
         {
-//            m_log.DebugFormat("[LOCAL ASSET SERVICES CONNECTOR]: Requesting data for asset {0}", id);
+            //            m_log.DebugFormat("[LOCAL ASSET SERVICES CONNECTOR]: Requesting data for asset {0}", id);
 
             AssetBase asset = null;
 
@@ -238,7 +237,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
 
         public bool Get(string id, Object sender, AssetRetrieved handler)
         {
-//            m_log.DebugFormat("[LOCAL ASSET SERVICES CONNECTOR]: Asynchronously requesting asset {0}", id);
+            //            m_log.DebugFormat("[LOCAL ASSET SERVICES CONNECTOR]: Asynchronously requesting asset {0}", id);
 
             if (m_Cache != null)
             {
@@ -259,8 +258,8 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
                 if ((a != null) && (m_Cache != null))
                     m_Cache.Cache(a);
 
-//                if (null == a)
-//                    m_log.WarnFormat("[LOCAL ASSET SERVICES CONNECTOR]: Could not asynchronously find asset with id {0}", id);
+                //                if (null == a)
+                //                    m_log.WarnFormat("[LOCAL ASSET SERVICES CONNECTOR]: Could not asynchronously find asset with id {0}", id);
 
                 Util.FireAndForget(
                     o => handler(assetID, s, a), null, "LocalAssetServiceConnector.GotFromServiceCallback");
@@ -279,17 +278,17 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
 
             if (asset.Local)
             {
-//                m_log.DebugFormat(
-//                    "[LOCAL ASSET SERVICE CONNECTOR]: Returning asset {0} {1} without querying database since status Temporary = {2}, Local = {3}",
-//                    asset.Name, asset.ID, asset.Temporary, asset.Local);
+                //                m_log.DebugFormat(
+                //                    "[LOCAL ASSET SERVICE CONNECTOR]: Returning asset {0} {1} without querying database since status Temporary = {2}, Local = {3}",
+                //                    asset.Name, asset.ID, asset.Temporary, asset.Local);
 
                 return asset.ID;
             }
             else
             {
-//                m_log.DebugFormat(
-//                    "[LOCAL ASSET SERVICE CONNECTOR]: Passing {0} {1} on to asset service for storage, status Temporary = {2}, Local = {3}",
-//                    asset.Name, asset.ID, asset.Temporary, asset.Local);
+                //                m_log.DebugFormat(
+                //                    "[LOCAL ASSET SERVICE CONNECTOR]: Passing {0} {1} on to asset service for storage, status Temporary = {2}, Local = {3}",
+                //                    asset.Name, asset.ID, asset.Temporary, asset.Local);
 
                 return m_AssetService.Store(asset);
             }

@@ -25,11 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
-using OpenMetaverse;
 
 namespace OpenSim.Framework
 {
@@ -220,7 +219,7 @@ namespace OpenSim.Framework
         public string AbuseEmail
         {
             get { return m_AbuseEmail; }
-            set { m_AbuseEmail= value; }
+            set { m_AbuseEmail = value; }
         }
 
         private UUID m_EstateOwner = UUID.Zero;
@@ -374,8 +373,8 @@ namespace OpenSim.Framework
             if (!IsEstateManagerOrOwner(avatarID))
             {
                 foreach (EstateBan ban in l_EstateBans)
-                if (ban.BannedUserID == avatarID)
-                    return true;
+                    if (ban.BannedUserID == avatarID)
+                        return true;
 
                 if (!HasAccess(avatarID))
                 {
@@ -549,8 +548,8 @@ namespace OpenSim.Framework
 
             // EstateBans are special
             if (map.ContainsKey("EstateBans"))
-            {               
-                if(map["EstateBans"] is string)
+            {
+                if (map["EstateBans"] is string)
                 {
                     // JSON encoded bans map
                     Dictionary<string, EstateBan> bdata = new Dictionary<string, EstateBan>();
@@ -560,15 +559,15 @@ namespace OpenSim.Framework
                         // this should only be called once.. but no problem, i hope
                         // (other uses may need more..)
                         LitJson.JsonMapper.RegisterImporter<string, UUID>((input) => new UUID(input));
-                        bdata = LitJson.JsonMapper.ToObject<Dictionary<string,EstateBan>>((string)map["EstateBans"]);
+                        bdata = LitJson.JsonMapper.ToObject<Dictionary<string, EstateBan>>((string)map["EstateBans"]);
                     }
- //                   catch(Exception e)
+                    //                   catch(Exception e)
                     catch
                     {
                         return;
                     }
                     EstateBan[] jbans = new EstateBan[bdata.Count];
-                    bdata.Values.CopyTo(jbans,0);
+                    bdata.Values.CopyTo(jbans, 0);
 
                     PropertyInfo jbansProperty = this.GetType().GetProperty("EstateBans", BindingFlags.Public | BindingFlags.Instance);
                     jbansProperty.SetValue(this, jbans, null);
@@ -583,7 +582,7 @@ namespace OpenSim.Framework
                         bans[b++] = new EstateBan(ban);
                     PropertyInfo bansProperty = this.GetType().GetProperty("EstateBans", BindingFlags.Public | BindingFlags.Instance);
                     bansProperty.SetValue(this, bans, null);
-                 }
+                }
             }
         }
     }

@@ -25,22 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
-using System.Collections.Generic;
 using OpenMetaverse;
 using OpenSim.Framework;
-using log4net;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.ScriptEngine.Shared;
-using OpenSim.Region.ScriptEngine.Shared.Api;
+using System;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
 {
     public class SensorRepeat
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Used by one-off and repeated sensors
@@ -198,7 +194,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
             // Go through all timers
 
             List<SensorInfo> curSensors;
-            lock(SenseRepeatListLock)
+            lock (SenseRepeatListLock)
                 curSensors = SenseRepeaters;
 
             DateTime now = DateTime.UtcNow;
@@ -304,7 +300,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
                     {
                         m_CmdManager.m_ScriptEngine.PostScriptEvent(ts.itemID,
                                 new EventParams("sensor",
-                                new Object[] {new LSL_Types.LSLInteger(detected.Count) },
+                                new Object[] { new LSL_Types.LSLInteger(detected.Count) },
                                 detected.ToArray()));
                     }
                 }
@@ -344,7 +340,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
             float dy;
             float dz;
 
-//            Quaternion q = SensePoint.RotationOffset;
+            //            Quaternion q = SensePoint.RotationOffset;
             Quaternion q = SensePoint.GetWorldRotation();		// non-attached prim Sensor *always* uses World rotation!
             if (SensePoint.ParentGroup.IsAttachment)
             {
@@ -511,18 +507,18 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
 
             Action<ScenePresence> senseEntity = new Action<ScenePresence>(presence =>
             {
-//                m_log.DebugFormat(
-//                    "[SENSOR REPEAT]: Inspecting scene presence {0}, type {1} on sensor sweep for {2}, type {3}",
-//                    presence.Name, presence.PresenceType, ts.name, ts.type);
+                //                m_log.DebugFormat(
+                //                    "[SENSOR REPEAT]: Inspecting scene presence {0}, type {1} on sensor sweep for {2}, type {3}",
+                //                    presence.Name, presence.PresenceType, ts.name, ts.type);
 
                 if ((ts.type & NPC) == 0 && presence.PresenceType == PresenceType.Npc)
                 {
                     INPC npcData = m_npcModule.GetNPC(presence.UUID, presence.Scene);
                     if (npcData == null || !npcData.SenseAsAgent)
                     {
-//                        m_log.DebugFormat(
-//                            "[SENSOR REPEAT]: Discarding NPC {0} from agent sense sweep for script item id {1}",
-//                            presence.Name, ts.itemID);
+                        //                        m_log.DebugFormat(
+                        //                            "[SENSOR REPEAT]: Discarding NPC {0} from agent sense sweep for script item id {1}",
+                        //                            presence.Name, ts.itemID);
                         return;
                     }
                 }
@@ -538,9 +534,9 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
                         INPC npcData = m_npcModule.GetNPC(presence.UUID, presence.Scene);
                         if (npcData != null && npcData.SenseAsAgent)
                         {
-//                            m_log.DebugFormat(
-//                                "[SENSOR REPEAT]: Discarding NPC {0} from non-agent sense sweep for script item id {1}",
-//                                presence.Name, ts.itemID);
+                            //                            m_log.DebugFormat(
+                            //                                "[SENSOR REPEAT]: Discarding NPC {0} from non-agent sense sweep for script item id {1}",
+                            //                                presence.Name, ts.itemID);
                             return;
                         }
                     }
@@ -569,12 +565,12 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
                 // Disabled for now since all osNpc* methods check for appropriate ownership permission.
                 // Perhaps could be re-enabled as an NPC setting at some point since being able to make NPCs not
                 // sensed might be useful.
-//                if (presence.PresenceType == PresenceType.Npc && npcModule != null)
-//                {
-//                    UUID npcOwner = npcModule.GetOwner(presence.UUID);
-//                    if (npcOwner != UUID.Zero && npcOwner != SensePoint.OwnerID)
-//                        return;
-//                }
+                //                if (presence.PresenceType == PresenceType.Npc && npcModule != null)
+                //                {
+                //                    UUID npcOwner = npcModule.GetOwner(presence.UUID);
+                //                    if (npcOwner != UUID.Zero && npcOwner != SensePoint.OwnerID)
+                //                        return;
+                //                }
 
                 // are they in range
                 if (dis <= ts.range)
@@ -695,11 +691,11 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
                 ts.itemID = itemID;
 
                 ts.interval = (double)data[idx];
-                ts.name = (string)data[idx+1];
-                ts.keyID = (UUID)data[idx+2];
-                ts.type = (int)data[idx+3];
-                ts.range = (double)data[idx+4];
-                ts.arc = (double)data[idx+5];
+                ts.name = (string)data[idx + 1];
+                ts.keyID = (UUID)data[idx + 2];
+                ts.type = (int)data[idx + 3];
+                ts.range = (double)data[idx + 4];
+                ts.arc = (double)data[idx + 5];
                 ts.host = part;
 
                 ts.next =

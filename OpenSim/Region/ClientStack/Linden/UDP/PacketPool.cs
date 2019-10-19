@@ -25,12 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenMetaverse.Packets;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using OpenMetaverse;
-using OpenMetaverse.Packets;
-using log4net;
 using OpenSim.Framework.Monitoring;
 
 namespace OpenSim.Region.ClientStack.LindenUDP
@@ -55,6 +55,8 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
         public bool RecyclePackets { get; set; }
 
+        public bool RecycleDataBlocks { get; set; }
+
         /// <summary>
         /// The number of packets pooled
         /// </summary>
@@ -63,7 +65,9 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             get
             {
                 lock (pool)
+                {
                     return pool.Count;
+                }
             }
         }
 
@@ -75,7 +79,9 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             get
             {
                 lock (DataBlocks)
+                {
                     return DataBlocks.Count;
+                }
             }
         }
 
@@ -103,6 +109,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         {
             // defaults
             RecyclePackets = true;
+            RecycleDataBlocks = true;
         }
 
         /// <summary>
@@ -112,34 +119,37 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         /// <returns>Guaranteed to always return a packet, whether from the pool or newly constructed.</returns>
         public Packet GetPacket(PacketType type)
         {
+            bool isNewPacket;
+            return GetPacket(type, out isNewPacket);
+        }
+
+        public Packet GetPacket(PacketType type, out bool isNewPacket)
+        {
             PacketsRequested++;
 
-            Packet packet;
+            isNewPacket = true;
 
             if (!RecyclePackets)
+            {
                 return Packet.BuildPacket(type);
+            }
 
             lock (pool)
             {
                 if (!pool.ContainsKey(type) || pool[type] == null || (pool[type]).Count == 0)
                 {
-//                    m_log.DebugFormat("[PACKETPOOL]: Building {0} packet", type);
-
                     // Creating a new packet if we cannot reuse an old package
-                    packet = Packet.BuildPacket(type);
+                    return Packet.BuildPacket(type);
                 }
                 else
                 {
-//                    m_log.DebugFormat("[PACKETPOOL]: Pulling {0} packet", type);
-
                     // Recycle old packages
                     PacketsReused++;
 
-                    packet = pool[type].Pop();
+                    isNewPacket = false;
+                    return pool[type].Pop();
                 }
             }
-
-            return packet;
         }
 
         private static PacketType GetType(byte[] bytes)
@@ -153,10 +163,15 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 if (bytes[7] == 0xFF)
                 {
                     freq = PacketFrequency.Low;
+
                     if (isZeroCoded && bytes[8] == 0)
+                    {
                         id = bytes[10];
+                    }
                     else
+                    {
                         id = (ushort)((bytes[8] << 8) + bytes[9]);
+                    }
                 }
                 else
                 {
@@ -177,14 +192,17 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         {
             PacketType type = GetType(bytes);
 
-//            Array.Clear(zeroBuffer, 0, zeroBuffer.Length);
-
             int i = 0;
             Packet packet = GetPacket(type);
+
             if (packet == null)
+            {
                 m_log.WarnFormat("[PACKETPOOL]: Failed to get packet of type {0}", type);
+            }
             else
+            {
                 packet.FromBytes(bytes, ref i, ref packetEnd, zeroBuffer);
+            }
 
             return packet;
         }
@@ -195,53 +213,59 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         /// <param name="packet"></param>
         public void ReturnPacket(Packet packet)
         {
-            if (!RecyclePackets)
-                return;
-
-            bool trypool = false;
-            PacketType type = packet.Type;
-
-            switch (type)
+            if (RecycleDataBlocks)
             {
-                case PacketType.ObjectUpdate:
-                    ObjectUpdatePacket oup = (ObjectUpdatePacket)packet;
-                    oup.ObjectData = null;
-                    trypool = true;
-                    break;
+                switch (packet.Type)
+                {
+                    case PacketType.ObjectUpdate:
+                        ObjectUpdatePacket oup = (ObjectUpdatePacket)packet;
 
-                case PacketType.ImprovedTerseObjectUpdate:
-                    ImprovedTerseObjectUpdatePacket itoup = (ImprovedTerseObjectUpdatePacket)packet;
-                    itoup.ObjectData = null;
-                    trypool = true;
-                    break;
+                            foreach (ObjectUpdatePacket.ObjectDataBlock oupod in oup.ObjectData)
+                                ReturnDataBlock<ObjectUpdatePacket.ObjectDataBlock>(oupod);
 
-                case PacketType.PacketAck:
-                    PacketAckPacket ackup = (PacketAckPacket)packet;
-                    ackup.Packets = null;
-                    trypool = true;
-                    break;
+                        oup.ObjectData = null;
+                        break;
 
-                case PacketType.AgentUpdate:
-                    trypool = true;
-                    break;
-                default:
-                    return;
+                    case PacketType.ImprovedTerseObjectUpdate:
+                        ImprovedTerseObjectUpdatePacket itoup = (ImprovedTerseObjectUpdatePacket)packet;
+
+                            foreach (ImprovedTerseObjectUpdatePacket.ObjectDataBlock itoupod in itoup.ObjectData)
+                                ReturnDataBlock<ImprovedTerseObjectUpdatePacket.ObjectDataBlock>(itoupod);
+
+                            itoup.ObjectData = null;
+                        break;
+                }
             }
 
-            if(!trypool)
-                return;
-
-            lock (pool)
+            if (RecyclePackets)
             {
-                if (!pool.ContainsKey(type))
+                switch (packet.Type)
                 {
-                    pool[type] = new Stack<Packet>();
-                }
+                    // List pooling packets here
+                    case PacketType.AgentUpdate:
+                    case PacketType.PacketAck:
+                    case PacketType.ObjectUpdate:
+                    case PacketType.ImprovedTerseObjectUpdate:
 
-                if ((pool[type]).Count < 50)
-                {
-//                  m_log.DebugFormat("[PACKETPOOL]: Pushing {0} packet", type);
-                    pool[type].Push(packet);
+			            lock (pool)
+			            {
+			                PacketType type = packet.Type;
+			
+			                if (!pool.ContainsKey(type))
+			                {
+			                    pool[type] = new Stack<Packet>();
+			                }
+			
+			                if ((pool[type]).Count < 50)
+			                {		
+			                    pool[type].Push(packet);
+			                }
+			            }
+			            break;
+
+                    // Other packets wont pool
+                    default:
+                        return;
                 }
             }
         }
@@ -274,15 +298,21 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         public void ReturnDataBlock<T>(T block) where T: new()
         {
             if (block == null)
+            {
                 return;
+            }
 
             lock (DataBlocks)
             {
                 if (!DataBlocks.ContainsKey(typeof(T)))
+                {
                     DataBlocks[typeof(T)] = new Stack<Object>();
+                }
 
                 if (DataBlocks[typeof(T)].Count < 50)
+                {
                     DataBlocks[typeof(T)].Push(block);
+                }
             }
         }
     }

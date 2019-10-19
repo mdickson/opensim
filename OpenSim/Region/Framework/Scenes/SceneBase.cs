@@ -25,17 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
-using OpenMetaverse;
-using log4net;
-using Nini.Config;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-
-using OpenSim.Region.Framework.Interfaces;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Region.Framework.Scenes
@@ -176,7 +174,7 @@ namespace OpenSim.Region.Framework.Scenes
             get { return m_permissions; }
         }
 
-         /* Used by the loadbalancer plugin on GForge */
+        /* Used by the loadbalancer plugin on GForge */
         protected RegionStatus m_regStatus;
         public RegionStatus RegionStatus
         {
@@ -415,7 +413,7 @@ namespace OpenSim.Region.Framework.Scenes
         /// <param name="mod"></param>
         public void RegisterModuleInterface<M>(M mod)
         {
-//            m_log.DebugFormat("[SCENE BASE]: Registering interface {0}", typeof(M));
+            //            m_log.DebugFormat("[SCENE BASE]: Registering interface {0}", typeof(M));
 
             List<Object> l = null;
             if (!ModuleInterfaces.TryGetValue(typeof(M), out l))
@@ -524,7 +522,7 @@ namespace OpenSim.Region.Framework.Scenes
             }
             else
             {
-                return new T[] {};
+                return new T[] { };
             }
         }
 

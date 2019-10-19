@@ -23,16 +23,17 @@
  * See GloebitSubscriptionData.cs for DB implementation
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using OpenMetaverse;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
-namespace Gloebit.GloebitMoneyModule {
+namespace Gloebit.GloebitMoneyModule
+{
 
-    public class GloebitSubscription {
+    public class GloebitSubscription
+    {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         // These 3 make up the primary key -- allows sim to swap back and forth between apps or GlbEnvs without getting errors
@@ -53,10 +54,12 @@ namespace Gloebit.GloebitMoneyModule {
 
         private static Dictionary<string, GloebitSubscription> s_subscriptionMap = new Dictionary<string, GloebitSubscription>();
 
-        public GloebitSubscription() {
+        public GloebitSubscription()
+        {
         }
 
-        private GloebitSubscription(UUID objectID, string appKey, string apiURL, string objectName, string objectDescription) {
+        private GloebitSubscription(UUID objectID, string appKey, string apiURL, string objectName, string objectDescription)
+        {
             this.ObjectID = objectID;
             this.AppKey = appKey;
             this.GlbApiUrl = apiURL;
@@ -73,25 +76,30 @@ namespace Gloebit.GloebitMoneyModule {
 
         }
 
-        public static GloebitSubscription Init(UUID objectID, string appKey, string apiUrl, string objectName, string objectDescription) {
+        public static GloebitSubscription Init(UUID objectID, string appKey, string apiUrl, string objectName, string objectDescription)
+        {
             string objectIDstr = objectID.ToString();
 
             GloebitSubscription s = new GloebitSubscription(objectID, appKey, apiUrl, objectName, objectDescription);
-            lock(s_subscriptionMap) {
+            lock (s_subscriptionMap)
+            {
                 s_subscriptionMap[objectIDstr] = s;
             }
             GloebitSubscriptionData.Instance.Store(s);
             return s;
         }
 
-        public static GloebitSubscription[] Get(UUID objectID) {
+        public static GloebitSubscription[] Get(UUID objectID)
+        {
             return Get(objectID.ToString());
         }
 
-        public static GloebitSubscription[] Get(string objectIDStr) {
+        public static GloebitSubscription[] Get(string objectIDStr)
+        {
             m_log.InfoFormat("[GLOEBITMONEYMODULE] in Subscription.Get");
             GloebitSubscription subscription = null;
-            lock(s_subscriptionMap) {
+            lock (s_subscriptionMap)
+            {
                 s_subscriptionMap.TryGetValue(objectIDStr, out subscription);
             }
 
@@ -108,13 +116,18 @@ namespace Gloebit.GloebitMoneyModule {
                      */
             bool cacheDuplicate = false;
             m_log.DebugFormat("[GLOEBITMONEYMODULE] Found {0} subscriptions for {0} saved in the DB", subscriptions.Length, objectIDStr);
-            if (subscription != null) {
+            if (subscription != null)
+            {
                 m_log.DebugFormat("[GLOEBITMONEYMODULE] Found 1 cached subscriptions for {0}", subscriptions.Length, objectIDStr);
-                if (subscriptions.Length == 0) {
+                if (subscriptions.Length == 0)
+                {
                     subscriptions = new GloebitSubscription[1];
                     subscriptions[0] = subscription;
-                } else {
-                    for (int i = 0; i < subscriptions.Length; i++) {
+                }
+                else
+                {
+                    for (int i = 0; i < subscriptions.Length; i++)
+                    {
                         if (subscriptions[i].ObjectID == subscription.ObjectID &&
                             subscriptions[i].AppKey == subscription.AppKey &&
                             subscriptions[i].GlbApiUrl == subscription.GlbApiUrl)
@@ -125,19 +138,23 @@ namespace Gloebit.GloebitMoneyModule {
                             break;
                         }
                     }
-                    if (!cacheDuplicate) {
+                    if (!cacheDuplicate)
+                    {
                         m_log.DebugFormat("[GLOEBITMONEYMODULE] Combining Cached subscription with those from db.");
                         GloebitSubscription[] dbSubs = subscriptions;
                         subscriptions = new GloebitSubscription[dbSubs.Length + 1];
                         subscriptions[0] = subscription;
-                        for (int i = 1; i < subscriptions.Length; i++) {
-                            subscriptions[i] = dbSubs[i-1];
+                        for (int i = 1; i < subscriptions.Length; i++)
+                        {
+                            subscriptions[i] = dbSubs[i - 1];
                         }
                     }
 
                 }
 
-            } else {
+            }
+            else
+            {
                 m_log.DebugFormat("[GLOEBITMONEYMODULE] Found no cached subscriptions for {0}", subscriptions.Length, objectIDStr);
             }
 
@@ -164,90 +181,107 @@ namespace Gloebit.GloebitMoneyModule {
                 return subscription;
                   */
         }
-        public static GloebitSubscription Get(UUID objectID, string appKey, Uri apiUrl) {
+        public static GloebitSubscription Get(UUID objectID, string appKey, Uri apiUrl)
+        {
             return Get(objectID.ToString(), appKey, apiUrl.ToString());
         }
 
-        public static GloebitSubscription Get(string objectIDStr, string appKey, Uri apiUrl) {
+        public static GloebitSubscription Get(string objectIDStr, string appKey, Uri apiUrl)
+        {
             return Get(objectIDStr, appKey, apiUrl.ToString());
         }
 
-        public static GloebitSubscription Get(UUID objectID, string appKey, string apiUrl) {
+        public static GloebitSubscription Get(UUID objectID, string appKey, string apiUrl)
+        {
             return Get(objectID.ToString(), appKey, apiUrl);
         }
 
-        public static GloebitSubscription Get(string objectIDStr, string appKey, string apiUrl) {
+        public static GloebitSubscription Get(string objectIDStr, string appKey, string apiUrl)
+        {
             m_log.InfoFormat("[GLOEBITMONEYMODULE] in GloebitSubscription.Get");
             GloebitSubscription subscription = null;
-            lock(s_subscriptionMap) {
+            lock (s_subscriptionMap)
+            {
                 s_subscriptionMap.TryGetValue(objectIDStr, out subscription);
             }
 
-            if(subscription == null) {
+            if (subscription == null)
+            {
                 m_log.DebugFormat("[GLOEBITMONEYMODULE] Looking for prior subscription for {0} {1} {2}", objectIDStr, appKey, apiUrl);
-                string[] keys = new string[] {"ObjectID", "AppKey", "GlbApiUrl"};
-                string[] values = new string[] {objectIDStr, appKey, apiUrl};
+                string[] keys = new string[] { "ObjectID", "AppKey", "GlbApiUrl" };
+                string[] values = new string[] { objectIDStr, appKey, apiUrl };
                 GloebitSubscription[] subscriptions = GloebitSubscriptionData.Instance.Get(keys, values);
 
-                switch(subscriptions.Length) {
-                case 1:
-                    subscription = subscriptions[0];
-                    m_log.DebugFormat("[GLOEBITMONEYMODULE] FOUND SUBSCRIPTION in DB! oID:{0} appKey:{1} url:{2} sID:{3} oN:{4} oD:{5}", subscription.ObjectID, subscription.AppKey, subscription.GlbApiUrl, subscription.SubscriptionID, subscription.ObjectName, subscription.Description);
-                    lock(s_subscriptionMap) {
-                        s_subscriptionMap[objectIDStr] = subscription;
-                    }
-                    return subscription;
-                case 0:
-                    m_log.DebugFormat("[GLOEBITMONEYMODULE] Could not find subscription matching oID:{0} appKey:{1} apiUrl:{2}", objectIDStr, appKey, apiUrl);
-                    return null;
-                default:
-                    throw new Exception(String.Format("[GLOEBITMONEYMODULE] Failed to find exactly one subscription for {0} {1} {2}", objectIDStr, appKey, apiUrl));
+                switch (subscriptions.Length)
+                {
+                    case 1:
+                        subscription = subscriptions[0];
+                        m_log.DebugFormat("[GLOEBITMONEYMODULE] FOUND SUBSCRIPTION in DB! oID:{0} appKey:{1} url:{2} sID:{3} oN:{4} oD:{5}", subscription.ObjectID, subscription.AppKey, subscription.GlbApiUrl, subscription.SubscriptionID, subscription.ObjectName, subscription.Description);
+                        lock (s_subscriptionMap)
+                        {
+                            s_subscriptionMap[objectIDStr] = subscription;
+                        }
+                        return subscription;
+                    case 0:
+                        m_log.DebugFormat("[GLOEBITMONEYMODULE] Could not find subscription matching oID:{0} appKey:{1} apiUrl:{2}", objectIDStr, appKey, apiUrl);
+                        return null;
+                    default:
+                        throw new Exception(String.Format("[GLOEBITMONEYMODULE] Failed to find exactly one subscription for {0} {1} {2}", objectIDStr, appKey, apiUrl));
                 }
             }
             m_log.DebugFormat("[GLOEBITMONEYMODULE] FOUND SUBSCRIPTION in cache! oID:{0} appKey:{1} url:{2} sID:{3} oN:{4} oD:{5}", subscription.ObjectID, subscription.AppKey, subscription.GlbApiUrl, subscription.SubscriptionID, subscription.ObjectName, subscription.Description);
             return subscription;
         }
 
-        public static GloebitSubscription GetBySubscriptionID(string subscriptionIDStr, string apiUrl) {
+        public static GloebitSubscription GetBySubscriptionID(string subscriptionIDStr, string apiUrl)
+        {
             m_log.InfoFormat("[GLOEBITMONEYMODULE] in GloebitSubscription.GetBySubscriptionID");
             GloebitSubscription subscription = null;
             GloebitSubscription localSub = null;
 
 
             m_log.DebugFormat("[GLOEBITMONEYMODULE] Looking for prior subscription for {0} {1}", subscriptionIDStr, apiUrl);
-            string[] keys = new string[] {"SubscriptionID", "GlbApiUrl"};
-            string[] values = new string[] {subscriptionIDStr, apiUrl};
+            string[] keys = new string[] { "SubscriptionID", "GlbApiUrl" };
+            string[] values = new string[] { subscriptionIDStr, apiUrl };
             GloebitSubscription[] subscriptions = GloebitSubscriptionData.Instance.Get(keys, values);
 
 
-            switch(subscriptions.Length) {
-            case 1:
-                subscription = subscriptions[0];
-                m_log.DebugFormat("[GLOEBITMONEYMODULE] FOUND SUBSCRIPTION in DB! oID:{0} appKey:{1} url:{2} sID:{3} oN:{4} oD:{5}", subscription.ObjectID, subscription.AppKey, subscription.GlbApiUrl, subscription.SubscriptionID, subscription.ObjectName, subscription.Description);
-                lock(s_subscriptionMap) {
-                    s_subscriptionMap.TryGetValue(subscription.ObjectID.ToString(), out localSub);
-                    if (localSub == null) {
-                        s_subscriptionMap[subscription.ObjectID.ToString()] = subscription;
+            switch (subscriptions.Length)
+            {
+                case 1:
+                    subscription = subscriptions[0];
+                    m_log.DebugFormat("[GLOEBITMONEYMODULE] FOUND SUBSCRIPTION in DB! oID:{0} appKey:{1} url:{2} sID:{3} oN:{4} oD:{5}", subscription.ObjectID, subscription.AppKey, subscription.GlbApiUrl, subscription.SubscriptionID, subscription.ObjectName, subscription.Description);
+                    lock (s_subscriptionMap)
+                    {
+                        s_subscriptionMap.TryGetValue(subscription.ObjectID.ToString(), out localSub);
+                        if (localSub == null)
+                        {
+                            s_subscriptionMap[subscription.ObjectID.ToString()] = subscription;
+                        }
                     }
-                }
-                if (localSub == null) {
-                    // do nothing.  already added subscription to cache in lock
-                } else if (localSub.Equals(subscription)) {
-                    // return cached sub instead of new sub from DB
-                    subscription = localSub;
-                } else {
-                    m_log.ErrorFormat("[GLOEBITMONEYMODULE] mapped Subscription is not equal to DB return --- shouldn't happen.  Investigate.");
-                    m_log.ErrorFormat("Local Sub\n sID:{0}\n oID:{1}\n appKey:{2}\n apiUrl:{3}\n oN:{4}\n oD:{5}\n enabled:{6}\n ctime:{7}", localSub.SubscriptionID, localSub.ObjectID, localSub.AppKey, localSub.GlbApiUrl, localSub.ObjectName, localSub.Description, localSub.Enabled, localSub.cTime);
-                    m_log.ErrorFormat("DB Sub\n sID:{0}\n oID:{1}\n appKey:{2}\n apiUrl:{3}\n oN:{4}\n oD:{5}\n enabled:{6}\n ctime:{7}", subscription.SubscriptionID, subscription.ObjectID, subscription.AppKey, subscription.GlbApiUrl, subscription.ObjectName, subscription.Description, subscription.Enabled, subscription.cTime);
-                    // still return cached sub instead of new sub from DB
-                    subscription = localSub;
-                }
-                return subscription;
-            case 0:
-                m_log.DebugFormat("[GLOEBITMONEYMODULE] Could not find subscription matching sID:{0} apiUrl:{1}", subscriptionIDStr, apiUrl);
-                return null;
-            default:
-                throw new Exception(String.Format("[GLOEBITMONEYMODULE] Failed to find exactly one subscription for {0} {1}", subscriptionIDStr, apiUrl));
+                    if (localSub == null)
+                    {
+                        // do nothing.  already added subscription to cache in lock
+                    }
+                    else if (localSub.Equals(subscription))
+                    {
+                        // return cached sub instead of new sub from DB
+                        subscription = localSub;
+                    }
+                    else
+                    {
+                        m_log.ErrorFormat("[GLOEBITMONEYMODULE] mapped Subscription is not equal to DB return --- shouldn't happen.  Investigate.");
+                        m_log.ErrorFormat("Local Sub\n sID:{0}\n oID:{1}\n appKey:{2}\n apiUrl:{3}\n oN:{4}\n oD:{5}\n enabled:{6}\n ctime:{7}", localSub.SubscriptionID, localSub.ObjectID, localSub.AppKey, localSub.GlbApiUrl, localSub.ObjectName, localSub.Description, localSub.Enabled, localSub.cTime);
+                        m_log.ErrorFormat("DB Sub\n sID:{0}\n oID:{1}\n appKey:{2}\n apiUrl:{3}\n oN:{4}\n oD:{5}\n enabled:{6}\n ctime:{7}", subscription.SubscriptionID, subscription.ObjectID, subscription.AppKey, subscription.GlbApiUrl, subscription.ObjectName, subscription.Description, subscription.Enabled, subscription.cTime);
+                        // still return cached sub instead of new sub from DB
+                        subscription = localSub;
+                    }
+                    return subscription;
+                case 0:
+                    m_log.DebugFormat("[GLOEBITMONEYMODULE] Could not find subscription matching sID:{0} apiUrl:{1}", subscriptionIDStr, apiUrl);
+                    return null;
+                default:
+                    throw new Exception(String.Format("[GLOEBITMONEYMODULE] Failed to find exactly one subscription for {0} {1}", subscriptionIDStr, apiUrl));
             }
             //m_log.DebugFormat("[GLOEBITMONEYMODULE] FOUND SUBSCRIPTION in cache! oID:{0} appKey:{1} url:{2} sID:{3} oN:{4} oD:{5}", subscription.ObjectID, subscription.AppKey, subscription.GlbApiUrl, subscription.SubscriptionID, subscription.ObjectName, subscription.Description);
             //return subscription;
@@ -256,11 +290,13 @@ namespace Gloebit.GloebitMoneyModule {
         public override bool Equals(Object obj)
         {
             //Check for null and compare run-time types.
-            if ((obj == null) || ! this.GetType().Equals(obj.GetType())) {
+            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+            {
                 return false;
             }
-            else {
-                GloebitSubscription s = (GloebitSubscription) obj;
+            else
+            {
+                GloebitSubscription s = (GloebitSubscription)obj;
                 // TODO: remove these info logs once we understand why things are not always equal
                 // m_log.InfoFormat("[GLOEBITMONEYMODULE] Subscription.Equals()");
                 // m_log.InfoFormat("ObjectID:{0}", (ObjectID == s.ObjectID));

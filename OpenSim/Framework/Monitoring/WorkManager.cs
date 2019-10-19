@@ -25,10 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
-using System.Threading;
 using log4net;
+using System;
+using System.Threading;
 
 namespace OpenSim.Framework.Monitoring
 {
@@ -136,9 +135,9 @@ namespace OpenSim.Framework.Monitoring
 
             Watchdog.ThreadWatchdogInfo twi
                 = new Watchdog.ThreadWatchdogInfo(thread, timeout, name)
-            { AlarmIfTimeout = alarmIfTimeout, AlarmMethod = alarmMethod };
+                { AlarmIfTimeout = alarmIfTimeout, AlarmMethod = alarmMethod };
 
-            Watchdog.AddThread(twi, name, log:log);
+            Watchdog.AddThread(twi, name, log: log);
 
             thread.Start();
 
@@ -161,7 +160,7 @@ namespace OpenSim.Framework.Monitoring
                 return;
             }
 
-            ThreadStart ts = new ThreadStart(delegate()
+            ThreadStart ts = new ThreadStart(delegate ()
             {
                 try
                 {
@@ -182,7 +181,7 @@ namespace OpenSim.Framework.Monitoring
                 }
             });
 
-            StartThread(ts, name, false, log:log);
+            StartThread(ts, name, false, log: log);
         }
 
         /// <summary>

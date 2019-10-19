@@ -25,6 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using HttpServer;
+using log4net;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,8 +36,6 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Web;
-using HttpServer;
-using log4net;
 
 namespace OpenSim.Framework.Servers.HttpServer
 {
@@ -174,7 +174,7 @@ namespace OpenSim.Framework.Servers.HttpServer
         }
         private Dictionary<string, object> _whiteboard = new Dictionary<string, object>();
 
-        public OSHttpRequest() {}
+        public OSHttpRequest() { }
 
         public OSHttpRequest(IHttpClientContext context, IHttpRequest req)
         {
@@ -244,12 +244,12 @@ namespace OpenSim.Framework.Servers.HttpServer
                 _log.ErrorFormat("[OSHttpRequest]: Error parsing querystring");
             }
 
-//            Form = new Hashtable();
-//            foreach (HttpInputItem item in req.Form)
-//            {
-//                _log.DebugFormat("[OSHttpRequest]: Got form item {0}={1}", item.Name, item.Value);
-//                Form.Add(item.Name, item.Value);
-//            }
+            //            Form = new Hashtable();
+            //            foreach (HttpInputItem item in req.Form)
+            //            {
+            //                _log.DebugFormat("[OSHttpRequest]: Got form item {0}={1}", item.Name, item.Value);
+            //                Form.Add(item.Name, item.Value);
+            //            }
         }
 
         public override string ToString()

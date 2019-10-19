@@ -28,14 +28,6 @@
 using System;
 using System.Reflection.Emit;
 
-using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
-using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
-using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
-using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
-using LSL_Rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
-using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
-using LSL_Vector = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Vector3;
-
 namespace OpenSim.Region.ScriptEngine.Yengine
 {
     public class XMRSDTypeClObj
@@ -95,12 +87,12 @@ namespace OpenSim.Region.ScriptEngine.Yengine
              * Yes, yes, lots of shitty little mallocs.
              */
             DynamicMethod[] vDynMeths = clas.vDynMeths;
-            if(vDynMeths != null)
+            if (vDynMeths != null)
             {
                 int n = vDynMeths.Length;
                 Type[] vMethTypes = clas.vMethTypes;
                 sdtcVTable = new Delegate[n];
-                for(int i = 0; i < n; i++)
+                for (int i = 0; i < n; i++)
                 {
                     sdtcVTable[i] = vDynMeths[i].CreateDelegate(vMethTypes[i], this);
                 }
@@ -116,11 +108,11 @@ namespace OpenSim.Region.ScriptEngine.Yengine
              * So we end up with this:
              *    sdtcITable[interfacenumber][methodofintfnumber] = delegate of this.ourimplementationofinterfacesmethod
              */
-            if(clas.iDynMeths != null)
+            if (clas.iDynMeths != null)
             {
                 int nIFaces = clas.iDynMeths.Length;
                 sdtcITable = new Delegate[nIFaces][];
-                for(int i = 0; i < nIFaces; i++)
+                for (int i = 0; i < nIFaces; i++)
                 {
 
                     // get vector of entrypoints of our instance methods that implement that interface
@@ -130,11 +122,11 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     // allocate an array with a slot for each method the interface defines
                     int nMeths = iDynMeths.Length;
                     Delegate[] ivec;
-                    if(nMeths > 0)
+                    if (nMeths > 0)
                     {
                         // fill in the array with delegates that reference back to this class instance
                         ivec = new Delegate[nMeths];
-                        for(int j = 0; j < nMeths; j++)
+                        for (int j = 0; j < nMeths; j++)
                         {
                             ivec[j] = iDynMeths[j].CreateDelegate(iMethTypes[j], this);
                         }
@@ -146,7 +138,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                         // with a dummy entry.  this will allow casting
                         // back to the original class instance (this)
                         // by reading Target of entry 0.
-                        if(thisMid == null)
+                        if (thisMid == null)
                         {
                             thisMid = new Delegate[1];
                             thisMid[0] = markerInterfaceDummy.CreateDelegate(typeof(MarkerInterfaceDummy), this);
@@ -194,7 +186,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
              * Let mono check to see if we at least have an XMRSDTypeClObj.
              */
             XMRSDTypeClObj ci = (XMRSDTypeClObj)ob;
-            if(ci != null)
+            if (ci != null)
             {
 
                 /*
@@ -207,9 +199,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                  * If we find the target class along the way, the cast is valid.
                  * If we run off the end of the root, the cast is not valid.
                  */
-                for(TokenDeclSDTypeClass ac = ci.sdtcClass; ac != tc; ac = ac.extends)
+                for (TokenDeclSDTypeClass ac = ci.sdtcClass; ac != tc; ac = ac.extends)
                 {
-                    if(ac == null)
+                    if (ac == null)
                         throw new InvalidCastException("invalid cast from " + ci.sdtcClass.longName.val +
                                                                       " to " + tc.longName.val);
                 }
@@ -229,13 +221,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public static Delegate[] CastObj2IFace(object ob, string ifacename)
         {
-            if(ob == null)
+            if (ob == null)
                 return null;
 
             /*
              * If it is already one of our interfaces, extract the script-defined class object from it.
              */
-            if(ob is Delegate[])
+            if (ob is Delegate[])
             {
                 Delegate[] da = (Delegate[])ob;
                 ob = da[0].Target;

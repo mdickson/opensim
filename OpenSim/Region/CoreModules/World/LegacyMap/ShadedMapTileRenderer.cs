@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Drawing;
-using System.Reflection;
 using log4net;
 using Nini.Config;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Drawing;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.World.LegacyMap
 {
@@ -199,7 +199,7 @@ namespace OpenSim.Region.CoreModules.World.LegacyMap
                                                                    (g - hfdiffi > 0) ? g - hfdiffi : 0,
                                                                    (b - hfdiffi > 0) ? b - hfdiffi : 0);
 
-                                            mapbmp.SetPixel(x-1, yr+1, color);
+                                            mapbmp.SetPixel(x - 1, yr + 1, color);
                                         }
                                     }
                                 }

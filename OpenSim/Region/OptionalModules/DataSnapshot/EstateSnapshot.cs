@@ -25,14 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Xml;
 using OpenMetaverse;
-using OpenSim.Framework;
-
 using OpenSim.Region.DataSnapshot.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Xml;
 
 namespace OpenSim.Region.DataSnapshot.Providers
 {
@@ -70,9 +68,9 @@ namespace OpenSim.Region.DataSnapshot.Providers
 
                 //TODO: Fix the marshalling system to have less copypasta gruntwork
                 XmlNode user = factory.CreateNode(XmlNodeType.Element, "user", "");
-//                XmlAttribute type = (XmlAttribute)factory.CreateNode(XmlNodeType.Attribute, "type", "");
-//                type.Value = "owner";
-//                user.Attributes.Append(type);
+                //                XmlAttribute type = (XmlAttribute)factory.CreateNode(XmlNodeType.Attribute, "type", "");
+                //                type.Value = "owner";
+                //                user.Attributes.Append(type);
 
                 //TODO: Create more TODOs
                 XmlNode username = factory.CreateNode(XmlNodeType.Element, "name", "");
@@ -125,16 +123,19 @@ namespace OpenSim.Region.DataSnapshot.Providers
             get { return m_scene; }
         }
 
-        public String Name {
+        public String Name
+        {
             get { return "EstateSnapshot"; }
         }
 
         public bool Stale
         {
-            get {
+            get
+            {
                 return m_stale;
             }
-            set {
+            set
+            {
                 m_stale = value;
 
                 if (m_stale)

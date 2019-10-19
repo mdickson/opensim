@@ -25,22 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
-using System.Text;
-using Nini.Config;
 using log4net;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Services.UserAccountService;
-using OpenSim.Data;
+using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Services.ProfilesService
 {
-    public class UserProfilesService: UserProfilesServiceBase, IUserProfilesService
+    public class UserProfilesService : UserProfilesServiceBase, IUserProfilesService
     {
         static readonly ILog m_log =
             LogManager.GetLogger(
@@ -48,7 +45,7 @@ namespace OpenSim.Services.ProfilesService
 
         IUserAccountService userAccounts;
 
-        public UserProfilesService(IConfigSource config, string configName):
+        public UserProfilesService(IConfigSource config, string configName) :
             base(config, configName)
         {
             IConfig Config = config.Configs[configName];
@@ -77,7 +74,7 @@ namespace OpenSim.Services.ProfilesService
 
         public bool ClassifiedUpdate(UserClassifiedAdd ad, ref string result)
         {
-            if(!ProfilesData.UpdateClassifiedRecord(ad, ref result))
+            if (!ProfilesData.UpdateClassifiedRecord(ad, ref result))
             {
                 return false;
             }
@@ -87,7 +84,7 @@ namespace OpenSim.Services.ProfilesService
 
         public bool ClassifiedDelete(UUID recordId)
         {
-            if(ProfilesData.DeleteClassifiedRecord(recordId))
+            if (ProfilesData.DeleteClassifiedRecord(recordId))
                 return true;
 
             return false;
@@ -95,7 +92,7 @@ namespace OpenSim.Services.ProfilesService
 
         public bool ClassifiedInfoRequest(ref UserClassifiedAdd ad, ref string result)
         {
-            if(ProfilesData.GetClassifiedInfo(ref ad, ref result))
+            if (ProfilesData.GetClassifiedInfo(ref ad, ref result))
                 return true;
 
             return false;
@@ -163,15 +160,15 @@ namespace OpenSim.Services.ProfilesService
         #region User Preferences
         public bool UserPreferencesUpdate(ref UserPreferences pref, ref string result)
         {
-            if(string.IsNullOrEmpty(pref.EMail))
+            if (string.IsNullOrEmpty(pref.EMail))
             {
                 UserAccount account = new UserAccount();
-                if(userAccounts is UserAccountService.UserAccountService)
+                if (userAccounts is UserAccountService.UserAccountService)
                 {
                     try
                     {
                         account = userAccounts.GetUserAccount(UUID.Zero, pref.UserId);
-                        if(string.IsNullOrEmpty(account.Email))
+                        if (string.IsNullOrEmpty(account.Email))
                         {
                             pref.EMail = string.Empty;
                         }
@@ -180,14 +177,14 @@ namespace OpenSim.Services.ProfilesService
                     }
                     catch
                     {
-                        m_log.Error ("[PROFILES SERVICE]: UserAccountService Exception: Could not get user account");
+                        m_log.Error("[PROFILES SERVICE]: UserAccountService Exception: Could not get user account");
                         result = "UserAccountService settings error in UserProfileService!";
                         return false;
                     }
                 }
                 else
                 {
-                    m_log.Error ("[PROFILES SERVICE]: UserAccountService: Could not get user account");
+                    m_log.Error("[PROFILES SERVICE]: UserAccountService: Could not get user account");
                     result = "UserAccountService settings error in UserProfileService!";
                     return false;
                 }
@@ -200,15 +197,15 @@ namespace OpenSim.Services.ProfilesService
             if (!ProfilesData.GetUserPreferences(ref pref, ref result))
                 return false;
 
-            if(string.IsNullOrEmpty(pref.EMail))
+            if (string.IsNullOrEmpty(pref.EMail))
             {
                 UserAccount account = new UserAccount();
-                if(userAccounts is UserAccountService.UserAccountService)
+                if (userAccounts is UserAccountService.UserAccountService)
                 {
                     try
                     {
                         account = userAccounts.GetUserAccount(UUID.Zero, pref.UserId);
-                        if(string.IsNullOrEmpty(account.Email))
+                        if (string.IsNullOrEmpty(account.Email))
                         {
                             pref.EMail = string.Empty;
                         }
@@ -220,20 +217,20 @@ namespace OpenSim.Services.ProfilesService
                     }
                     catch
                     {
-                        m_log.Error ("[PROFILES SERVICE]: UserAccountService Exception: Could not get user account");
+                        m_log.Error("[PROFILES SERVICE]: UserAccountService Exception: Could not get user account");
                         result = "UserAccountService settings error in UserProfileService!";
                         return false;
                     }
                 }
                 else
                 {
-                    m_log.Error ("[PROFILES SERVICE]: UserAccountService: Could not get user account");
+                    m_log.Error("[PROFILES SERVICE]: UserAccountService: Could not get user account");
                     result = "UserAccountService settings error in UserProfileService!";
                     return false;
                 }
             }
 
-            if(string.IsNullOrEmpty(pref.EMail))
+            if (string.IsNullOrEmpty(pref.EMail))
                 pref.EMail = "No Email Address On Record";
 
             return true;

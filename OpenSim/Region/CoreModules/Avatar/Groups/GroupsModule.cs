@@ -25,17 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-
-using Mono.Addins;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.Avatar.Groups
 {
@@ -144,7 +143,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Groups
             if (!m_Enabled)
                 return;
 
-//            m_log.Debug("[GROUPS]: Shutting down group module.");
+            //            m_log.Debug("[GROUPS]: Shutting down group module.");
 
             lock (m_ClientMap)
             {
@@ -172,7 +171,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Groups
         private void OnNewClient(IClientAPI client)
         {
             // Subscribe to instant messages
-//            client.OnInstantMessage += OnInstantMessage;
+            //            client.OnInstantMessage += OnInstantMessage;
             client.OnAgentDataUpdateRequest += OnAgentDataUpdateRequest;
             client.OnUUIDGroupNameRequest += HandleUUIDGroupNameRequest;
             lock (m_ClientMap)
@@ -205,17 +204,17 @@ namespace OpenSim.Region.CoreModules.Avatar.Groups
                                              ActiveGroupTitle);
         }
 
-//        private void OnInstantMessage(IClientAPI client, GridInstantMessage im)
-//        {
-//        }
+        //        private void OnInstantMessage(IClientAPI client, GridInstantMessage im)
+        //        {
+        //        }
 
-//        private void OnGridInstantMessage(GridInstantMessage msg)
-//        {
-//            // Trigger the above event handler
-//            OnInstantMessage(null, msg);
-//        }
+        //        private void OnGridInstantMessage(GridInstantMessage msg)
+        //        {
+        //            // Trigger the above event handler
+        //            OnInstantMessage(null, msg);
+        //        }
 
-        private void HandleUUIDGroupNameRequest(UUID id,IClientAPI remote_client)
+        private void HandleUUIDGroupNameRequest(UUID id, IClientAPI remote_client)
         {
             string groupnamereply = "Unknown";
             UUID groupUUID = UUID.Zero;
@@ -250,15 +249,15 @@ namespace OpenSim.Region.CoreModules.Avatar.Groups
             {
                 if (m_ClientMap.ContainsKey(agentID))
                 {
-//                    IClientAPI cli = m_ClientMap[agentID];
-//                    if (cli != null)
-//                    {
-//                        //m_log.Info("[GROUPS]: Removing all reference to groups for " + cli.Name);
-//                    }
-//                    else
-//                    {
-//                        //m_log.Info("[GROUPS]: Removing all reference to groups for " + agentID.ToString());
-//                    }
+                    //                    IClientAPI cli = m_ClientMap[agentID];
+                    //                    if (cli != null)
+                    //                    {
+                    //                        //m_log.Info("[GROUPS]: Removing all reference to groups for " + cli.Name);
+                    //                    }
+                    //                    else
+                    //                    {
+                    //                        //m_log.Info("[GROUPS]: Removing all reference to groups for " + agentID.ToString());
+                    //                    }
                     m_ClientMap.Remove(agentID);
                 }
             }

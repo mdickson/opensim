@@ -25,20 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using log4net.Config;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
-using OpenMetaverse.Assets;
 using OpenSim.Framework;
-using OpenSim.Region.CoreModules.Avatar.Inventory.Transfer;
-using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
 using OpenSim.Tests.Common;
+using System;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer.Tests
 {
@@ -63,7 +58,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer.Tests
         [Test]
         public void TestAcceptGivenItem()
         {
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID initialSessionId = TestHelpers.ParseTail(0x10);
             UUID itemId = TestHelpers.ParseTail(0x100);
@@ -159,7 +154,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer.Tests
         [Test]
         public void TestRejectGivenItem()
         {
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID initialSessionId = TestHelpers.ParseTail(0x10);
             UUID itemId = TestHelpers.ParseTail(0x100);
@@ -256,7 +251,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer.Tests
         public void TestAcceptGivenFolder()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID initialSessionId = TestHelpers.ParseTail(0x10);
             UUID folderId = TestHelpers.ParseTail(0x100);
@@ -352,7 +347,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer.Tests
         public void TestRejectGivenFolder()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID initialSessionId = TestHelpers.ParseTail(0x10);
             UUID folderId = TestHelpers.ParseTail(0x100);

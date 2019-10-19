@@ -25,19 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Services.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Xml;
-
-using OpenSim.Framework;
-using OpenSim.Services.Base;
-using OpenSim.Services.Interfaces;
-
-using log4net;
-using Nini.Config;
-using OpenMetaverse;
 using PermissionMask = OpenSim.Framework.PermissionMask;
 
 namespace OpenSim.Services.InventoryService
@@ -75,11 +73,11 @@ namespace OpenSim.Services.InventoryService
         static readonly uint m_NextPermissions = (uint)PermissionMask.AllAndExport;
         static readonly uint m_GroupPermissions = 0;
 
-        public LibraryService(IConfigSource config):base(config)
+        public LibraryService(IConfigSource config) : base(config)
         {
-            lock(m_rootLock)
+            lock (m_rootLock)
             {
-                if(m_root != null)
+                if (m_root != null)
                     return;
                 m_root = this;
             }
@@ -184,7 +182,7 @@ namespace OpenSim.Services.InventoryService
                 libraryFolders.Add(folderInfo.ID, folderInfo);
                 parentFolder.AddChildFolder(folderInfo);
 
-//                 m_log.InfoFormat("[LIBRARY INVENTORY]: Adding folder {0} ({1})", folderInfo.name, folderInfo.folderID);
+                //                 m_log.InfoFormat("[LIBRARY INVENTORY]: Adding folder {0} ({1})", folderInfo.name, folderInfo.folderID);
             }
             else
             {
@@ -204,7 +202,7 @@ namespace OpenSim.Services.InventoryService
             item.Owner = libOwner;
             item.CreatorId = libOwner.ToString();
             UUID itID = new UUID(config.GetString("inventoryID", m_LibraryRootFolder.ID.ToString()));
-            item.ID = itID; 
+            item.ID = itID;
             item.AssetID = new UUID(config.GetString("assetID", item.ID.ToString()));
             item.Folder = new UUID(config.GetString("folderID", m_LibraryRootFolder.ID.ToString()));
             item.Name = config.GetString("name", String.Empty);
@@ -215,13 +213,13 @@ namespace OpenSim.Services.InventoryService
             item.NextPermissions = (uint)config.GetLong("nextPermissions", m_NextPermissions);
             item.EveryOnePermissions = (uint)config.GetLong("everyonePermissions", m_EveryOnePermissions);
             item.BasePermissions = (uint)config.GetLong("basePermissions", m_BasePermissions);
-            item.GroupPermissions = (uint)config.GetLong("basePermissions", m_GroupPermissions);;
+            item.GroupPermissions = (uint)config.GetLong("basePermissions", m_GroupPermissions); ;
             item.Flags = (uint)config.GetInt("flags", 0);
 
             if (libraryFolders.ContainsKey(item.Folder))
             {
                 InventoryFolderImpl parentFolder = libraryFolders[item.Folder];
-                if(!parentFolder.Items.ContainsKey(itID))
+                if (!parentFolder.Items.ContainsKey(itID))
                 {
                     parentFolder.Items.Add(itID, item);
                     m_items[itID] = item;
@@ -302,7 +300,7 @@ namespace OpenSim.Services.InventoryService
 
         public InventoryItemBase GetItem(UUID itemID)
         {
-            if(m_items.ContainsKey(itemID))
+            if (m_items.ContainsKey(itemID))
                 return m_items[itemID];
             return null;
         }
@@ -312,11 +310,11 @@ namespace OpenSim.Services.InventoryService
             List<InventoryItemBase> items = new List<InventoryItemBase>();
             foreach (UUID id in ids)
             {
-                if(m_items.ContainsKey(id))
+                if (m_items.ContainsKey(id))
                     items.Add(m_items[id]);
             }
 
-            if(items.Count == 0)
+            if (items.Count == 0)
                 return null;
             return items.ToArray();
         }

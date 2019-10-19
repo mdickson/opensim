@@ -25,11 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-
-using OpenMetaverse;
 
 namespace OpenSim.Framework
 {
@@ -92,7 +91,7 @@ namespace OpenSim.Framework
         /// </summary>
         public string BannedHostIPMask
         {
-           get
+            get
             {
                 return m_bannedHostIPMask;
             }

@@ -25,14 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenSim.Region.PhysicsModules.SharedBase;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
-using OpenMetaverse;
-using OpenSim.Region.PhysicsModules.SharedBase;
-using log4net;
 
 namespace OpenSim.Region.PhysicsModule.ODE
 {
@@ -254,8 +253,8 @@ namespace OpenSim.Region.PhysicsModule.ODE
 
             if (g1 == IntPtr.Zero || g2 == IntPtr.Zero)
                 return;
-//            if (d.GeomGetClass(g1) == d.GeomClassID.HeightfieldClass || d.GeomGetClass(g2) == d.GeomClassID.HeightfieldClass)
-//                return;
+            //            if (d.GeomGetClass(g1) == d.GeomClassID.HeightfieldClass || d.GeomGetClass(g2) == d.GeomClassID.HeightfieldClass)
+            //                return;
 
             // Raytest against AABBs of spaces first, then dig into the spaces it hits for actual geoms.
             if (SafeNativeMethods.GeomIsSpace(g1) || SafeNativeMethods.GeomIsSpace(g2))

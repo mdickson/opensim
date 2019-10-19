@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using System.Collections.Specialized;
 using System.Net;
 
@@ -35,7 +34,7 @@ namespace OpenSim.Framework.ServiceAuth
     {
         public string Name { get { return "DisallowllHTTPRequest"; } }
 
-        public void AddAuthorization(NameValueCollection headers) {}
+        public void AddAuthorization(NameValueCollection headers) { }
 
         public bool Authenticate(string data)
         {
@@ -44,7 +43,7 @@ namespace OpenSim.Framework.ServiceAuth
 
         public bool Authenticate(NameValueCollection requestHeaders, AddHeaderDelegate d, out HttpStatusCode statusCode)
         {
-//            Console.WriteLine("DisallowLlHttpRequest");
+            //            Console.WriteLine("DisallowLlHttpRequest");
 
             if (requestHeaders["X-SecondLife-Shard"] != null)
             {

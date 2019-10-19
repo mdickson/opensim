@@ -25,10 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Timers;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -38,7 +34,9 @@ using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-using DirFindFlags = OpenMetaverse.DirectoryManager.DirFindFlags;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Groups
 {
@@ -59,7 +57,7 @@ namespace OpenSim.Groups
         private bool m_groupsEnabled = false;
         private bool m_groupNoticesEnabled = true;
         private bool m_debugEnabled = false;
-        private int  m_levelGroupCreate = 0;
+        private int m_levelGroupCreate = 0;
 
         #region Region Module interfaceBase Members
 
@@ -89,9 +87,9 @@ namespace OpenSim.Groups
 
                 m_log.InfoFormat("[Groups]: Initializing {0}", this.Name);
 
-                m_groupNoticesEnabled   = groupsConfig.GetBoolean("NoticesEnabled", true);
-                m_debugEnabled          = groupsConfig.GetBoolean("DebugEnabled", false);
-                m_levelGroupCreate      = groupsConfig.GetInt("LevelGroupCreate", 0);
+                m_groupNoticesEnabled = groupsConfig.GetBoolean("NoticesEnabled", true);
+                m_debugEnabled = groupsConfig.GetBoolean("DebugEnabled", false);
+                m_levelGroupCreate = groupsConfig.GetInt("LevelGroupCreate", 0);
             }
         }
 
@@ -249,7 +247,7 @@ namespace OpenSim.Groups
             // There might be some problem with the thread we're generating this on but not
             //   doing the update at this time causes problems (Mantis #7920 and #7915)
             // TODO: move sending this update to a later time in the rootification of the client.
-            if(!sp.m_haveGroupInformation)
+            if (!sp.m_haveGroupInformation)
                 SendAgentGroupDataUpdate(sp.ControllingClient, false);
         }
 
@@ -395,9 +393,9 @@ namespace OpenSim.Groups
 
                             OutgoingInstantMessage(msg, invitee);
                             IClientAPI inviteeClient = GetActiveRootClient(invitee);
-                            if(inviteeClient !=null)
+                            if (inviteeClient != null)
                             {
-                                SendAgentGroupDataUpdate(inviteeClient,true);
+                                SendAgentGroupDataUpdate(inviteeClient, true);
                             }
                         }
 
@@ -485,7 +483,7 @@ namespace OpenSim.Groups
                     return;
 
                 //// 16 bytes are the UUID. Maybe.
-//                UUID folderID = new UUID(im.binaryBucket, 0);
+                //                UUID folderID = new UUID(im.binaryBucket, 0);
                 UUID noticeID = new UUID(im.imSessionID);
 
                 GroupNoticeInfo notice = m_groupData.GetGroupNotice(remoteClient.AgentId.ToString(), noticeID);
@@ -532,7 +530,7 @@ namespace OpenSim.Groups
                 {
                     UUID groupID = new UUID(im.imSessionID);
                     ejectee.SendAgentDropGroup(groupID);
-                    SendAgentGroupDataUpdate(ejectee,true);
+                    SendAgentGroupDataUpdate(ejectee, true);
                 }
             }
         }
@@ -769,7 +767,8 @@ namespace OpenSim.Groups
             if (money != null)
             {
                 // do the transaction, that is if the agent has got sufficient funds
-                if (!money.AmountCovered(remoteClient.AgentId, money.GroupCreationCharge)) {
+                if (!money.AmountCovered(remoteClient.AgentId, money.GroupCreationCharge))
+                {
                     remoteClient.SendCreateGroupReply(UUID.Zero, false, "Insufficient funds to create a group.");
                     return UUID.Zero;
                 }
@@ -1092,13 +1091,13 @@ namespace OpenSim.Groups
             GridInstantMessage msg = new GridInstantMessage();
 
             // if local send a normal message
-            if(ejecteeClient != null)
+            if (ejecteeClient != null)
             {
                 msg.imSessionID = UUID.Zero.Guid;
                 msg.dialog = (byte)OpenMetaverse.InstantMessageDialog.MessageFromAgent;
                 // also execute and send update
                 ejecteeClient.SendAgentDropGroup(groupID);
-                SendAgentGroupDataUpdate(ejecteeClient,true);
+                SendAgentGroupDataUpdate(ejecteeClient, true);
             }
             else // send
             {
@@ -1221,11 +1220,11 @@ namespace OpenSim.Groups
                 ScenePresence sp = scene.GetScenePresence(agentID);
                 if (sp != null && !sp.IsChildAgent && !sp.IsDeleted)
                 {
-                        return sp.ControllingClient;
+                    return sp.ControllingClient;
                 }
             }
             return null;
-         }
+        }
 
         /// <summary>
         /// Try to find an active IClientAPI reference for agentID giving preference to root connections
@@ -1238,7 +1237,7 @@ namespace OpenSim.Groups
             foreach (Scene scene in m_sceneList)
             {
                 ScenePresence sp = scene.GetScenePresence(agentID);
-                if (sp != null&& !sp.IsDeleted)
+                if (sp != null && !sp.IsDeleted)
                 {
                     if (!sp.IsChildAgent)
                     {
@@ -1270,7 +1269,7 @@ namespace OpenSim.Groups
                     {
                         presence.Grouptitle = Title;
 
-                        if (! presence.IsChildAgent)
+                        if (!presence.IsChildAgent)
                             presence.SendAvatarDataToAllAgents();
                     }
                 }
@@ -1298,7 +1297,7 @@ namespace OpenSim.Groups
 
             UUID agentID = GetRequestingAgentID(remoteClient);
 
-            SendDataUpdate(remoteClient,  tellOthers);
+            SendDataUpdate(remoteClient, tellOthers);
 
             GroupMembershipData[] membershipArray = GetProfileListedGroupMemberships(remoteClient, agentID);
 
@@ -1330,7 +1329,7 @@ namespace OpenSim.Groups
             {
                 if (requestingClient.AgentId != dataForAgentID)
                 {
-                    Predicate<GroupMembershipData> showInProfile = delegate(GroupMembershipData membership)
+                    Predicate<GroupMembershipData> showInProfile = delegate (GroupMembershipData membership)
                     {
                         return membership.ListInProfile;
                     };
@@ -1355,7 +1354,7 @@ namespace OpenSim.Groups
             return membershipArray;
         }
 
-         //tell remoteClient about its agent group info, and optionally send title to others
+        //tell remoteClient about its agent group info, and optionally send title to others
         private void SendDataUpdate(IClientAPI remoteClient, bool tellOthers)
         {
             if (m_debugEnabled) m_log.DebugFormat("[GROUPS]: {0} called", System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -1417,7 +1416,7 @@ namespace OpenSim.Groups
             else if (m_msgTransferModule != null)
             {
                 if (m_debugEnabled) m_log.InfoFormat("[Groups]: MsgTo ({0}) is not local, delivering via TransferModule", msgTo);
-                m_msgTransferModule.SendInstantMessage(msg, delegate(bool success) { if (m_debugEnabled) m_log.DebugFormat("[Groups]: Message Sent: {0}", success?"Succeeded":"Failed"); });
+                m_msgTransferModule.SendInstantMessage(msg, delegate (bool success) { if (m_debugEnabled) m_log.DebugFormat("[Groups]: Message Sent: {0}", success ? "Succeeded" : "Failed"); });
             }
         }
 

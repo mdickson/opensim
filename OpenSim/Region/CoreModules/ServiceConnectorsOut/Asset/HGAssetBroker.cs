@@ -28,16 +28,13 @@
 using log4net;
 using Mono.Addins;
 using Nini.Config;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using OpenSim.Framework;
-
-using OpenSim.Server.Base;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using OpenSim.Server.Base;
 using OpenSim.Services.Interfaces;
-using OpenMetaverse;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
 {
@@ -69,7 +66,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
             get { return "HGAssetBroker"; }
         }
 
-        public HGAssetBroker() {}
+        public HGAssetBroker() { }
 
         public HGAssetBroker(IConfigSource config)
         {
@@ -372,14 +369,14 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
             if (String.IsNullOrEmpty(id))
                 return string.Empty;
 
-           if(asset.ID != id)
-           {
+            if (asset.ID != id)
+            {
                 asset.ID = id;
                 if (m_Cache != null)
                     m_Cache.Cache(asset);
-           }
+            }
 
-           return id;
+            return id;
         }
 
         public bool UpdateContent(string id, byte[] data)

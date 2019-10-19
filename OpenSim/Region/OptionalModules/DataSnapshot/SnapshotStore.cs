@@ -25,6 +25,9 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+using log4net;
+using OpenSim.Region.DataSnapshot.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,9 +35,6 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
-using log4net;
-using OpenSim.Region.DataSnapshot.Interfaces;
-using OpenSim.Region.Framework.Scenes;
 
 namespace OpenSim.Region.DataSnapshot
 {
@@ -49,7 +49,8 @@ namespace OpenSim.Region.DataSnapshot
         private bool m_cacheEnabled = true;
         #endregion
 
-        public SnapshotStore(string directory, Dictionary<String, String> gridinfo) {
+        public SnapshotStore(string directory, Dictionary<String, String> gridinfo)
+        {
             m_directory = directory;
             m_scenes = new Dictionary<Scene, bool>();
             m_providers = new List<IDataSnapshotProvider>();
@@ -81,9 +82,9 @@ namespace OpenSim.Region.DataSnapshot
         public void ForceSceneStale(Scene scene)
         {
             m_scenes[scene] = true;
-            foreach(IDataSnapshotProvider pv in m_providers)
+            foreach (IDataSnapshotProvider pv in m_providers)
             {
-                if(pv.GetParentScene == scene && pv.Name == "LandSnapshot")
+                if (pv.GetParentScene == scene && pv.Name == "LandSnapshot")
                     pv.Stale = true;
             }
         }
@@ -149,7 +150,8 @@ namespace OpenSim.Region.DataSnapshot
         {
             m_log.Debug("[DATASNAPSHOT]: Data requested for scene " + scene.RegionInfo.RegionName);
 
-            if (!m_scenes.ContainsKey(scene)) {
+            if (!m_scenes.ContainsKey(scene))
+            {
                 m_scenes.Add(scene, true); //stale by default
             }
 

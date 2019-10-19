@@ -25,12 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Text.RegularExpressions;
-using System.Threading;
 using log4net;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
@@ -38,6 +32,11 @@ using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Scenes.Serialization;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using OpenSimAssetType = OpenSim.Framework.SLUtil.OpenSimAssetType;
 
 namespace OpenSim.Region.Framework.Scenes
@@ -96,9 +95,11 @@ namespace OpenSim.Region.Framework.Scenes
         /// Asset service.
         /// </param>
         public UuidGatherer(IAssetService assetService) : this(assetService, new Dictionary<UUID, sbyte>(),
-                new HashSet <UUID>(),new HashSet <UUID>()) {}
+                new HashSet<UUID>(), new HashSet<UUID>())
+        { }
         public UuidGatherer(IAssetService assetService, IDictionary<UUID, sbyte> collector) : this(assetService, collector,
-            new HashSet <UUID>(), new HashSet <UUID>()) {}
+            new HashSet<UUID>(), new HashSet<UUID>())
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OpenSim.Region.Framework.Scenes.UuidGatherer"/> class.
@@ -110,7 +111,7 @@ namespace OpenSim.Region.Framework.Scenes
         /// Gathered UUIDs will be collected in this dictionary.
         /// It can be pre-populated if you want to stop the gatherer from analyzing assets that have already been fetched and inspected.
         /// </param>
-        public UuidGatherer(IAssetService assetService, IDictionary<UUID, sbyte> collector, HashSet <UUID> failedIDs, HashSet <UUID> uncertainAssetsUUIDs)
+        public UuidGatherer(IAssetService assetService, IDictionary<UUID, sbyte> collector, HashSet<UUID> failedIDs, HashSet<UUID> uncertainAssetsUUIDs)
         {
             m_assetService = assetService;
             GatheredUuids = collector;
@@ -130,23 +131,23 @@ namespace OpenSim.Region.Framework.Scenes
         /// <param name="uuid">UUID.</param>
         public bool AddForInspection(UUID uuid)
         {
-            if(uuid == UUID.Zero)
+            if (uuid == UUID.Zero)
                 return false;
 
-            if(FailedUUIDs.Contains(uuid))
+            if (FailedUUIDs.Contains(uuid))
             {
-                if(UncertainAssetsUUIDs.Contains(uuid))
+                if (UncertainAssetsUUIDs.Contains(uuid))
                     possibleNotAssetCount++;
                 else
                     ErrorCount++;
                 return false;
             }
-            if(GatheredUuids.ContainsKey(uuid))
+            if (GatheredUuids.ContainsKey(uuid))
                 return false;
             if (m_assetUuidsToInspect.Contains(uuid))
                 return false;
 
-//            m_log.DebugFormat("[UUID GATHERER]: Adding asset {0} for inspection", uuid);
+            //            m_log.DebugFormat("[UUID GATHERER]: Adding asset {0} for inspection", uuid);
 
             m_assetUuidsToInspect.Enqueue(uuid);
             return true;
@@ -165,7 +166,7 @@ namespace OpenSim.Region.Framework.Scenes
         {
             //            m_log.DebugFormat(
             //                "[UUID GATHERER]: Getting assets for object {0}, {1}", sceneObject.Name, sceneObject.UUID);
-            if(sceneObject.IsDeleted)
+            if (sceneObject.IsDeleted)
                 return;
 
             SceneObjectPart[] parts = sceneObject.Parts;
@@ -204,7 +205,7 @@ namespace OpenSim.Region.Framework.Scenes
                         GatheredUuids[part.Shape.ProjectionTextureUUID] = (sbyte)AssetType.Texture;
 
                     UUID collisionSound = part.CollisionSound;
-                    if ( collisionSound != UUID.Zero &&
+                    if (collisionSound != UUID.Zero &&
                                 collisionSound != part.invalidCollisionSoundUUID)
                         GatheredUuids[collisionSound] = (sbyte)AssetType.Sound;
 
@@ -263,7 +264,7 @@ namespace OpenSim.Region.Framework.Scenes
 
             UUID nextToInspect = m_assetUuidsToInspect.Dequeue();
 
-//            m_log.DebugFormat("[UUID GATHERER]: Inspecting asset {0}", nextToInspect);
+            //            m_log.DebugFormat("[UUID GATHERER]: Inspecting asset {0}", nextToInspect);
 
             GetAssetUuids(nextToInspect);
 
@@ -279,7 +280,7 @@ namespace OpenSim.Region.Framework.Scenes
             if (Complete)
                 return false;
 
-            while (GatherNext());
+            while (GatherNext()) ;
 
             return true;
         }
@@ -298,12 +299,12 @@ namespace OpenSim.Region.Framework.Scenes
         /// <param name="assetUuid">The uuid of the asset for which to gather referenced assets</param>
         private void GetAssetUuids(UUID assetUuid)
         {
-            if(assetUuid == UUID.Zero)
+            if (assetUuid == UUID.Zero)
                 return;
 
-            if(FailedUUIDs.Contains(assetUuid))
+            if (FailedUUIDs.Contains(assetUuid))
             {
-                if(UncertainAssetsUUIDs.Contains(assetUuid))
+                if (UncertainAssetsUUIDs.Contains(assetUuid))
                     possibleNotAssetCount++;
                 else
                     ErrorCount++;
@@ -327,25 +328,25 @@ namespace OpenSim.Region.Framework.Scenes
                 return;
             }
 
-            if(assetBase == null)
+            if (assetBase == null)
             {
-//                m_log.ErrorFormat("[UUID GATHERER]: asset {0} not found", assetUuid);
+                //                m_log.ErrorFormat("[UUID GATHERER]: asset {0} not found", assetUuid);
                 FailedUUIDs.Add(assetUuid);
-                if(UncertainAssetsUUIDs.Contains(assetUuid))
+                if (UncertainAssetsUUIDs.Contains(assetUuid))
                     possibleNotAssetCount++;
                 else
                     ErrorCount++;
                 return;
             }
 
-            if(UncertainAssetsUUIDs.Contains(assetUuid))
+            if (UncertainAssetsUUIDs.Contains(assetUuid))
                 UncertainAssetsUUIDs.Remove(assetUuid);
 
             sbyte assetType = assetBase.Type;
 
-            if(assetBase.Data == null || assetBase.Data.Length == 0)
+            if (assetBase.Data == null || assetBase.Data.Length == 0)
             {
-//                m_log.ErrorFormat("[UUID GATHERER]: asset {0}, type {1} has no data", assetUuid, assetType);
+                //                m_log.ErrorFormat("[UUID GATHERER]: asset {0}, type {1} has no data", assetUuid, assetType);
                 ErrorCount++;
                 FailedUUIDs.Add(assetUuid);
                 return;
@@ -390,19 +391,19 @@ namespace OpenSim.Region.Framework.Scenes
 
         private void AddForInspection(UUID assetUuid, sbyte assetType)
         {
-            if(assetUuid == UUID.Zero)
+            if (assetUuid == UUID.Zero)
                 return;
 
             // Here, we want to collect uuids which require further asset fetches but mark the others as gathered
-            if(FailedUUIDs.Contains(assetUuid))
+            if (FailedUUIDs.Contains(assetUuid))
             {
-                if(UncertainAssetsUUIDs.Contains(assetUuid))
+                if (UncertainAssetsUUIDs.Contains(assetUuid))
                     possibleNotAssetCount++;
                 else
                     ErrorCount++;
                 return;
             }
-            if(GatheredUuids.ContainsKey(assetUuid))
+            if (GatheredUuids.ContainsKey(assetUuid))
                 return;
             try
             {
@@ -450,7 +451,7 @@ namespace OpenSim.Region.Framework.Scenes
         {
             // scan thru the dynAttrs map of this part for any textures used as materials
             OSD osdMaterials = null;
-            if(part.DynAttrs == null)
+            if (part.DynAttrs == null)
                 return;
 
             lock (part.DynAttrs)
@@ -530,17 +531,17 @@ namespace OpenSim.Region.Framework.Scenes
             //            m_log.DebugFormat("[ASSET GATHERER]: Getting assets for uuid references in asset {0}", embeddingAssetId);
 
             string text = Utils.BytesToString(textAsset.Data);
-//            m_log.DebugFormat("[UUID GATHERER]: Text {0}", text);
+            //            m_log.DebugFormat("[UUID GATHERER]: Text {0}", text);
             MatchCollection uuidMatches = Util.PermissiveUUIDPattern.Matches(text);
-//            m_log.DebugFormat("[UUID GATHERER]: Found {0} matches in text", uuidMatches.Count);
+            //            m_log.DebugFormat("[UUID GATHERER]: Found {0} matches in text", uuidMatches.Count);
 
             foreach (Match uuidMatch in uuidMatches)
             {
                 UUID uuid = new UUID(uuidMatch.Value);
-                if(uuid == UUID.Zero)
+                if (uuid == UUID.Zero)
                     continue;
-//                m_log.DebugFormat("[UUID GATHERER]: Recording {0} in text", uuid);
-                if(!UncertainAssetsUUIDs.Contains(uuid))
+                //                m_log.DebugFormat("[UUID GATHERER]: Recording {0} in text", uuid);
+                if (!UncertainAssetsUUIDs.Contains(uuid))
                     UncertainAssetsUUIDs.Add(uuid);
                 AddForInspection(uuid);
             }
@@ -595,7 +596,7 @@ namespace OpenSim.Region.Framework.Scenes
         private void RecordGestureAssetUuids(AssetBase gestureAsset)
         {
             using (MemoryStream ms = new MemoryStream(gestureAsset.Data))
-                using (StreamReader sr = new StreamReader(ms))
+            using (StreamReader sr = new StreamReader(ms))
             {
                 sr.ReadLine(); // Unknown (Version?)
                 sr.ReadLine(); // Unknown
@@ -604,7 +605,7 @@ namespace OpenSim.Region.Framework.Scenes
                 sr.ReadLine(); // Comment ?
                 int count = Convert.ToInt32(sr.ReadLine()); // Item count
 
-                for (int i = 0 ; i < count ; i++)
+                for (int i = 0; i < count; i++)
                 {
                     string type = sr.ReadLine();
                     if (type == null)
@@ -639,8 +640,8 @@ namespace OpenSim.Region.Framework.Scenes
             }
             catch (Exception e)
             {
-               m_log.WarnFormat("[Materials]: cannot decode material asset {0}: {1}", materialAsset.ID, e.Message);
-               return;
+                m_log.WarnFormat("[Materials]: cannot decode material asset {0}: {1}", materialAsset.ID, e.Message);
+                return;
             }
 
             UUID normMap = mat["NormMap"].AsUUID();
@@ -660,7 +661,7 @@ namespace OpenSim.Region.Framework.Scenes
         protected string m_assetServerURL;
 
         public HGUuidGatherer(IAssetService assetService, string assetServerURL)
-            : this(assetService, assetServerURL, new Dictionary<UUID, sbyte>()) {}
+            : this(assetService, assetServerURL, new Dictionary<UUID, sbyte>()) { }
 
         public HGUuidGatherer(IAssetService assetService, string assetServerURL, IDictionary<UUID, sbyte> collector)
             : base(assetService, collector)

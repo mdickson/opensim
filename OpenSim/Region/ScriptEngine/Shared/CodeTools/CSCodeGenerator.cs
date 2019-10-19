@@ -25,20 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Text;
-using System.IO;
-using System.Collections.Generic;
-using System.Reflection;
-using log4net;
-using Tools;
 using OpenSim.Region.Framework.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using Tools;
 
 namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
 {
     public class CSCodeGenerator : ICodeConverter
     {
-//      private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //      private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static yyLSLSyntax yyLSL = new yyLSLSyntax();
         private SYMBOL m_astRoot = null;
@@ -131,7 +128,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
         /// <returns>String containing the generated C# code.</returns>
         public void Convert(string script, StringBuilder sb)
         {
-//            m_log.DebugFormat("[CS CODE GENERATOR]: Converting to C#\n{0}", script);
+            //            m_log.DebugFormat("[CS CODE GENERATOR]: Converting to C#\n{0}", script);
 
             m_warnings.Clear();
             ResetCounters();
@@ -155,8 +152,8 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
 
                 // Remove wrong line number info
                 //
-                if (emessage.StartsWith(slinfo+": "))
-                    emessage = emessage.Substring(slinfo.Length+2);
+                if (emessage.StartsWith(slinfo + ": "))
+                    emessage = emessage.Substring(slinfo.Length + 2);
 
                 message = String.Format("({0},{1}) {2}",
                         e.slInfo.lineNumber - 1,
@@ -184,7 +181,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
                 GenerateNodeToSB(m_astRoot, s, sb);
 
             codeTransformer = null;
-            p.m_lexer.m_buf=null;
+            p.m_lexer.m_buf = null;
             p.m_lexer.yytext = null;
             p.m_lexer = null;
             p.m_symbols = null;
@@ -192,14 +189,14 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
             errorHandler = null;
 
             // close braces!
-//            m_braceCount--;
+            //            m_braceCount--;
             //retstr += GenerateIndentedLine("}");
-//            m_braceCount--;
+            //            m_braceCount--;
             //retstr += GenerateLine("}");
 
             // Removes all carriage return characters which may be generated in Windows platform. Is there
             // cleaner way of doing this?
-//            sb.Replace("\r", "");
+            //            sb.Replace("\r", "");
         }
 
         /// <summary>
@@ -232,67 +229,67 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
             // ie: since IdentArgument and ExpressionArgument inherit from
             // Argument, put IdentArgument and ExpressionArgument before Argument
             if (s is GlobalFunctionDefinition)
-                GenerateGlobalFunctionDefinition((GlobalFunctionDefinition) s, sb);
+                GenerateGlobalFunctionDefinition((GlobalFunctionDefinition)s, sb);
             else if (s is GlobalVariableDeclaration)
-                GenerateGlobalVariableDeclaration((GlobalVariableDeclaration) s , sb);
+                GenerateGlobalVariableDeclaration((GlobalVariableDeclaration)s, sb);
             else if (s is State)
-                GenerateState((State) s, sb);
+                GenerateState((State)s, sb);
             else if (s is CompoundStatement)
-                GenerateCompoundStatement(previousSymbol, (CompoundStatement) s, sb);
+                GenerateCompoundStatement(previousSymbol, (CompoundStatement)s, sb);
             else if (s is Declaration)
-                GenerateDeclaration((Declaration) s, sb);
+                GenerateDeclaration((Declaration)s, sb);
             else if (s is Statement)
-                GenerateStatement(previousSymbol, (Statement) s, sb);
+                GenerateStatement(previousSymbol, (Statement)s, sb);
             else if (s is ReturnStatement)
-                GenerateReturnStatement((ReturnStatement) s, sb);
+                GenerateReturnStatement((ReturnStatement)s, sb);
             else if (s is JumpLabel)
-                GenerateJumpLabel((JumpLabel) s, sb);
+                GenerateJumpLabel((JumpLabel)s, sb);
             else if (s is JumpStatement)
-                GenerateJumpStatement((JumpStatement) s, sb);
+                GenerateJumpStatement((JumpStatement)s, sb);
             else if (s is StateChange)
-                GenerateStateChange((StateChange) s, sb);
+                GenerateStateChange((StateChange)s, sb);
             else if (s is IfStatement)
-                GenerateIfStatement((IfStatement) s, sb);
+                GenerateIfStatement((IfStatement)s, sb);
             else if (s is WhileStatement)
-                GenerateWhileStatement((WhileStatement) s, sb);
+                GenerateWhileStatement((WhileStatement)s, sb);
             else if (s is DoWhileStatement)
-                GenerateDoWhileStatement((DoWhileStatement) s, sb);
+                GenerateDoWhileStatement((DoWhileStatement)s, sb);
             else if (s is ForLoop)
-                GenerateForLoop((ForLoop) s, sb);
+                GenerateForLoop((ForLoop)s, sb);
             else if (s is ArgumentList)
-                GenerateArgumentList((ArgumentList) s, sb);
+                GenerateArgumentList((ArgumentList)s, sb);
             else if (s is Assignment)
-                GenerateAssignment((Assignment) s, sb);
+                GenerateAssignment((Assignment)s, sb);
             else if (s is BinaryExpression)
-                GenerateBinaryExpression((BinaryExpression) s, sb);
+                GenerateBinaryExpression((BinaryExpression)s, sb);
             else if (s is ParenthesisExpression)
-                GenerateParenthesisExpression((ParenthesisExpression) s, sb);
+                GenerateParenthesisExpression((ParenthesisExpression)s, sb);
             else if (s is UnaryExpression)
-                GenerateUnaryExpression((UnaryExpression) s, sb);
+                GenerateUnaryExpression((UnaryExpression)s, sb);
             else if (s is IncrementDecrementExpression)
-                GenerateIncrementDecrementExpression((IncrementDecrementExpression) s, sb);
+                GenerateIncrementDecrementExpression((IncrementDecrementExpression)s, sb);
             else if (s is TypecastExpression)
-                GenerateTypecastExpression((TypecastExpression) s, sb);
+                GenerateTypecastExpression((TypecastExpression)s, sb);
             else if (s is FunctionCall)
-                GenerateFunctionCall((FunctionCall) s, sb);
+                GenerateFunctionCall((FunctionCall)s, sb);
             else if (s is VectorConstant)
-                GenerateVectorConstant((VectorConstant) s, sb);
+                GenerateVectorConstant((VectorConstant)s, sb);
             else if (s is RotationConstant)
-                GenerateRotationConstant((RotationConstant) s, sb);
+                GenerateRotationConstant((RotationConstant)s, sb);
             else if (s is ListConstant)
-                GenerateListConstant((ListConstant) s, sb);
+                GenerateListConstant((ListConstant)s, sb);
             else if (s is Constant)
-                GenerateConstant((Constant) s, sb);
+                GenerateConstant((Constant)s, sb);
             else if (s is IdentDotExpression)
-                Generate(CheckName(((IdentDotExpression) s).Name) + "." + ((IdentDotExpression) s).Member, s, sb);
+                Generate(CheckName(((IdentDotExpression)s).Name) + "." + ((IdentDotExpression)s).Member, s, sb);
             else if (s is IdentExpression)
-                GenerateIdentifier(((IdentExpression) s).Name, s, sb);
+                GenerateIdentifier(((IdentExpression)s).Name, s, sb);
             else if (s is IDENT)
-                Generate(CheckName(((TOKEN) s).yytext), s, sb);
+                Generate(CheckName(((TOKEN)s).yytext), s, sb);
             else
             {
                 foreach (SYMBOL kid in s.kids)
-                    GenerateNodeToSB(s, kid,sb);
+                    GenerateNodeToSB(s, kid, sb);
             }
 
             return;
@@ -319,12 +316,12 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
 
             // print the state arguments, if any
             foreach (SYMBOL kid in argumentDeclarationListKids)
-                GenerateArgumentDeclarationList((ArgumentDeclarationList) kid, sb);
+                GenerateArgumentDeclarationList((ArgumentDeclarationList)kid, sb);
 
             GenerateLine(")", sb);
 
             foreach (SYMBOL kid in remainingKids)
-                GenerateNodeToSB(gf, kid,sb);
+                GenerateNodeToSB(gf, kid, sb);
         }
 
         /// <summary>
@@ -337,7 +334,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
             foreach (SYMBOL s in gv.kids)
             {
                 Indent(sb);
-                GenerateNodeToSB(gv, s ,sb);
+                GenerateNodeToSB(gv, s, sb);
                 GenerateLine(";", sb);
             }
         }
@@ -351,7 +348,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
         {
             foreach (SYMBOL kid in s.kids)
                 if (kid is StateEvent)
-                    GenerateStateEvent((StateEvent) kid, s.Name, sb);
+                    GenerateStateEvent((StateEvent)kid, s.Name, sb);
         }
 
         /// <summary>
@@ -373,11 +370,11 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
                     remainingKids.Add(kid);
 
             // "state" (function) declaration
-            GenerateIndented(String.Format("public void {0}_event_{1}(", parentStateName, se.Name), se , sb);
+            GenerateIndented(String.Format("public void {0}_event_{1}(", parentStateName, se.Name), se, sb);
 
             // print the state arguments, if any
             foreach (SYMBOL kid in argumentDeclarationListKids)
-                GenerateArgumentDeclarationList((ArgumentDeclarationList) kid, sb);
+                GenerateArgumentDeclarationList((ArgumentDeclarationList)kid, sb);
 
             GenerateLine(")", sb);
 
@@ -438,7 +435,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
                     || previousSymbol is DoWhileStatement
                     || previousSymbol is ForLoop
                     || previousSymbol is StateEvent)
-                GenerateIndentedLine(m_coopTerminationCheck, sb);
+                    GenerateIndentedLine(m_coopTerminationCheck, sb);
             }
 
             foreach (SYMBOL kid in cs.kids)
@@ -521,7 +518,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
             List<string> identifiers = new List<string>();
             checkForMultipleAssignments(identifiers, a);
 
-            GenerateNodeToSB(a, (SYMBOL) a.kids.Pop(), sb);
+            GenerateNodeToSB(a, (SYMBOL)a.kids.Pop(), sb);
             Generate(String.Format(" {0} ", a.AssignmentType), a, sb);
             foreach (SYMBOL kid in a.kids)
                 GenerateNodeToSB(a, kid, sb);
@@ -579,7 +576,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
             int index;
             for (index = 0; index < s.kids.Count; index++)
             {
-                checkForMultipleAssignments(identifiers, (SYMBOL) s.kids[index]);
+                checkForMultipleAssignments(identifiers, (SYMBOL)s.kids[index]);
             }
         }
 
@@ -631,14 +628,14 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
         private void GenerateIfStatement(IfStatement ifs, StringBuilder sb)
         {
             GenerateIndented("if (", ifs, sb);
-            GenerateNodeToSB(ifs, (SYMBOL) ifs.kids.Pop(), sb);
+            GenerateNodeToSB(ifs, (SYMBOL)ifs.kids.Pop(), sb);
             GenerateLine(")", sb);
 
             // CompoundStatement handles indentation itself but we need to do it
             // otherwise.
             bool indentHere = ifs.kids.Top is Statement;
             if (indentHere) m_braceCount++;
-            GenerateNodeToSB(ifs, (SYMBOL) ifs.kids.Pop(), sb);
+            GenerateNodeToSB(ifs, (SYMBOL)ifs.kids.Pop(), sb);
             if (indentHere) m_braceCount--;
 
             if (0 < ifs.kids.Count) // do it again for an else
@@ -647,7 +644,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
 
                 indentHere = ifs.kids.Top is Statement;
                 if (indentHere) m_braceCount++;
-                GenerateNodeToSB(ifs, (SYMBOL) ifs.kids.Pop(), sb);
+                GenerateNodeToSB(ifs, (SYMBOL)ifs.kids.Pop(), sb);
                 if (indentHere) m_braceCount--;
             }
         }
@@ -670,14 +667,14 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
         private void GenerateWhileStatement(WhileStatement ws, StringBuilder sb)
         {
             GenerateIndented("while (", ws, sb);
-            GenerateNodeToSB(ws, (SYMBOL) ws.kids.Pop(), sb);
+            GenerateNodeToSB(ws, (SYMBOL)ws.kids.Pop(), sb);
             GenerateLine(")", sb);
 
             // CompoundStatement handles indentation itself but we need to do it
             // otherwise.
             bool indentHere = ws.kids.Top is Statement;
             if (indentHere) m_braceCount++;
-            GenerateNodeToSB(ws, (SYMBOL) ws.kids.Pop(), sb);
+            GenerateNodeToSB(ws, (SYMBOL)ws.kids.Pop(), sb);
             if (indentHere) m_braceCount--;
         }
 
@@ -694,11 +691,11 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
             // otherwise.
             bool indentHere = dws.kids.Top is Statement;
             if (indentHere) m_braceCount++;
-            GenerateNodeToSB(dws, (SYMBOL) dws.kids.Pop(), sb);
+            GenerateNodeToSB(dws, (SYMBOL)dws.kids.Pop(), sb);
             if (indentHere) m_braceCount--;
 
-            GenerateIndented("while (", dws ,sb);
-            GenerateNodeToSB(dws, (SYMBOL) dws.kids.Pop(), sb);
+            GenerateIndented("while (", dws, sb);
+            GenerateNodeToSB(dws, (SYMBOL)dws.kids.Pop(), sb);
             GenerateLine(");", sb);
         }
 
@@ -715,7 +712,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
             // the child will be null and we only print the semicolon.
             // for (x = 0; x < 10; x++)
             //      ^^^^^
-            ForLoopStatement s = (ForLoopStatement) fl.kids.Pop();
+            ForLoopStatement s = (ForLoopStatement)fl.kids.Pop();
             if (null != s)
             {
                 GenerateForLoopStatement(s, sb);
@@ -723,18 +720,18 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
             Generate("; ", sb);
             // for (x = 0; x < 10; x++)
             //             ^^^^^^
-            GenerateNodeToSB(fl, (SYMBOL) fl.kids.Pop(), sb);
+            GenerateNodeToSB(fl, (SYMBOL)fl.kids.Pop(), sb);
             Generate("; ", sb);
             // for (x = 0; x < 10; x++)
             //                     ^^^
-            GenerateForLoopStatement((ForLoopStatement) fl.kids.Pop(), sb);
+            GenerateForLoopStatement((ForLoopStatement)fl.kids.Pop(), sb);
             GenerateLine(")", sb);
 
             // CompoundStatement handles indentation itself but we need to do it
             // otherwise.
             bool indentHere = fl.kids.Top is Statement;
             if (indentHere) m_braceCount++;
-            GenerateNodeToSB(fl, (SYMBOL) fl.kids.Pop(), sb);
+            GenerateNodeToSB(fl, (SYMBOL)fl.kids.Pop(), sb);
             if (indentHere) m_braceCount--;
         }
 
@@ -794,7 +791,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
                 sb.Append("((bool)(");
                 GenerateNodeToSB(be, (SYMBOL)be.kids.Pop(), sb);
                 sb.Append("))");
-                Generate(String.Format(" {0} ", be.ExpressionSymbol.Substring(0,1)), be, sb);
+                Generate(String.Format(" {0} ", be.ExpressionSymbol.Substring(0, 1)), be, sb);
                 sb.Append("((bool)(");
                 foreach (SYMBOL kid in be.kids)
                     GenerateNodeToSB(be, kid, sb);
@@ -817,7 +814,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
         private void GenerateUnaryExpression(UnaryExpression ue, StringBuilder sb)
         {
             Generate(ue.UnarySymbol, ue, sb);
-            GenerateNodeToSB(ue, (SYMBOL) ue.kids.Pop(), sb);
+            GenerateNodeToSB(ue, (SYMBOL)ue.kids.Pop(), sb);
         }
 
         /// <summary>
@@ -844,7 +841,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
         {
             if (0 < ide.kids.Count)
             {
-                IdentDotExpression dot = (IdentDotExpression) ide.kids.Top;
+                IdentDotExpression dot = (IdentDotExpression)ide.kids.Top;
                 Generate(String.Format("{0}", ide.PostOperation ? CheckName(dot.Name) + "." + dot.Member + ide.Operation : ide.Operation + CheckName(dot.Name) + "." + dot.Member), ide, sb);
             }
             else
@@ -860,7 +857,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
         {
             // we wrap all typecasted statements in parentheses
             Generate(String.Format("({0}) (", te.TypecastType), te, sb);
-            GenerateNodeToSB(te, (SYMBOL) te.kids.Pop(), sb);
+            GenerateNodeToSB(te, (SYMBOL)te.kids.Pop(), sb);
             Generate(")", sb);
         }
 
@@ -870,7 +867,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
         /// <param name="id">The symbol name</param>
         /// <param name="s">The Symbol node.</param>
         /// <returns>String containing C# code for identifier reference.</returns>
-        private void GenerateIdentifier(string id, SYMBOL s, StringBuilder  sb)
+        private void GenerateIdentifier(string id, SYMBOL s, StringBuilder sb)
         {
             if (m_comms != null)
             {
@@ -879,17 +876,17 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
                 {
                     string retval = null;
                     if (value is int)
-                        retval = String.Format("new LSL_Types.LSLInteger({0})",((int)value).ToString());
+                        retval = String.Format("new LSL_Types.LSLInteger({0})", ((int)value).ToString());
                     else if (value is float)
-                        retval = String.Format("new LSL_Types.LSLFloat({0})",((float)value).ToString());
+                        retval = String.Format("new LSL_Types.LSLFloat({0})", ((float)value).ToString());
                     else if (value is string)
-                        retval = String.Format("new LSL_Types.LSLString(\"{0}\")",((string)value));
+                        retval = String.Format("new LSL_Types.LSLString(\"{0}\")", ((string)value));
                     else if (value is OpenMetaverse.UUID)
-                        retval = String.Format("new LSL_Types.key(\"{0}\")",((OpenMetaverse.UUID)value).ToString());
+                        retval = String.Format("new LSL_Types.key(\"{0}\")", ((OpenMetaverse.UUID)value).ToString());
                     else if (value is OpenMetaverse.Vector3)
-                        retval = String.Format("new LSL_Types.Vector3(\"{0}\")",((OpenMetaverse.Vector3)value).ToString());
+                        retval = String.Format("new LSL_Types.Vector3(\"{0}\")", ((OpenMetaverse.Vector3)value).ToString());
                     else if (value is OpenMetaverse.Quaternion)
-                        retval = String.Format("new LSL_Types.Quaternion(\"{0}\")",((OpenMetaverse.Quaternion)value).ToString());
+                        retval = String.Format("new LSL_Types.Quaternion(\"{0}\")", ((OpenMetaverse.Quaternion)value).ToString());
                     else retval = id;
 
                     Generate(retval, s, sb);
@@ -917,9 +914,9 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
                 if (fc.kids[0] is ArgumentList)
                 {
                     if ((fc.kids[0] as ArgumentList).kids.Count == 0)
-                        Generate(String.Format("{0}(\"{1}\"",modinvoke,fc.Id), fc, sb);
+                        Generate(String.Format("{0}(\"{1}\"", modinvoke, fc.Id), fc, sb);
                     else
-                        Generate(String.Format("{0}(\"{1}\",",modinvoke,fc.Id), fc, sb);
+                        Generate(String.Format("{0}(\"{1}\",", modinvoke, fc.Id), fc, sb);
                 }
             }
             else
@@ -947,15 +944,15 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
                 int dotIndex = c.Value.IndexOf('.') + 1;
                 if (0 < dotIndex && (dotIndex == c.Value.Length || !Char.IsDigit(c.Value[dotIndex])))
                     c.Value = c.Value.Insert(dotIndex, "0");
-                c.Value = "new LSL_Types.LSLFloat("+c.Value+")";
+                c.Value = "new LSL_Types.LSLFloat(" + c.Value + ")";
             }
             else if ("LSL_Types.LSLInteger" == c.Type)
             {
-                c.Value = "new LSL_Types.LSLInteger("+c.Value+")";
+                c.Value = "new LSL_Types.LSLInteger(" + c.Value + ")";
             }
             else if ("LSL_Types.LSLString" == c.Type)
             {
-                c.Value = "new LSL_Types.LSLString(\""+c.Value+"\")";
+                c.Value = "new LSL_Types.LSLString(\"" + c.Value + "\")";
             }
 
             Generate(c.Value, c, sb);
@@ -969,11 +966,11 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
         private void GenerateVectorConstant(VectorConstant vc, StringBuilder sb)
         {
             Generate(String.Format("new {0}(", vc.Type), vc, sb);
-            GenerateNodeToSB(vc, (SYMBOL) vc.kids.Pop(), sb);
+            GenerateNodeToSB(vc, (SYMBOL)vc.kids.Pop(), sb);
             Generate(", ", sb);
-            GenerateNodeToSB(vc, (SYMBOL) vc.kids.Pop(), sb);
+            GenerateNodeToSB(vc, (SYMBOL)vc.kids.Pop(), sb);
             Generate(", ", sb);
-            GenerateNodeToSB(vc, (SYMBOL) vc.kids.Pop(), sb);
+            GenerateNodeToSB(vc, (SYMBOL)vc.kids.Pop(), sb);
             Generate(")", sb);
         }
 
@@ -985,13 +982,13 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
         private void GenerateRotationConstant(RotationConstant rc, StringBuilder sb)
         {
             Generate(String.Format("new {0}(", rc.Type), rc, sb);
-            GenerateNodeToSB(rc, (SYMBOL) rc.kids.Pop(), sb);
+            GenerateNodeToSB(rc, (SYMBOL)rc.kids.Pop(), sb);
             Generate(", ", sb);
-            GenerateNodeToSB(rc, (SYMBOL) rc.kids.Pop(), sb);
+            GenerateNodeToSB(rc, (SYMBOL)rc.kids.Pop(), sb);
             Generate(", ", sb);
-            GenerateNodeToSB(rc, (SYMBOL) rc.kids.Pop(), sb);
+            GenerateNodeToSB(rc, (SYMBOL)rc.kids.Pop(), sb);
             Generate(", ", sb);
-            GenerateNodeToSB(rc, (SYMBOL) rc.kids.Pop(), sb);
+            GenerateNodeToSB(rc, (SYMBOL)rc.kids.Pop(), sb);
             Generate(")", sb);
         }
 
@@ -1096,7 +1093,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
         /// <returns>Properly indented string s followed by newline.</returns>
         private void GenerateIndentedLine(string s, SYMBOL sym, StringBuilder sb)
         {
-            GenerateIndented(s, sym , sb );
+            GenerateIndented(s, sym, sb);
             sb.Append("\n");
             m_CSharpLine++;
             m_CSharpCol = 1;

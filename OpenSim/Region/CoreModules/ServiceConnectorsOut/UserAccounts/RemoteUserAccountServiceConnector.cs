@@ -25,20 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Nini.Config;
 using log4net;
 using Mono.Addins;
-using System.Reflection;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
 using OpenSim.Services.Connectors;
-using OpenSim.Framework;
-
-using OpenMetaverse;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.UserAccounts
 {
@@ -171,9 +169,9 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.UserAccounts
             UserAccount account;
             bool inCache = false;
 
-            foreach(string id in IDs)
+            foreach (string id in IDs)
             {
-                if(UUID.TryParse(id, out uuid))
+                if (UUID.TryParse(id, out uuid))
                 {
                     account = m_Cache.Get(uuid, out inCache);
                     if (inCache)
@@ -183,14 +181,14 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.UserAccounts
                 }
             }
 
-            if(missing.Count > 0)
+            if (missing.Count > 0)
             {
                 List<UserAccount> ext = base.GetUserAccounts(scopeID, missing);
-                if(ext != null && ext.Count >0 )
+                if (ext != null && ext.Count > 0)
                 {
-                    foreach(UserAccount acc in ext)
+                    foreach (UserAccount acc in ext)
                     {
-                        if(acc != null)
+                        if (acc != null)
                         {
                             accs.Add(acc);
                             m_Cache.Cache(acc.PrincipalID, acc);

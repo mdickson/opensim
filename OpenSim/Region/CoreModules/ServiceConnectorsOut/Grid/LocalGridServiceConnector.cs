@@ -28,17 +28,15 @@
 using log4net;
 using Mono.Addins;
 using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Server.Base;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using OpenMetaverse;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Grid
 {
@@ -93,7 +91,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Grid
                 string name = moduleConfig.GetString("GridServices", "");
                 if (name == Name)
                 {
-                    if(InitialiseService(source, null))
+                    if (InitialiseService(source, null))
                         m_log.Info("[LOCAL GRID SERVICE CONNECTOR]: Local grid connector enabled");
                 }
             }
@@ -101,7 +99,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Grid
 
         private bool InitialiseService(IConfigSource source, RegionInfoCache ric)
         {
-            if(ric == null && m_RegionInfoCache == null)
+            if (ric == null && m_RegionInfoCache == null)
                 m_RegionInfoCache = new RegionInfoCache();
             else
                 m_RegionInfoCache = ric;
@@ -149,9 +147,9 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Grid
             if (!m_Enabled)
                 return;
 
-            lock(m_scenes)
+            lock (m_scenes)
             {
-                if(!m_scenes.Contains(scene))
+                if (!m_scenes.Contains(scene))
                     m_scenes.Add(scene);
             }
             scene.RegisterModuleInterface<IGridService>(this);
@@ -167,9 +165,9 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Grid
             if (!m_Enabled)
                 return;
 
-            lock(m_scenes)
+            lock (m_scenes)
             {
-                if(m_scenes.Contains(scene))
+                if (m_scenes.Contains(scene))
                     m_scenes.Remove(scene);
             }
 
@@ -212,13 +210,13 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Grid
         public GridRegion GetRegionByUUID(UUID scopeID, UUID regionID)
         {
             bool inCache = false;
-            GridRegion rinfo = m_RegionInfoCache.Get(scopeID,regionID,out inCache);
+            GridRegion rinfo = m_RegionInfoCache.Get(scopeID, regionID, out inCache);
             if (inCache)
                 return rinfo;
 
             rinfo = m_GridService.GetRegionByUUID(scopeID, regionID);
-            if(rinfo != null)
-             m_RegionInfoCache.Cache(scopeID, rinfo);
+            if (rinfo != null)
+                m_RegionInfoCache.Cache(scopeID, rinfo);
             return rinfo;
         }
 
@@ -235,7 +233,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Grid
 
             // Then try on this sim (may be a lookup in DB if this is using MySql).
             rinfo = m_GridService.GetRegionByPosition(scopeID, x, y);
-            if(rinfo != null)
+            if (rinfo != null)
                 m_RegionInfoCache.Cache(scopeID, rinfo);
             return rinfo;
         }
@@ -247,8 +245,8 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Grid
             if (inCache)
                 return rinfo;
 
-            rinfo =  m_GridService.GetRegionByName(scopeID, regionName);
-            if(rinfo != null)
+            rinfo = m_GridService.GetRegionByName(scopeID, regionName);
+            if (rinfo != null)
                 m_RegionInfoCache.Cache(scopeID, rinfo);
             return rinfo;
         }

@@ -25,18 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Server.Base;
+using OpenSim.Server.Handlers.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections;
-using System.Web;
 using System.Reflection;
-using Nini.Config;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Server.Handlers.Base;
-using log4net;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
+using System.Web;
 
 namespace OpenSim.Server.Handlers.Freeswitch
 {
@@ -80,9 +78,9 @@ namespace OpenSim.Server.Handlers.Freeswitch
             response["keepalive"] = false;
             response["int_response_code"] = 500;
 
-            Hashtable requestBody = ParseRequestBody((string) request["body"]);
+            Hashtable requestBody = ParseRequestBody((string)request["body"]);
 
-            string section = (string) requestBody["section"];
+            string section = (string)requestBody["section"];
 
             if (section == "directory")
                 response = m_FreeswitchService.HandleDirectoryRequest(requestBody);
@@ -98,13 +96,13 @@ namespace OpenSim.Server.Handlers.Freeswitch
         {
             Hashtable bodyParams = new Hashtable();
             // split string
-            string [] nvps = body.Split(new Char [] {'&'});
+            string[] nvps = body.Split(new Char[] { '&' });
 
             foreach (string s in nvps)
             {
                 if (s.Trim() != "")
                 {
-                    string [] nvp = s.Split(new Char [] {'='});
+                    string[] nvp = s.Split(new Char[] { '=' });
                     bodyParams.Add(HttpUtility.UrlDecode(nvp[0]), HttpUtility.UrlDecode(nvp[1]));
                 }
             }

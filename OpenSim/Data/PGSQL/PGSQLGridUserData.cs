@@ -26,13 +26,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Reflection;
-using System.Threading;
-using log4net;
-using OpenMetaverse;
-using OpenSim.Framework;
 
 namespace OpenSim.Data.PGSQL
 {
@@ -42,7 +35,7 @@ namespace OpenSim.Data.PGSQL
     public class PGSQLGridUserData : PGSQLGenericTableHandler<GridUserData>,
             IGridUserData
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public PGSQLGridUserData(string connectionString, string realm) :
             base(connectionString, realm, "GridUserStore")

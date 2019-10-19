@@ -25,16 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Xml;
-using OpenMetaverse;
-using log4net;
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.PhysicsModules.SharedBase;
 
 namespace OpenSim.Region.Framework.Scenes.Serialization
 {
@@ -53,7 +50,7 @@ namespace OpenSim.Region.Framework.Scenes.Serialization
 
             if (fileName.StartsWith("http:") || File.Exists(fileName))
             {
-                using(XmlTextReader reader = new XmlTextReader(fileName))
+                using (XmlTextReader reader = new XmlTextReader(fileName))
                 {
                     reader.WhitespaceHandling = WhitespaceHandling.None;
 
@@ -209,8 +206,8 @@ namespace OpenSim.Region.Framework.Scenes.Serialization
                     }
 
                     //stream.WriteLine(SceneObjectSerializer.ToXml2Format(g));
-                    SceneObjectSerializer.SOGToXml2(writer, (SceneObjectGroup)ent, new Dictionary<string,object>());
-//                    stream.WriteLine();
+                    SceneObjectSerializer.SOGToXml2(writer, (SceneObjectGroup)ent, new Dictionary<string, object>());
+                    //                    stream.WriteLine();
 
                     primCount++;
                 }
@@ -275,8 +272,8 @@ namespace OpenSim.Region.Framework.Scenes.Serialization
 
             foreach (SceneObjectGroup sceneObject in sceneObjects)
             {
-                 sceneObject.CreateScriptInstances(0, true, scene.DefaultScriptEngine, 0);
-                 sceneObject.ResumeScripts();
+                sceneObject.CreateScriptInstances(0, true, scene.DefaultScriptEngine, 0);
+                sceneObject.ResumeScripts();
             }
         }
 

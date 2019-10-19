@@ -25,23 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using Nwc.XmlRpc;
+using OpenMetaverse;
+using OpenSim.Framework.Monitoring;
+using OpenSim.Framework.Servers;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 using System.Threading;
-using log4net;
-using Nini.Config;
-using Nwc.XmlRpc;
-using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Framework.Monitoring;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using Mono.Addins;
 
 /*****************************************************
  *
@@ -264,7 +263,7 @@ namespace OpenSim.Region.CoreModules.Scripting.XMLRPC
 
                     IEnumerator tmpEnumerator = tmp.GetEnumerator();
                     while (tmpEnumerator.MoveNext())
-                        m_openChannels.Remove((UUID) tmpEnumerator.Current);
+                        m_openChannels.Remove((UUID)tmpEnumerator.Current);
                 }
             }
         }
@@ -433,18 +432,18 @@ namespace OpenSim.Region.CoreModules.Scripting.XMLRPC
         {
             XmlRpcResponse response = new XmlRpcResponse();
 
-            Hashtable requestData = (Hashtable) request.Params[0];
+            Hashtable requestData = (Hashtable)request.Params[0];
             bool GoodXML = (requestData.Contains("Channel") && requestData.Contains("IntValue") &&
                             requestData.Contains("StringValue"));
 
             if (GoodXML)
             {
-                UUID channel = new UUID((string) requestData["Channel"]);
+                UUID channel = new UUID((string)requestData["Channel"]);
                 RPCChannelInfo rpcChanInfo;
                 if (m_openChannels.TryGetValue(channel, out rpcChanInfo))
                 {
                     string intVal = Convert.ToInt32(requestData["IntValue"]).ToString();
-                    string strVal = (string) requestData["StringValue"];
+                    string strVal = (string)requestData["StringValue"];
 
                     RPCRequestInfo rpcInfo;
 
@@ -491,7 +490,7 @@ namespace OpenSim.Region.CoreModules.Scripting.XMLRPC
         }
     }
 
-    public class RPCRequestInfo: IXmlRpcRequestInfo
+    public class RPCRequestInfo : IXmlRpcRequestInfo
     {
         private UUID m_ChannelKey;
         private string m_IntVal;
@@ -606,7 +605,7 @@ namespace OpenSim.Region.CoreModules.Scripting.XMLRPC
         }
     }
 
-    public class SendRemoteDataRequest: IServiceRequest
+    public class SendRemoteDataRequest : IServiceRequest
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -694,18 +693,18 @@ namespace OpenSim.Region.CoreModules.Scripting.XMLRPC
                     Hashtable respParms;
                     if (resp.Value.GetType().Equals(typeof(Hashtable)))
                     {
-                        respParms = (Hashtable) resp.Value;
+                        respParms = (Hashtable)resp.Value;
                     }
                     else
                     {
-                        ArrayList respData = (ArrayList) resp.Value;
-                        respParms = (Hashtable) respData[0];
+                        ArrayList respData = (ArrayList)resp.Value;
+                        respParms = (Hashtable)respData[0];
                     }
                     if (respParms != null)
                     {
                         if (respParms.Contains("StringValue"))
                         {
-                            Sdata = (string) respParms["StringValue"];
+                            Sdata = (string)respParms["StringValue"];
                         }
                         if (respParms.Contains("IntValue"))
                         {
@@ -713,7 +712,7 @@ namespace OpenSim.Region.CoreModules.Scripting.XMLRPC
                         }
                         if (respParms.Contains("faultString"))
                         {
-                            Sdata = (string) respParms["faultString"];
+                            Sdata = (string)respParms["faultString"];
                         }
                         if (respParms.Contains("faultCode"))
                         {

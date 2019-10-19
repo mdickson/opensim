@@ -25,17 +25,17 @@
  * by OpenSim's auto-debit scripted objects.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
 using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading;
 
 
-namespace Gloebit.GloebitMoneyModule {
+namespace Gloebit.GloebitMoneyModule
+{
 
     /*********************************************************
      ********** DIALOG helper class **************************
@@ -119,12 +119,14 @@ namespace Gloebit.GloebitMoneyModule {
         private static int PickChannel()
         {
             int local_lc, myChannel;
-            do {
+            do
+            {
                 local_lc = s_lastChannel;
                 myChannel = local_lc - 1;
 
                 // channel limited to -2,147,483,648 -- reset when we get close
-                if (myChannel < c_MinChannel) {
+                if (myChannel < c_MinChannel)
+                {
                     myChannel = c_MaxChannel;
                 }
             } while (local_lc != Interlocked.CompareExchange(ref s_lastChannel, myChannel, local_lc));
@@ -156,10 +158,12 @@ namespace Gloebit.GloebitMoneyModule {
         /// </summary>
         private void Open()
         {
-            lock (s_clientDialogMap) {
+            lock (s_clientDialogMap)
+            {
                 /***** Create Dialog Dict for agent and register chat listener if no open dialogs exist for this agent *****/
                 Dictionary<int, Dialog> channelDialogMap;
-                if (!s_clientDialogMap.TryGetValue(AgentID, out channelDialogMap )) {
+                if (!s_clientDialogMap.TryGetValue(AgentID, out channelDialogMap))
+                {
                     s_clientDialogMap[AgentID] = channelDialogMap = new Dictionary<int, Dialog>();
                     Client.OnChatFromClient += OnChatFromClientAPI;
                 }
@@ -201,15 +205,17 @@ namespace Gloebit.GloebitMoneyModule {
             // m_log.InfoFormat("[GLOEBITMONEYMODULE] OnChatFromClientAPI from:{0} chat:{1}", sender, chat);
             // m_log.InfoFormat("[GLOEBITMONEYMODULE] OnChatFromClientAPI \n\tmessage:{0} \n\ttype: {1} \n\tchannel: {2} \n\tposition: {3} \n\tfrom: {4} \n\tto: {5} \n\tsender: {6} \n\tsenderObject: {7} \n\tsenderUUID: {8} \n\ttargetUUID: {9} \n\tscene: {10}", chat.Message, chat.Type, chat.Channel, chat.Position, chat.From, chat.To, chat.Sender, chat.SenderObject, chat.SenderUUID, chat.TargetUUID, chat.Scene);
 
-            IClientAPI client = (IClientAPI) sender;
+            IClientAPI client = (IClientAPI)sender;
 
             /***** Verify that this is a message intended for us.  Otherwise, ignore or check to see if time to purge old dialogs *****/
 
             // Since we have to lock the map to look for a dialog with this channel, let's only proceed if the channel is within our range,
             // or we've reached our purge duration.
-            if (chat.Channel < c_MinChannel || chat.Channel > c_MaxChannel) {
+            if (chat.Channel < c_MinChannel || chat.Channel > c_MaxChannel)
+            {
                 // Every so often, cleanup old dialog messages not yet deregistered.
-                if (s_lastPurgedOldDialogs.CompareTo(DateTime.UtcNow.AddHours(-6)) < 0) {
+                if (s_lastPurgedOldDialogs.CompareTo(DateTime.UtcNow.AddHours(-6)) < 0)
+                {
                     Dialog.PurgeOldDialogs();
                 }
                 // message is not for us, so exit
@@ -219,12 +225,15 @@ namespace Gloebit.GloebitMoneyModule {
             Dictionary<int, Dialog> channelDialogDict;
             Dialog dialog = null;
             bool found = false;
-            lock (s_clientDialogMap) {
-                if ( s_clientDialogMap.TryGetValue(client.AgentId, out channelDialogDict) ) {
+            lock (s_clientDialogMap)
+            {
+                if (s_clientDialogMap.TryGetValue(client.AgentId, out channelDialogDict))
+                {
                     found = channelDialogDict.TryGetValue(chat.Channel, out dialog);
                 }
             }
-            if (!found) {
+            if (!found)
+            {
                 // message is not for us
                 return;
             }
@@ -233,7 +242,8 @@ namespace Gloebit.GloebitMoneyModule {
 
             // Check defaults that should always be the same to ensure no one tried to impersonate our dialog response
             // if (chat.SenderUUID != UUID.Zero || chat.TargetUUID != UUID.Zero || !String.IsNullOrEmpty(chat.From) || !String.IsNullOrEmpty(chat.To) || chat.Type != ChatTypeEnum.Region) {
-            if (chat.SenderUUID != UUID.Zero || !String.IsNullOrEmpty(chat.From) || chat.Type != ChatTypeEnum.Region) {
+            if (chat.SenderUUID != UUID.Zero || !String.IsNullOrEmpty(chat.From) || chat.Type != ChatTypeEnum.Region)
+            {
                 // m_log.WarnFormat("[GLOEBITMONEYMODULE] OnChatFromClientAPI Received message on Gloebit dialog channel:{0} which may be an attempted impersonation. SenderUUID:{1}, TargetUUID:{2}, From:{3} To:{4} Type: {5} Message:{6}", chat.Channel, chat.SenderUUID, chat.TargetUUID, chat.From, chat.To, chat.Type, chat.Message);
                 m_log.WarnFormat("[GLOEBITMONEYMODULE] OnChatFromClientAPI Received message on Gloebit dialog channel:{0} which may be an attempted impersonation. SenderUUID:{1}, From:{2}, Type: {3}, Message:{4}", chat.Channel, chat.SenderUUID, chat.From, chat.Type, chat.Message);
                 return;
@@ -272,19 +282,25 @@ namespace Gloebit.GloebitMoneyModule {
 
             /***** Remove Dialog from master map --- also deregister chat listener if no more active dialogs for this agent *****/
 
-            lock (s_clientDialogMap) {
+            lock (s_clientDialogMap)
+            {
                 Dictionary<int, Dialog> channelDialogMap;
-                if (s_clientDialogMap.TryGetValue(this.AgentID, out channelDialogMap)) {
+                if (s_clientDialogMap.TryGetValue(this.AgentID, out channelDialogMap))
+                {
                     foundChannelDialogMap = true;
-                    if (channelDialogMap.ContainsKey(this.Channel)) {
+                    if (channelDialogMap.ContainsKey(this.Channel))
+                    {
                         foundChannel = true;
 
-                        if (channelDialogMap.Count == 1) {
+                        if (channelDialogMap.Count == 1)
+                        {
                             // Delete channelDialogMap and Deregister chat listener as we're closing the only open dialog for this agent
                             lastActiveDialog = true;
                             this.Client.OnChatFromClient -= OnChatFromClientAPI;
                             s_clientDialogMap.Remove(this.AgentID);
-                        } else {
+                        }
+                        else
+                        {
                             // Remove this dialog from the map for this agent
                             channelDialogMap.Remove(this.Channel);
                         }
@@ -293,13 +309,19 @@ namespace Gloebit.GloebitMoneyModule {
             }
 
             /***** Handle error/info messaging here so it is outside of the lock *****/
-            if (!foundChannelDialogMap) {
+            if (!foundChannelDialogMap)
+            {
                 m_log.WarnFormat("[GLOEBITMONEYMODULE] Dialog.Close Called on dialog where agent is not in map -  AgentID:{0}.", this.AgentID);
-            } else if (!foundChannel){
+            }
+            else if (!foundChannel)
+            {
                 m_log.WarnFormat("[GLOEBITMONEYMODULE] Dialog.Close Called on dialog where channel is not in map for agent -  AgentID:{0} Channel:{1}.", this.AgentID, this.Channel);
-            } else {
+            }
+            else
+            {
                 m_log.InfoFormat("[GLOEBITMONEYMODULE] Dialog.Close Removed dialog - AgentID:{0} Channel:{1}.", this.AgentID, this.Channel);
-                if (lastActiveDialog) {
+                if (lastActiveDialog)
+                {
                     m_log.InfoFormat("[GLOEBITMONEYMODULE] Dialog.Close Removed agent dialog event listener - AgentID:{0}", this.AgentID);
                 }
             }
@@ -316,16 +338,21 @@ namespace Gloebit.GloebitMoneyModule {
             m_log.InfoFormat("[GLOEBITMONEYMODULE] Dialog.DeregisterAgent - AgentID:{0}.", agentID);
             bool foundChannelDialogMap = false;
 
-            lock (s_clientDialogMap) {
-                if (s_clientDialogMap.ContainsKey(agentID)) {
+            lock (s_clientDialogMap)
+            {
+                if (s_clientDialogMap.ContainsKey(agentID))
+                {
                     foundChannelDialogMap = true;
                     client.OnChatFromClient -= OnChatFromClientAPI;
                     s_clientDialogMap.Remove(agentID);
                 }
             }
-            if (!foundChannelDialogMap) {
+            if (!foundChannelDialogMap)
+            {
                 m_log.InfoFormat("[GLOEBITMONEYMODULE] Dialog.DeregisterAgent No listener - AgentID:{0}.", agentID);
-            } else {
+            }
+            else
+            {
                 m_log.InfoFormat("[GLOEBITMONEYMODULE] Dialog.DeregisterAgent Removed listener - AgentID:{0}.", agentID);
             }
         }
@@ -341,20 +368,29 @@ namespace Gloebit.GloebitMoneyModule {
         private static void PurgeOldDialogs()
         {
             // Let's avoid two purges running at the same time.
-            if (Monitor.TryEnter(s_purgeLock)) {
-                try {
-                    if (s_lastPurgedOldDialogs.CompareTo(DateTime.UtcNow.AddHours(-6)) < 0) {
+            if (Monitor.TryEnter(s_purgeLock))
+            {
+                try
+                {
+                    if (s_lastPurgedOldDialogs.CompareTo(DateTime.UtcNow.AddHours(-6)) < 0)
+                    {
                         // Time to purge.  Reset s_lastPurgedOldDialogs so no other thread will purge after the Monitor exists.
                         s_lastPurgedOldDialogs = DateTime.UtcNow;
-                    } else {
+                    }
+                    else
+                    {
                         // Not yet time.  Return
                         return;
                     }
-                } finally {
+                }
+                finally
+                {
                     // Allow other threads access to this resource again.
                     Monitor.Exit(s_purgeLock);
                 }
-            } else {
+            }
+            else
+            {
                 // another thread is making this check.  Return
                 return;
             }
@@ -365,18 +401,22 @@ namespace Gloebit.GloebitMoneyModule {
 
             List<Dialog> dialogsToPurge = new List<Dialog>();
 
-            lock (s_clientDialogMap) {
-                foreach( KeyValuePair<UUID, Dictionary<int, Dialog>> kvp in s_clientDialogMap )
+            lock (s_clientDialogMap)
+            {
+                foreach (KeyValuePair<UUID, Dictionary<int, Dialog>> kvp in s_clientDialogMap)
                 {
-                    foreach (KeyValuePair<int, Dialog> idp in kvp.Value) {
-                        if (idp.Value.cTime.CompareTo(DateTime.UtcNow.AddHours(-6)) < 0) {
+                    foreach (KeyValuePair<int, Dialog> idp in kvp.Value)
+                    {
+                        if (idp.Value.cTime.CompareTo(DateTime.UtcNow.AddHours(-6)) < 0)
+                        {
                             dialogsToPurge.Add(idp.Value);
                         }
                     }
                 }
             }
 
-            foreach( Dialog dialog in dialogsToPurge ) {
+            foreach (Dialog dialog in dialogsToPurge)
+            {
                 // If any of these have already been closed, we'll produce a WarnFormat log.
                 dialog.Close();
             }
@@ -418,7 +458,7 @@ namespace Gloebit.GloebitMoneyModule {
 
         // Create static variables here so we only need one string array
         private const string c_title = "Subscription Authorization Request (scripted object auto-debit)";
-        private static readonly string[] c_buttons = new string[3] {"Authorize", "Ignore", "Report Fraud"};
+        private static readonly string[] c_buttons = new string[3] { "Authorize", "Ignore", "Report Fraud" };
 
         // Create variable we can format once in constructor to return for MsgBody
         private readonly string m_body;
@@ -497,32 +537,34 @@ namespace Gloebit.GloebitMoneyModule {
         /// <param name="chat">response sent</param>
         protected override void ProcessResponse(IClientAPI client, OSChatMessage chat)
         {
-            switch (chat.Message) {
-            case "Ignore":
-                // User actively ignored.  remove from our message listener
-                break;
-            case "Authorize":
-                // Create authorization
+            switch (chat.Message)
+            {
+                case "Ignore":
+                    // User actively ignored.  remove from our message listener
+                    break;
+                case "Authorize":
+                    // Create authorization
 
-                string subscriptionIDStr = SubscriptionID.ToString();
-                string apiUrl = apiW.m_url.ToString();
+                    string subscriptionIDStr = SubscriptionID.ToString();
+                    string apiUrl = apiW.m_url.ToString();
 
-                GloebitSubscription sub = GloebitSubscription.GetBySubscriptionID(subscriptionIDStr, apiUrl);
-                // IF null, there was a db error on storing this -- test store functions for db impl
-                if (sub == null) {
-                    string msg = String.Format("[GLOEBITMONEYMODULE] CreateSubscriptionAuthorizationDialog.ProcessResponse Could not retrieve subscription.  Likely DB error when storing subID:{0}", subscriptionIDStr);
-                    m_log.Error(msg);
-                    throw new Exception(msg);
-                }
-                apiW.AuthorizeSubscription(AgentID, String.Empty, sub, false);
-                break;
-            case "Report Fraud":
-                // Report to Gloebit
-                // TODO: fire off fraud report to Gloebit
-                break;
-            default:
-                m_log.ErrorFormat("[GLOEBITMONEYMODULE] CreateSubscriptionAuthorizationDialog.ProcessResponse Received unexpected dialog response message:{0}", chat.Message);
-                break;
+                    GloebitSubscription sub = GloebitSubscription.GetBySubscriptionID(subscriptionIDStr, apiUrl);
+                    // IF null, there was a db error on storing this -- test store functions for db impl
+                    if (sub == null)
+                    {
+                        string msg = String.Format("[GLOEBITMONEYMODULE] CreateSubscriptionAuthorizationDialog.ProcessResponse Could not retrieve subscription.  Likely DB error when storing subID:{0}", subscriptionIDStr);
+                        m_log.Error(msg);
+                        throw new Exception(msg);
+                    }
+                    apiW.AuthorizeSubscription(AgentID, String.Empty, sub, false);
+                    break;
+                case "Report Fraud":
+                    // Report to Gloebit
+                    // TODO: fire off fraud report to Gloebit
+                    break;
+                default:
+                    m_log.ErrorFormat("[GLOEBITMONEYMODULE] CreateSubscriptionAuthorizationDialog.ProcessResponse Received unexpected dialog response message:{0}", chat.Message);
+                    break;
             }
         }
 
@@ -567,7 +609,7 @@ namespace Gloebit.GloebitMoneyModule {
 
         // Create static variables here so we only need one string array
         private const string c_title = "Pending Subscription Authorization Request (scripted object auto-debit)";
-        private static readonly string[] c_buttons = new string[3] {"Respond", "Ignore", "Report Fraud"};
+        private static readonly string[] c_buttons = new string[3] { "Respond", "Ignore", "Report Fraud" };
 
         // Create variable we can format once in constructor to return for MsgBody
         private readonly string m_body;
@@ -647,29 +689,30 @@ namespace Gloebit.GloebitMoneyModule {
         /// <param name="chat">response sent</param>
         protected override void ProcessResponse(IClientAPI client, OSChatMessage chat)
         {
-            switch (chat.Message) {
-            case "Ignore":
-                // User actively ignored.  remove from our message listener
-                break;
-            case "Respond":
-                // Resend authorization link
+            switch (chat.Message)
+            {
+                case "Ignore":
+                    // User actively ignored.  remove from our message listener
+                    break;
+                case "Respond":
+                    // Resend authorization link
 
-                string subscriptionIDStr = SubscriptionID.ToString();
-                string apiUrl = apiW.m_url.ToString();
-                GloebitSubscription sub = GloebitSubscription.GetBySubscriptionID(subscriptionIDStr, apiUrl);
-                // TODO: Do we need to check if this is null?  Shouldn't happen.
+                    string subscriptionIDStr = SubscriptionID.ToString();
+                    string apiUrl = apiW.m_url.ToString();
+                    GloebitSubscription sub = GloebitSubscription.GetBySubscriptionID(subscriptionIDStr, apiUrl);
+                    // TODO: Do we need to check if this is null?  Shouldn't happen.
 
-                // Send Authorize URL
-                apiW.AuthorizeSubscription(client.AgentId, SubscriptionAuthorizationID.ToString(), sub, false);
+                    // Send Authorize URL
+                    apiW.AuthorizeSubscription(client.AgentId, SubscriptionAuthorizationID.ToString(), sub, false);
 
-                break;
-            case "Report Fraud":
-                // Report to Gloebit
-                // TODO: fire off fraud report to Gloebit
-                break;
-            default:
-                m_log.ErrorFormat("[GLOEBITMONEYMODULE] PendingSubscriptionAuthorizationDialog.ProcessResponse Received unexpected dialog response message:{0}", chat.Message);
-                break;
+                    break;
+                case "Report Fraud":
+                    // Report to Gloebit
+                    // TODO: fire off fraud report to Gloebit
+                    break;
+                default:
+                    m_log.ErrorFormat("[GLOEBITMONEYMODULE] PendingSubscriptionAuthorizationDialog.ProcessResponse Received unexpected dialog response message:{0}", chat.Message);
+                    break;
             }
         }
     };

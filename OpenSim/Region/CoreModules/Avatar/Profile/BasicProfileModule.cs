@@ -24,21 +24,18 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Reflection;
-
-using OpenMetaverse;
 using log4net;
-using Nini.Config;
 using Mono.Addins;
-
+using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.Avatar.Profile
 {
@@ -57,7 +54,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Profile
 
         public void Initialise(IConfigSource config)
         {
-            if(config.Configs["UserProfiles"] != null)
+            if (config.Configs["UserProfiles"] != null)
                 return;
 
             m_log.DebugFormat("[PROFILE MODULE]: Basic Profile Module enabled");
@@ -131,7 +128,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Profile
             if (!(s is Scene))
                 return;
 
-//            Scene scene = (Scene)s;
+            //            Scene scene = (Scene)s;
 
             string profileUrl = String.Empty;
             string aboutText = String.Empty;

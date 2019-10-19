@@ -26,9 +26,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
 
 namespace OpenSim.Region.ScriptEngine.Yengine
 {
@@ -50,12 +47,12 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             {
                 CallSEH();                 // run script event handler
             }
-            catch(StackHibernateException)
+            catch (StackHibernateException)
             {
-                if(callMode != XMRInstance.CallMode_SAVE)
+                if (callMode != XMRInstance.CallMode_SAVE)
                     throw new Exception("callMode=" + callMode);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return e;
             }
@@ -77,12 +74,12 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             {
                 CallSEH();                 // run script event handler
             }
-            catch(StackHibernateException)
+            catch (StackHibernateException)
             {
-                if(callMode != XMRInstance.CallMode_SAVE)
+                if (callMode != XMRInstance.CallMode_SAVE)
                     throw new Exception("callMode=" + callMode);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return e;
             }
@@ -90,7 +87,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return null;
         }
 
-        public class StackHibernateException: Exception, IXMRUncatchable
+        public class StackHibernateException : Exception, IXMRUncatchable
         {
         }
     }

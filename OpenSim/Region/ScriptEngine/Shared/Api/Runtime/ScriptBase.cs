@@ -25,25 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenSim.Region.ScriptEngine.Interfaces;
 using System;
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Lifetime;
-using System.Security.Permissions;
-using System.Threading;
-using System.Reflection;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics; //for [DebuggerNonUserCode]
-using OpenSim.Region.ScriptEngine.Interfaces;
-using OpenSim.Region.ScriptEngine.Shared;
-using OpenSim.Region.ScriptEngine.Shared.Api.Runtime;
+using System.Reflection;
+using System.Runtime.Remoting.Lifetime;
 
 namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 {
     public partial class ScriptBaseClass : MarshalByRefObject, IScript
     {
         private Dictionary<string, MethodInfo> inits = new Dictionary<string, MethodInfo>();
-//        private ScriptSponsor m_sponser;
+        //        private ScriptSponsor m_sponser;
 
         public override Object InitializeLifetimeService()
         {
@@ -52,8 +46,8 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
             {
                 // Infinite
                 lease.InitialLeaseTime = TimeSpan.FromMinutes(0);
-//                lease.RenewOnCallTime = TimeSpan.FromSeconds(10.0);
-//                lease.SponsorshipTimeout = TimeSpan.FromMinutes(1.0);
+                //                lease.RenewOnCallTime = TimeSpan.FromSeconds(10.0);
+                //                lease.SponsorshipTimeout = TimeSpan.FromMinutes(1.0);
             }
             return lease;
         }
@@ -81,7 +75,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
                 }
             }
 
-//            m_sponser = new ScriptSponsor();
+            //            m_sponser = new ScriptSponsor();
         }
 
         private Executor m_Executor = null;
@@ -116,7 +110,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 
             //ILease lease = (ILease)RemotingServices.GetLifetimeService(data as MarshalByRefObject);
             //RemotingServices.GetLifetimeService(data as MarshalByRefObject);
-//            lease.Register(m_sponser);
+            //            lease.Register(m_sponser);
 
             MethodInfo mi = inits[api];
 
@@ -134,7 +128,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 
         public void Close()
         {
-//            m_sponser.Close();
+            //            m_sponser.Close();
         }
 
         public Dictionary<string, object> GetVars()

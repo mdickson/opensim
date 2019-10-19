@@ -25,21 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using DotNetOpenId;
+using DotNetOpenId.Provider;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Web;
-using DotNetOpenId;
-using DotNetOpenId.Provider;
-using OpenSim.Framework;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Server.Handlers.Base;
-using OpenSim.Services.Interfaces;
-using Nini.Config;
-using OpenMetaverse;
 
 namespace OpenSim.Server.Handlers.Authentication
 {
@@ -223,7 +220,7 @@ For more information, see <a href='http://openid.net/'>http://openid.net/</a>.
             try
             {
                 string forPost;
-                using(StreamReader sr = new StreamReader(httpRequest.InputStream))
+                using (StreamReader sr = new StreamReader(httpRequest.InputStream))
                     forPost = sr.ReadToEnd();
                 NameValueCollection postQuery = HttpUtility.ParseQueryString(forPost);
                 NameValueCollection getQuery = HttpUtility.ParseQueryString(httpRequest.Url.Query);
@@ -245,7 +242,7 @@ For more information, see <a href='http://openid.net/'>http://openid.net/</a>.
                             if (passwordValues != null && passwordValues.Length == 1)
                             {
                                 if (account != null &&
-                                    (m_authenticationService.Authenticate(account.PrincipalID,Util.Md5Hash(passwordValues[0]), 30) != string.Empty))
+                                    (m_authenticationService.Authenticate(account.PrincipalID, Util.Md5Hash(passwordValues[0]), 30) != string.Empty))
                                     authRequest.IsAuthenticated = true;
                                 else
                                     authRequest.IsAuthenticated = false;

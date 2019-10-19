@@ -34,7 +34,7 @@ namespace OpenSim.Framework
         // bits definitions
         Position = 0x01,
         Rotation = 0x02,
-        Scale   = 0x04,
+        Scale = 0x04,
         Group = 0x08,
         UniformScale = 0x10,
 

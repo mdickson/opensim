@@ -25,28 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
+using OpenSim.Framework;
 using System;
-using System.IO;
-using System.Threading;
-using System.Collections;
 using System.Collections.Generic;
-using System.Security.Policy;
-using System.Reflection;
 using System.Globalization;
 using System.Xml;
-using OpenMetaverse;
-using log4net;
-using Nini.Config;
-using Amib.Threading;
-using OpenSim.Framework;
-using OpenSim.Region.CoreModules;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.ScriptEngine.Shared;
-using OpenSim.Region.ScriptEngine.Shared.Api;
-using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
-using OpenSim.Region.ScriptEngine.Shared.CodeTools;
-using OpenSim.Region.ScriptEngine.Interfaces;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Instance
 {
@@ -221,170 +205,170 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
                 {
                     switch (part.Name)
                     {
-                    case "State":
-                        instance.State=part.InnerText;
-                        break;
-                    case "Running":
-                        instance.Running=bool.Parse(part.InnerText);
-                        break;
-                    case "Variables":
-                        XmlNodeList varL = part.ChildNodes;
-                        foreach (XmlNode var in varL)
-                        {
-                            string varName;
-                            varValue=ReadTypedValue(var, out varName);
-
-                            if (vars.ContainsKey(varName))
-                                vars[varName] = varValue;
-                        }
-                        instance.SetVars(vars);
-                        break;
-                    case "Queue":
-                        XmlNodeList itemL = part.ChildNodes;
-                        foreach (XmlNode item in itemL)
-                        {
-                            List<Object> parms = new List<Object>();
-                            List<DetectParams> detected =
-                                    new List<DetectParams>();
-
-                            string eventName =
-                                    item.Attributes.GetNamedItem("event").Value;
-                            XmlNodeList eventL = item.ChildNodes;
-                            foreach (XmlNode evt in eventL)
+                        case "State":
+                            instance.State = part.InnerText;
+                            break;
+                        case "Running":
+                            instance.Running = bool.Parse(part.InnerText);
+                            break;
+                        case "Variables":
+                            XmlNodeList varL = part.ChildNodes;
+                            foreach (XmlNode var in varL)
                             {
-                                switch (evt.Name)
-                                {
-                                case "Params":
-                                    XmlNodeList prms = evt.ChildNodes;
-                                    foreach (XmlNode pm in prms)
-                                        parms.Add(ReadTypedValue(pm));
+                                string varName;
+                                varValue = ReadTypedValue(var, out varName);
 
-                                    break;
-                                case "Detected":
-                                    XmlNodeList detL = evt.ChildNodes;
-                                    foreach (XmlNode det in detL)
-                                    {
-                                        string vect =
-                                                det.Attributes.GetNamedItem(
-                                                "pos").Value;
-                                        LSL_Types.Vector3 v =
-                                                new LSL_Types.Vector3(vect);
-
-                                        int d_linkNum=0;
-                                        UUID d_group = UUID.Zero;
-                                        string d_name = String.Empty;
-                                        UUID d_owner = UUID.Zero;
-                                        LSL_Types.Vector3 d_position =
-                                            new LSL_Types.Vector3();
-                                        LSL_Types.Quaternion d_rotation =
-                                            new LSL_Types.Quaternion();
-                                        int d_type = 0;
-                                        LSL_Types.Vector3 d_velocity =
-                                            new LSL_Types.Vector3();
-
-                                        try
-                                        {
-                                            string tmp;
-
-                                            tmp = det.Attributes.GetNamedItem(
-                                                    "linkNum").Value;
-                                            int.TryParse(tmp, out d_linkNum);
-
-                                            tmp = det.Attributes.GetNamedItem(
-                                                    "group").Value;
-                                            UUID.TryParse(tmp, out d_group);
-
-                                            d_name = det.Attributes.GetNamedItem(
-                                                    "name").Value;
-
-                                            tmp = det.Attributes.GetNamedItem(
-                                                    "owner").Value;
-                                            UUID.TryParse(tmp, out d_owner);
-
-                                            tmp = det.Attributes.GetNamedItem(
-                                                    "position").Value;
-                                            d_position =
-                                                new LSL_Types.Vector3(tmp);
-
-                                            tmp = det.Attributes.GetNamedItem(
-                                                    "rotation").Value;
-                                            d_rotation =
-                                                new LSL_Types.Quaternion(tmp);
-
-                                            tmp = det.Attributes.GetNamedItem(
-                                                    "type").Value;
-                                            int.TryParse(tmp, out d_type);
-
-                                            tmp = det.Attributes.GetNamedItem(
-                                                    "velocity").Value;
-                                            d_velocity =
-                                                new LSL_Types.Vector3(tmp);
-
-                                        }
-                                        catch (Exception) // Old version XML
-                                        {
-                                        }
-
-                                        UUID uuid = new UUID();
-                                        UUID.TryParse(det.InnerText,
-                                                out uuid);
-
-                                        DetectParams d = new DetectParams();
-                                        d.Key = uuid;
-                                        d.OffsetPos = v;
-                                        d.LinkNum = d_linkNum;
-                                        d.Group = d_group;
-                                        d.Name = d_name;
-                                        d.Owner = d_owner;
-                                        d.Position = d_position;
-                                        d.Rotation = d_rotation;
-                                        d.Type = d_type;
-                                        d.Velocity = d_velocity;
-
-                                        detected.Add(d);
-                                    }
-                                    break;
-                                }
+                                if (vars.ContainsKey(varName))
+                                    vars[varName] = varValue;
                             }
-                            EventParams ep = new EventParams(
-                                    eventName, parms.ToArray(),
-                                    detected.ToArray());
-                            instance.EventQueue.Enqueue(ep);
-                        }
-                        break;
-                    case "Plugins":
-                        instance.PluginData = ReadList(part).Data;
-                        break;
-                    case "Permissions":
-                        string tmpPerm;
-                        int mask = 0;
-                        tmpPerm = part.Attributes.GetNamedItem("mask").Value;
-                        if (tmpPerm != null)
-                        {
-                            int.TryParse(tmpPerm, out mask);
-                            if (mask != 0)
+                            instance.SetVars(vars);
+                            break;
+                        case "Queue":
+                            XmlNodeList itemL = part.ChildNodes;
+                            foreach (XmlNode item in itemL)
                             {
-                                tmpPerm = part.Attributes.GetNamedItem("granter").Value;
-                                if (tmpPerm != null)
+                                List<Object> parms = new List<Object>();
+                                List<DetectParams> detected =
+                                        new List<DetectParams>();
+
+                                string eventName =
+                                        item.Attributes.GetNamedItem("event").Value;
+                                XmlNodeList eventL = item.ChildNodes;
+                                foreach (XmlNode evt in eventL)
                                 {
-                                    UUID granter = new UUID();
-                                    UUID.TryParse(tmpPerm, out granter);
-                                    if (granter != UUID.Zero)
+                                    switch (evt.Name)
                                     {
-                                        instance.ScriptTask.PermsMask = mask;
-                                        instance.ScriptTask.PermsGranter = granter;
+                                        case "Params":
+                                            XmlNodeList prms = evt.ChildNodes;
+                                            foreach (XmlNode pm in prms)
+                                                parms.Add(ReadTypedValue(pm));
+
+                                            break;
+                                        case "Detected":
+                                            XmlNodeList detL = evt.ChildNodes;
+                                            foreach (XmlNode det in detL)
+                                            {
+                                                string vect =
+                                                        det.Attributes.GetNamedItem(
+                                                        "pos").Value;
+                                                LSL_Types.Vector3 v =
+                                                        new LSL_Types.Vector3(vect);
+
+                                                int d_linkNum = 0;
+                                                UUID d_group = UUID.Zero;
+                                                string d_name = String.Empty;
+                                                UUID d_owner = UUID.Zero;
+                                                LSL_Types.Vector3 d_position =
+                                                    new LSL_Types.Vector3();
+                                                LSL_Types.Quaternion d_rotation =
+                                                    new LSL_Types.Quaternion();
+                                                int d_type = 0;
+                                                LSL_Types.Vector3 d_velocity =
+                                                    new LSL_Types.Vector3();
+
+                                                try
+                                                {
+                                                    string tmp;
+
+                                                    tmp = det.Attributes.GetNamedItem(
+                                                            "linkNum").Value;
+                                                    int.TryParse(tmp, out d_linkNum);
+
+                                                    tmp = det.Attributes.GetNamedItem(
+                                                            "group").Value;
+                                                    UUID.TryParse(tmp, out d_group);
+
+                                                    d_name = det.Attributes.GetNamedItem(
+                                                            "name").Value;
+
+                                                    tmp = det.Attributes.GetNamedItem(
+                                                            "owner").Value;
+                                                    UUID.TryParse(tmp, out d_owner);
+
+                                                    tmp = det.Attributes.GetNamedItem(
+                                                            "position").Value;
+                                                    d_position =
+                                                        new LSL_Types.Vector3(tmp);
+
+                                                    tmp = det.Attributes.GetNamedItem(
+                                                            "rotation").Value;
+                                                    d_rotation =
+                                                        new LSL_Types.Quaternion(tmp);
+
+                                                    tmp = det.Attributes.GetNamedItem(
+                                                            "type").Value;
+                                                    int.TryParse(tmp, out d_type);
+
+                                                    tmp = det.Attributes.GetNamedItem(
+                                                            "velocity").Value;
+                                                    d_velocity =
+                                                        new LSL_Types.Vector3(tmp);
+
+                                                }
+                                                catch (Exception) // Old version XML
+                                                {
+                                                }
+
+                                                UUID uuid = new UUID();
+                                                UUID.TryParse(det.InnerText,
+                                                        out uuid);
+
+                                                DetectParams d = new DetectParams();
+                                                d.Key = uuid;
+                                                d.OffsetPos = v;
+                                                d.LinkNum = d_linkNum;
+                                                d.Group = d_group;
+                                                d.Name = d_name;
+                                                d.Owner = d_owner;
+                                                d.Position = d_position;
+                                                d.Rotation = d_rotation;
+                                                d.Type = d_type;
+                                                d.Velocity = d_velocity;
+
+                                                detected.Add(d);
+                                            }
+                                            break;
                                     }
                                 }
+                                EventParams ep = new EventParams(
+                                        eventName, parms.ToArray(),
+                                        detected.ToArray());
+                                instance.EventQueue.Enqueue(ep);
                             }
-                        }
-                        break;
-                    case "MinEventDelay":
-                        double minEventDelay = 0.0;
-                        double.TryParse(part.InnerText, NumberStyles.Float, Culture.NumberFormatInfo, out minEventDelay);
-                        instance.MinEventDelay = minEventDelay;
-                        break;
+                            break;
+                        case "Plugins":
+                            instance.PluginData = ReadList(part).Data;
+                            break;
+                        case "Permissions":
+                            string tmpPerm;
+                            int mask = 0;
+                            tmpPerm = part.Attributes.GetNamedItem("mask").Value;
+                            if (tmpPerm != null)
+                            {
+                                int.TryParse(tmpPerm, out mask);
+                                if (mask != 0)
+                                {
+                                    tmpPerm = part.Attributes.GetNamedItem("granter").Value;
+                                    if (tmpPerm != null)
+                                    {
+                                        UUID granter = new UUID();
+                                        UUID.TryParse(tmpPerm, out granter);
+                                        if (granter != UUID.Zero)
+                                        {
+                                            instance.ScriptTask.PermsMask = mask;
+                                            instance.ScriptTask.PermsGranter = granter;
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        case "MinEventDelay":
+                            double minEventDelay = 0.0;
+                            double.TryParse(part.InnerText, NumberStyles.Float, Culture.NumberFormatInfo, out minEventDelay);
+                            instance.MinEventDelay = minEventDelay;
+                            break;
+                    }
                 }
-              }
             }
         }
 
@@ -409,7 +393,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
         private static void WriteTypedValue(XmlDocument doc, XmlNode parent,
                 string tag, string name, object value)
         {
-            Type t=value.GetType();
+            Type t = value.GetType();
             XmlAttribute typ = doc.CreateAttribute("", "type", "");
             XmlNode n = doc.CreateElement("", tag, "");
 
@@ -418,7 +402,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
                 typ.Value = "list";
                 n.Attributes.Append(typ);
 
-                DumpList(doc, n, (LSL_Types.list) value);
+                DumpList(doc, n, (LSL_Types.list)value);
 
                 if (name != String.Empty)
                 {
@@ -476,7 +460,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
                 Object[] args =
                     new Object[] { tag.InnerText };
 
-                assembly = itemType+", OpenSim.Region.ScriptEngine.Shared";
+                assembly = itemType + ", OpenSim.Region.ScriptEngine.Shared";
                 itemT = Type.GetType(assembly);
                 if (itemT == null)
                     return null;

@@ -25,14 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using OpenSim.Framework;
 using OpenSim.Tests.Common;
-using Animation = OpenSim.Framework.Animation;
 
 namespace OpenSim.Framework.Tests
 {
@@ -61,10 +57,10 @@ namespace OpenSim.Framework.Tests
         [Test]
         public void AnimationOSDTest()
         {
-            Assert.That(anim1.AnimID==animUUID1 && anim1.ObjectID == objUUID1 && anim1.SequenceNum ==1, "The Animation Constructor didn't set the fields correctly");
+            Assert.That(anim1.AnimID == animUUID1 && anim1.ObjectID == objUUID1 && anim1.SequenceNum == 1, "The Animation Constructor didn't set the fields correctly");
             OSD updateMessage = anim1.PackUpdateMessage();
             Assert.That(updateMessage is OSDMap, "Packed UpdateMessage isn't an OSDMap");
-            OSDMap updateMap = (OSDMap) updateMessage;
+            OSDMap updateMap = (OSDMap)updateMessage;
             Assert.That(updateMap.ContainsKey("animation"), "Packed Message doesn't contain an animation element");
             Assert.That(updateMap.ContainsKey("object_id"), "Packed Message doesn't contain an object_id element");
             Assert.That(updateMap.ContainsKey("seq_num"), "Packed Message doesn't contain a seq_num element");

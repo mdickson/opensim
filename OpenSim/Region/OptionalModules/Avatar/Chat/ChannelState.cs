@@ -25,15 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenSim.Framework;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using log4net;
-using Nini.Config;
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
 
 namespace OpenSim.Region.OptionalModules.Avatar.Chat
 {
@@ -500,7 +498,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.Chat
             }
 
             // Now we unescape the literal brackets
-            result = result.Replace(@"\[","[").Replace(@"\]","]");
+            result = result.Replace(@"\[", "[").Replace(@"\]", "]");
 
             // m_log.DebugFormat("[IRC-Channel] Parse[3]: {0}", result);
             return result;

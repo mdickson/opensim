@@ -26,23 +26,23 @@
 *
 */
 
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.DataSnapshot.Interfaces;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Threading;
 using System.Text;
+using System.Threading;
 using System.Xml;
-using log4net;
-using Nini.Config;
-using OpenMetaverse;
-using Mono.Addins;
-using OpenSim.Framework;
-using OpenSim.Region.DataSnapshot.Interfaces;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
 
 namespace OpenSim.Region.DataSnapshot
 {
@@ -130,9 +130,9 @@ namespace OpenSim.Region.DataSnapshot
 
                         m_exposure_level = config.Configs["DataSnapshot"].GetString("data_exposure", m_exposure_level);
                         m_exposure_level = m_exposure_level.ToLower();
-                        if(m_exposure_level !="all" && m_exposure_level != "minimum")
+                        if (m_exposure_level != "all" && m_exposure_level != "minimum")
                         {
-                            m_log.ErrorFormat("[DATASNAPSHOT]: unknown data_exposure option: '{0}'. defaulting to minimum",m_exposure_level);
+                            m_log.ErrorFormat("[DATASNAPSHOT]: unknown data_exposure option: '{0}'. defaulting to minimum", m_exposure_level);
                             m_exposure_level = "minimum";
                         }
 
@@ -327,7 +327,7 @@ namespace OpenSim.Region.DataSnapshot
 
         public XmlDocument GetSnapshot(string regionName)
         {
-            if(!Monitor.TryEnter(m_serializeGen,30000))
+            if (!Monitor.TryEnter(m_serializeGen, 30000))
             {
                 return null;
             }
@@ -404,7 +404,7 @@ namespace OpenSim.Region.DataSnapshot
         {
             Stream reply = null;
             string delimStr = ";";
-            char [] delimiter = delimStr.ToCharArray();
+            char[] delimiter = delimStr.ToCharArray();
 
             string[] services = servicesStr.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
 

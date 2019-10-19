@@ -25,24 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using Nwc.XmlRpc;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-
-using Nwc.XmlRpc;
-
-using log4net;
-using Mono.Addins;
-using Nini.Config;
-
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Services.Interfaces;
 
 namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
 {
@@ -116,7 +111,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
 
         private bool m_disableKeepAlive = true;
 
-        private string m_groupReadKey  = string.Empty;
+        private string m_groupReadKey = string.Empty;
         private string m_groupWriteKey = string.Empty;
 
         private IUserAccountService m_accountService = null;
@@ -382,7 +377,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
 
             GroupMembershipData MemberInfo = GetAgentGroupMembership(requestingAgentID, AgentID, GroupID);
             GroupProfileData MemberGroupProfile = GroupProfileHashtableToGroupProfileData(respData);
-            if(MemberInfo != null)
+            if (MemberInfo != null)
             {
                 MemberGroupProfile.MemberTitle = MemberInfo.GroupTitle;
                 MemberGroupProfile.PowersMask = MemberInfo.GroupPowers;
@@ -666,7 +661,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
                 data.ListInProfile = ((string)membership["ListInProfile"]) == "1";
                 data.AgentPowers = ulong.Parse((string)membership["AgentPowers"]);
                 data.Title = (string)membership["Title"];
-                if(membership.ContainsKey("OnlineStatus"))
+                if (membership.ContainsKey("OnlineStatus"))
                     data.OnlineStatus = (string)membership["OnlineStatus"];
 
                 members.Add(data);
@@ -805,8 +800,8 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
         {
             if (m_groupsAgentsDroppedFromChatSession.ContainsKey(groupID))
             {
-            if (m_groupsAgentsInvitedToChatSession[groupID].Contains(agentID))
-                m_groupsAgentsInvitedToChatSession[groupID].Remove(agentID);
+                if (m_groupsAgentsInvitedToChatSession[groupID].Contains(agentID))
+                    m_groupsAgentsInvitedToChatSession[groupID].Remove(agentID);
 
                 // If not in dropped list, add
                 if (!m_groupsAgentsDroppedFromChatSession[groupID].Contains(agentID))
@@ -987,7 +982,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
                         "[XMLRPC-GROUPS-CONNECTOR]: An error has occured while attempting to access the XmlRpcGroups server method {0} at {1}: {2}",
                         function, m_groupsServerURI, e.Message);
 
-                    if(m_debugEnabled)
+                    if (m_debugEnabled)
                     {
                         m_log.ErrorFormat("[XMLRPC-GROUPS-CONNECTOR]: {0}", e.StackTrace);
 
@@ -1107,10 +1102,9 @@ namespace Nwc.XmlRpc
     using System;
     using System.Collections;
     using System.IO;
-    using System.Xml;
     using System.Net;
     using System.Text;
-    using System.Reflection;
+    using System.Xml;
 
     /// <summary>Class supporting the request side of an XML-RPC transaction.</summary>
     public class ConfigurableKeepAliveXmlRpcRequest : XmlRpcRequest

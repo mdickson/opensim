@@ -25,13 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography; // for computing md5 hash
-using OpenSim.Framework;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using OpenSim.Framework;
+using System;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography; // for computing md5 hash
+using System.Text;
 
 namespace OpenSim.Region.Framework.Scenes
 {

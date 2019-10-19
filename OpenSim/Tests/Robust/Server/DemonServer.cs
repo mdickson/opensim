@@ -25,16 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using NUnit.Framework;
+using OpenSim.Server;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-
-using Nini.Config;
-using log4net;
-using NUnit.Framework;
-
-using OpenSim.Server;
 
 namespace Robust.Tests
 {
@@ -52,7 +47,7 @@ namespace Robust.Tests
                 File.Delete("Robust.Tests.log");
 
             Console.WriteLine("**** Starting demon Robust server ****");
-            m_demon = new Thread( () => Main(new string[] {"-inifile=Robust.Tests.ini"}));
+            m_demon = new Thread(() => Main(new string[] { "-inifile=Robust.Tests.ini" }));
             m_demon.Start();
             // Give some time for the server to instantiate all services
             Thread.Sleep(3000);

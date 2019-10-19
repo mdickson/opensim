@@ -25,17 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
+using OpenSim.Framework;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Sockets;
-using System.Reflection;
-
-using OpenSim.Framework;
-using OpenMetaverse;
-
-using log4net;
 
 namespace OpenSim.Services.Interfaces
 {
@@ -121,7 +115,7 @@ namespace OpenSim.Services.Interfaces
         /// <param name='regionID'></param>
         int GetRegionFlags(UUID scopeID, UUID regionID);
 
-        Dictionary<string,object> GetExtraFeatures();
+        Dictionary<string, object> GetExtraFeatures();
     }
 
     public interface IHypergridLinker
@@ -132,7 +126,7 @@ namespace OpenSim.Services.Interfaces
 
     public class GridRegion
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
 #pragma warning disable 414
         private static readonly string LogHeader = "[GRID REGION]";
@@ -148,24 +142,29 @@ namespace OpenSim.Services.Interfaces
         /// </summary>
         public string ServerURI
         {
-            get {
-                if (!String.IsNullOrEmpty(m_serverURI)) {
+            get
+            {
+                if (!String.IsNullOrEmpty(m_serverURI))
+                {
                     return m_serverURI;
-                } else {
+                }
+                else
+                {
                     if (HttpPort == 0)
                         return "http://" + m_externalHostName + "/";
                     else
                         return "http://" + m_externalHostName + ":" + HttpPort + "/";
                 }
             }
-            set {
-                if ( value == null)
+            set
+            {
+                if (value == null)
                 {
                     m_serverURI = String.Empty;
                     return;
                 }
 
-                if ( value.EndsWith("/") )
+                if (value.EndsWith("/"))
                 {
 
                     m_serverURI = value;
@@ -260,7 +259,7 @@ namespace OpenSim.Services.Interfaces
         public UUID TerrainImage = UUID.Zero;
         public UUID ParcelImage = UUID.Zero;
         public byte Access;
-        public int  Maturity;
+        public int Maturity;
         public string RegionSecret = string.Empty;
         public string Token = string.Empty;
 
@@ -388,7 +387,7 @@ namespace OpenSim.Services.Interfaces
                 UUID.TryParse((string)kvp["parcelMapTexture"], out ParcelImage);
 
             if (kvp.ContainsKey("regionSecret"))
-                RegionSecret =(string)kvp["regionSecret"];
+                RegionSecret = (string)kvp["regionSecret"];
 
             if (kvp.ContainsKey("owner_uuid"))
                 EstateOwner = new UUID(kvp["owner_uuid"].ToString());

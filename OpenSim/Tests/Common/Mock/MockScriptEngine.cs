@@ -25,10 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
@@ -36,6 +32,10 @@ using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.ScriptEngine.Interfaces;
 using OpenSim.Region.ScriptEngine.Shared;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Tests.Common
 {
@@ -99,19 +99,19 @@ namespace OpenSim.Tests.Common
         public event ObjectRemoved OnObjectRemoved;
 #pragma warning restore 0067
 
-        public string GetXMLState (UUID itemID)
+        public string GetXMLState(UUID itemID)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public bool SetXMLState(UUID itemID, string xml)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public bool PostScriptEvent(UUID itemID, string name, object[] args)
         {
-//            Console.WriteLine("Posting event {0} for {1}", name, itemID);
+            //            Console.WriteLine("Posting event {0} for {1}", name, itemID);
 
             return PostScriptEvent(itemID, new EventParams(name, args, null));
         }
@@ -158,107 +158,107 @@ namespace OpenSim.Tests.Common
 
         public void SuspendScript(UUID itemID)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public void ResumeScript(UUID itemID)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public ArrayList GetScriptErrors(UUID itemID)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public bool HasScript(UUID itemID, out bool running)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public bool GetScriptState(UUID itemID)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public void SaveAllState()
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public void StartProcessing()
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public float GetScriptExecutionTime(List<UUID> itemIDs)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public Dictionary<uint, float> GetObjectScriptsExecutionTimes()
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public IScriptWorkItem QueueEventHandler(object parms)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public DetectParams GetDetectParams(UUID item, int number)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public void SetMinEventDelay(UUID itemID, double delay)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public int GetStartParameter(UUID itemID)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public void SetScriptState(UUID itemID, bool state, bool self)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public void SetState(UUID itemID, string newState)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public void ApiResetScript(UUID itemID)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
-        public void ResetScript (UUID itemID)
+        public void ResetScript(UUID itemID)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public IScriptApi GetApi(UUID itemID, string name)
         {
-            throw new System.NotImplementedException ();
+            throw new System.NotImplementedException();
         }
 
         public Scene World { get { return m_scene; } }
 
         public IScriptModule ScriptModule { get { return this; } }
 
-        public string ScriptEnginePath { get { throw new System.NotImplementedException (); }}
+        public string ScriptEnginePath { get { throw new System.NotImplementedException(); } }
 
-        public string ScriptClassName { get { throw new System.NotImplementedException (); } }
+        public string ScriptClassName { get { throw new System.NotImplementedException(); } }
 
-        public string ScriptBaseClassName { get { throw new System.NotImplementedException (); } }
+        public string ScriptBaseClassName { get { throw new System.NotImplementedException(); } }
 
-        public string[] ScriptReferencedAssemblies { get { throw new System.NotImplementedException (); } }
+        public string[] ScriptReferencedAssemblies { get { throw new System.NotImplementedException(); } }
 
-        public ParameterInfo[] ScriptBaseClassParameters { get { throw new System.NotImplementedException (); } }
+        public ParameterInfo[] ScriptBaseClassParameters { get { throw new System.NotImplementedException(); } }
 
         public void ClearPostedEvents()
         {

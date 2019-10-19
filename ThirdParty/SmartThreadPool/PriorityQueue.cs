@@ -18,7 +18,7 @@ namespace Amib.Threading.Internal
         /// <summary>
         /// The number of queues, there is one for each type of priority
         /// </summary>
-        private const int _queuesCount = WorkItemPriority.Highest-WorkItemPriority.Lowest+1;
+        private const int _queuesCount = WorkItemPriority.Highest - WorkItemPriority.Lowest + 1;
 
         /// <summary>
         /// Work items queues. There is one for each type of priority
@@ -41,7 +41,7 @@ namespace Amib.Threading.Internal
 
         public PriorityQueue()
         {
-            for(int i = 0; i < _queues.Length; ++i)
+            for (int i = 0; i < _queues.Length; ++i)
             {
                 _queues[i] = new LinkedList<IHasWorkItemPriority>();
             }
@@ -59,7 +59,7 @@ namespace Amib.Threading.Internal
         {
             Debug.Assert(null != workItem);
 
-            int queueIndex = _queuesCount-(int)workItem.WorkItemPriority-1;
+            int queueIndex = _queuesCount - (int)workItem.WorkItemPriority - 1;
             Debug.Assert(queueIndex >= 0);
             Debug.Assert(queueIndex < _queuesCount);
 
@@ -76,7 +76,7 @@ namespace Amib.Threading.Internal
         {
             IHasWorkItemPriority workItem = null;
 
-            if(_workItemsCount > 0)
+            if (_workItemsCount > 0)
             {
                 int queueIndex = GetNextNonEmptyQueue(-1);
                 Debug.Assert(queueIndex >= 0);
@@ -99,9 +99,9 @@ namespace Amib.Threading.Internal
         /// </returns>
         private int GetNextNonEmptyQueue(int queueIndex)
         {
-            for(int i = queueIndex+1; i < _queuesCount; ++i)
+            for (int i = queueIndex + 1; i < _queuesCount; ++i)
             {
-                if(_queues[i].Count > 0)
+                if (_queues[i].Count > 0)
                 {
                     return i;
                 }
@@ -127,7 +127,7 @@ namespace Amib.Threading.Internal
         {
             if (_workItemsCount > 0)
             {
-                foreach(LinkedList<IHasWorkItemPriority> queue in _queues)
+                foreach (LinkedList<IHasWorkItemPriority> queue in _queues)
                 {
                     queue.Clear();
                 }
@@ -210,7 +210,7 @@ namespace Amib.Threading.Internal
                     return false;
                 }
 
-                if(_version != _priorityQueue._version)
+                if (_version != _priorityQueue._version)
                 {
                     throw new InvalidOperationException("The collection has been modified");
 
@@ -218,7 +218,7 @@ namespace Amib.Threading.Internal
                 if (!_enumerator.MoveNext())
                 {
                     _queueIndex = _priorityQueue.GetNextNonEmptyQueue(_queueIndex);
-                    if(-1 == _queueIndex)
+                    if (-1 == _queueIndex)
                     {
                         return false;
                     }

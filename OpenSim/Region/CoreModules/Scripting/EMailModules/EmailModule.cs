@@ -25,19 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using DotNetOpenMail;
+using DotNetOpenMail.SmtpAuth;
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using DotNetOpenMail;
-using DotNetOpenMail.SmtpAuth;
-using log4net;
-using Nini.Config;
-using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using Mono.Addins;
 
 namespace OpenSim.Region.CoreModules.Scripting.EmailModules
 {
@@ -125,7 +124,7 @@ namespace OpenSim.Region.CoreModules.Scripting.EmailModules
             if (!m_Enabled)
                 return;
 
-        // It's a go!
+            // It's a go!
             lock (m_Scenes)
             {
                 // Claim the interface slot
@@ -268,7 +267,7 @@ namespace OpenSim.Region.CoreModules.Scripting.EmailModules
             bool isEMailStrictMatch = EMailreStrict.IsMatch(address);
             if (!isEMailStrictMatch)
             {
-                m_log.Error("[EMAIL]: REGEX Problem in EMail Address: "+address);
+                m_log.Error("[EMAIL]: REGEX Problem in EMail Address: " + address);
                 return;
             }
             if ((subject.Length + body.Length) > m_MaxEmailSize)
@@ -306,13 +305,13 @@ namespace OpenSim.Region.CoreModules.Scripting.EmailModules
 
                     //Config SMTP Server
                     //Set SMTP SERVER config
-                    SmtpServer smtpServer=new SmtpServer(SMTP_SERVER_HOSTNAME,SMTP_SERVER_PORT);
+                    SmtpServer smtpServer = new SmtpServer(SMTP_SERVER_HOSTNAME, SMTP_SERVER_PORT);
                     // Add authentication only when requested
                     //
                     if (SMTP_SERVER_LOGIN != String.Empty && SMTP_SERVER_PASSWORD != String.Empty)
                     {
                         //Authentication
-                        smtpServer.SmtpAuthToken=new SmtpAuthToken(SMTP_SERVER_LOGIN, SMTP_SERVER_PASSWORD);
+                        smtpServer.SmtpAuthToken = new SmtpAuthToken(SMTP_SERVER_LOGIN, SMTP_SERVER_PASSWORD);
                     }
                     //Send Email Message
                     emailMessage.Send(smtpServer);
@@ -329,7 +328,7 @@ namespace OpenSim.Region.CoreModules.Scripting.EmailModules
             {
                 // inter object email, keep it in the family
                 Email email = new Email();
-                email.time = ((int)((DateTime.UtcNow - new DateTime(1970,1,1,0,0,0)).TotalSeconds)).ToString();
+                email.time = ((int)((DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds)).ToString();
                 email.subject = subject;
                 email.sender = objectID.ToString() + "@" + m_InterObjectHostname;
                 email.message = "Object-Name: " + LastObjectName +

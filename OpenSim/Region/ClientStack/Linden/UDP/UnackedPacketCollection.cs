@@ -25,11 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading;
-using OpenMetaverse;
 
 //using System.Reflection;
 //using log4net;
@@ -230,7 +229,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             }
 
             uint pendingRemove;
-            while(m_pendingRemoves.TryDequeue(out pendingRemove))
+            while (m_pendingRemoves.TryDequeue(out pendingRemove))
             {
                 OutgoingPacket removedPacket;
                 if (m_packets.TryGetValue(pendingRemove, out removedPacket))

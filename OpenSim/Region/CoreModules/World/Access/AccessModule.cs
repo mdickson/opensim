@@ -25,25 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using log4net;
 using Mono.Addins;
 using Nini.Config;
-using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Console;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.CoreModules.World
 {
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "AccessModule")]
     public class AccessModule : ISharedRegionModule
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private List<Scene> m_SceneList = new List<Scene>();
 
@@ -134,23 +129,23 @@ namespace OpenSim.Region.CoreModules.World
 
             switch (cmd[1])
             {
-            case "enable":
-                scene.LoginsEnabled = true;
-                MainConsole.Instance.Output(String.Format("Logins are enabled for region {0}", scene.RegionInfo.RegionName));
-                break;
-            case "disable":
-                scene.LoginsEnabled = false;
-                MainConsole.Instance.Output(String.Format("Logins are disabled for region {0}", scene.RegionInfo.RegionName));
-                break;
-            case "status":
-                if (scene.LoginsEnabled)
-                    MainConsole.Instance.Output(String.Format("Login in {0} are enabled", scene.RegionInfo.RegionName));
-                else
-                    MainConsole.Instance.Output(String.Format("Login in {0} are disabled", scene.RegionInfo.RegionName));
-                break;
-            default:
-                MainConsole.Instance.Output("Syntax: login enable|disable|status");
-                return false;
+                case "enable":
+                    scene.LoginsEnabled = true;
+                    MainConsole.Instance.Output(String.Format("Logins are enabled for region {0}", scene.RegionInfo.RegionName));
+                    break;
+                case "disable":
+                    scene.LoginsEnabled = false;
+                    MainConsole.Instance.Output(String.Format("Logins are disabled for region {0}", scene.RegionInfo.RegionName));
+                    break;
+                case "status":
+                    if (scene.LoginsEnabled)
+                        MainConsole.Instance.Output(String.Format("Login in {0} are enabled", scene.RegionInfo.RegionName));
+                    else
+                        MainConsole.Instance.Output(String.Format("Login in {0} are disabled", scene.RegionInfo.RegionName));
+                    break;
+                default:
+                    MainConsole.Instance.Output("Syntax: login enable|disable|status");
+                    return false;
             }
 
             return true;

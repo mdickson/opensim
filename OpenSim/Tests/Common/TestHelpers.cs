@@ -25,12 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using NUnit.Framework;
+using OpenMetaverse;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using NUnit.Framework;
-using OpenMetaverse;
 
 namespace OpenSim.Tests.Common
 {
@@ -61,11 +61,11 @@ namespace OpenSim.Tests.Common
         private static MemoryStream DisableLoggingConfigStream
             = new MemoryStream(
                 Encoding.UTF8.GetBytes(
-//                        "<?xml version=\"1.0\" encoding=\"utf-8\" ?><configuration><log4net><root><level value=\"OFF\"/><appender-ref ref=\"A1\"/></root></log4net></configuration>"));
+                    //                        "<?xml version=\"1.0\" encoding=\"utf-8\" ?><configuration><log4net><root><level value=\"OFF\"/><appender-ref ref=\"A1\"/></root></log4net></configuration>"));
                     //"<?xml version=\"1.0\" encoding=\"utf-8\" ?><configuration><log4net><root><level value=\"OFF\"/></root></log4net></configuration>")));
-//                    "<configuration><log4net><root><level value=\"OFF\"/></root></log4net></configuration>"));
-//                    "<configuration><log4net><root></root></log4net></configuration>")));
-//                    "<configuration><log4net><root/></log4net></configuration>"));
+                    //                    "<configuration><log4net><root><level value=\"OFF\"/></root></log4net></configuration>"));
+                    //                    "<configuration><log4net><root></root></log4net></configuration>")));
+                    //                    "<configuration><log4net><root/></log4net></configuration>"));
                     "<log4net><root/></log4net>"));
 
         public static bool AssertThisDelegateCausesArgumentException(TestDelegate d)
@@ -74,7 +74,7 @@ namespace OpenSim.Tests.Common
             {
                 d();
             }
-            catch(ArgumentException)
+            catch (ArgumentException)
             {
                 return true;
             }

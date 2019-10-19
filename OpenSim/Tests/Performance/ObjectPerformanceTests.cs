@@ -25,15 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Diagnostics;
-using System.Reflection;
-using log4net;
 using NUnit.Framework;
 using OpenMetaverse;
-using OpenSim.Framework;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Tests.Common;
+using System;
 
 namespace OpenSim.Tests.Performance
 {
@@ -55,20 +51,20 @@ namespace OpenSim.Tests.Performance
             GC.WaitForPendingFinalizers();
         }
 
-//        [Test]
-//        public void Test0000Clean()
-//        {
-//            TestHelpers.InMethod();
-////            log4net.Config.XmlConfigurator.Configure();
-//
-//            TestAddObjects(200000);
-//        }
+        //        [Test]
+        //        public void Test0000Clean()
+        //        {
+        //            TestHelpers.InMethod();
+        ////            log4net.Config.XmlConfigurator.Configure();
+        //
+        //            TestAddObjects(200000);
+        //        }
 
         [Test]
         public void Test_0001_10K_1PrimObjects()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             TestAddObjects(1, 10000);
         }
@@ -77,7 +73,7 @@ namespace OpenSim.Tests.Performance
         public void Test_0002_100K_1PrimObjects()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             TestAddObjects(1, 100000);
         }
@@ -86,7 +82,7 @@ namespace OpenSim.Tests.Performance
         public void Test_0003_200K_1PrimObjects()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             TestAddObjects(1, 200000);
         }
@@ -95,7 +91,7 @@ namespace OpenSim.Tests.Performance
         public void Test_0011_100_100PrimObjects()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             TestAddObjects(100, 100);
         }
@@ -104,7 +100,7 @@ namespace OpenSim.Tests.Performance
         public void Test_0012_1K_100PrimObjects()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             TestAddObjects(100, 1000);
         }
@@ -113,7 +109,7 @@ namespace OpenSim.Tests.Performance
         public void Test_0013_2K_100PrimObjects()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             TestAddObjects(100, 2000);
         }
@@ -127,8 +123,8 @@ namespace OpenSim.Tests.Performance
             // nulled out, the garbage collect can be delayed.
             TestScene scene = new SceneHelpers().SetupScene();
 
-//            Process process = Process.GetCurrentProcess();
-//            long startProcessMemory = process.PrivateMemorySize64;
+            //            Process process = Process.GetCurrentProcess();
+            //            long startProcessMemory = process.PrivateMemorySize64;
             long startGcMemory = GC.GetTotalMemory(true);
             DateTime start = DateTime.Now;
 
@@ -139,7 +135,7 @@ namespace OpenSim.Tests.Performance
             }
 
             TimeSpan elapsed = DateTime.Now - start;
-//            long processMemoryAlloc = process.PrivateMemorySize64 - startProcessMemory;
+            //            long processMemoryAlloc = process.PrivateMemorySize64 - startProcessMemory;
             long endGcMemory = GC.GetTotalMemory(false);
 
             for (int i = 1; i <= objectsToAdd; i++)
@@ -168,7 +164,7 @@ namespace OpenSim.Tests.Performance
                 primsInEachObject);
 
             scene.Close();
-//            scene = null;
+            //            scene = null;
         }
     }
 }

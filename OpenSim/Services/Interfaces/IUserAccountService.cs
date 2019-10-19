@@ -25,11 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
+using OpenSim.Framework;
 using System;
 using System.Collections.Generic;
-using OpenMetaverse;
-
-using OpenSim.Framework;
 
 namespace OpenSim.Services.Interfaces
 {
@@ -135,7 +134,7 @@ namespace OpenSim.Services.Interfaces
                 if (str != string.Empty)
                 {
                     string[] parts = str.Split(new char[] { ';' });
-//                    Dictionary<string, object> dic = new Dictionary<string, object>();
+                    //                    Dictionary<string, object> dic = new Dictionary<string, object>();
                     foreach (string s in parts)
                     {
                         string[] parts2 = s.Split(new char[] { '*' });

@@ -25,21 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text.RegularExpressions;
-using log4net;
-using log4net.Config;
 using NUnit.Framework;
 using OpenMetaverse;
-using OpenSim.Capabilities.Handlers;
 using OpenSim.Framework;
-using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
 using OpenSim.Tests.Common;
+using System;
+using System.Text.RegularExpressions;
 
 namespace OpenSim.Capabilities.Handlers.FetchInventory.Tests
 {
@@ -218,11 +210,11 @@ namespace OpenSim.Capabilities.Handlers.FetchInventory.Tests
             // Make sure the folder link is included
             Assert.That(llsdresponse.Contains("Link to Objects folder"), Is.True, "Link to Objects folder is missing");
 
-/* contents of link folder are not supposed to be listed
-            // Make sure the objects inside the Objects folder are included
-            // Note: I'm not entirely sure this is needed, but that's what I found in the implementation
-            Assert.That(llsdresponse.Contains("Some Object"), Is.True, "Some Object item (contents of the source) is missing");
-*/
+            /* contents of link folder are not supposed to be listed
+                        // Make sure the objects inside the Objects folder are included
+                        // Note: I'm not entirely sure this is needed, but that's what I found in the implementation
+                        Assert.That(llsdresponse.Contains("Some Object"), Is.True, "Some Object item (contents of the source) is missing");
+            */
             // Make sure that the source item is before the link item
             pos1 = llsdresponse.IndexOf("Some Object");
             pos2 = llsdresponse.IndexOf("Link to Objects folder");

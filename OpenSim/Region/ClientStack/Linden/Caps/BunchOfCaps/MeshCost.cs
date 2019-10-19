@@ -26,26 +26,17 @@
  */
 
 
-using System;
-using System.IO;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-
+using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-
-using OpenSim.Framework;
-using OpenSim.Region.Framework;
-using OpenSim.Region.Framework.Scenes;
 using OpenSim.Framework.Capabilities;
-
+using OpenSim.Region.Framework.Scenes;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
-
 using OSDArray = OpenMetaverse.StructuredData.OSDArray;
 using OSDMap = OpenMetaverse.StructuredData.OSDMap;
-
-using Nini.Config;
 
 namespace OpenSim.Region.ClientStack.Linden
 {
@@ -116,7 +107,7 @@ namespace OpenSim.Region.ClientStack.Linden
             ModelMeshCostFactor = EconomyConfig.GetFloat("MeshModelUploadCostFactor", ModelMeshCostFactor);
             ModelTextureCostFactor = EconomyConfig.GetFloat("MeshModelUploadTextureCostFactor", ModelTextureCostFactor);
             ModelMinCostFactor = EconomyConfig.GetFloat("MeshModelMinCostFactor", ModelMinCostFactor);
-                    // next 2 are normalized so final cost is afected by modelUploadFactor above and normal cost
+            // next 2 are normalized so final cost is afected by modelUploadFactor above and normal cost
             primCreationCost = EconomyConfig.GetFloat("ModelPrimCreationCost", primCreationCost);
             bytecost = EconomyConfig.GetFloat("ModelMeshByteCost", bytecost);
         }
@@ -306,7 +297,7 @@ namespace OpenSim.Region.ClientStack.Linden
                     return false;
                 }
                 else
-                    warning += skipedSmall.ToString() + " of the requested " +numberInstances.ToString() +
+                    warning += skipedSmall.ToString() + " of the requested " + numberInstances.ToString() +
                         " model prims will not upload because they are smaller than " + PrimScaleMin.ToString() +
                         "m minimum allowed size. Please check scalling ";
             }
@@ -340,7 +331,7 @@ namespace OpenSim.Region.ClientStack.Linden
         }
 
         // single mesh asset cost
-        private bool MeshCost(byte[] data, ameshCostParam cost,out bool skeleton, out bool avatarPhys, out string error)
+        private bool MeshCost(byte[] data, ameshCostParam cost, out bool skeleton, out bool avatarPhys, out string error)
         {
             cost.highLODSize = 0;
             cost.highLODsides = 0;
@@ -407,7 +398,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 if (tmpmap.ContainsKey("offset") && tmpmap.ContainsKey("size"))
                 {
                     int sksize = tmpmap["size"].AsInteger();
-                    if(sksize > 0)
+                    if (sksize > 0)
                         skeleton = true;
                 }
             }
@@ -506,13 +497,13 @@ namespace OpenSim.Region.ClientStack.Linden
             submesh_offset = -1;
 
             tmpmap = null;
-            if(map.ContainsKey("physics_mesh"))
+            if (map.ContainsKey("physics_mesh"))
                 tmpmap = (OSDMap)map["physics_mesh"];
             else if (map.ContainsKey("physics_shape")) // old naming
                 tmpmap = (OSDMap)map["physics_shape"];
 
             int phys_nsides = 0;
-            if(tmpmap != null)
+            if (tmpmap != null)
             {
                 if (tmpmap.ContainsKey("offset"))
                     submesh_offset = tmpmap["offset"].AsInteger() + start;
@@ -665,20 +656,20 @@ namespace OpenSim.Region.ClientStack.Linden
             else
                 return false;
 
-/* upload is done with convex shape type
-            if (cmap.ContainsKey("HullList"))
-            {
-                dummy = cmap["HullList"].AsBinary();
-                nhulls += dummy.Length;
-            }
+            /* upload is done with convex shape type
+                        if (cmap.ContainsKey("HullList"))
+                        {
+                            dummy = cmap["HullList"].AsBinary();
+                            nhulls += dummy.Length;
+                        }
 
 
-            if (cmap.ContainsKey("Positions"))
-            {
-                dummy = cmap["Positions"].AsBinary();
-                nvertices = dummy.Length / bytesPerCoord;
-            }
- */
+                        if (cmap.ContainsKey("Positions"))
+                        {
+                            dummy = cmap["Positions"].AsBinary();
+                            nvertices = dummy.Length / bytesPerCoord;
+                        }
+             */
 
             return true;
         }

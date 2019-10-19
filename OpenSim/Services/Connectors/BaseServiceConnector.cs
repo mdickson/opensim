@@ -1,8 +1,6 @@
-﻿using System;
+﻿using Nini.Config;
 using OpenSim.Framework;
 using OpenSim.Framework.ServiceAuth;
-
-using Nini.Config;
 
 namespace OpenSim.Services.Connectors
 {

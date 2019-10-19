@@ -25,23 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using Nini.Config;
 using log4net;
-using System;
-using System.Reflection;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml;
-using System.Xml.Serialization;
-using System.Collections.Generic;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Framework.ServiceAuth;
 using OpenSim.Server.Base;
 using OpenSim.Services.Interfaces;
-using OpenSim.Framework;
-using OpenSim.Framework.ServiceAuth;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenMetaverse;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Xml;
 
 namespace OpenSim.Server.Handlers.AgentPreferences
 {
@@ -129,7 +124,7 @@ namespace OpenSim.Server.Handlers.AgentPreferences
 
             AgentPrefs data = new AgentPrefs(userID);
             data.AccessPrefs = request["AccessPrefs"].ToString();
-            data.HoverHeight = double.Parse(request["HoverHeight"].ToString());
+            data.HoverHeight = float.Parse(request["HoverHeight"].ToString());
             data.Language = request["Language"].ToString();
             data.LanguageIsPublic = bool.Parse(request["LanguageIsPublic"].ToString());
             data.PermEveryone = int.Parse(request["PermEveryone"].ToString());

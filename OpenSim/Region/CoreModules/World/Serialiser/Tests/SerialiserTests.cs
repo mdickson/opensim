@@ -25,18 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Xml;
-using log4net.Config;
 using NUnit.Framework;
 using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.Framework.Scenes.Serialization;
 using OpenSim.Tests.Common;
-using OpenMetaverse.StructuredData;
+using System.Collections.Generic;
+using System.IO;
+using System.Xml;
 
 namespace OpenSim.Region.CoreModules.World.Serialiser.Tests
 {
@@ -661,7 +659,7 @@ namespace OpenSim.Region.CoreModules.World.Serialiser.Tests
         public void TestDeserializeBadFloatsXml()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             SceneObjectGroup so = SceneObjectSerializer.FromOriginalXmlFormat(ObjectWithBadFloatsXml);
             SceneObjectPart rootPart = so.RootPart;
@@ -693,9 +691,9 @@ namespace OpenSim.Region.CoreModules.World.Serialiser.Tests
             UUID rpUuid = UUID.Parse("00000000-0000-0000-0000-000000000964");
             UUID rpCreatorId = UUID.Parse("00000000-0000-0000-0000-000000000915");
             PrimitiveBaseShape shape = PrimitiveBaseShape.CreateSphere();
-//            Vector3 groupPosition = new Vector3(10, 20, 30);
-//            Quaternion rotationOffset = new Quaternion(20, 30, 40, 50);
-//            Vector3 offsetPosition = new Vector3(5, 10, 15);
+            //            Vector3 groupPosition = new Vector3(10, 20, 30);
+            //            Quaternion rotationOffset = new Quaternion(20, 30, 40, 50);
+            //            Vector3 offsetPosition = new Vector3(5, 10, 15);
 
             SceneObjectPart rp = new SceneObjectPart();
             rp.UUID = rpUuid;
@@ -802,9 +800,9 @@ namespace OpenSim.Region.CoreModules.World.Serialiser.Tests
             UUID rpUuid = UUID.Parse("00000000-0000-0000-0000-000000000064");
             UUID rpCreatorId = UUID.Parse("00000000-0000-0000-0000-000000000015");
             PrimitiveBaseShape shape = PrimitiveBaseShape.CreateSphere();
-//            Vector3 groupPosition = new Vector3(10, 20, 30);
-//            Quaternion rotationOffset = new Quaternion(20, 30, 40, 50);
-//            Vector3 offsetPosition = new Vector3(5, 10, 15);
+            //            Vector3 groupPosition = new Vector3(10, 20, 30);
+            //            Quaternion rotationOffset = new Quaternion(20, 30, 40, 50);
+            //            Vector3 offsetPosition = new Vector3(5, 10, 15);
 
             SceneObjectPart rp = new SceneObjectPart();
             rp.UUID = rpUuid;

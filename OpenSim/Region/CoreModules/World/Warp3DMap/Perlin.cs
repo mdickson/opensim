@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using OpenMetaverse;
+using System;
 
 namespace OpenSim.Region.CoreModules.World.Warp3DMap
 {
@@ -235,7 +235,7 @@ namespace OpenSim.Region.CoreModules.World.Warp3DMap
             float a = v[i, 0];
             float b = v[i, 1];
 
-            s = (float)Math.Sqrt(a * a +  b * b);
+            s = (float)Math.Sqrt(a * a + b * b);
             s = 1.0f / s;
             v[i, 0] = a * s;
             v[i, 1] = b * s;

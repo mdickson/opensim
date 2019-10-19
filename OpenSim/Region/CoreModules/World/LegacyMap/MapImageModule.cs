@@ -25,10 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -37,6 +33,10 @@ using OpenMetaverse.Imaging;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.World.LegacyMap
 {
@@ -55,7 +55,7 @@ namespace OpenSim.Region.CoreModules.World.LegacyMap
     public struct DrawStruct
     {
         public DrawRoutine dr;
-//        public Rectangle rect;
+        //        public Rectangle rect;
         public SolidBrush brush;
         public face[] trns;
     }
@@ -213,46 +213,46 @@ namespace OpenSim.Region.CoreModules.World.LegacyMap
 
         #endregion
 
-// TODO: unused:
-//         private void ShadeBuildings(Bitmap map)
-//         {
-//             lock (map)
-//             {
-//                 lock (m_scene.Entities)
-//                 {
-//                     foreach (EntityBase entity in m_scene.Entities.Values)
-//                     {
-//                         if (entity is SceneObjectGroup)
-//                         {
-//                             SceneObjectGroup sog = (SceneObjectGroup) entity;
-//
-//                             foreach (SceneObjectPart primitive in sog.Children.Values)
-//                             {
-//                                 int x = (int) (primitive.AbsolutePosition.X - (primitive.Scale.X / 2));
-//                                 int y = (int) (primitive.AbsolutePosition.Y - (primitive.Scale.Y / 2));
-//                                 int w = (int) primitive.Scale.X;
-//                                 int h = (int) primitive.Scale.Y;
-//
-//                                 int dx;
-//                                 for (dx = x; dx < x + w; dx++)
-//                                 {
-//                                     int dy;
-//                                     for (dy = y; dy < y + h; dy++)
-//                                     {
-//                                         if (x < 0 || y < 0)
-//                                             continue;
-//                                         if (x >= map.Width || y >= map.Height)
-//                                             continue;
-//
-//                                         map.SetPixel(dx, dy, Color.DarkGray);
-//                                     }
-//                                 }
-//                             }
-//                         }
-//                     }
-//                 }
-//             }
-//         }
+        // TODO: unused:
+        //         private void ShadeBuildings(Bitmap map)
+        //         {
+        //             lock (map)
+        //             {
+        //                 lock (m_scene.Entities)
+        //                 {
+        //                     foreach (EntityBase entity in m_scene.Entities.Values)
+        //                     {
+        //                         if (entity is SceneObjectGroup)
+        //                         {
+        //                             SceneObjectGroup sog = (SceneObjectGroup) entity;
+        //
+        //                             foreach (SceneObjectPart primitive in sog.Children.Values)
+        //                             {
+        //                                 int x = (int) (primitive.AbsolutePosition.X - (primitive.Scale.X / 2));
+        //                                 int y = (int) (primitive.AbsolutePosition.Y - (primitive.Scale.Y / 2));
+        //                                 int w = (int) primitive.Scale.X;
+        //                                 int h = (int) primitive.Scale.Y;
+        //
+        //                                 int dx;
+        //                                 for (dx = x; dx < x + w; dx++)
+        //                                 {
+        //                                     int dy;
+        //                                     for (dy = y; dy < y + h; dy++)
+        //                                     {
+        //                                         if (x < 0 || y < 0)
+        //                                             continue;
+        //                                         if (x >= map.Width || y >= map.Height)
+        //                                             continue;
+        //
+        //                                         map.SetPixel(dx, dy, Color.DarkGray);
+        //                                     }
+        //                                 }
+        //                             }
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
 
         private Bitmap FetchTexture(UUID id)
         {
@@ -612,7 +612,7 @@ namespace OpenSim.Region.CoreModules.World.LegacyMap
                                 DrawStruct rectDrawStruct = z_sort[sortedlocalIds[s]];
                                 for (int r = 0; r < rectDrawStruct.trns.Length; r++)
                                 {
-                                    g.FillPolygon(rectDrawStruct.brush,rectDrawStruct.trns[r].pts);
+                                    g.FillPolygon(rectDrawStruct.brush, rectDrawStruct.trns[r].pts);
                                 }
                                 //g.FillRectangle(rectDrawStruct.brush , rectDrawStruct.rect);
                             }

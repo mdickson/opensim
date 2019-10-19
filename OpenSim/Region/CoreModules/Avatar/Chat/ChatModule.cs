@@ -25,17 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
-using Nini.Config;
 using Mono.Addins;
+using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.Avatar.Chat
 {
@@ -70,10 +70,10 @@ namespace OpenSim.Region.CoreModules.Avatar.Chat
                     return;
                 }
 
-            m_whisperdistance = m_config.GetInt("whisper_distance", m_whisperdistance);
-            m_saydistance = m_config.GetInt("say_distance", m_saydistance);
-            m_shoutdistance = m_config.GetInt("shout_distance", m_shoutdistance);
-            m_adminPrefix = m_config.GetString("admin_prefix", "");
+                m_whisperdistance = m_config.GetInt("whisper_distance", m_whisperdistance);
+                m_saydistance = m_config.GetInt("say_distance", m_saydistance);
+                m_shoutdistance = m_config.GetInt("shout_distance", m_shoutdistance);
+                m_adminPrefix = m_config.GetString("admin_prefix", "");
             }
         }
 
@@ -215,7 +215,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Chat
 
             if (c.Channel == DEBUG_CHANNEL) c.Type = ChatTypeEnum.DebugChannel;
 
-            if(!m_scenes.Contains(scene))
+            if (!m_scenes.Contains(scene))
             {
                 m_log.WarnFormat("[CHAT]: message from unkown scene {0} ignored",
                                      scene.RegionInfo.RegionName);
@@ -263,9 +263,9 @@ namespace OpenSim.Region.CoreModules.Avatar.Chat
             if (message.Length >= 1000) // libomv limit
                 message = message.Substring(0, 1000);
 
-//            m_log.DebugFormat(
-//                "[CHAT]: DCTA: fromID {0} fromName {1}, region{2}, cType {3}, sType {4}",
-//                fromID, fromName, scene.RegionInfo.RegionName, c.Type, sourceType);
+            //            m_log.DebugFormat(
+            //                "[CHAT]: DCTA: fromID {0} fromName {1}, region{2}, cType {3}, sType {4}",
+            //                fromID, fromName, scene.RegionInfo.RegionName, c.Type, sourceType);
 
             HashSet<UUID> receiverIDs = new HashSet<UUID>();
 
@@ -284,23 +284,23 @@ namespace OpenSim.Region.CoreModules.Avatar.Chat
             }
 
             scene.ForEachScenePresence(
-                delegate(ScenePresence presence)
+                delegate (ScenePresence presence)
                 {
                     if (destination != UUID.Zero && presence.UUID != destination)
                         return;
 
-                    if(presence.IsChildAgent)
-                        {
-                            if(checkParcelHide)
-                                return;
-                            if (TrySendChatMessage(presence, fromPos, regionPos, fromID,
-                                        ownerID, fromNamePrefix + fromName, c.Type,
-                                        message, sourceType, (destination != UUID.Zero)))
-                                receiverIDs.Add(presence.UUID);
+                    if (presence.IsChildAgent)
+                    {
+                        if (checkParcelHide)
                             return;
-                        }
+                        if (TrySendChatMessage(presence, fromPos, regionPos, fromID,
+                                    ownerID, fromNamePrefix + fromName, c.Type,
+                                    message, sourceType, (destination != UUID.Zero)))
+                            receiverIDs.Add(presence.UUID);
+                        return;
+                    }
 
-                    ILandObject Presencecheck = scene.LandChannel.GetLandObject(presence.AbsolutePosition.X,            presence.AbsolutePosition.Y);
+                    ILandObject Presencecheck = scene.LandChannel.GetLandObject(presence.AbsolutePosition.X, presence.AbsolutePosition.Y);
                     if (Presencecheck != null)
                     {
                         if (checkParcelHide)
@@ -366,7 +366,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Chat
             {
                 ((Scene)c.Scene).ForEachRootClient
                 (
-                    delegate(IClientAPI client)
+                    delegate (IClientAPI client)
                     {
                         // don't forward SayOwner chat from objects to
                         // non-owner agents
@@ -382,7 +382,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Chat
                 );
                 (c.Scene as Scene).EventManager.TriggerOnChatToClients(
                     fromID, receiverIDs, c.Message, cType, CenterOfRegion, fromName, sourceType, ChatAudibleLevel.Fully);
-             }
+            }
         }
 
         /// <summary>
@@ -428,7 +428,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Chat
 
             // TODO: should change so the message is sent through the avatar rather than direct to the ClientView
             presence.ControllingClient.SendChatMessage(
-                message, (byte) type, fromPos, fromName,
+                message, (byte)type, fromPos, fromName,
                 fromAgentID, ownerID, (byte)src, (byte)ChatAudibleLevel.Fully);
 
             return true;

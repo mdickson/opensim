@@ -25,24 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Region.Framework;
-using OpenSim.Region.Framework.Interfaces;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Data.Null
 {
     public class NullEstateStore : IEstateDataStore
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-//        private string m_connectionString;
+        //        private string m_connectionString;
 
-//        private Dictionary<uint, EstateSettings> m_knownEstates = new Dictionary<uint, EstateSettings>();
+        //        private Dictionary<uint, EstateSettings> m_knownEstates = new Dictionary<uint, EstateSettings>();
         private EstateSettings m_estate = null;
 
         private EstateSettings GetEstate()
@@ -74,7 +70,7 @@ namespace OpenSim.Data.Null
 
         public void Initialise(string connectionString)
         {
-//            m_connectionString = connectionString;
+            //            m_connectionString = connectionString;
         }
 
         private string[] FieldList

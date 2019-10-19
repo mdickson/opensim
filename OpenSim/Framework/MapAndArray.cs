@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using System.Collections.Generic;
 
 namespace OpenSim.Framework
@@ -173,7 +172,7 @@ namespace OpenSim.Framework
             {
                 if (m_array == null)
                 {
-                    if(m_dict.Count == 0)
+                    if (m_dict.Count == 0)
                         return new TValue[0];
                     m_array = new TValue[m_dict.Count];
                     m_dict.Values.CopyTo(m_array, 0);

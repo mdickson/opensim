@@ -25,16 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenSim.Data;
+using OpenSim.Services.Base;
 using System;
 using System.Reflection;
-using Nini.Config;
-using log4net;
-using OpenSim.Services.Base;
-using OpenSim.Data;
 
 namespace OpenSim.Services.ProfilesService
 {
-    public class UserProfilesServiceBase: ServiceBase
+    public class UserProfilesServiceBase : ServiceBase
     {
         static readonly ILog m_log =
             LogManager.GetLogger(
@@ -47,10 +47,10 @@ namespace OpenSim.Services.ProfilesService
             get; private set;
         }
 
-        public UserProfilesServiceBase(IConfigSource config, string configName):
+        public UserProfilesServiceBase(IConfigSource config, string configName) :
             base(config)
         {
-            if(string.IsNullOrEmpty(configName))
+            if (string.IsNullOrEmpty(configName))
             {
                 m_log.WarnFormat("[PROFILES SERVICE]: Configuration section not given!");
                 return;

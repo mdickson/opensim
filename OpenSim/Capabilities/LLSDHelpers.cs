@@ -25,31 +25,31 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using System;
 using System.Collections;
 using System.IO;
 using System.Reflection;
 using System.Xml;
-using OpenMetaverse;
 
 namespace OpenSim.Framework.Capabilities
 {
     public class LLSDHelpers
     {
-//        private static readonly log4net.ILog m_log
-//            = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly log4net.ILog m_log
+        //            = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public static string SerialiseLLSDReply(object obj)
         {
-            using(StringWriter sw = new StringWriter())
-            using(XmlTextWriter writer = new XmlTextWriter(sw))
+            using (StringWriter sw = new StringWriter())
+            using (XmlTextWriter writer = new XmlTextWriter(sw))
             {
                 writer.Formatting = Formatting.None;
                 writer.WriteStartElement(String.Empty, "llsd", String.Empty);
                 SerializeOSDType(writer, obj);
                 writer.WriteEndElement();
                 writer.Flush();
-            //m_log.DebugFormat("[LLSD Helpers]: Generated serialized LLSD reply {0}", sw.ToString());
+                //m_log.DebugFormat("[LLSD Helpers]: Generated serialized LLSD reply {0}", sw.ToString());
 
                 return sw.ToString();
             }
@@ -57,13 +57,13 @@ namespace OpenSim.Framework.Capabilities
 
         public static string SerialiseLLSDReplyNoHeader(object obj)
         {
-            using(StringWriter sw = new StringWriter())
-            using(XmlTextWriter writer = new XmlTextWriter(sw))
+            using (StringWriter sw = new StringWriter())
+            using (XmlTextWriter writer = new XmlTextWriter(sw))
             {
                 writer.Formatting = Formatting.None;
                 SerializeOSDType(writer, obj);
                 writer.Flush();
-            //m_log.DebugFormat("[LLSD Helpers]: Generated serialized LLSD reply {0}", sw.ToString());
+                //m_log.DebugFormat("[LLSD Helpers]: Generated serialized LLSD reply {0}", sw.ToString());
 
                 return sw.ToString();
             }
@@ -72,7 +72,7 @@ namespace OpenSim.Framework.Capabilities
         private static void SerializeOSDType(XmlTextWriter writer, object obj)
         {
             Type myType = obj.GetType();
-            LLSDType[] llsdattributes = (LLSDType[]) myType.GetCustomAttributes(typeof (LLSDType), false);
+            LLSDType[] llsdattributes = (LLSDType[])myType.GetCustomAttributes(typeof(LLSDType), false);
             if (llsdattributes.Length > 0)
             {
                 switch (llsdattributes[0].ObjectType)
@@ -86,7 +86,7 @@ namespace OpenSim.Framework.Capabilities
                             {
                                 object fieldValue = fields[i].GetValue(obj);
                                 LLSDType[] fieldAttributes =
-                                    (LLSDType[]) fieldValue.GetType().GetCustomAttributes(typeof (LLSDType), false);
+                                    (LLSDType[])fieldValue.GetType().GetCustomAttributes(typeof(LLSDType), false);
                                 if (fieldAttributes.Length > 0)
                                 {
                                     writer.WriteStartElement(String.Empty, "key", String.Empty);
@@ -120,7 +120,7 @@ namespace OpenSim.Framework.Capabilities
                     case "ARRAY":
                         // OSDArray arrayObject = obj as OSDArray;
                         // ArrayList a = arrayObject.Array;
-                        ArrayList a = (ArrayList) obj.GetType().GetField("Array").GetValue(obj);
+                        ArrayList a = (ArrayList)obj.GetType().GetField("Array").GetValue(obj);
                         if (a != null)
                         {
                             writer.WriteStartElement(String.Empty, "array", String.Empty);
@@ -144,7 +144,7 @@ namespace OpenSim.Framework.Capabilities
         public static object DeserialiseOSDMap(Hashtable llsd, object obj)
         {
             Type myType = obj.GetType();
-            LLSDType[] llsdattributes = (LLSDType[]) myType.GetCustomAttributes(typeof (LLSDType), false);
+            LLSDType[] llsdattributes = (LLSDType[])myType.GetCustomAttributes(typeof(LLSDType), false);
             if (llsdattributes.Length > 0)
             {
                 switch (llsdattributes[0].ObjectType)
@@ -154,7 +154,7 @@ namespace OpenSim.Framework.Capabilities
                         while (enumerator.MoveNext())
                         {
                             string keyName = (string)enumerator.Key;
-                            keyName = keyName.Replace("-","_");
+                            keyName = keyName.Replace("-", "_");
                             FieldInfo field = myType.GetField(keyName);
                             if (field != null)
                             {
@@ -162,7 +162,7 @@ namespace OpenSim.Framework.Capabilities
                                 if (enumerator.Value is Hashtable)
                                 {
                                     object fieldValue = field.GetValue(obj);
-                                    DeserialiseOSDMap((Hashtable) enumerator.Value, fieldValue);
+                                    DeserialiseOSDMap((Hashtable)enumerator.Value, fieldValue);
                                     //  DeserialiseOSDMap((OpenMetaverse.StructuredData.OSDMap) enumerator.Value, fieldValue);
                                 }
                                 else if (enumerator.Value is ArrayList)
@@ -173,17 +173,17 @@ namespace OpenSim.Framework.Capabilities
                                     // the LLSD map/array types in the array need to be deserialised
                                     // but first we need to know the right class to deserialise them into.
                                 }
-                                else if(enumerator.Value is Boolean && field.FieldType == typeof(int) )
+                                else if (enumerator.Value is Boolean && field.FieldType == typeof(int))
                                 {
                                     int i = (bool)enumerator.Value ? 1 : 0;
                                     field.SetValue(obj, i);
                                 }
-                                else if(field.FieldType == typeof(bool) &&  enumerator.Value is int)
+                                else if (field.FieldType == typeof(bool) && enumerator.Value is int)
                                 {
                                     bool b = (int)enumerator.Value != 0;
                                     field.SetValue(obj, b);
                                 }
-                                else if(field.FieldType == typeof(UUID) &&  enumerator.Value is string)
+                                else if (field.FieldType == typeof(UUID) && enumerator.Value is string)
                                 {
                                     UUID u;
                                     UUID.TryParse((string)enumerator.Value, out u);

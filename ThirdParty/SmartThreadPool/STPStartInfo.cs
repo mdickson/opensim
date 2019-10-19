@@ -109,11 +109,12 @@ namespace Amib.Threading
         /// <summary>
         /// Get/Set the thread pool name. Threads will get names depending on this.
         /// </summary>
-        public virtual string ThreadPoolName {
+        public virtual string ThreadPoolName
+        {
             get { return _threadPoolName; }
             set
             {
-                ThrowIfReadOnly ();
+                ThrowIfReadOnly();
                 _threadPoolName = value;
             }
         }
@@ -152,14 +153,14 @@ namespace Amib.Threading
         /// Get/Set backgroundness of thread in thread pool.
         /// </summary>
         public virtual bool AreThreadsBackground
-         {
-             get { return _areThreadsBackground; }
-             set
-             {
-                 ThrowIfReadOnly ();
-                 _areThreadsBackground = value;
-             }
-         }
+        {
+            get { return _areThreadsBackground; }
+            set
+            {
+                ThrowIfReadOnly();
+                _areThreadsBackground = value;
+            }
+        }
 
         /// <summary>
         /// Get a readonly version of this STPStartInfo.

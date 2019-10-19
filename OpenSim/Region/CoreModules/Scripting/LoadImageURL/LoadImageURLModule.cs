@@ -25,20 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Drawing;
-using System.IO;
-using System.Net;
+using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.Imaging;
 using OpenSim.Framework;
-using OpenSim.Region.CoreModules.Scripting.DynamicTexture;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using log4net;
+using System;
+using System.Drawing;
+using System.IO;
+using System.Net;
 using System.Reflection;
-using Mono.Addins;
 
 namespace OpenSim.Region.CoreModules.Scripting.LoadImageURL
 {
@@ -72,11 +71,11 @@ namespace OpenSim.Region.CoreModules.Scripting.LoadImageURL
             return true;
         }
 
-//        public bool AlwaysIdenticalConversion(string bodyData, string extraParams)
-//        {
-//            // We don't support conversion of body data.
-//            return false;
-//        }
+        //        public bool AlwaysIdenticalConversion(string bodyData, string extraParams)
+        //        {
+        //            // We don't support conversion of body data.
+        //            return false;
+        //        }
 
         public IDynamicTexture ConvertUrl(string url, string extraParams)
         {
@@ -185,7 +184,7 @@ namespace OpenSim.Region.CoreModules.Scripting.LoadImageURL
             request.BeginGetResponse(new AsyncCallback(HttpRequestReturn), state);
 
             TimeSpan t = (DateTime.UtcNow - new DateTime(1970, 1, 1));
-            state.TimeOfRequest = (int) t.TotalSeconds;
+            state.TimeOfRequest = (int)t.TotalSeconds;
 
             return true;
         }
@@ -198,8 +197,8 @@ namespace OpenSim.Region.CoreModules.Scripting.LoadImageURL
                 return;
             }
 
-            RequestState state = (RequestState) result.AsyncState;
-            WebRequest request = (WebRequest) state.Request;
+            RequestState state = (RequestState)result.AsyncState;
+            WebRequest request = (WebRequest)state.Request;
             Stream stream = null;
             byte[] imageJ2000 = new byte[0];
             Size newSize = new Size(0, 0);
@@ -215,30 +214,30 @@ namespace OpenSim.Region.CoreModules.Scripting.LoadImageURL
                     {
                         try
                         {
-                            using(Bitmap image = new Bitmap(stream))
+                            using (Bitmap image = new Bitmap(stream))
                             {
                                 // TODO: make this a bit less hard coded
-                                if((image.Height < 64) && (image.Width < 64))
+                                if ((image.Height < 64) && (image.Width < 64))
                                 {
                                     newSize.Width = 32;
                                     newSize.Height = 32;
                                 }
-                                else if((image.Height < 128) && (image.Width < 128))
+                                else if ((image.Height < 128) && (image.Width < 128))
                                 {
                                     newSize.Width = 64;
                                     newSize.Height = 64;
                                 }
-                                else if((image.Height < 256) && (image.Width < 256))
+                                else if ((image.Height < 256) && (image.Width < 256))
                                 {
                                     newSize.Width = 128;
                                     newSize.Height = 128;
                                 }
-                                else if((image.Height < 512 && image.Width < 512))
+                                else if ((image.Height < 512 && image.Width < 512))
                                 {
                                     newSize.Width = 256;
                                     newSize.Height = 256;
                                 }
-                                else if((image.Height < 1024 && image.Width < 1024))
+                                else if ((image.Height < 1024 && image.Width < 1024))
                                 {
                                     newSize.Width = 512;
                                     newSize.Height = 512;
@@ -249,10 +248,10 @@ namespace OpenSim.Region.CoreModules.Scripting.LoadImageURL
                                     newSize.Height = 1024;
                                 }
 
-                                if(newSize.Width != image.Width || newSize.Height != image.Height)
+                                if (newSize.Width != image.Width || newSize.Height != image.Height)
                                 {
-                                    using(Bitmap resize = new Bitmap(image, newSize))
-                                     imageJ2000 = OpenJPEG.EncodeFromImage(resize, false);
+                                    using (Bitmap resize = new Bitmap(image, newSize))
+                                        imageJ2000 = OpenJPEG.EncodeFromImage(resize, false);
                                 }
                                 else
                                     imageJ2000 = OpenJPEG.EncodeFromImage(image, false);

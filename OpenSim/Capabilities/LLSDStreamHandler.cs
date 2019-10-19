@@ -25,11 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenSim.Framework.Servers.HttpServer;
 using System.Collections;
 using System.IO;
-using System.Text;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Servers.HttpServer;
 
 namespace OpenSim.Framework.Capabilities
 {
@@ -39,7 +37,7 @@ namespace OpenSim.Framework.Capabilities
         private LLSDMethod<TRequest, TResponse> m_method;
 
         public LLSDStreamhandler(string httpMethod, string path, LLSDMethod<TRequest, TResponse> method)
-            : this(httpMethod, path, method, null, null) {}
+            : this(httpMethod, path, method, null, null) { }
 
         public LLSDStreamhandler(
             string httpMethod, string path, LLSDMethod<TRequest, TResponse> method, string name, string description)
@@ -60,8 +58,8 @@ namespace OpenSim.Framework.Capabilities
             // OpenMetaverse.StructuredData.OSDMap hash = (OpenMetaverse.StructuredData.OSDMap)
             //    OpenMetaverse.StructuredData.LLSDParser.DeserializeXml(new XmlTextReader(request));
 
-            Hashtable hash = (Hashtable) LLSD.LLSDDeserialize(request);
-            if(hash == null)
+            Hashtable hash = (Hashtable)LLSD.LLSDDeserialize(request);
+            if (hash == null)
                 return new byte[0];
 
             TRequest llsdRequest = new TRequest();

@@ -25,15 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Reflection;
-using System.Threading;
-using log4net;
-using OpenMetaverse;
-using OpenSim.Framework;
 using Mono.Data.Sqlite;
+using OpenMetaverse;
+using System;
 
 namespace OpenSim.Data.SQLite
 {
@@ -42,10 +36,10 @@ namespace OpenSim.Data.SQLite
     /// </summary>
     public class SQLiteHGTravelData : SQLiteGenericTableHandler<HGTravelingData>, IHGTravelingData
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public SQLiteHGTravelData(string connectionString, string realm)
-            : base(connectionString, realm, "HGTravelStore") {}
+            : base(connectionString, realm, "HGTravelStore") { }
 
         public HGTravelingData Get(UUID sessionID)
         {

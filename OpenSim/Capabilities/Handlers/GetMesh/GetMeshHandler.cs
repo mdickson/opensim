@@ -25,20 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections;
-using System.Collections.Specialized;
 using System.Reflection;
-using System.IO;
-using System.Web;
-using log4net;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using OpenSim.Framework;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Services.Interfaces;
 using Caps = OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Capabilities.Handlers
@@ -84,11 +77,11 @@ namespace OpenSim.Capabilities.Handlers
                 return responsedata;
 
             UUID meshID = UUID.Zero;
-            if(!UUID.TryParse(meshStr, out meshID))
+            if (!UUID.TryParse(meshStr, out meshID))
                 return responsedata;
 
             AssetBase mesh = m_assetService.Get(meshID.ToString());
-            if(mesh == null)
+            if (mesh == null)
             {
                 responsedata["int_response_code"] = (int)System.Net.HttpStatusCode.NotFound;
                 responsedata["str_response_string"] = "Mesh not found.";
@@ -104,7 +97,7 @@ namespace OpenSim.Capabilities.Handlers
             string range = String.Empty;
 
             if (((Hashtable)request["headers"])["range"] != null)
-               range = (string)((Hashtable)request["headers"])["range"];
+                range = (string)((Hashtable)request["headers"])["range"];
             else if (((Hashtable)request["headers"])["Range"] != null)
                 range = (string)((Hashtable)request["headers"])["Range"];
 

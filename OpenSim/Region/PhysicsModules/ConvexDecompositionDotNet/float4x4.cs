@@ -26,9 +26,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace OpenSim.Region.PhysicsModules.ConvexDecompositionDotNet
 {
@@ -155,56 +152,56 @@ namespace OpenSim.Region.PhysicsModules.ConvexDecompositionDotNet
             tmp[10] = src[8] * src[13];
             tmp[11] = src[9] * src[12];
             // calculate first 8 elements (cofactors)
-            d.x.x = tmp[0]*src[5] + tmp[3]*src[6] + tmp[4]*src[7];
-            d.x.x -= tmp[1]*src[5] + tmp[2]*src[6] + tmp[5]*src[7];
-            d.x.y = tmp[1]*src[4] + tmp[6]*src[6] + tmp[9]*src[7];
-            d.x.y -= tmp[0]*src[4] + tmp[7]*src[6] + tmp[8]*src[7];
-            d.x.z = tmp[2]*src[4] + tmp[7]*src[5] + tmp[10]*src[7];
-            d.x.z -= tmp[3]*src[4] + tmp[6]*src[5] + tmp[11]*src[7];
-            d.x.w = tmp[5]*src[4] + tmp[8]*src[5] + tmp[11]*src[6];
-            d.x.w -= tmp[4]*src[4] + tmp[9]*src[5] + tmp[10]*src[6];
-            d.y.x = tmp[1]*src[1] + tmp[2]*src[2] + tmp[5]*src[3];
-            d.y.x -= tmp[0]*src[1] + tmp[3]*src[2] + tmp[4]*src[3];
-            d.y.y = tmp[0]*src[0] + tmp[7]*src[2] + tmp[8]*src[3];
-            d.y.y -= tmp[1]*src[0] + tmp[6]*src[2] + tmp[9]*src[3];
-            d.y.z = tmp[3]*src[0] + tmp[6]*src[1] + tmp[11]*src[3];
-            d.y.z -= tmp[2]*src[0] + tmp[7]*src[1] + tmp[10]*src[3];
-            d.y.w = tmp[4]*src[0] + tmp[9]*src[1] + tmp[10]*src[2];
-            d.y.w -= tmp[5]*src[0] + tmp[8]*src[1] + tmp[11]*src[2];
+            d.x.x = tmp[0] * src[5] + tmp[3] * src[6] + tmp[4] * src[7];
+            d.x.x -= tmp[1] * src[5] + tmp[2] * src[6] + tmp[5] * src[7];
+            d.x.y = tmp[1] * src[4] + tmp[6] * src[6] + tmp[9] * src[7];
+            d.x.y -= tmp[0] * src[4] + tmp[7] * src[6] + tmp[8] * src[7];
+            d.x.z = tmp[2] * src[4] + tmp[7] * src[5] + tmp[10] * src[7];
+            d.x.z -= tmp[3] * src[4] + tmp[6] * src[5] + tmp[11] * src[7];
+            d.x.w = tmp[5] * src[4] + tmp[8] * src[5] + tmp[11] * src[6];
+            d.x.w -= tmp[4] * src[4] + tmp[9] * src[5] + tmp[10] * src[6];
+            d.y.x = tmp[1] * src[1] + tmp[2] * src[2] + tmp[5] * src[3];
+            d.y.x -= tmp[0] * src[1] + tmp[3] * src[2] + tmp[4] * src[3];
+            d.y.y = tmp[0] * src[0] + tmp[7] * src[2] + tmp[8] * src[3];
+            d.y.y -= tmp[1] * src[0] + tmp[6] * src[2] + tmp[9] * src[3];
+            d.y.z = tmp[3] * src[0] + tmp[6] * src[1] + tmp[11] * src[3];
+            d.y.z -= tmp[2] * src[0] + tmp[7] * src[1] + tmp[10] * src[3];
+            d.y.w = tmp[4] * src[0] + tmp[9] * src[1] + tmp[10] * src[2];
+            d.y.w -= tmp[5] * src[0] + tmp[8] * src[1] + tmp[11] * src[2];
             // calculate pairs for second 8 elements (cofactors)
-            tmp[0] = src[2]*src[7];
-            tmp[1] = src[3]*src[6];
-            tmp[2] = src[1]*src[7];
-            tmp[3] = src[3]*src[5];
-            tmp[4] = src[1]*src[6];
-            tmp[5] = src[2]*src[5];
-            tmp[6] = src[0]*src[7];
-            tmp[7] = src[3]*src[4];
-            tmp[8] = src[0]*src[6];
-            tmp[9] = src[2]*src[4];
-            tmp[10] = src[0]*src[5];
-            tmp[11] = src[1]*src[4];
+            tmp[0] = src[2] * src[7];
+            tmp[1] = src[3] * src[6];
+            tmp[2] = src[1] * src[7];
+            tmp[3] = src[3] * src[5];
+            tmp[4] = src[1] * src[6];
+            tmp[5] = src[2] * src[5];
+            tmp[6] = src[0] * src[7];
+            tmp[7] = src[3] * src[4];
+            tmp[8] = src[0] * src[6];
+            tmp[9] = src[2] * src[4];
+            tmp[10] = src[0] * src[5];
+            tmp[11] = src[1] * src[4];
             // calculate second 8 elements (cofactors)
-            d.z.x = tmp[0]*src[13] + tmp[3]*src[14] + tmp[4]*src[15];
-            d.z.x -= tmp[1]*src[13] + tmp[2]*src[14] + tmp[5]*src[15];
-            d.z.y = tmp[1]*src[12] + tmp[6]*src[14] + tmp[9]*src[15];
-            d.z.y -= tmp[0]*src[12] + tmp[7]*src[14] + tmp[8]*src[15];
-            d.z.z = tmp[2]*src[12] + tmp[7]*src[13] + tmp[10]*src[15];
-            d.z.z -= tmp[3]*src[12] + tmp[6]*src[13] + tmp[11]*src[15];
-            d.z.w = tmp[5]*src[12] + tmp[8]*src[13] + tmp[11]*src[14];
-            d.z.w-= tmp[4]*src[12] + tmp[9]*src[13] + tmp[10]*src[14];
-            d.w.x = tmp[2]*src[10] + tmp[5]*src[11] + tmp[1]*src[9];
-            d.w.x-= tmp[4]*src[11] + tmp[0]*src[9] + tmp[3]*src[10];
-            d.w.y = tmp[8]*src[11] + tmp[0]*src[8] + tmp[7]*src[10];
-            d.w.y-= tmp[6]*src[10] + tmp[9]*src[11] + tmp[1]*src[8];
-            d.w.z = tmp[6]*src[9] + tmp[11]*src[11] + tmp[3]*src[8];
-            d.w.z-= tmp[10]*src[11] + tmp[2]*src[8] + tmp[7]*src[9];
-            d.w.w = tmp[10]*src[10] + tmp[4]*src[8] + tmp[9]*src[9];
-            d.w.w-= tmp[8]*src[9] + tmp[11]*src[10] + tmp[5]*src[8];
+            d.z.x = tmp[0] * src[13] + tmp[3] * src[14] + tmp[4] * src[15];
+            d.z.x -= tmp[1] * src[13] + tmp[2] * src[14] + tmp[5] * src[15];
+            d.z.y = tmp[1] * src[12] + tmp[6] * src[14] + tmp[9] * src[15];
+            d.z.y -= tmp[0] * src[12] + tmp[7] * src[14] + tmp[8] * src[15];
+            d.z.z = tmp[2] * src[12] + tmp[7] * src[13] + tmp[10] * src[15];
+            d.z.z -= tmp[3] * src[12] + tmp[6] * src[13] + tmp[11] * src[15];
+            d.z.w = tmp[5] * src[12] + tmp[8] * src[13] + tmp[11] * src[14];
+            d.z.w -= tmp[4] * src[12] + tmp[9] * src[13] + tmp[10] * src[14];
+            d.w.x = tmp[2] * src[10] + tmp[5] * src[11] + tmp[1] * src[9];
+            d.w.x -= tmp[4] * src[11] + tmp[0] * src[9] + tmp[3] * src[10];
+            d.w.y = tmp[8] * src[11] + tmp[0] * src[8] + tmp[7] * src[10];
+            d.w.y -= tmp[6] * src[10] + tmp[9] * src[11] + tmp[1] * src[8];
+            d.w.z = tmp[6] * src[9] + tmp[11] * src[11] + tmp[3] * src[8];
+            d.w.z -= tmp[10] * src[11] + tmp[2] * src[8] + tmp[7] * src[9];
+            d.w.w = tmp[10] * src[10] + tmp[4] * src[8] + tmp[9] * src[9];
+            d.w.w -= tmp[8] * src[9] + tmp[11] * src[10] + tmp[5] * src[8];
             // calculate determinant
             det = src[0] * d.x.x + src[1] * d.x.y + src[2] * d.x.z + src[3] * d.x.w;
             // calculate matrix inverse
-            det = 1/det;
+            det = 1 / det;
             for (int j = 0; j < 4; j++)
                 d[j] *= det;
             return d;

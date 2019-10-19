@@ -25,23 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenMetaverse;
-using Nini.Config;
-using System;
-using System.IO;
-using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.ServiceAuth;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-using Mono.Addins;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace OpenSim.Region.CoreModules.Avatar.BakedTextures
 {
@@ -120,37 +119,54 @@ namespace OpenSim.Region.CoreModules.Avatar.BakedTextures
 
                 try
                 {
-                    using(Stream s = rc.Request(m_Auth))
+                    using (Stream s = rc.Request(m_Auth))
                     {
-                        using(XmlTextReader sr = new XmlTextReader(s))
+                        using (XmlTextReader sr = new XmlTextReader(s))
                         {
                             sr.ReadStartElement("BakedAppearance");
-                            while(sr.LocalName == "BakedTexture")
+                            while (sr.LocalName == "BakedTexture")
                             {
                                 string sTextureIndex = sr.GetAttribute("TextureIndex");
                                 int lTextureIndex = Convert.ToInt32(sTextureIndex);
                                 string sCacheId = sr.GetAttribute("CacheId");
-                                UUID lCacheId = UUID.Zero;
-                                if(!(UUID.TryParse(sCacheId,out lCacheId)))
-                                {
-                                // ??  Nothing here
-                                }
+                                UUID.TryParse(sCacheId, out UUID lCacheId);
 
                                 sr.ReadStartElement("BakedTexture");
-                                if(sr.Name=="AssetBase")
+                                if (sr.Name == "AssetBase")
                                 {
                                     AssetBase a = (AssetBase)m_serializer.Deserialize(sr);
                                     ret.Add(new WearableCacheItem()
-                                        {
+                                {
                                         CacheId = lCacheId,
                                         TextureIndex = (uint)lTextureIndex,
                                         TextureAsset = a,
                                         TextureID = a.FullID
-                                        });
+                                    });
                                     sr.ReadEndElement();
                                 }
                             }
-                        m_log.DebugFormat("[XBakes]: read {0} textures for user {1}",ret.Count,id);
+                            while (sr.LocalName == "BESetA")
+                            {
+                                string sTextureIndex = sr.GetAttribute("TextureIndex");
+                                int lTextureIndex = Convert.ToInt32(sTextureIndex);
+                                string sCacheId = sr.GetAttribute("CacheId");
+                                UUID.TryParse(sCacheId, out UUID lCacheId);
+
+                                sr.ReadStartElement("BESetA");
+                                if (sr.Name == "AssetBase")
+                                {
+                                    AssetBase a = (AssetBase)m_serializer.Deserialize(sr);
+                                    ret.Add(new WearableCacheItem()
+                                    {
+                                        CacheId = lCacheId,
+                                        TextureIndex = (uint)lTextureIndex,
+                                        TextureAsset = a,
+                                        TextureID = a.FullID
+                                    });
+                                    sr.ReadEndElement();
+                                }
+                            }
+                            m_log.DebugFormat("[XBakes]: read {0} textures for user {1}",ret.Count,id);
                         }
                         return ret.ToArray();
                     }
@@ -182,19 +198,37 @@ namespace OpenSim.Region.CoreModules.Avatar.BakedTextures
             using (XmlTextWriter bakeWriter = new XmlTextWriter(bakeStream, null))
             {
                 bakeWriter.WriteStartElement(String.Empty, "BakedAppearance", String.Empty);
-
+                List<int> extended = new List<int>();
                 for (int i = 0; i < data.Length; i++)
                 {
                     if (data[i] != null && data[i].TextureAsset != null)
                     {
+                        if(data[i].TextureIndex > 26)
+                        {
+                            extended.Add(i);
+                            continue;
+                        }
                         bakeWriter.WriteStartElement(String.Empty, "BakedTexture", String.Empty);
                         bakeWriter.WriteAttributeString(String.Empty, "TextureIndex", String.Empty, data[i].TextureIndex.ToString());
                         bakeWriter.WriteAttributeString(String.Empty, "CacheId", String.Empty, data[i].CacheId.ToString());
-//                        if (data[i].TextureAsset != null)
-                            m_serializer.Serialize(bakeWriter, data[i].TextureAsset);
+                        //                        if (data[i].TextureAsset != null)
+                        m_serializer.Serialize(bakeWriter, data[i].TextureAsset);
 
                         bakeWriter.WriteEndElement();
                         numberWears++;
+                    }
+                }
+
+                if(extended.Count > 0)
+                {
+                    foreach(int i in extended)
+                    {
+                            bakeWriter.WriteStartElement(String.Empty, "BESetA", String.Empty);
+                            bakeWriter.WriteAttributeString(String.Empty, "TextureIndex", String.Empty, data[i].TextureIndex.ToString());
+                            bakeWriter.WriteAttributeString(String.Empty, "CacheId", String.Empty, data[i].CacheId.ToString());
+                            m_serializer.Serialize(bakeWriter, data[i].TextureAsset);
+                            bakeWriter.WriteEndElement();
+                            numberWears++;
                     }
                 }
 
@@ -207,7 +241,7 @@ namespace OpenSim.Region.CoreModules.Avatar.BakedTextures
             Util.FireAndForget(
                 delegate
                 {
-                    using(RestClient rc = new RestClient(m_URL))
+                    using (RestClient rc = new RestClient(m_URL))
                     {
                         rc.AddResourcePath("bakes");
                         rc.AddResourcePath(agentId.ToString());
@@ -216,7 +250,7 @@ namespace OpenSim.Region.CoreModules.Avatar.BakedTextures
                         rc.Request(reqStream, m_Auth);
                         m_log.DebugFormat("[XBakes]: stored {0} textures for user {1}", numberWears, agentId);
                     }
-                    if(reqStream != null)
+                    if (reqStream != null)
                         reqStream.Dispose();
                 }, null, "XBakesModule.Store"
             );

@@ -25,32 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Threading;
-using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection.Emit;
-using System.Runtime.Remoting.Lifetime;
-using System.Security.Policy;
-using System.IO;
-using System.Xml;
-using System.Text;
 using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Region.ScriptEngine.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.ScriptEngine.Shared;
 using OpenSim.Region.ScriptEngine.Shared.Api;
-using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
-using OpenSim.Region.ScriptEngine.Yengine;
-using OpenSim.Region.Framework.Scenes;
-using log4net;
-
-using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
+using System;
+using System.IO;
+using System.Text;
 using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
-using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
-using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
-using LSL_Rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
 using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_Vector = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Vector3;
 
@@ -74,13 +56,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public void Dispose()
         {
-             // Tell script stop executing next time it calls CheckRun().
+            // Tell script stop executing next time it calls CheckRun().
             suspendOnCheckRunHold = true;
 
-             // Don't send us any more events.
-            lock(m_RunLock)
+            // Don't send us any more events.
+            lock (m_RunLock)
             {
-                if(m_Part != null)
+                if (m_Part != null)
                 {
                     m_Part.RemoveScriptEvents(m_ItemID);
                     AsyncCommandManager.RemoveScript(m_Engine, m_LocalID, m_ItemID);
@@ -88,20 +70,20 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 }
             }
 
-             // Let script methods get garbage collected if no one else is using
-             // them.
+            // Let script methods get garbage collected if no one else is using
+            // them.
             DecObjCodeRefCount();
         }
 
         private void DecObjCodeRefCount()
         {
-            if(m_ObjCode != null)
+            if (m_ObjCode != null)
             {
-                lock(m_CompileLock)
+                lock (m_CompileLock)
                 {
                     ScriptObjCode objCode;
 
-                    if(m_CompiledScriptObjCode.TryGetValue(m_ScriptObjCodeKey, out objCode) &&
+                    if (m_CompiledScriptObjCode.TryGetValue(m_ScriptObjCodeKey, out objCode) &&
                         (objCode == m_ObjCode) &&
                         (--objCode.refCount == 0))
                     {
@@ -114,7 +96,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public void Verbose(string format, params object[] args)
         {
-            if(m_Engine.m_Verbose)
+            if (m_Engine.m_Verbose)
                 m_log.DebugFormat(format, args);
         }
 
@@ -123,7 +105,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         //  Sacha 
         public void RunTestTop()
         {
-            if(m_InstEHSlice > 0)
+            if (m_InstEHSlice > 0)
             {
                 Console.WriteLine(m_DescName);
                 Console.WriteLine("    m_LocalID       = " + m_LocalID);
@@ -148,7 +130,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         // to dump this script's state to console
         public string RunTestLs(bool flagFull)
         {
-            if(flagFull)
+            if (flagFull)
             {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine(m_DescName);
@@ -177,10 +159,10 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 sb.AppendLine("    m_InstEHSlice        = " + m_InstEHSlice.ToString());
                 sb.AppendLine("    m_CPUTime            = " + m_CPUTime);
                 sb.AppendLine("    callMode             = " + callMode);
-                lock(m_QueueLock)
+                lock (m_QueueLock)
                 {
                     sb.AppendLine("    m_Running            = " + m_Running);
-                    foreach(EventParams evt in m_EventQueue)
+                    foreach (EventParams evt in m_EventQueue)
                     {
                         sb.AppendLine("        evt.EventName        = " + evt.EventName);
                     }
@@ -205,16 +187,16 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public int GetStateEventFlags(int stateCode)
         {
-            if((stateCode < 0) ||
+            if ((stateCode < 0) ||
                 (stateCode >= m_ObjCode.scriptEventHandlerTable.GetLength(0)))
             {
                 return 0;
             }
 
             int code = 0;
-            for(int i = 0; i < 32; i++)
+            for (int i = 0; i < 32; i++)
             {
-                if(m_ObjCode.scriptEventHandlerTable[stateCode, i] != null)
+                if (m_ObjCode.scriptEventHandlerTable[stateCode, i] != null)
                 {
                     code |= 1 << i;
                 }
@@ -245,23 +227,23 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public static string GetScriptFileName(string scriptBasePath, string filename)
         {
-             // Get old path, ie, all files lumped in a single huge directory.
+            // Get old path, ie, all files lumped in a single huge directory.
             string oldPath = Path.Combine(scriptBasePath, filename);
 
-             // Get new path, ie, files split up based on first 2 chars of name.
-             //           string subdir = filename.Substring (0, 2);
-             //           filename = filename.Substring (2);
+            // Get new path, ie, files split up based on first 2 chars of name.
+            //           string subdir = filename.Substring (0, 2);
+            //           filename = filename.Substring (2);
             string subdir = filename.Substring(0, 1);
             filename = filename.Substring(1);
             scriptBasePath = Path.Combine(scriptBasePath, subdir);
             Directory.CreateDirectory(scriptBasePath);
             string newPath = Path.Combine(scriptBasePath, filename);
 
-             // If file exists only in old location, move to new location.
-             // If file exists in both locations, delete old location.
-            if(File.Exists(oldPath))
+            // If file exists only in old location, move to new location.
+            // If file exists in both locations, delete old location.
+            if (File.Exists(oldPath))
             {
-                if(File.Exists(newPath))
+                if (File.Exists(newPath))
                 {
                     File.Delete(oldPath);
                 }
@@ -271,7 +253,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 }
             }
 
-             // Always return new location.
+            // Always return new location.
             return newPath;
         }
 
@@ -367,14 +349,14 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
             set
             {
-                lock(m_QueueLock)
+                lock (m_QueueLock)
                 {
                     m_Running = value;
-                    if(value)
+                    if (value)
                     {
                         if (m_IState == XMRInstState.SUSPENDED && m_SuspendCount == 0)
                         {
-                            if(eventCode != ScriptEventCode.None)
+                            if (eventCode != ScriptEventCode.None)
                             {
                                 m_IState = XMRInstState.ONYIELDQ;
                                 m_Engine.QueueToYield(this);
@@ -387,12 +369,12 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                             else
                                 m_IState = XMRInstState.IDLE;
                         }
-                        else if(m_SuspendCount != 0)
+                        else if (m_SuspendCount != 0)
                             m_IState = XMRInstState.IDLE;
                     }
                     else
                     {
-                        if(m_IState == XMRInstState.ONSLEEPQ)
+                        if (m_IState == XMRInstState.ONSLEEPQ)
                         {
                             m_Engine.RemoveFromSleep(this);
                             m_IState = XMRInstState.SUSPENDED;
@@ -410,7 +392,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public void EmptyEventQueues()
         {
             m_EventQueue.Clear();
-            for(int i = m_EventCounts.Length; --i >= 0;)
+            for (int i = m_EventCounts.Length; --i >= 0;)
                 m_EventCounts[i] = 0;
         }
 
@@ -427,7 +409,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public static int ListInt(object element)
         {
-            if(element is LSL_Integer)
+            if (element is LSL_Integer)
             {
                 return (int)(LSL_Integer)element;
             }
@@ -439,7 +421,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public static string ListStr(object element)
         {
-            if(element is LSL_String)
+            if (element is LSL_String)
             {
                 return (string)(LSL_String)element;
             }

@@ -26,10 +26,10 @@
  */
 
 using System;
-using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace OpenSim.Framework
 {
@@ -67,7 +67,7 @@ namespace OpenSim.Framework
                 {
                     handle.heap = null;
                     handle = null;
-                }               
+                }
                 value = default(T);
             }
 
@@ -92,7 +92,8 @@ namespace OpenSim.Framework
         public MinHeap(int capacity) : this(capacity, Comparer<T>.Default) { }
         public MinHeap(IComparer<T> comparer) : this(DEFAULT_CAPACITY, comparer) { }
         public MinHeap(int capacity, IComparer<T> comparer) :
-            this(capacity, new Comparison<T>(comparer.Compare)) { }
+            this(capacity, new Comparison<T>(comparer.Compare))
+        { }
         public MinHeap(Comparison<T> comparison) : this(DEFAULT_CAPACITY, comparison) { }
         public MinHeap(int _capacity, Comparison<T> _comparison)
         {
@@ -190,7 +191,7 @@ namespace OpenSim.Framework
             int current;
             int child;
 
-            for(current = index , child = (2 * current) + 1;
+            for (current = index, child = (2 * current) + 1;
                         current < size / 2;
                         current = child, child = (2 * current) + 1)
             {
@@ -274,7 +275,7 @@ namespace OpenSim.Framework
             for (int index = 0; index < size; ++index)
                 items[index].Clear();
             size = 0;
-            if(items.Length > minCapacity)
+            if (items.Length > minCapacity)
                 items = new HeapItem[minCapacity];
             ++version;
         }
@@ -296,7 +297,8 @@ namespace OpenSim.Framework
             items[index].Clear();
             --size;
             if (size > 0)
-            {   if(index != size)
+            {
+                if (index != size)
                 {
                     Set(items[size], index);
                     items[size].ClearRef();
@@ -304,7 +306,7 @@ namespace OpenSim.Framework
                         BubbleDown(index);
                 }
             }
-            else if(items.Length > 4 * minCapacity)
+            else if (items.Length > 4 * minCapacity)
                 items = new HeapItem[minCapacity];
         }
 

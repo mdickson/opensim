@@ -25,10 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Framework;
@@ -37,6 +33,8 @@ using OpenSim.Region.ScriptEngine.Shared.Api;
 using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
 using OpenSim.Services.Interfaces;
 using OpenSim.Tests.Common;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Tests
 {
@@ -61,7 +59,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         public void TestLlRequestAgentDataOnline()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID userId = TestHelpers.ParseTail(0x1);
 
@@ -112,10 +110,10 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
                 m_engine.PostedEvents.Clear();
             }
 
-            apiGrp1.LlRequestAgentDataCacheTimeoutMs = 1;
+            apiGrp1.LlRequestAgentDataCacheTimeoutMs = 20;
 
             // Make absolutely sure that we should trigger cache timeout.
-            Thread.Sleep(apiGrp1.LlRequestAgentDataCacheTimeoutMs + 1);
+            Thread.Sleep(apiGrp1.LlRequestAgentDataCacheTimeoutMs + 50);
 
             {
                 apiGrp1.llRequestAgentData(userId.ToString(), ScriptBaseClass.DATA_ONLINE);
@@ -135,7 +133,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
 
             m_scene.CloseAgent(userId, false);
 
-            Thread.Sleep(apiGrp1.LlRequestAgentDataCacheTimeoutMs + 1 + 1);
+            Thread.Sleep(apiGrp1.LlRequestAgentDataCacheTimeoutMs + 50);
 
             {
                 apiGrp1.llRequestAgentData(userId.ToString(), ScriptBaseClass.DATA_ONLINE);

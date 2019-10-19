@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using LukeSkywalker.IPNetwork;
+using Nini.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using log4net;
-using LukeSkywalker.IPNetwork;
-using Nini.Config;
 
 namespace OpenSim.Framework
 {
@@ -167,13 +167,13 @@ namespace OpenSim.Framework
         {
             foreach (IPNetwork ipn in networks)
             {
-//                                            m_log.DebugFormat(
-//                                                "[OUTBOUND URL FILTER]: Checking [{0}] against network [{1}]", addr, ipn);
+                //                                            m_log.DebugFormat(
+                //                                                "[OUTBOUND URL FILTER]: Checking [{0}] against network [{1}]", addr, ipn);
 
                 if (IPNetwork.Contains(ipn, addr))
                 {
-//                                                    m_log.DebugFormat(
-//                                                        "[OUTBOUND URL FILTER]: Found [{0}] in network [{1}]", addr, ipn);
+                    //                                                    m_log.DebugFormat(
+                    //                                                        "[OUTBOUND URL FILTER]: Found [{0}] in network [{1}]", addr, ipn);
 
                     return true;
                 }
@@ -183,20 +183,20 @@ namespace OpenSim.Framework
 
             foreach (IPEndPoint ep in endPoints)
             {
-//                m_log.DebugFormat(
-//                    "[OUTBOUND URL FILTER]: Checking [{0}:{1}] against endpoint [{2}]",
-//                    addr, port, ep);
+                //                m_log.DebugFormat(
+                //                    "[OUTBOUND URL FILTER]: Checking [{0}:{1}] against endpoint [{2}]",
+                //                    addr, port, ep);
 
                 if (addr.Equals(ep.Address) && port == ep.Port)
                 {
-//                    m_log.DebugFormat(
-//                        "[OUTBOUND URL FILTER]: Found [{0}:{1}] in endpoint [{2}]", addr, port, ep);
+                    //                    m_log.DebugFormat(
+                    //                        "[OUTBOUND URL FILTER]: Found [{0}:{1}] in endpoint [{2}]", addr, port, ep);
 
                     return true;
                 }
             }
 
-//            m_log.DebugFormat("[OUTBOUND URL FILTER]: Did not find [{0}:{1}] in list", addr, port);
+            //            m_log.DebugFormat("[OUTBOUND URL FILTER]: Did not find [{0}:{1}] in list", addr, port);
 
             return false;
         }
@@ -213,7 +213,7 @@ namespace OpenSim.Framework
             bool foundIpv4Address = false;
 
             IPAddress[] addresses = null;
-            
+
             try
             {
                 addresses = Dns.GetHostAddresses(url.Host);
@@ -228,37 +228,37 @@ namespace OpenSim.Framework
             {
                 if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                 {
-//                    m_log.DebugFormat("[OUTBOUND URL FILTER]: Found address [{0}]", addr);
+                    //                    m_log.DebugFormat("[OUTBOUND URL FILTER]: Found address [{0}]", addr);
 
                     foundIpv4Address = true;
 
                     // Check blacklist
                     if (OutboundUrlFilter.IsInNetwork(addr, url.Port, m_blacklistNetworks, m_blacklistEndPoints, Name))
                     {
-//                        m_log.DebugFormat("[OUTBOUND URL FILTER]: Found [{0}] in blacklist for {1}", url, Name);
+                        //                        m_log.DebugFormat("[OUTBOUND URL FILTER]: Found [{0}] in blacklist for {1}", url, Name);
 
                         // Check blacklist exceptions
                         allowed
                             = OutboundUrlFilter.IsInNetwork(
                                 addr, url.Port, m_blacklistExceptionNetworks, m_blacklistExceptionEndPoints, Name);
 
-//                        if (allowed)
-//                            m_log.DebugFormat("[OUTBOUND URL FILTER]: Found [{0}] in whitelist for {1}", url, Name);
+                        //                        if (allowed)
+                        //                            m_log.DebugFormat("[OUTBOUND URL FILTER]: Found [{0}] in whitelist for {1}", url, Name);
                     }
                 }
 
                 // Found at least one address in a blacklist and not a blacklist exception
                 if (!allowed)
                     return false;
-//                else
-//                    m_log.DebugFormat("[OUTBOUND URL FILTER]: URL [{0}] not in blacklist for {1}", url, Name);
+                //                else
+                //                    m_log.DebugFormat("[OUTBOUND URL FILTER]: URL [{0}] not in blacklist for {1}", url, Name);
             }
 
             // We do not know how to handle IPv6 securely yet.
             if (!foundIpv4Address)
                 return false;
 
-//            m_log.DebugFormat("[OUTBOUND URL FILTER]: Allowing request [{0}]", url);
+            //            m_log.DebugFormat("[OUTBOUND URL FILTER]: Allowing request [{0}]", url);
 
             return allowed;
         }

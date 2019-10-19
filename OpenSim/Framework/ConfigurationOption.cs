@@ -58,7 +58,7 @@ namespace OpenSim.Framework
             TYPE_Vector3,
             TYPE_FLOAT,
             TYPE_DOUBLE
-        } ;
+        };
 
         #endregion
 

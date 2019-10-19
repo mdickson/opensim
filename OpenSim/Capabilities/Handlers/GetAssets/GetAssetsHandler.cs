@@ -25,22 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Reflection;
-using System.IO;
-using System.Web;
-using log4net;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using OpenSim.Framework;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Services.Interfaces;
-using Caps = OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Capabilities.Handlers
 {
@@ -95,14 +87,14 @@ namespace OpenSim.Capabilities.Handlers
             responsedata["int_response_code"] = (int)System.Net.HttpStatusCode.BadRequest;
 
             string[] queries = null;
-            if(request.Contains("querystringkeys"))
+            if (request.Contains("querystringkeys"))
                 queries = (string[])request["querystringkeys"];
-            
-            if(queries == null || queries.Length == 0)
+
+            if (queries == null || queries.Length == 0)
                 return responsedata;
 
             string query = queries[0];
-            if(!queryTypes.ContainsKey(query))
+            if (!queryTypes.ContainsKey(query))
             {
                 m_log.Warn("[GETASSET]: Unknown type: " + query);
                 return responsedata;
@@ -118,11 +110,11 @@ namespace OpenSim.Capabilities.Handlers
                 return responsedata;
 
             UUID assetID = UUID.Zero;
-            if(!UUID.TryParse(assetStr, out assetID))
+            if (!UUID.TryParse(assetStr, out assetID))
                 return responsedata;
 
             AssetBase asset = m_assetService.Get(assetID.ToString());
-            if(asset == null)
+            if (asset == null)
             {
                 // m_log.Warn("[GETASSET]: not found: " + query + " " + assetStr);
                 responsedata["int_response_code"] = (int)System.Net.HttpStatusCode.NotFound;
@@ -136,7 +128,7 @@ namespace OpenSim.Capabilities.Handlers
                 return responsedata;
             }
 
-            if(type == AssetType.Mesh || type == AssetType.Texture)
+            if (type == AssetType.Mesh || type == AssetType.Texture)
                 responsedata["throttle"] = true;
 
             responsedata["content_type"] = asset.Metadata.ContentType;
@@ -146,7 +138,7 @@ namespace OpenSim.Capabilities.Handlers
 
             string range = String.Empty;
             if (((Hashtable)request["headers"])["range"] != null)
-               range = (string)((Hashtable)request["headers"])["range"];
+                range = (string)((Hashtable)request["headers"])["range"];
             else if (((Hashtable)request["headers"])["Range"] != null)
                 range = (string)((Hashtable)request["headers"])["Range"];
             else

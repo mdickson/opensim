@@ -30,10 +30,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
-
-using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
-using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
-using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
 using LSL_Rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
 using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
@@ -44,7 +40,7 @@ using LSL_Vector = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Vector3;
  */
 namespace OpenSim.Region.ScriptEngine.Yengine
 {
-    public abstract class TokenDeclInline: TokenDeclVar
+    public abstract class TokenDeclInline : TokenDeclVar
     {
         public static VarDict inlineFunctions = CreateDictionary();
 
@@ -138,13 +134,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             };
 
             VarDict ifd = new VarDict(false);
-
             Type[] oneDoub = new Type[] { typeof(double) };
             Type[] twoDoubs = new Type[] { typeof(double), typeof(double) };
 
             /*
              * Mono generates an FPU instruction for many math calls.
              */
+
             new TokenDeclInline_LLAbs(ifd);
             new TokenDeclInline_Math(ifd, "llAcos(float)", "Acos", oneDoub);
             new TokenDeclInline_Math(ifd, "llAsin(float)", "Asin", oneDoub);
@@ -187,10 +183,10 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public static void AddInterfaceMethods(VarDict ifd, MethodInfo[] ifaceMethods, FieldInfo acf)
         {
             List<MethodInfo> lcms = new List<MethodInfo>(ifaceMethods.Length);
-            foreach(MethodInfo meth in ifaceMethods)
+            foreach (MethodInfo meth in ifaceMethods)
             {
                 string name = meth.Name;
-                if((name[0] >= 'a') && (name[0] <= 'z'))
+                if ((name[0] >= 'a') && (name[0] <= 'z'))
                 {
                     lcms.Add(meth);
                 }
@@ -201,10 +197,10 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         // this one accepts all methods given to it
         public static void AddInterfaceMethods(VarDict ifd, IEnumerator<MethodInfo> ifaceMethods, FieldInfo acf)
         {
-            if(ifd == null)
+            if (ifd == null)
                 ifd = inlineFunctions;
 
-            for(ifaceMethods.Reset(); ifaceMethods.MoveNext();)
+            for (ifaceMethods.Reset(); ifaceMethods.MoveNext();)
             {
                 MethodInfo ifaceMethod = ifaceMethods.Current;
                 string key = ifaceMethod.Name;
@@ -218,9 +214,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                      * Otherwise, assume we will call CheckRun()
                      */
                     bool dcr = !key.StartsWith("xmr");
-                    foreach(string ncr in noCheckRuns)
+                    foreach (string ncr in noCheckRuns)
                     {
-                        if(ncr == key)
+                        if (ncr == key)
                         {
                             dcr = false;
                             break;
@@ -260,15 +256,15 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             this.name = new TokenName(null, nameArgSig.Substring(0, j++));
 
             this.argDecl = new TokenArgDecl(null);
-            if(nameArgSig[j] != ')')
+            if (nameArgSig[j] != ')')
             {
                 int i;
                 TokenName name;
                 TokenType type;
 
-                for(i = j; nameArgSig[i] != ')'; i++)
+                for (i = j; nameArgSig[i] != ')'; i++)
                 {
-                    if(nameArgSig[i] == ',')
+                    if (nameArgSig[i] == ',')
                     {
                         type = TokenType.FromLSLType(null, nameArgSig.Substring(j, i - j));
                         name = new TokenName(null, "arg" + this.argDecl.varDict.Count);
@@ -283,7 +279,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
 
             this.location = new CompValuInline(this);
-            if(ifd == null)
+            if (ifd == null)
                 ifd = inlineFunctions;
             ifd.AddEntry(this);
         }
@@ -302,7 +298,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             this.triviality = (doCheckRun || this.isTaggedCallsCheckRun) ? Triviality.complex : Triviality.trivial;
             this.location = new CompValuInline(this);
 
-            if(ifd == null)
+            if (ifd == null)
                 ifd = inlineFunctions;
             ifd.AddEntry(this);
         }
@@ -310,7 +306,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         private static TokenArgDecl GetArgDecl(ParameterInfo[] parameters)
         {
             TokenArgDecl argDecl = new TokenArgDecl(null);
-            foreach(ParameterInfo pi in parameters)
+            foreach (ParameterInfo pi in parameters)
             {
                 TokenType type = TokenType.FromSysType(null, pi.ParameterType);
                 TokenName name = new TokenName(null, pi.Name);
@@ -344,17 +340,17 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         private static TokenType GetRetType(MethodInfo methInfo, TokenType retType)
         {
-            if((methInfo != null) && (retType != null) && (retType is TokenTypeStr))
+            if ((methInfo != null) && (retType != null) && (retType is TokenTypeStr))
             {
-                if(Attribute.IsDefined(methInfo, typeof(xmrMethodReturnsKeyAttribute)))
+                if (Attribute.IsDefined(methInfo, typeof(xmrMethodReturnsKeyAttribute)))
                 {
                     return ChangeToKeyType(retType);
                 }
 
                 string mn = methInfo.Name;
-                foreach(string kr in keyReturns)
+                foreach (string kr in keyReturns)
                 {
-                    if(kr == mn)
+                    if (kr == mn)
                         return ChangeToKeyType(retType);
                 }
 
@@ -363,7 +359,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         private static TokenType ChangeToKeyType(TokenType retType)
         {
-            if(retType is TokenTypeLSLString)
+            if (retType is TokenTypeLSLString)
             {
                 retType = new TokenTypeLSLKey(null);
             }
@@ -387,16 +383,16 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             writeLine("\nBuilt-in functions:\n");
             SortedDictionary<string, TokenDeclInline> bifs = new SortedDictionary<string, TokenDeclInline>();
-            foreach(TokenDeclVar bif in TokenDeclInline.inlineFunctions)
+            foreach (TokenDeclVar bif in TokenDeclInline.inlineFunctions)
             {
                 bifs.Add(bif.fullName, (TokenDeclInline)bif);
             }
-            foreach(TokenDeclInline bif in bifs.Values)
+            foreach (TokenDeclInline bif in bifs.Values)
             {
                 char noisy = (!inclNoisyTag || !IsTaggedNoisy(bif.GetMethodInfo())) ? ' ' : (bif.retType is TokenTypeVoid) ? 'N' : 'R';
                 writeLine(noisy + "   " + bif.retType.ToString().PadLeft(8) + " " + bif.fullName);
             }
-            if(inclNoisyTag)
+            if (inclNoisyTag)
             {
                 writeLine("\nN - stub that writes name and arguments to stdout");
                 writeLine("R - stub that writes name and arguments to stdout then reads return value from stdin");
@@ -407,13 +403,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             writeLine("\nBuilt-in constants:\n");
             SortedDictionary<string, ScriptConst> scs = new SortedDictionary<string, ScriptConst>();
             int widest = 0;
-            foreach(ScriptConst sc in ScriptConst.scriptConstants.Values)
+            foreach (ScriptConst sc in ScriptConst.scriptConstants.Values)
             {
-                if(widest < sc.name.Length)
+                if (widest < sc.name.Length)
                     widest = sc.name.Length;
                 scs.Add(sc.name, sc);
             }
-            foreach(ScriptConst sc in scs.Values)
+            foreach (ScriptConst sc in scs.Values)
             {
                 writeLine("    " + sc.rVal.type.ToString().PadLeft(8) + " " + sc.name.PadRight(widest) + " = " + BuiltInConstVal(sc.rVal));
             }
@@ -426,20 +422,20 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public static string BuiltInConstVal(CompValu rVal)
         {
-            if(rVal is CompValuInteger)
+            if (rVal is CompValuInteger)
             {
                 int x = ((CompValuInteger)rVal).x;
                 return "0x" + x.ToString("X8") + " = " + x.ToString().PadLeft(11);
             }
-            if(rVal is CompValuFloat)
+            if (rVal is CompValuFloat)
                 return ((CompValuFloat)rVal).x.ToString();
-            if(rVal is CompValuString)
+            if (rVal is CompValuString)
             {
                 StringBuilder sb = new StringBuilder();
                 PrintParam(sb, ((CompValuString)rVal).x);
                 return sb.ToString();
             }
-            if(rVal is CompValuSField)
+            if (rVal is CompValuSField)
             {
                 FieldInfo fi = ((CompValuSField)rVal).field;
                 StringBuilder sb = new StringBuilder();
@@ -451,23 +447,23 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public static void PrintParam(StringBuilder sb, object p)
         {
-            if(p == null)
+            if (p == null)
             {
                 sb.Append("null");
             }
-            else if(p is LSL_List)
+            else if (p is LSL_List)
             {
                 sb.Append('[');
                 object[] d = ((LSL_List)p).Data;
-                for(int i = 0; i < d.Length; i++)
+                for (int i = 0; i < d.Length; i++)
                 {
-                    if(i > 0)
+                    if (i > 0)
                         sb.Append(',');
                     PrintParam(sb, d[i]);
                 }
                 sb.Append(']');
             }
-            else if(p is LSL_Rotation)
+            else if (p is LSL_Rotation)
             {
                 LSL_Rotation r = (LSL_Rotation)p;
                 sb.Append('<');
@@ -480,11 +476,11 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 sb.Append(r.s);
                 sb.Append('>');
             }
-            else if(p is LSL_String)
+            else if (p is LSL_String)
             {
                 PrintParamString(sb, (string)(LSL_String)p);
             }
-            else if(p is LSL_Vector)
+            else if (p is LSL_Vector)
             {
                 LSL_Vector v = (LSL_Vector)p;
                 sb.Append('<');
@@ -495,7 +491,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 sb.Append(v.z);
                 sb.Append('>');
             }
-            else if(p is string)
+            else if (p is string)
             {
                 PrintParamString(sb, (string)p);
             }
@@ -508,34 +504,34 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public static void PrintParamString(StringBuilder sb, string p)
         {
             sb.Append('"');
-            foreach(char c in p)
+            foreach (char c in p)
             {
-                if(c == '\b')
+                if (c == '\b')
                 {
                     sb.Append("\\b");
                     continue;
                 }
-                if(c == '\n')
+                if (c == '\n')
                 {
                     sb.Append("\\n");
                     continue;
                 }
-                if(c == '\r')
+                if (c == '\r')
                 {
                     sb.Append("\\r");
                     continue;
                 }
-                if(c == '\t')
+                if (c == '\t')
                 {
                     sb.Append("\\t");
                     continue;
                 }
-                if(c == '"')
+                if (c == '"')
                 {
                     sb.Append("\\\"");
                     continue;
                 }
-                if(c == '\\')
+                if (c == '\\')
                 {
                     sb.Append("\\\\");
                     continue;
@@ -553,7 +549,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
      * @param args = type/location of arguments (types match function definition)
      */
 
-    public class TokenDeclInline_LLAbs: TokenDeclInline
+    public class TokenDeclInline_LLAbs : TokenDeclInline
     {
         public TokenDeclInline_LLAbs(VarDict ifd)
                 : base(ifd, false, "llAbs(integer)", new TokenTypeInt(null)) { }
@@ -572,7 +568,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class TokenDeclInline_Math: TokenDeclInline
+    public class TokenDeclInline_Math : TokenDeclInline
     {
         private MethodInfo methInfo;
 
@@ -584,7 +580,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public override void CodeGen(ScriptCodeGen scg, Token errorAt, CompValuTemp result, CompValu[] args)
         {
-            for(int i = 0; i < args.Length; i++)
+            for (int i = 0; i < args.Length; i++)
             {
                 args[i].PushVal(scg, errorAt, argDecl.types[i]);
             }
@@ -593,7 +589,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class TokenDeclInline_LLRound: TokenDeclInline
+    public class TokenDeclInline_LLRound : TokenDeclInline
     {
 
         private static MethodInfo roundMethInfo = ScriptCodeGen.GetStaticMethod(typeof(System.Math), "Round",
@@ -611,7 +607,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class TokenDeclInline_GetFreeMemory: TokenDeclInline
+    public class TokenDeclInline_GetFreeMemory : TokenDeclInline
     {
         private static readonly MethodInfo getFreeMemMethInfo = typeof(XMRInstAbstract).GetMethod("xmrHeapLeft", new Type[] { });
 
@@ -628,7 +624,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class TokenDeclInline_GetUsedMemory: TokenDeclInline
+    public class TokenDeclInline_GetUsedMemory : TokenDeclInline
     {
         private static readonly MethodInfo getUsedMemMethInfo = typeof(XMRInstAbstract).GetMethod("xmrHeapUsed", new Type[] { });
 
@@ -648,7 +644,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     /**
      * @brief Generate code for the usual ll...() functions.
      */
-    public class TokenDeclInline_BEApi: TokenDeclInline
+    public class TokenDeclInline_BEApi : TokenDeclInline
     {
         //        private static readonly MethodInfo fixLLParcelMediaQuery = ScriptCodeGen.GetStaticMethod 
         //                (typeof (XMRInstAbstract), "FixLLParcelMediaQuery", new Type[] { typeof (LSL_List) });
@@ -687,20 +683,20 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public override void CodeGen(ScriptCodeGen scg, Token errorAt, CompValuTemp result, CompValu[] args)
         {
-            if(isTaggedCallsCheckRun)
+            if (isTaggedCallsCheckRun)
             {                                                   // see if 'xmr' method that calls CheckRun() internally
                 new ScriptCodeGen.CallLabel(scg, errorAt);     // if so, put a call label immediately before it
                                                                // .. so restoring the frame will jump immediately to the
                                                                // .. call without re-executing any code before this
             }
-            if(!methInfo.IsStatic)
+            if (!methInfo.IsStatic)
             {
                 scg.PushXMRInst();                          // XMRInstanceSuperType pointer
-                if(apiContextField != null)                 // 'this' pointer for API function
+                if (apiContextField != null)                 // 'this' pointer for API function
                     scg.ilGen.Emit(errorAt, OpCodes.Ldfld, apiContextField);
 
             }
-            for(int i = 0; i < args.Length; i++)             // push arguments, boxing/unboxing as needed
+            for (int i = 0; i < args.Length; i++)             // push arguments, boxing/unboxing as needed
                 args[i].PushVal(scg, errorAt, argDecl.types[i]);
 
             // this should not be needed
@@ -711,16 +707,16 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             //            if (methInfo.Name == "llParcelMediaCommandList") {
             //                scg.ilGen.Emit (errorAt, OpCodes.Call, fixLLParcelMediaCommandList);
             //            }
-            if(methInfo.IsVirtual)                            // call API function
+            if (methInfo.IsVirtual)                            // call API function
                 scg.ilGen.Emit(errorAt, OpCodes.Callvirt, methInfo);
             else
                 scg.ilGen.Emit(errorAt, OpCodes.Call, methInfo);
 
             result.Pop(scg, errorAt, retType);                  // pop result, boxing/unboxing as needed
-            if(isTaggedCallsCheckRun)
+            if (isTaggedCallsCheckRun)
                 scg.openCallLabel = null;
 
-            if(doCheckRun)
+            if (doCheckRun)
                 scg.EmitCallCheckRun(errorAt, false);       // maybe call CheckRun()
         }
     }

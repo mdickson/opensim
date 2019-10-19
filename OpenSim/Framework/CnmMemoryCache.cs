@@ -250,7 +250,7 @@ namespace OpenSim.Framework
             if (maximalSize < 8)
                 maximalSize = 8;
             if (maximalCount > maximalSize)
-                maximalCount = (int) maximalSize;
+                maximalCount = (int)maximalSize;
 
             Comparer = comparer;
             m_expirationTime = expirationTime;
@@ -401,8 +401,8 @@ namespace OpenSim.Framework
             /// </param>
             public Enumerator(CnmMemoryCache<TKey, TValue> cache)
             {
-                m_generationEnumerators[ 0 ] = cache.m_newGeneration.GetEnumerator();
-                m_generationEnumerators[ 1 ] = cache.m_oldGeneration.GetEnumerator();
+                m_generationEnumerators[0] = cache.m_newGeneration.GetEnumerator();
+                m_generationEnumerators[1] = cache.m_oldGeneration.GetEnumerator();
             }
 
             #region IEnumerator<KeyValuePair<TKey,TValue>> Members
@@ -423,7 +423,7 @@ namespace OpenSim.Framework
                     if (m_currentEnumerator == -1 || m_currentEnumerator >= m_generationEnumerators.Length)
                         throw new InvalidOperationException();
 
-                    return m_generationEnumerators[ m_currentEnumerator ].Current;
+                    return m_generationEnumerators[m_currentEnumerator].Current;
                 }
             }
 
@@ -466,7 +466,7 @@ namespace OpenSim.Framework
 
                 while (m_currentEnumerator < m_generationEnumerators.Length)
                 {
-                    if (m_generationEnumerators[ m_currentEnumerator ].MoveNext())
+                    if (m_generationEnumerators[m_currentEnumerator].MoveNext())
                         return true;
 
                     m_currentEnumerator++;
@@ -611,18 +611,18 @@ namespace OpenSim.Framework
             private int FindElementIndex(int bucketIndex, TKey key, bool moveToFront, out int previousIndex)
             {
                 previousIndex = -1;
-                int elementIndex = m_buckets[ bucketIndex ];
+                int elementIndex = m_buckets[bucketIndex];
                 while (elementIndex >= 0)
                 {
-                    if (m_cache.Comparer.Equals(key, m_elements[ elementIndex ].Key))
+                    if (m_cache.Comparer.Equals(key, m_elements[elementIndex].Key))
                     {
                         // Found match
                         if (moveToFront && previousIndex >= 0)
                         {
                             // Move entry to front
-                            m_elements[ previousIndex ].Next = m_elements[ elementIndex ].Next;
-                            m_elements[ elementIndex ].Next = m_buckets[ bucketIndex ];
-                            m_buckets[ bucketIndex ] = elementIndex;
+                            m_elements[previousIndex].Next = m_elements[elementIndex].Next;
+                            m_elements[elementIndex].Next = m_buckets[bucketIndex];
+                            m_buckets[bucketIndex] = elementIndex;
                             previousIndex = 0;
                         }
 
@@ -630,7 +630,7 @@ namespace OpenSim.Framework
                     }
 
                     previousIndex = elementIndex;
-                    elementIndex = m_elements[ elementIndex ].Next;
+                    elementIndex = m_elements[elementIndex].Next;
                 }
 
                 return -1;
@@ -651,16 +651,16 @@ namespace OpenSim.Framework
             private void RemoveElement(int bucketIndex, int entryIndex, int previousIndex)
             {
                 if (previousIndex >= 0)
-                    m_elements[ previousIndex ].Next = m_elements[ entryIndex ].Next;
+                    m_elements[previousIndex].Next = m_elements[entryIndex].Next;
                 else
-                    m_buckets[ bucketIndex ] = m_elements[ entryIndex ].Next;
+                    m_buckets[bucketIndex] = m_elements[entryIndex].Next;
 
-                Size -= m_elements[ entryIndex ].Size;
-                m_elements[ entryIndex ].Value = default(TValue);
-                m_elements[ entryIndex ].Key = default(TKey);
+                Size -= m_elements[entryIndex].Size;
+                m_elements[entryIndex].Value = default(TValue);
+                m_elements[entryIndex].Key = default(TKey);
 
                 // Add element to free elements list
-                m_elements[ entryIndex ].Next = m_firstFreeElement;
+                m_elements[entryIndex].Next = m_firstFreeElement;
                 m_firstFreeElement = entryIndex;
                 m_freeCount++;
             }
@@ -821,14 +821,14 @@ namespace OpenSim.Framework
 
                     while (m_currentIndex < m_generation.Count)
                     {
-                        if (m_generation.m_elements[ m_currentIndex ].IsFree)
+                        if (m_generation.m_elements[m_currentIndex].IsFree)
                         {
                             m_currentIndex++;
                             continue;
                         }
 
-                        m_current = new KeyValuePair<TKey, TValue>(m_generation.m_elements[ m_currentIndex ].Key,
-                            m_generation.m_elements[ m_currentIndex ].Value);
+                        m_current = new KeyValuePair<TKey, TValue>(m_generation.m_elements[m_currentIndex].Key,
+                            m_generation.m_elements[m_currentIndex].Value);
                         m_currentIndex++;
                         return true;
                     }
@@ -907,9 +907,9 @@ namespace OpenSim.Framework
             /// <seealso cref="IGeneration.MakeOld"/>
             public void Clear()
             {
-                for (int i = m_buckets.Length - 1 ; i >= 0 ; i--)
+                for (int i = m_buckets.Length - 1; i >= 0; i--)
                 {
-                    m_buckets[ i ] = -1;
+                    m_buckets[i] = -1;
                 }
 
                 Array.Clear(m_elements, 0, m_elements.Length);
@@ -1045,7 +1045,7 @@ namespace OpenSim.Framework
                     {
                         // There was entry that was removed
                         elementIndex = m_firstFreeElement;
-                        m_firstFreeElement = m_elements[ elementIndex ].Next;
+                        m_firstFreeElement = m_elements[elementIndex].Next;
                         m_freeCount--;
                     }
                     else
@@ -1055,19 +1055,19 @@ namespace OpenSim.Framework
                         m_nextUnusedElement++;
                     }
 
-                    Debug.Assert(m_elements[ elementIndex ].IsFree, "Allocated element is not free.");
+                    Debug.Assert(m_elements[elementIndex].IsFree, "Allocated element is not free.");
 
                     // Move new entry to front
-                    m_elements[ elementIndex ].Next = m_buckets[ bucketIndex ];
-                    m_buckets[ bucketIndex ] = elementIndex;
+                    m_elements[elementIndex].Next = m_buckets[bucketIndex];
+                    m_buckets[bucketIndex] = elementIndex;
 
                     // Set key and update count
-                    m_elements[ elementIndex ].Key = key;
+                    m_elements[elementIndex].Key = key;
                 }
                 else
                 {
                     // Existing key
-                    if (Size - m_elements[ elementIndex ].Size + size > m_cache.m_generationMaxSize)
+                    if (Size - m_elements[elementIndex].Size + size > m_cache.m_generationMaxSize)
                     {
                         // Generation is full
                         // Remove existing element, because generation is going to be recycled to
@@ -1077,12 +1077,12 @@ namespace OpenSim.Framework
                     }
 
                     // Update generation's size
-                    Size = Size - m_elements[ elementIndex ].Size + size;
+                    Size = Size - m_elements[elementIndex].Size + size;
                 }
 
                 // Finally set value and size
-                m_elements[ elementIndex ].Value = value;
-                m_elements[ elementIndex ].Size = size;
+                m_elements[elementIndex].Value = value;
+                m_elements[elementIndex].Size = size;
 
                 // Success - key was inserterted to generation
                 AccessedSinceLastTimeCheck = true;
@@ -1125,8 +1125,8 @@ namespace OpenSim.Framework
                     return false;
                 }
 
-                value = m_elements[ elementIndex ].Value;
-                size = m_elements[ elementIndex ].Size;
+                value = m_elements[elementIndex].Value;
+                size = m_elements[elementIndex].Size;
 
                 if (!m_newGeneration)
                 {

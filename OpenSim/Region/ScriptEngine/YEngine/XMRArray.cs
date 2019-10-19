@@ -27,7 +27,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
@@ -79,13 +78,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public static TokenType GetRValType(TokenName name)
         {
-            if(name.val == "count")
+            if (name.val == "count")
                 return new TokenTypeInt(name);
-            if(name.val == "clear")
+            if (name.val == "clear")
                 return clearDelegate;
-            if(name.val == "index")
+            if (name.val == "index")
                 return indexDelegate;
-            if(name.val == "value")
+            if (name.val == "value")
                 return valueDelegate;
             return new TokenTypeVoid(name);
         }
@@ -99,7 +98,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             object val;
             key = FixKey(key);
-            if(!dnary.TryGetValue(key, out val))
+            if (!dnary.TryGetValue(key, out val))
                 val = null;
             return val;
         }
@@ -108,23 +107,23 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             key = FixKey(key);
 
-             // Update heap use throwing an exception on failure
-             // before making any changes to the array.
+            // Update heap use throwing an exception on failure
+            // before making any changes to the array.
             int keysize = HeapTrackerObject.Size(key);
             int newheapuse = heapUse;
             object oldval;
-            if(dnary.TryGetValue(key, out oldval))
+            if (dnary.TryGetValue(key, out oldval))
             {
                 newheapuse -= keysize + HeapTrackerObject.Size(oldval);
             }
-            if(value != null)
+            if (value != null)
             {
                 newheapuse += keysize + HeapTrackerObject.Size(value);
             }
             heapUse = inst.UpdateHeapUse(heapUse, newheapuse);
 
-             // Save new value in array, replacing one of same key if there.
-             // null means remove the value, ie, script did array[key] = undef.
+            // Save new value in array, replacing one of same key if there.
+            // null means remove the value, ie, script did array[key] = undef.
             if (value != null)
             {
                 dnary[key] = value;
@@ -133,15 +132,15 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             {
                 dnary.Remove(key);
 
-                 // Shrink the enumeration array, but always leave at least one element.
-                if((array != null) && (dnary.Count < array.Length / 2))
+                // Shrink the enumeration array, but always leave at least one element.
+                if ((array != null) && (dnary.Count < array.Length / 2))
                 {
                     Array.Resize<KeyValuePair<object, object>>(ref array, array.Length / 2);
                 }
             }
 
-             // The enumeration array is invalid because the dictionary has been modified.
-             // Next time a ForEach() call happens, it will repopulate 'array' as elements are retrieved.
+            // The enumeration array is invalid because the dictionary has been modified.
+            // Next time a ForEach() call happens, it will repopulate 'array' as elements are retrieved.
             arrayValid = 0;
         }
 
@@ -154,25 +153,25 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public static XMR_Array Obj2Array(object obj)
         {
-            if(obj == null)
+            if (obj == null)
                 throw new NullReferenceException();
             return (XMR_Array)obj;
         }
         public static LSL_Key Obj2Key(object obj)
         {
-            if(obj == null)
+            if (obj == null)
                 throw new NullReferenceException();
             return (LSL_Key)obj;
         }
         public static LSL_List Obj2List(object obj)
         {
-            if(obj == null)
+            if (obj == null)
                 throw new NullReferenceException();
             return (LSL_List)obj;
         }
         public static LSL_String Obj2String(object obj)
         {
-            if(obj == null)
+            if (obj == null)
                 throw new NullReferenceException();
             return obj.ToString();
         }
@@ -228,33 +227,33 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         private bool ForEach(int number)
         {
-             // If we don't have any array, we can't have ever done
-             // any calls here before, so allocate an array big enough
-             // and set everything else to the beginning.
-            if(array == null)
+            // If we don't have any array, we can't have ever done
+            // any calls here before, so allocate an array big enough
+            // and set everything else to the beginning.
+            if (array == null)
             {
                 array = new KeyValuePair<object, object>[dnary.Count];
                 arrayValid = 0;
             }
 
-             // If dictionary modified since last enumeration, get a new enumerator.
-            if(arrayValid == 0)
+            // If dictionary modified since last enumeration, get a new enumerator.
+            if (arrayValid == 0)
             {
                 enumr = dnary.GetEnumerator();
                 enumrValid = true;
             }
 
-             // Make sure we have filled the array up enough for requested element.
-            while((arrayValid <= number) && enumrValid && enumr.MoveNext())
+            // Make sure we have filled the array up enough for requested element.
+            while ((arrayValid <= number) && enumrValid && enumr.MoveNext())
             {
-                if(arrayValid >= array.Length)
+                if (arrayValid >= array.Length)
                 {
                     Array.Resize<KeyValuePair<object, object>>(ref array, dnary.Count);
                 }
                 array[arrayValid++] = enumr.Current;
             }
 
-             // If we don't have that many elements, return end-of-array status.
+            // If we don't have that many elements, return end-of-array status.
             return number < arrayValid;
         }
 
@@ -265,10 +264,10 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public delegate void SendArrayObjDelegate(object graph);
         public void SendArrayObj(SendArrayObjDelegate sendObj)
         {
-             // Set the count then the elements themselves.
-             // UnfixKey() because sendObj doesn't handle XMRArrayListKeys.
+            // Set the count then the elements themselves.
+            // UnfixKey() because sendObj doesn't handle XMRArrayListKeys.
             sendObj(dnary.Count);
-            foreach(KeyValuePair<object, object> kvp in dnary)
+            foreach (KeyValuePair<object, object> kvp in dnary)
             {
                 sendObj(UnfixKey(kvp.Key));
                 sendObj(kvp.Value);
@@ -291,10 +290,10 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             arrayValid = 0;
             enumrValid = false;
 
-             // Fill dictionary.
+            // Fill dictionary.
             dnary.Clear();
             int count = (int)recvObj();
-            while(--count >= 0)
+            while (--count >= 0)
             {
                 object key = FixKey(recvObj());
                 object val = recvObj();
@@ -311,18 +310,18 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public static object FixKey(object key)
         {
-            if(key is LSL_Integer)
+            if (key is LSL_Integer)
                 return (int)(LSL_Integer)key;
-            if(key is LSL_Float)
+            if (key is LSL_Float)
                 return (double)(LSL_Float)key;
-            if(key is LSL_Key)
+            if (key is LSL_Key)
                 return (string)(LSL_Key)key;
-            if(key is LSL_String)
+            if (key is LSL_String)
                 return (string)(LSL_String)key;
-            if(key is LSL_List)
+            if (key is LSL_List)
             {
                 object[] data = ((LSL_List)key).Data;
-                if(data.Length == 1)
+                if (data.Length == 1)
                     return FixKey(data[0]);
                 return new XMRArrayListKey((LSL_List)key);
             }
@@ -336,13 +335,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         private static object UnfixKey(object key)
         {
-            if(key is XMRArrayListKey)
+            if (key is XMRArrayListKey)
                 key = ((XMRArrayListKey)key).GetOriginal();
             return key;
         }
     }
 
-    public class XMRArrayKeyComparer: IComparer<object>
+    public class XMRArrayKeyComparer : IComparer<object>
     {
 
         public static XMRArrayKeyComparer singleton = new XMRArrayKeyComparer();
@@ -352,15 +351,15 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public int Compare(object x, object y)  // IComparer<object>
         {
-             // Use short type name (eg, String, Int32, XMRArrayListKey) as most significant part of key.
+            // Use short type name (eg, String, Int32, XMRArrayListKey) as most significant part of key.
             string xtn = x.GetType().Name;
             string ytn = y.GetType().Name;
             int ctn = String.CompareOrdinal(xtn, ytn);
-            if(ctn != 0)
+            if (ctn != 0)
                 return ctn;
 
             ComparerDelegate cd;
-            if(!comparers.TryGetValue(xtn, out cd))
+            if (!comparers.TryGetValue(xtn, out cd))
             {
                 throw new Exception("unsupported key type " + xtn);
             }
@@ -387,9 +386,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             double af = (double)a;
             double bf = (double)b;
-            if(af < bf)
+            if (af < bf)
                 return -1;
-            if(af > bf)
+            if (af > bf)
                 return 1;
             return 0;
         }
@@ -407,21 +406,21 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             LSL_Rotation ar = (LSL_Rotation)a;
             LSL_Rotation br = (LSL_Rotation)b;
-            if(ar.x < br.x)
+            if (ar.x < br.x)
                 return -1;
-            if(ar.x > br.x)
+            if (ar.x > br.x)
                 return 1;
-            if(ar.y < br.y)
+            if (ar.y < br.y)
                 return -1;
-            if(ar.y > br.y)
+            if (ar.y > br.y)
                 return 1;
-            if(ar.z < br.z)
+            if (ar.z < br.z)
                 return -1;
-            if(ar.z > br.z)
+            if (ar.z > br.z)
                 return 1;
-            if(ar.s < br.s)
+            if (ar.s < br.s)
                 return -1;
-            if(ar.s > br.s)
+            if (ar.s > br.s)
                 return 1;
             return 0;
         }
@@ -433,17 +432,17 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             LSL_Vector av = (LSL_Vector)a;
             LSL_Vector bv = (LSL_Vector)b;
-            if(av.x < bv.x)
+            if (av.x < bv.x)
                 return -1;
-            if(av.x > bv.x)
+            if (av.x > bv.x)
                 return 1;
-            if(av.y < bv.y)
+            if (av.y < bv.y)
                 return -1;
-            if(av.y > bv.y)
+            if (av.y > bv.y)
                 return 1;
-            if(av.z < bv.z)
+            if (av.z < bv.z)
                 return -1;
-            if(av.z > bv.z)
+            if (av.z > bv.z)
                 return 1;
             return 0;
         }
@@ -475,7 +474,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             length = len;
             cleaned = new object[len];
             int hc = len;
-            for(int i = 0; i < len; i++)
+            for (int i = 0; i < len; i++)
             {
                 object v = XMR_Array.FixKey(given[i]);
                 hc += hc + ((hc < 0) ? 1 : 0);
@@ -501,17 +500,17 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public override bool Equals(object o)
         {
-            if(!(o is XMRArrayListKey))
+            if (!(o is XMRArrayListKey))
                 return false;
             XMRArrayListKey a = (XMRArrayListKey)o;
             int len = a.length;
-            if(len != length)
+            if (len != length)
                 return false;
-            if(a.hashCode != hashCode)
+            if (a.hashCode != hashCode)
                 return false;
-            for(int i = 0; i < len; i++)
+            for (int i = 0; i < len; i++)
             {
-                if(!cleaned[i].Equals(a.cleaned[i]))
+                if (!cleaned[i].Equals(a.cleaned[i]))
                     return false;
             }
             return true;
@@ -531,14 +530,14 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public static int Compare(XMRArrayListKey x, XMRArrayListKey y)
         {
             int j = x.length - y.length;
-            if(j == 0)
+            if (j == 0)
             {
-                for(int i = 0; i < x.length; i++)
+                for (int i = 0; i < x.length; i++)
                 {
                     object xo = x.cleaned[i];
                     object yo = y.cleaned[i];
                     j = XMRArrayKeyComparer.singleton.Compare(xo, yo);
-                    if(j != 0)
+                    if (j != 0)
                         break;
                 }
             }
@@ -559,9 +558,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            for(int i = 0; i < length; i++)
+            for (int i = 0; i < length; i++)
             {
-                if(i > 0)
+                if (i > 0)
                     sb.Append(',');
                 sb.Append(cleaned[i].ToString());
             }

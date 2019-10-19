@@ -25,24 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Mono.Addins;
+using OpenMetaverse;
+using OpenSim.Framework;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
-using log4net;
-using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Region.CoreModules.Agent.AssetTransaction;
-using OpenSim.Region.CoreModules.Avatar.InstantMessage;
-using OpenSim.Region.CoreModules.Scripting.DynamicTexture;
-using OpenSim.Region.CoreModules.Scripting.LoadImageURL;
-using OpenSim.Region.CoreModules.Scripting.XMLRPC;
-using OpenSim.Services.Interfaces;
-using Mono.Addins;
 
 namespace OpenSim.ApplicationPlugins.LoadRegions
 {
-    [Extension(Path="/OpenSim/Startup", Id="LoadRegions", NodeName="Plugin")]
+    [Extension(Path = "/OpenSim/Startup", Id = "LoadRegions", NodeName = "Plugin")]
     public class LoadRegionsPlugin : IApplicationPlugin, IRegionCreator
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -106,8 +100,8 @@ namespace OpenSim.ApplicationPlugins.LoadRegions
             //m_openSim.ModuleLoader.LoadDefaultSharedModule(new LoadImageURLModule());
             //m_log.Info("[LOAD REGIONS PLUGIN]: XMLRPCModule...");
             //m_openSim.ModuleLoader.LoadDefaultSharedModule(new XMLRPCModule());
-//            m_log.Info("[LOADREGIONSPLUGIN]: AssetTransactionModule...");
-//            m_openSim.ModuleLoader.LoadDefaultSharedModule(new AssetTransactionModule());
+            //            m_log.Info("[LOADREGIONSPLUGIN]: AssetTransactionModule...");
+            //            m_openSim.ModuleLoader.LoadDefaultSharedModule(new AssetTransactionModule());
             m_log.Info("[LOAD REGIONS PLUGIN]: Done.");
 
             if (!CheckRegionsForSanity(regionsToLoad))

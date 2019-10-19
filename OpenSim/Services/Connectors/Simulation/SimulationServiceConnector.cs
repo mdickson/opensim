@@ -25,22 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Reflection;
-using System.Text;
-using System.Collections;
-
-using OpenSim.Framework;
-using OpenSim.Services.Interfaces;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 using log4net;
 using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using OpenSim.Framework;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Services.Connectors.Simulation
 {
@@ -49,7 +43,7 @@ namespace OpenSim.Services.Connectors.Simulation
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         // we use this dictionary to track the pending updateagent requests, maps URI --> position update
-        private Dictionary<string,AgentPosition> m_updateAgentQueue = new Dictionary<string,AgentPosition>();
+        private Dictionary<string, AgentPosition> m_updateAgentQueue = new Dictionary<string, AgentPosition>();
 
         //private GridRegion m_Region;
 
@@ -116,6 +110,8 @@ namespace OpenSim.Services.Connectors.Simulation
             try
             {
                 OSDMap args = aCircuit.PackAgentCircuitData(ctx);
+                if(ctx == null)
+                    ctx = new EntityTransferContext();
                 args["context"] = ctx.Pack();
                 PackData(args, source, aCircuit, destination, flags);
 
@@ -264,7 +260,7 @@ namespace OpenSim.Services.Connectors.Simulation
                 OSDMap result = WebUtil.PutToServiceCompressed(uri, args, timeout);
                 if (result["Success"].AsBoolean())
                     return true;
-                if(ctx.OutboundVersion < 0.2)
+                if (ctx.OutboundVersion < 0.2)
                     result = WebUtil.PutToService(uri, args, timeout);
 
                 return result["Success"].AsBoolean();
@@ -340,9 +336,9 @@ namespace OpenSim.Services.Connectors.Simulation
                     else if (data.TryGetValue("version", out tmpOSD) && tmpOSD != null)
                     {
                         string versionString = tmpOSD.AsString();
-                        if(versionString != string.Empty)
+                        if (versionString != string.Empty)
                         {
-                            String[] parts = versionString.Split(new char[] {'/'});
+                            String[] parts = versionString.Split(new char[] { '/' });
                             if (parts.Length > 1)
                             {
                                 ctx.InboundVersion = float.Parse(parts[1], Culture.FormatProvider);
@@ -404,7 +400,7 @@ namespace OpenSim.Services.Connectors.Simulation
             }
             catch (Exception e)
             {
-                m_log.WarnFormat("[REMOTE SIMULATION CONNECTOR] QueryAcesss failed with exception; {0}",e.ToString());
+                m_log.WarnFormat("[REMOTE SIMULATION CONNECTOR] QueryAcesss failed with exception; {0}", e.ToString());
             }
 
             return false;
@@ -422,7 +418,7 @@ namespace OpenSim.Services.Connectors.Simulation
             }
             catch (Exception e)
             {
-                m_log.WarnFormat("[REMOTE SIMULATION CONNECTOR] ReleaseAgent failed with exception; {0}",e.ToString());
+                m_log.WarnFormat("[REMOTE SIMULATION CONNECTOR] ReleaseAgent failed with exception; {0}", e.ToString());
             }
 
             return true;
@@ -441,7 +437,7 @@ namespace OpenSim.Services.Connectors.Simulation
             }
             catch (Exception e)
             {
-                m_log.WarnFormat("[REMOTE SIMULATION CONNECTOR] CloseAgent failed with exception; {0}",e.ToString());
+                m_log.WarnFormat("[REMOTE SIMULATION CONNECTOR] CloseAgent failed with exception; {0}", e.ToString());
             }
 
             return true;
@@ -494,7 +490,7 @@ namespace OpenSim.Services.Connectors.Simulation
             }
             catch (Exception e)
             {
-                m_log.WarnFormat("[REMOTE SIMULATION CONNECTOR] CreateObject failed with exception; {0}",e.ToString());
+                m_log.WarnFormat("[REMOTE SIMULATION CONNECTOR] CreateObject failed with exception; {0}", e.ToString());
                 return false;
             }
 

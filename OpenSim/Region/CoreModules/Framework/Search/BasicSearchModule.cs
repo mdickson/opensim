@@ -24,28 +24,17 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Threading;
-
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Framework.Monitoring;
-using OpenSim.Region.ClientStack.LindenUDP;
-using OpenSim.Region.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-using OpenSim.Services.Connectors.Hypergrid;
-
-using OpenMetaverse;
-using OpenMetaverse.Packets;
-using log4net;
-using Nini.Config;
-using Mono.Addins;
-
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using DirFindFlags = OpenMetaverse.DirectoryManager.DirFindFlags;
 
 namespace OpenSim.Region.CoreModules.Framework.Search
@@ -59,6 +48,9 @@ namespace OpenSim.Region.CoreModules.Framework.Search
         protected List<Scene> m_Scenes = new List<Scene>();
 
         private IGroupsModule m_GroupsService = null;
+
+        private ExpiringCache<string, List<UserAccount>> queryPeopleCache = new ExpiringCache<string, List<UserAccount>>();
+        private ExpiringCache<string, List<DirGroupsReplyData>> queryGroupCache = new ExpiringCache<string, List<DirGroupsReplyData>>();
 
         #region ISharedRegionModule
 
@@ -150,16 +142,31 @@ namespace OpenSim.Region.CoreModules.Framework.Search
 
         void OnDirFindQuery(IClientAPI remoteClient, UUID queryID, string queryText, uint queryFlags, int queryStart)
         {
-            queryText = queryText.Trim();
+            if (!string.IsNullOrEmpty(queryText))
+            {
+                queryText = queryText.Trim();
+                queryText = queryText.ToLowerInvariant();
+            }
 
             if (((DirFindFlags)queryFlags & DirFindFlags.People) == DirFindFlags.People)
             {
                 if (string.IsNullOrEmpty(queryText))
                     remoteClient.SendDirPeopleReply(queryID, new DirPeopleReplyData[0]);
 
-                List<UserAccount> accounts = m_Scenes[0].UserAccountService.GetUserAccounts(m_Scenes[0].RegionInfo.ScopeID, queryText);
+                List<UserAccount> accounts;
+                if (!queryPeopleCache.TryGetValue(queryText, out accounts))
+                    accounts = m_Scenes[0].UserAccountService.GetUserAccounts(m_Scenes[0].RegionInfo.ScopeID, queryText);
+
+                queryPeopleCache.AddOrUpdate(queryText, accounts, 30.0);
+
+                if (accounts.Count == 0)
+                {
+                    remoteClient.SendDirPeopleReply(queryID, new DirPeopleReplyData[0]);
+                    return;
+                }
+
                 DirPeopleReplyData[] hits = new DirPeopleReplyData[accounts.Count];
-                int i = 0;
+                int count = 0;
                 foreach (UserAccount acc in accounts)
                 {
                     DirPeopleReplyData d = new DirPeopleReplyData();
@@ -168,9 +175,25 @@ namespace OpenSim.Region.CoreModules.Framework.Search
                     d.lastName = acc.LastName;
                     d.online = false;
 
-                    hits[i++] = d;
+                    hits[count++] = d;
                 }
 
+                // viewers don't sent sorting, so results they show are a nice mess
+                if ((queryStart > 0) && (queryStart < count))
+                {
+                    int len = count - queryStart;
+                    if (len > 101) // a viewer page is 100
+                        len = 101;
+                    DirPeopleReplyData[] tmp = new DirPeopleReplyData[len];
+                    Array.Copy(hits, queryStart, tmp, 0, len);
+                    hits = tmp;
+                }
+                else if (count > 101)
+                {
+                    DirPeopleReplyData[] tmp = new DirPeopleReplyData[101];
+                    Array.Copy(hits, 0, tmp, 0, 101);
+                    hits = tmp;
+                }
                 // TODO: This currently ignores pretty much all the query flags including Mature and sort order
                 remoteClient.SendDirPeopleReply(queryID, hits);
             }
@@ -186,10 +209,48 @@ namespace OpenSim.Region.CoreModules.Framework.Search
                 if (string.IsNullOrEmpty(queryText))
                     remoteClient.SendDirGroupsReply(queryID, new DirGroupsReplyData[0]);
 
-                // TODO: This currently ignores pretty much all the query flags including Mature and sort order
-                remoteClient.SendDirGroupsReply(queryID, m_GroupsService.FindGroups(remoteClient, queryText).ToArray());
-            }
+                List<DirGroupsReplyData> answer;
+                if (!queryGroupCache.TryGetValue(queryText, out answer))
+                    answer = m_GroupsService.FindGroups(remoteClient, queryText);
 
+                queryGroupCache.AddOrUpdate(queryText, answer, 30.0);
+
+                if(answer.Count == 0)
+                {
+                    remoteClient.SendDirGroupsReply(queryID, new DirGroupsReplyData[0]);
+                    return;
+                }
+
+                // filter out groups
+                DirGroupsReplyData[] result = new DirGroupsReplyData[answer.Count];
+                int count = 0;
+                foreach(DirGroupsReplyData dgrd in answer)
+                {
+                    if(dgrd.members > 0)
+                        result[count++] = dgrd;
+                }
+                answer = null;
+
+                // viewers don't sent sorting, so results they show are a nice mess
+                if ((queryStart > 0) && (queryStart < count))
+                {
+                    int len = count - queryStart;
+                    if (len > 101) // a viewer page is 100
+                        len = 101;
+                    DirGroupsReplyData[] tmp = new DirGroupsReplyData[len];
+                    Array.Copy(result, queryStart, tmp, 0, len);
+                    result = tmp;
+                }
+                else if (count > 101)
+                {
+                    DirGroupsReplyData[] tmp = new DirGroupsReplyData[101];
+                    Array.Copy(result, 0, tmp, 0, 101);
+                    result = tmp;
+                }
+
+                // TODO: This currently ignores pretty much all the query flags including Mature and sort order
+                remoteClient.SendDirGroupsReply(queryID, result);
+            }
         }
 
         #endregion Event Handlers

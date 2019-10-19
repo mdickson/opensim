@@ -25,13 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
 using OpenMetaverse;
-using OpenSim.Region.PhysicsModules.SharedBase;
-using OpenSim.Region.PhysicsModule.ubODEMeshing;
+using System;
+using System.Globalization;
 
 public class Vertex : IComparable<Vertex>
 {
@@ -91,7 +87,7 @@ public class Vertex : IComparable<Vertex>
 
         Vertex v2 = new Vertex(0f, 0f, 0f);
 
-        v2.X =   q.W * q.W * v.X +
+        v2.X = q.W * q.W * v.X +
             2f * q.Y * q.W * v.Z -
             2f * q.Z * q.W * v.Y +
                  q.X * q.X * v.X +
@@ -166,7 +162,7 @@ public class Vertex : IComparable<Vertex>
     {
         if (am == 0f)
         {
-            return new Vertex(0f,0f,0f);
+            return new Vertex(0f, 0f, 0f);
         }
         float mul = 1.0f / am;
         v1.X *= mul;
@@ -194,7 +190,7 @@ public class Vertex : IComparable<Vertex>
 
     public static Vertex FromAngle(double angle)
     {
-        return new Vertex((float) Math.Cos(angle), (float) Math.Sin(angle), 0.0f);
+        return new Vertex((float)Math.Cos(angle), (float)Math.Sin(angle), 0.0f);
     }
 
     public float Length()
@@ -277,9 +273,9 @@ public class Triangle
         v3 = _v3;
     }
 
-    public Triangle(float _v1x,float _v1y,float _v1z,
-                    float _v2x,float _v2y,float _v2z,
-                    float _v3x,float _v3y,float _v3z)
+    public Triangle(float _v1x, float _v1y, float _v1z,
+                    float _v2x, float _v2y, float _v2z,
+                    float _v3x, float _v3y, float _v3z)
     {
         v1 = new Vertex(_v1x, _v1y, _v1z);
         v2 = new Vertex(_v2x, _v2y, _v2z);
@@ -317,7 +313,7 @@ public class Triangle
         float l = n.Length();
 
         // Normalized "normal"
-        n = n/l;
+        n = n / l;
 
         return n;
     }

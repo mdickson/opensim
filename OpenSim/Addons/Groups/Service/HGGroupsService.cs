@@ -25,17 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Timers;
 using log4net;
 using Nini.Config;
-
 using OpenMetaverse;
 using OpenSim.Data;
 using OpenSim.Framework;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Groups
 {
@@ -60,7 +58,7 @@ namespace OpenSim.Groups
 
         #region HG specific operations
 
-        public bool CreateGroupProxy(string RequestingAgentID, string agentID,  string accessToken, UUID groupID, string serviceLocation, string name, out string reason)
+        public bool CreateGroupProxy(string RequestingAgentID, string agentID, string accessToken, UUID groupID, string serviceLocation, string name, out string reason)
         {
             reason = string.Empty;
             Uri uri = null;
@@ -209,7 +207,7 @@ namespace OpenSim.Groups
             List<ExtendedGroupRoleMembersData> rolemembers = GetGroupRoleMembers(RequestingAgentID, GroupID);
 
             // convert UUIDs to UUIs
-            rolemembers.ForEach(delegate(ExtendedGroupRoleMembersData m)
+            rolemembers.ForEach(delegate (ExtendedGroupRoleMembersData m)
             {
                 if (m.MemberID.ToString().Length == 36) // UUID
                 {

@@ -25,10 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
 using NUnit.Framework;
 using OpenSim.Tests.Common;
-using OpenSim.Region.ScriptEngine.Shared;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Tests
 {
@@ -85,7 +84,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
 
             foreach (KeyValuePair<double, int> number in m_doubleIntSet)
             {
-                testInteger = (LSL_Types.LSLInteger) new LSL_Types.LSLFloat(number.Key);
+                testInteger = (LSL_Types.LSLInteger)new LSL_Types.LSLFloat(number.Key);
                 Assert.AreEqual(testInteger.value, number.Value);
             }
         }
@@ -102,7 +101,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
 
             foreach (KeyValuePair<string, int> number in m_stringIntSet)
             {
-                testInteger = (LSL_Types.LSLInteger) number.Key;
+                testInteger = (LSL_Types.LSLInteger)number.Key;
                 Assert.AreEqual(testInteger.value, number.Value);
             }
         }
@@ -119,7 +118,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
 
             foreach (KeyValuePair<string, int> number in m_stringIntSet)
             {
-                testInteger = (LSL_Types.LSLInteger) new LSL_Types.LSLString(number.Key);
+                testInteger = (LSL_Types.LSLInteger)new LSL_Types.LSLString(number.Key);
                 Assert.AreEqual(testInteger.value, number.Value);
             }
         }

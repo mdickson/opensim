@@ -27,6 +27,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Threading;
 using System.Text;
@@ -35,6 +36,7 @@ using log4net;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
+using OpenSim.Framework.Monitoring;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
@@ -59,8 +61,10 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
 
         private int m_checkTime = 500; // milliseconds to wait between checks for appearance updates
         private System.Timers.Timer m_updateTimer = new System.Timers.Timer();
-        private Dictionary<UUID,long> m_savequeue = new Dictionary<UUID,long>();
-        private Dictionary<UUID,long> m_sendqueue = new Dictionary<UUID,long>();
+        private ConcurrentDictionary<UUID,long> m_savequeue = new ConcurrentDictionary<UUID,long>();
+        private ConcurrentDictionary<UUID,long> m_sendqueue = new ConcurrentDictionary<UUID,long>();
+        private object m_updatesLock = new object();
+        private int m_updatesbusy = 0;
 
         private object m_setAppearanceLock = new object();
 
@@ -72,9 +76,9 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
             IConfig appearanceConfig = config.Configs["Appearance"];
             if (appearanceConfig != null)
             {
-                m_savetime = Convert.ToInt32(appearanceConfig.GetString("DelayBeforeAppearanceSave",Convert.ToString(m_savetime)));
-                m_sendtime = Convert.ToInt32(appearanceConfig.GetString("DelayBeforeAppearanceSend",Convert.ToString(m_sendtime)));
-                m_reusetextures = appearanceConfig.GetBoolean("ReuseTextures",m_reusetextures);
+                m_savetime = Convert.ToInt32(appearanceConfig.GetString("DelayBeforeAppearanceSave", Convert.ToString(m_savetime)));
+                m_sendtime = Convert.ToInt32(appearanceConfig.GetString("DelayBeforeAppearanceSend", Convert.ToString(m_sendtime)));
+                m_reusetextures = appearanceConfig.GetBoolean("ReuseTextures", m_reusetextures);
 
                 // m_log.InfoFormat("[AVFACTORY] configured for {0} save and {1} send",m_savetime,m_sendtime);
             }
@@ -134,7 +138,7 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
             client.OnRequestWearables += Client_OnRequestWearables;
             client.OnSetAppearance += Client_OnSetAppearance;
             client.OnAvatarNowWearing += Client_OnAvatarNowWearing;
-            client.OnCachedTextureRequest += Client_OnCachedTextureRequest;
+            //client.OnCachedTextureRequest += Client_OnCachedTextureRequest;
         }
 
         #endregion
@@ -173,9 +177,9 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
         /// <param name="visualParam"></param>
         public void SetAppearance(IScenePresence sp, Primitive.TextureEntry textureEntry, byte[] visualParams, WearableCacheItem[] cacheItems)
         {
-//            m_log.DebugFormat(
-//                "[AVFACTORY]: start SetAppearance for {0}, te {1}, visualParams {2}",
-//                sp.Name, textureEntry, visualParams);
+            //            m_log.DebugFormat(
+            //                "[AVFACTORY]: start SetAppearance for {0}, te {1}, visualParams {2}",
+            //                sp.Name, textureEntry, visualParams);
 
             // TODO: This is probably not necessary any longer, just assume the
             // textureEntry set implies that the appearance transaction is complete
@@ -196,11 +200,11 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
                 {
                     m_log.DebugFormat("[AVFACTORY]: Received texture update for {0} {1}", sp.Name, sp.UUID);
 
-//                    WriteBakedTexturesReport(sp, m_log.DebugFormat);
+                    //                    WriteBakedTexturesReport(sp, m_log.DebugFormat);
 
                     changed = sp.Appearance.SetTextureEntries(textureEntry) || changed;
 
-//                    WriteBakedTexturesReport(sp, m_log.DebugFormat);
+                    //                    WriteBakedTexturesReport(sp, m_log.DebugFormat);
 
                     UpdateBakedTextureCache(sp, cacheItems);
 
@@ -232,20 +236,15 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
             sp.SendAppearanceToAllOtherAgents();
 
             // Send animations back to the avatar as well
-            sp.Animator.SendAnimPack();
+            if(sp.Animator != null)
+                sp.Animator.SendAnimPack();
         }
 
         public bool SendAppearance(UUID agentId)
         {
-//            m_log.DebugFormat("[AVFACTORY]: Sending appearance for {0}", agentId);
-
             ScenePresence sp = m_scene.GetScenePresence(agentId);
-            if (sp == null)
-            {
-                // This is expected if the user has gone away.
-//                m_log.DebugFormat("[AVFACTORY]: Agent {0} no longer in the scene", agentId);
+            if (sp == null || sp.IsDeleted)
                 return false;
-            }
 
             SendAppearance(sp);
             return true;
@@ -289,7 +288,7 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
                 return false;
 
             IAssetCache cache = sp.Scene.RequestModuleInterface<IAssetCache>();
-            if(cache == null)
+            if (cache == null)
                 return true; // no baked local caching so nothing to do
 
             foreach (BakeType bakeType in bakedTextures.Keys)
@@ -334,34 +333,28 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
         /// <param name="agentId"></param>
         public void QueueAppearanceSend(UUID agentid)
         {
-//            m_log.DebugFormat("[AVFACTORY]: Queue appearance send for {0}", agentid);
+            //            m_log.DebugFormat("[AVFACTORY]: Queue appearance send for {0}", agentid);
 
             // 10000 ticks per millisecond, 1000 milliseconds per second
             long timestamp = DateTime.Now.Ticks + Convert.ToInt64(m_sendtime * 1000 * 10000);
-            lock (m_sendqueue)
-            {
-                m_sendqueue[agentid] = timestamp;
-                m_updateTimer.Start();
-            }
+            m_sendqueue[agentid] = timestamp;
+            m_updateTimer.Start();
         }
 
         public void QueueAppearanceSave(UUID agentid)
         {
-//            m_log.DebugFormat("[AVFACTORY]: Queueing appearance save for {0}", agentid);
+            //            m_log.DebugFormat("[AVFACTORY]: Queueing appearance save for {0}", agentid);
 
             // 10000 ticks per millisecond, 1000 milliseconds per second
             long timestamp = DateTime.Now.Ticks + Convert.ToInt64(m_savetime * 1000 * 10000);
-            lock (m_savequeue)
-            {
-                m_savequeue[agentid] = timestamp;
-                m_updateTimer.Start();
-            }
+            m_savequeue[agentid] = timestamp;
+            m_updateTimer.Start();
         }
 
         // called on textures update
         public bool UpdateBakedTextureCache(IScenePresence sp, WearableCacheItem[] cacheItems)
         {
-            if(cacheItems == null)
+            if(cacheItems == null || cacheItems.Length == 0)
                 return false;
 
             // npcs dont have baked cache
@@ -370,71 +363,52 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
 
             // uploaded baked textures will be in assets local cache
             IAssetCache cache = m_scene.RequestModuleInterface<IAssetCache>();
-            IBakedTextureModule m_BakedTextureModule = m_scene.RequestModuleInterface<IBakedTextureModule>();
 
             int validDirtyBakes = 0;
             int hits = 0;
 
             // our main cacheIDs mapper is p.Appearance.WearableCacheItems
-            WearableCacheItem[] wearableCache = sp.Appearance.WearableCacheItems;
+            bool hadSkirt = false;
 
+            WearableCacheItem[] wearableCache = sp.Appearance.WearableCacheItems;
             if (wearableCache == null)
-            {
                 wearableCache = WearableCacheItem.GetDefaultCacheItem();
+            else
+            {
+                hadSkirt = (wearableCache[19].TextureID != UUID.Zero);
             }
 
+            HashSet<uint> updatedFaces = new HashSet<uint>();
             List<UUID> missing = new List<UUID>();
-
-            bool haveSkirt = (wearableCache[19].TextureID != UUID.Zero);
-            bool haveNewSkirt = false;
 
             // Process received baked textures
             for (int i = 0; i < cacheItems.Length; i++)
             {
-                int idx = (int)cacheItems[i].TextureIndex;
-                Primitive.TextureEntryFace face = sp.Appearance.Texture.FaceTextures[idx];
-
-                // No face
-                if (face == null)
+                uint idx = cacheItems[i].TextureIndex;
+                if(idx >= AvatarAppearance.TEXTURE_COUNT)
                 {
-                    // for some reason viewer is cleaning this
-                    if(idx != 19) // skirt is optional
-                        {
-                        sp.Appearance.Texture.FaceTextures[idx] = sp.Appearance.Texture.CreateFace((uint) idx);
-                        sp.Appearance.Texture.FaceTextures[idx].TextureID = AppearanceManager.DEFAULT_AVATAR_TEXTURE;
-                        }
-                    wearableCache[idx].CacheId = UUID.Zero;
-                    wearableCache[idx].TextureID = UUID.Zero;
-                    wearableCache[idx].TextureAsset = null;
+                    hits++;
                     continue;
                 }
-                else
+
+                updatedFaces.Add(idx);
+
+                wearableCache[idx].TextureAsset = null; // just in case
+                Primitive.TextureEntryFace face = sp.Appearance.Texture.FaceTextures[idx];
+
+                if (face == null || face.TextureID == UUID.Zero || face.TextureID == AppearanceManager.DEFAULT_AVATAR_TEXTURE)
                 {
-                    if (face.TextureID == UUID.Zero || face.TextureID == AppearanceManager.DEFAULT_AVATAR_TEXTURE)
-                    {
                         wearableCache[idx].CacheId = UUID.Zero;
                         wearableCache[idx].TextureID = UUID.Zero;
-                        wearableCache[idx].TextureAsset = null;
-                        continue;
-                    }
-
-                    if(idx == 19)
-                        haveNewSkirt = true;
-/*
-                    if (face.TextureID == wearableCache[idx].TextureID && m_BakedTextureModule != null)
-                    {
-                        if (wearableCache[idx].CacheId != cacheItems[i].CacheId)
-                        {
-                            wearableCache[idx].CacheId = cacheItems[i].CacheId;
-                            validDirtyBakes++;
-
-                            //assuming this can only happen if asset is in cache
-                        }
+                    if (idx == 19)
+                                        {
                         hits++;
-                        continue;
-                    }
-*/
-                    wearableCache[idx].TextureAsset = null;
+                        if(hadSkirt)
+                                                validDirtyBakes++;
+                                            }
+                                            continue;
+                                        }
+
                     if (cache != null)
                     {
                         AssetBase asb = null;
@@ -442,34 +416,37 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
                         wearableCache[idx].TextureAsset = asb;
                     }
 
-                    if (wearableCache[idx].TextureAsset != null)
-                    {
-                        if ( wearableCache[idx].TextureID != face.TextureID ||
-                                wearableCache[idx].CacheId != cacheItems[i].CacheId)
-                            validDirtyBakes++;
+                if (wearableCache[idx].TextureAsset != null)
+                {
+                    if ( wearableCache[idx].TextureID != face.TextureID ||
+                            wearableCache[idx].CacheId != cacheItems[i].CacheId)
+                        validDirtyBakes++;
 
-                        wearableCache[idx].TextureID = face.TextureID;
-                        wearableCache[idx].CacheId = cacheItems[i].CacheId;
-                        hits++;
-                    }
-                    else
-                    {
-                        wearableCache[idx].CacheId = UUID.Zero;
-                        wearableCache[idx].TextureID = UUID.Zero;
-                        wearableCache[idx].TextureAsset = null;
-                        missing.Add(face.TextureID);
-                        continue;
-                    }
+                    wearableCache[idx].TextureID = face.TextureID;
+                    wearableCache[idx].CacheId = cacheItems[i].CacheId;
+                    hits++;
+                }
+                else
+                {
+                    wearableCache[idx].CacheId = UUID.Zero;
+                    wearableCache[idx].TextureID = UUID.Zero;
+                    missing.Add(face.TextureID);
+                    continue;
                 }
             }
 
-            // handle optional skirt case
-            if(!haveNewSkirt && haveSkirt)
+            // this may be a current fs bug
+            for (int i = AvatarAppearance.BAKES_COUNT_PV7; i < AvatarAppearance.BAKE_INDICES.Length; i++)
             {
-                wearableCache[19].CacheId = UUID.Zero;
-                wearableCache[19].TextureID = UUID.Zero;
-                wearableCache[19].TextureAsset = null;
-                validDirtyBakes++;
+                uint idx = AvatarAppearance.BAKE_INDICES[i];
+                if(updatedFaces.Contains(idx))
+                    continue;
+
+                sp.Appearance.Texture.FaceTextures[idx] = null;
+
+                 wearableCache[idx].CacheId = UUID.Zero;
+                 wearableCache[idx].TextureID = UUID.Zero;
+                 wearableCache[idx].TextureAsset = null;
             }
 
             sp.Appearance.WearableCacheItems = wearableCache;
@@ -480,15 +457,18 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
                     sp.ControllingClient.SendRebakeAvatarTextures(id);
             }
 
+            bool changed = false;
             if (validDirtyBakes > 0 && hits == cacheItems.Length)
             {
                 // if we got a full set of baked textures save all in BakedTextureModule
+                IBakedTextureModule m_BakedTextureModule = m_scene.RequestModuleInterface<IBakedTextureModule>();
                 if (m_BakedTextureModule != null)
                 {
                     m_log.DebugFormat("[UpdateBakedCache] Uploading to Bakes Server: cache hits: {0} changed entries: {1} rebakes {2}",
                         hits.ToString(), validDirtyBakes.ToString(), missing.Count);
 
                     m_BakedTextureModule.Store(sp.UUID, wearableCache);
+                    changed = true;
                 }
             }
             else
@@ -499,65 +479,64 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
             {
                 int j = AvatarAppearance.BAKE_INDICES[iter];
                 sp.Appearance.WearableCacheItems[j].TextureAsset = null;
-//                m_log.Debug("[UpdateBCache] {" + iter + "/" +
-//                                    sp.Appearance.WearableCacheItems[j].TextureIndex + "}: c-" +
-//                                    sp.Appearance.WearableCacheItems[j].CacheId + ", t-" +
-//                                    sp.Appearance.WearableCacheItems[j].TextureID);
+                //                m_log.Debug("[UpdateBCache] {" + iter + "/" +
+                //                                    sp.Appearance.WearableCacheItems[j].TextureIndex + "}: c-" +
+                //                                    sp.Appearance.WearableCacheItems[j].CacheId + ", t-" +
+                //                                    sp.Appearance.WearableCacheItems[j].TextureID);
             }
 
-            return (hits == cacheItems.Length);
+            return changed;
         }
 
         // called when we get a new root avatar
         public bool ValidateBakedTextureCache(IScenePresence sp)
         {
-            int hits = 0;
-
             if (((ScenePresence)sp).IsNPC)
                 return true;
 
+            int hits = 0;
+
+            IAssetCache cache = m_scene.RequestModuleInterface<IAssetCache>();
+            if (cache == null)
+                return false;
+
+            IBakedTextureModule bakedModule = m_scene.RequestModuleInterface<IBakedTextureModule>();
+
             lock (m_setAppearanceLock)
             {
-                IAssetCache cache = m_scene.RequestModuleInterface<IAssetCache>();
-                IBakedTextureModule bakedModule = m_scene.RequestModuleInterface<IBakedTextureModule>();
-                WearableCacheItem[] bakedModuleCache = null;
-
-                if (cache == null)
-                    return false;
-
                 WearableCacheItem[] wearableCache = sp.Appearance.WearableCacheItems;
 
                 // big debug
-//                m_log.DebugFormat("[AVFACTORY]: ValidateBakedTextureCache start for {0} {1}", sp.Name, sp.UUID);
-/*
-                for (int iter = 0; iter < AvatarAppearance.BAKE_INDICES.Length; iter++)
-                {
-                    int j = AvatarAppearance.BAKE_INDICES[iter];
-                    Primitive.TextureEntryFace face = sp.Appearance.Texture.FaceTextures[j];
-                    if (wearableCache == null)
-                    {
-                        if (face != null)
-                            m_log.Debug("[ValidateBakedCache] {" + iter + "/" + j + " t- " + face.TextureID);
-                        else
-                            m_log.Debug("[ValidateBakedCache] {" + iter + "/" + j + " t- No texture");
-                    }
-                    else
-                    {
-                        if (face != null)
-                            m_log.Debug("[ValidateBakedCache] {" + iter + "/" + j + " ft- " + face.TextureID +
-                                   "}: cc-" +
-                                    wearableCache[j].CacheId + ", ct-" +
-                                    wearableCache[j].TextureID
-                                );
-                        else
-                            m_log.Debug("[ValidateBakedCache] {" + iter + "/" + j + " t - No texture" +
-                                    "}: cc-" +
-                                    wearableCache[j].CacheId + ", ct-" +
-                                    wearableCache[j].TextureID
-                                );
-                    }
-                }
-*/
+                //                m_log.DebugFormat("[AVFACTORY]: ValidateBakedTextureCache start for {0} {1}", sp.Name, sp.UUID);
+                /*
+                                for (int iter = 0; iter < AvatarAppearance.BAKE_INDICES.Length; iter++)
+                                {
+                                    int j = AvatarAppearance.BAKE_INDICES[iter];
+                                    Primitive.TextureEntryFace face = sp.Appearance.Texture.FaceTextures[j];
+                                    if (wearableCache == null)
+                                    {
+                                        if (face != null)
+                                            m_log.Debug("[ValidateBakedCache] {" + iter + "/" + j + " t- " + face.TextureID);
+                                        else
+                                            m_log.Debug("[ValidateBakedCache] {" + iter + "/" + j + " t- No texture");
+                                    }
+                                    else
+                                    {
+                                        if (face != null)
+                                            m_log.Debug("[ValidateBakedCache] {" + iter + "/" + j + " ft- " + face.TextureID +
+                                                   "}: cc-" +
+                                                    wearableCache[j].CacheId + ", ct-" +
+                                                    wearableCache[j].TextureID
+                                                );
+                                        else
+                                            m_log.Debug("[ValidateBakedCache] {" + iter + "/" + j + " t - No texture" +
+                                                    "}: cc-" +
+                                                    wearableCache[j].CacheId + ", ct-" +
+                                                    wearableCache[j].TextureID
+                                                );
+                                    }
+                                }
+                */
 
                 bool wearableCacheValid = false;
                 if (wearableCache == null)
@@ -566,70 +545,46 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
                 }
                 else
                 {
-                    // we may have received a full cache
-                    // check same coerence and store
                     wearableCacheValid = true;
+                    Primitive.TextureEntryFace face;
                     for (int i = 0; i < AvatarAppearance.BAKE_INDICES.Length; i++)
                     {
                         int idx = AvatarAppearance.BAKE_INDICES[i];
-                        Primitive.TextureEntryFace face = sp.Appearance.Texture.FaceTextures[idx];
-                        if (face != null)
-                        {
-                            if (face.TextureID == wearableCache[idx].TextureID &&
-                                face.TextureID != UUID.Zero)
-                            {
-                                if (wearableCache[idx].TextureAsset != null)
-                                {
-                                    hits++;
-                                    wearableCache[idx].TextureAsset.Temporary = true;
-                                    wearableCache[idx].TextureAsset.Local = true;
-                                    cache.Cache(wearableCache[idx].TextureAsset);
-                                    wearableCache[idx].TextureAsset = null;
-                                    continue;
-                                }
-                                
-                                if (cache.Check((wearableCache[idx].TextureID).ToString()))
-                                {
-                                    hits++;
-                                    continue;
-                                }
-                            }
-                            wearableCacheValid = false;
-                        }
-                    }
+                        face = sp.Appearance.Texture.FaceTextures[idx];
 
-                    wearableCacheValid = (wearableCacheValid && (hits >= AvatarAppearance.BAKE_INDICES.Length - 1));
-                    if (wearableCacheValid)
-                    {
-//                        m_log.Debug("[ValidateBakedCache] have valid local cache");
+                        if(face == null || face.TextureID == AppearanceManager.DEFAULT_AVATAR_TEXTURE)
+                        {
+                            wearableCache[idx].CacheId = UUID.Zero;
+                            wearableCache[idx].TextureID = AppearanceManager.DEFAULT_AVATAR_TEXTURE;
+                            hits++;
+                            continue;
+                        }
+
+                        if (face.TextureID == wearableCache[idx].TextureID &&
+                            face.TextureID != UUID.Zero)
+                        {
+                            if (cache.Check((wearableCache[idx].TextureID).ToString()))
+                            {
+                                    hits++;
+                                    continue;
+                                }
+                        }
+                        wearableCache[idx].CacheId = UUID.Zero;
+                        wearableCache[idx].TextureID = AppearanceManager.DEFAULT_AVATAR_TEXTURE;
+                        wearableCacheValid = false;
                     }
-                    else
-                        wearableCache[19].TextureAsset = null; // clear optional skirt
                 }
 
                 bool checkExternal = false;
-
                 if (!wearableCacheValid)
-                {
-                    hits = 0;
-                    // only use external bake module on login condition check
-//                    ScenePresence ssp = null;
-//                    if (sp is ScenePresence)
-                    {
-//                        ssp = (ScenePresence)sp;
-//                        checkExternal = (((uint)ssp.TeleportFlags & (uint)TeleportFlags.ViaLogin) != 0) &&
-//                            bakedModule != null;
-
-                        // or do it anytime we dont have the cache
                         checkExternal = bakedModule != null;
-                    }
-                }
 
                 if (checkExternal)
                 {
-                    bool gotbacked = false;
+                    WearableCacheItem[] bakedModuleCache = null;
+                    hits = 0;
 
-//                    m_log.Debug("[ValidateBakedCache] local cache invalid, checking bakedModule");
+                    //                    m_log.Debug("[ValidateBakedCache] local cache invalid, checking bakedModule");
                     try
                     {
                         bakedModuleCache = bakedModule.Get(sp.UUID);
@@ -647,8 +602,7 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
                         for (int i = 0; i < bakedModuleCache.Length; i++)
                         {
                             int j = (int)bakedModuleCache[i].TextureIndex;
-
-                            if (bakedModuleCache[i].TextureAsset != null)
+                            if (j < AvatarAppearance.TEXTURE_COUNT && bakedModuleCache[i].TextureAsset != null)
                             {
                                 wearableCache[j].TextureID = bakedModuleCache[i].TextureID;
                                 wearableCache[j].CacheId = bakedModuleCache[i].CacheId;
@@ -658,33 +612,27 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
                                 cache.Cache(bakedModuleCache[i].TextureAsset);
                             }
                         }
-                        gotbacked = true;
-                    }
 
-                    if (gotbacked)
-                    {
                         // force the ones we got
                         for (int i = 0; i < AvatarAppearance.BAKE_INDICES.Length; i++)
                         {
                             int idx = AvatarAppearance.BAKE_INDICES[i];
-                            if(wearableCache[idx].TextureAsset == null)
+                            if (wearableCache[idx].TextureAsset == null)
                             {
-                                if(idx == 19)
+                                if (idx == 19)
                                 {
                                     sp.Appearance.Texture.FaceTextures[idx] = null;
                                     hits++;
                                 }
+                                else if(sp.Appearance.Texture.FaceTextures[idx] == null ||
+                                    sp.Appearance.Texture.FaceTextures[idx].TextureID == AppearanceManager.DEFAULT_AVATAR_TEXTURE)
+                                    hits++;
+                                wearableCache[idx].TextureID = AppearanceManager.DEFAULT_AVATAR_TEXTURE;
+                                wearableCache[idx].CacheId = UUID.Zero;
                                 continue;
                             }
 
-                            Primitive.TextureEntryFace face = sp.Appearance.Texture.FaceTextures[idx];
-
-                            if (face == null)
-                            {
-                                face = sp.Appearance.Texture.CreateFace((uint)idx);
-                                sp.Appearance.Texture.FaceTextures[idx] = face;
-                            }
-
+                            Primitive.TextureEntryFace face = sp.Appearance.Texture.GetFace((uint)idx);
                             face.TextureID = wearableCache[idx].TextureID;
                             hits++;
                             wearableCache[idx].TextureAsset = null;
@@ -699,16 +647,16 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
             // debug
 //            m_log.DebugFormat("[ValidateBakedCache]: Completed texture check for {0} {1} with {2} hits", sp.Name, sp.UUID, hits);
 /*
-            for (int iter = 0; iter < AvatarAppearance.BAKE_INDICES.Length; iter++)
-            {
-                int j = AvatarAppearance.BAKE_INDICES[iter];
-                m_log.Debug("[ValidateBakedCache] {" + iter + "/" +
-                                    sp.Appearance.WearableCacheItems[j].TextureIndex + "}: c-" +
-                                    sp.Appearance.WearableCacheItems[j].CacheId + ", t-" +
-                                    sp.Appearance.WearableCacheItems[j].TextureID);
-            }
+                        for (int iter = 0; iter < AvatarAppearance.BAKE_INDICES.Length; iter++)
+                        {
+                            int j = AvatarAppearance.BAKE_INDICES[iter];
+                            m_log.Debug("[ValidateBakedCache] {" + iter + "/" +
+                                                sp.Appearance.WearableCacheItems[j].TextureIndex + "}: c-" +
+                                                sp.Appearance.WearableCacheItems[j].CacheId + ", t-" +
+                                                sp.Appearance.WearableCacheItems[j].TextureID);
+                        }
 */
-            return (hits >= AvatarAppearance.BAKE_INDICES.Length - 1); // skirt is optional
+            return (hits >= AvatarAppearance.BAKE_INDICES.Length); // skirt is optional
         }
 
         public int RequestRebake(IScenePresence sp, bool missingTexturesOnly)
@@ -733,7 +681,7 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
 
                 if (missingTexturesOnly)
                 {
-                    if (cache != null &&  cache.Check(face.TextureID.ToString()))
+                    if (cache != null && cache.Check(face.TextureID.ToString()))
                     {
                         continue;
                     }
@@ -776,13 +724,15 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
             foreach (int i in Enum.GetValues(typeof(BakeType)))
             {
                 BakeType bakeType = (BakeType)i;
+                if (bakeType == BakeType.NumberOfEntries)
+                    break;
 
                 if (bakeType == BakeType.Unknown)
                     continue;
 
-//                m_log.DebugFormat(
-//                    "[AVFACTORY]: NPC avatar {0} has texture id {1} : {2}",
-//                    acd.AgentID, i, acd.Appearance.Texture.FaceTextures[i]);
+                //                m_log.DebugFormat(
+                //                    "[AVFACTORY]: NPC avatar {0} has texture id {1} : {2}",
+                //                    acd.AgentID, i, acd.Appearance.Texture.FaceTextures[i]);
 
                 int ftIndex = (int)AppearanceManager.BakeTypeToAgentTextureIndex(bakeType);
                 Primitive.TextureEntryFace texture = faceTextures[ftIndex];    // this will be null if there's no such baked texture
@@ -794,90 +744,78 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
 
         private void HandleAppearanceUpdateTimer(object sender, EventArgs ea)
         {
-            long now = DateTime.Now.Ticks;
-
-            lock (m_sendqueue)
+            if(Monitor.TryEnter(m_updatesLock))
             {
-                Dictionary<UUID, long> sends = new Dictionary<UUID, long>(m_sendqueue);
-                foreach (KeyValuePair<UUID, long> kvp in sends)
+                UUID id;
+                long now = DateTime.Now.Ticks;
+
+                foreach (KeyValuePair<UUID, long> kvp in m_sendqueue)
                 {
-                    // We have to load the key and value into local parameters to avoid a race condition if we loop
-                    // around and load kvp with a different value before FireAndForget has launched its thread.
-                    UUID avatarID = kvp.Key;
                     long sendTime = kvp.Value;
+                    if (sendTime > now)
+                    continue;
 
-//                    m_log.DebugFormat("[AVFACTORY]: Handling queued appearance updates for {0}, update delta to now is {1}", avatarID, sendTime - now);
-
-                    if (sendTime < now)
-                    {
-                        Util.FireAndForget(o => SendAppearance(avatarID), null, "AvatarFactoryModule.SendAppearance");
-                        m_sendqueue.Remove(avatarID);
-                    }
-                }
-            }
-
-            lock (m_savequeue)
-            {
-                Dictionary<UUID, long> saves = new Dictionary<UUID, long>(m_savequeue);
-                foreach (KeyValuePair<UUID, long> kvp in saves)
-                {
-                    // We have to load the key and value into local parameters to avoid a race condition if we loop
-                    // around and load kvp with a different value before FireAndForget has launched its thread.
-                    UUID avatarID = kvp.Key;
-                    long sendTime = kvp.Value;
-
-                    if (sendTime < now)
-                    {
-                        Util.FireAndForget(o => SaveAppearance(avatarID), null, "AvatarFactoryModule.SaveAppearance");
-                        m_savequeue.Remove(avatarID);
-                    }
+                    id = kvp.Key;
+                    m_sendqueue.TryRemove(id, out sendTime);
+                    SendAppearance(id);
                 }
 
-                // We must lock both queues here so that QueueAppearanceSave() or *Send() don't m_updateTimer.Start() on
-                // another thread inbetween the first count calls and m_updateTimer.Stop() on this thread.
-                lock (m_sendqueue)
-                    if (m_savequeue.Count == 0 && m_sendqueue.Count == 0)
-                        m_updateTimer.Stop();
+                if(m_updatesbusy == 0)
+                {
+                    m_updatesbusy = -1;
+                    List<UUID> saves = new List<UUID>(m_savequeue.Count);
+                    foreach (KeyValuePair<UUID, long> kvp in m_savequeue)
+                    {
+                        long sendTime = kvp.Value;
+                        if (sendTime > now)
+                            continue;
+
+                        id = kvp.Key;
+                        m_savequeue.TryRemove(id, out sendTime);
+                            saves.Add(id);
+                    }
+
+                    m_updatesbusy = 0;
+                    if (saves.Count > 0)
+                    {
+                        ++m_updatesbusy;
+                        WorkManager.RunInThreadPool(
+                            delegate
+                            {
+                                SaveAppearance(saves);
+                                saves = null;
+                                --m_updatesbusy;
+                            }, null, string.Format("SaveAppearance ({0})", m_scene.Name));
+                    }
+                }
+
+                if (m_savequeue.Count == 0 && m_sendqueue.Count == 0)
+                    m_updateTimer.Stop();
+
+                 Monitor.Exit(m_updatesLock);
             }
         }
 
-        private void SaveAppearance(UUID agentid)
+        private void SaveAppearance(List<UUID> ids)
         {
-            // We must set appearance parameters in the en_US culture in order to avoid issues where values are saved
-            // in a culture where decimal points are commas and then reloaded in a culture which just treats them as
-            // number seperators.
-            Culture.SetCurrentCulture();
-
-            ScenePresence sp = m_scene.GetScenePresence(agentid);
-            if (sp == null)
-            {
-                // This is expected if the user has gone away.
-//                m_log.DebugFormat("[AVFACTORY]: Agent {0} no longer in the scene", agentid);
-                return;
-            }
-
 //            m_log.DebugFormat("[AVFACTORY]: Saving appearance for avatar {0}", agentid);
 
+            foreach(UUID id in ids)
+            {
+                ScenePresence sp = m_scene.GetScenePresence(id);
+                if(sp == null)
+                    continue;
             // This could take awhile since it needs to pull inventory
             // We need to do it at the point of save so that there is a sufficient delay for any upload of new body part/shape
             // assets and item asset id changes to complete.
             // I don't think we need to worry about doing this within m_setAppearanceLock since the queueing avoids
             // multiple save requests.
-            SetAppearanceAssets(sp.UUID, sp.Appearance);
 
-//            List<AvatarAttachment> attachments = sp.Appearance.GetAttachments();
-//            foreach (AvatarAttachment att in attachments)
-//            {
-//                m_log.DebugFormat(
-//                    "[AVFACTORY]: For {0} saving attachment {1} at point {2}",
-//                    sp.Name, att.ItemID, att.AttachPoint);
-//            }
+                SetAppearanceAssets(id, sp.Appearance);
 
-            m_scene.AvatarService.SetAppearance(agentid, sp.Appearance);
-
-            // Trigger this here because it's the final step in the set/queue/save process for appearance setting.
-            // Everything has been updated and stored. Ensures bakes have been persisted (if option is set to persist bakes).
-            m_scene.EventManager.TriggerAvatarAppearanceChanged(sp);
+                m_scene.AvatarService.SetAppearance(id, sp.Appearance);
+                //m_scene.EventManager.TriggerAvatarAppearanceChanged(sp);
+            }
         }
 
         /// <summary>
@@ -934,225 +872,226 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
                 m_log.WarnFormat("[AVFACTORY]: user {0} has no inventory, appearance isn't going to work", userID);
             }
 
-//            IInventoryService invService = m_scene.InventoryService;
-//            bool resetwearable = false;
-//            if (invService.GetRootFolder(userID) != null)
-//            {
-//                for (int i = 0; i < AvatarWearable.MAX_WEARABLES; i++)
-//                {
-//                    for (int j = 0; j < appearance.Wearables[i].Count; j++)
-//                    {
-//                        // Check if the default wearables are not set
-//                        if (appearance.Wearables[i][j].ItemID == UUID.Zero)
-//                        {
-//                            switch ((WearableType) i)
-//                            {
-//                                case WearableType.Eyes:
-//                                case WearableType.Hair:
-//                                case WearableType.Shape:
-//                                case WearableType.Skin:
-//                                //case WearableType.Underpants:
-//                                    TryAndRepairBrokenWearable((WearableType)i, invService, userID, appearance);
-//                                    resetwearable = true;
-//                                    m_log.Warn("[AVFACTORY]: UUID.Zero Wearables, passing fake values.");
-//                                    resetwearable = true;
-//                                    break;
-//
-//                            }
-//                            continue;
-//                        }
-//
-//                        // Ignore ruth's assets except for the body parts! missing body parts fail avatar appearance on V1
-//                        if (appearance.Wearables[i][j].ItemID == AvatarWearable.DefaultWearables[i][0].ItemID)
-//                        {
-//                            switch ((WearableType)i)
-//                            {
-//                                case WearableType.Eyes:
-//                                case WearableType.Hair:
-//                                case WearableType.Shape:
-//                                case WearableType.Skin:
-//                                //case WearableType.Underpants:
-//                                    TryAndRepairBrokenWearable((WearableType)i, invService, userID, appearance);
-//
-//                                    m_log.WarnFormat("[AVFACTORY]: {0} Default Wearables, passing existing values.", (WearableType)i);
-//                                    resetwearable = true;
-//                                    break;
-//
-//                            }
-//                            continue;
-//                        }
-//
-//                        InventoryItemBase baseItem = new InventoryItemBase(appearance.Wearables[i][j].ItemID, userID);
-//                        baseItem = invService.GetItem(baseItem);
-//
-//                        if (baseItem != null)
-//                        {
-//                            appearance.Wearables[i].Add(appearance.Wearables[i][j].ItemID, baseItem.AssetID);
-//                            int unmodifiedWearableIndexForClosure = i;
-//                            m_scene.AssetService.Get(baseItem.AssetID.ToString(), this,
-//                                                                      delegate(string x, object y, AssetBase z)
-//                                                                      {
-//                                                                          if (z == null)
-//                                                                          {
-//                                                                              TryAndRepairBrokenWearable(
-//                                                                                  (WearableType)unmodifiedWearableIndexForClosure, invService,
-//                                                                                  userID, appearance);
-//                                                                          }
-//                                                                      });
-//                        }
-//                        else
-//                        {
-//                            m_log.ErrorFormat(
-//                                "[AVFACTORY]: Can't find inventory item {0} for {1}, setting to default",
-//                                appearance.Wearables[i][j].ItemID, (WearableType)i);
-//
-//                            TryAndRepairBrokenWearable((WearableType)i, invService, userID, appearance);
-//                            resetwearable = true;
-//
-//                        }
-//                    }
-//                }
-//
-//                // I don't know why we have to test for this again...  but the above switches do not capture these scenarios for some reason....
-//                if (appearance.Wearables[(int) WearableType.Eyes] == null)
-//                {
-//                    m_log.WarnFormat("[AVFACTORY]: {0} Eyes are Null, passing existing values.", (WearableType.Eyes));
-//
-//                    TryAndRepairBrokenWearable(WearableType.Eyes, invService, userID, appearance);
-//                    resetwearable = true;
-//                }
-//                else
-//                {
-//                    if (appearance.Wearables[(int) WearableType.Eyes][0].ItemID == UUID.Zero)
-//                    {
-//                        m_log.WarnFormat("[AVFACTORY]: Eyes are UUID.Zero are broken, {0} {1}",
-//                                         appearance.Wearables[(int) WearableType.Eyes][0].ItemID,
-//                                         appearance.Wearables[(int) WearableType.Eyes][0].AssetID);
-//                        TryAndRepairBrokenWearable(WearableType.Eyes, invService, userID, appearance);
-//                        resetwearable = true;
-//
-//                    }
-//
-//                }
-//                // I don't know why we have to test for this again...  but the above switches do not capture these scenarios for some reason....
-//                if (appearance.Wearables[(int)WearableType.Shape] == null)
-//                {
-//                    m_log.WarnFormat("[AVFACTORY]: {0} shape is Null, passing existing values.", (WearableType.Shape));
-//
-//                    TryAndRepairBrokenWearable(WearableType.Shape, invService, userID, appearance);
-//                    resetwearable = true;
-//                }
-//                else
-//                {
-//                    if (appearance.Wearables[(int)WearableType.Shape][0].ItemID == UUID.Zero)
-//                    {
-//                        m_log.WarnFormat("[AVFACTORY]: Shape is UUID.Zero and broken, {0} {1}",
-//                                         appearance.Wearables[(int)WearableType.Shape][0].ItemID,
-//                                         appearance.Wearables[(int)WearableType.Shape][0].AssetID);
-//                        TryAndRepairBrokenWearable(WearableType.Shape, invService, userID, appearance);
-//                        resetwearable = true;
-//
-//                    }
-//
-//                }
-//                // I don't know why we have to test for this again...  but the above switches do not capture these scenarios for some reason....
-//                if (appearance.Wearables[(int)WearableType.Hair] == null)
-//                {
-//                    m_log.WarnFormat("[AVFACTORY]: {0} Hair is Null, passing existing values.", (WearableType.Hair));
-//
-//                    TryAndRepairBrokenWearable(WearableType.Hair, invService, userID, appearance);
-//                    resetwearable = true;
-//                }
-//                else
-//                {
-//                    if (appearance.Wearables[(int)WearableType.Hair][0].ItemID == UUID.Zero)
-//                    {
-//                        m_log.WarnFormat("[AVFACTORY]: Hair is UUID.Zero and broken, {0} {1}",
-//                                         appearance.Wearables[(int)WearableType.Hair][0].ItemID,
-//                                         appearance.Wearables[(int)WearableType.Hair][0].AssetID);
-//                        TryAndRepairBrokenWearable(WearableType.Hair, invService, userID, appearance);
-//                        resetwearable = true;
-//
-//                    }
-//
-//                }
-//                // I don't know why we have to test for this again...  but the above switches do not capture these scenarios for some reason....
-//                if (appearance.Wearables[(int)WearableType.Skin] == null)
-//                {
-//                    m_log.WarnFormat("[AVFACTORY]: {0} Skin is Null, passing existing values.", (WearableType.Skin));
-//
-//                    TryAndRepairBrokenWearable(WearableType.Skin, invService, userID, appearance);
-//                    resetwearable = true;
-//                }
-//                else
-//                {
-//                    if (appearance.Wearables[(int)WearableType.Skin][0].ItemID == UUID.Zero)
-//                    {
-//                        m_log.WarnFormat("[AVFACTORY]: Skin is UUID.Zero and broken, {0} {1}",
-//                                         appearance.Wearables[(int)WearableType.Skin][0].ItemID,
-//                                         appearance.Wearables[(int)WearableType.Skin][0].AssetID);
-//                        TryAndRepairBrokenWearable(WearableType.Skin, invService, userID, appearance);
-//                        resetwearable = true;
-//
-//                    }
-//
-//                }
-//                if (resetwearable)
-//                {
-//                    ScenePresence presence = null;
-//                    if (m_scene.TryGetScenePresence(userID, out presence))
-//                    {
-//                        presence.ControllingClient.SendWearables(presence.Appearance.Wearables,
-//                                                                 presence.Appearance.Serial++);
-//                    }
-//                }
-//
-//            }
-//            else
-//            {
-//                m_log.WarnFormat("[AVFACTORY]: user {0} has no inventory, appearance isn't going to work", userID);
-//            }
+            //            IInventoryService invService = m_scene.InventoryService;
+            //            bool resetwearable = false;
+            //            if (invService.GetRootFolder(userID) != null)
+            //            {
+            //                for (int i = 0; i < AvatarWearable.MAX_WEARABLES; i++)
+            //                {
+            //                    for (int j = 0; j < appearance.Wearables[i].Count; j++)
+            //                    {
+            //                        // Check if the default wearables are not set
+            //                        if (appearance.Wearables[i][j].ItemID == UUID.Zero)
+            //                        {
+            //                            switch ((WearableType) i)
+            //                            {
+            //                                case WearableType.Eyes:
+            //                                case WearableType.Hair:
+            //                                case WearableType.Shape:
+            //                                case WearableType.Skin:
+            //                                //case WearableType.Underpants:
+            //                                    TryAndRepairBrokenWearable((WearableType)i, invService, userID, appearance);
+            //                                    resetwearable = true;
+            //                                    m_log.Warn("[AVFACTORY]: UUID.Zero Wearables, passing fake values.");
+            //                                    resetwearable = true;
+            //                                    break;
+            //
+            //                            }
+            //                            continue;
+            //                        }
+            //
+            //                        // Ignore ruth's assets except for the body parts! missing body parts fail avatar appearance on V1
+            //                        if (appearance.Wearables[i][j].ItemID == AvatarWearable.DefaultWearables[i][0].ItemID)
+            //                        {
+            //                            switch ((WearableType)i)
+            //                            {
+            //                                case WearableType.Eyes:
+            //                                case WearableType.Hair:
+            //                                case WearableType.Shape:
+            //                                case WearableType.Skin:
+            //                                //case WearableType.Underpants:
+            //                                    TryAndRepairBrokenWearable((WearableType)i, invService, userID, appearance);
+            //
+            //                                    m_log.WarnFormat("[AVFACTORY]: {0} Default Wearables, passing existing values.", (WearableType)i);
+            //                                    resetwearable = true;
+            //                                    break;
+            //
+            //                            }
+            //                            continue;
+            //                        }
+            //
+            //                        InventoryItemBase baseItem = new InventoryItemBase(appearance.Wearables[i][j].ItemID, userID);
+            //                        baseItem = invService.GetItem(baseItem);
+            //
+            //                        if (baseItem != null)
+            //                        {
+            //                            appearance.Wearables[i].Add(appearance.Wearables[i][j].ItemID, baseItem.AssetID);
+            //                            int unmodifiedWearableIndexForClosure = i;
+            //                            m_scene.AssetService.Get(baseItem.AssetID.ToString(), this,
+            //                                                                      delegate(string x, object y, AssetBase z)
+            //                                                                      {
+            //                                                                          if (z == null)
+            //                                                                          {
+            //                                                                              TryAndRepairBrokenWearable(
+            //                                                                                  (WearableType)unmodifiedWearableIndexForClosure, invService,
+            //                                                                                  userID, appearance);
+            //                                                                          }
+            //                                                                      });
+            //                        }
+            //                        else
+            //                        {
+            //                            m_log.ErrorFormat(
+            //                                "[AVFACTORY]: Can't find inventory item {0} for {1}, setting to default",
+            //                                appearance.Wearables[i][j].ItemID, (WearableType)i);
+            //
+            //                            TryAndRepairBrokenWearable((WearableType)i, invService, userID, appearance);
+            //                            resetwearable = true;
+            //
+            //                        }
+            //                    }
+            //                }
+            //
+            //                // I don't know why we have to test for this again...  but the above switches do not capture these scenarios for some reason....
+            //                if (appearance.Wearables[(int) WearableType.Eyes] == null)
+            //                {
+            //                    m_log.WarnFormat("[AVFACTORY]: {0} Eyes are Null, passing existing values.", (WearableType.Eyes));
+            //
+            //                    TryAndRepairBrokenWearable(WearableType.Eyes, invService, userID, appearance);
+            //                    resetwearable = true;
+            //                }
+            //                else
+            //                {
+            //                    if (appearance.Wearables[(int) WearableType.Eyes][0].ItemID == UUID.Zero)
+            //                    {
+            //                        m_log.WarnFormat("[AVFACTORY]: Eyes are UUID.Zero are broken, {0} {1}",
+            //                                         appearance.Wearables[(int) WearableType.Eyes][0].ItemID,
+            //                                         appearance.Wearables[(int) WearableType.Eyes][0].AssetID);
+            //                        TryAndRepairBrokenWearable(WearableType.Eyes, invService, userID, appearance);
+            //                        resetwearable = true;
+            //
+            //                    }
+            //
+            //                }
+            //                // I don't know why we have to test for this again...  but the above switches do not capture these scenarios for some reason....
+            //                if (appearance.Wearables[(int)WearableType.Shape] == null)
+            //                {
+            //                    m_log.WarnFormat("[AVFACTORY]: {0} shape is Null, passing existing values.", (WearableType.Shape));
+            //
+            //                    TryAndRepairBrokenWearable(WearableType.Shape, invService, userID, appearance);
+            //                    resetwearable = true;
+            //                }
+            //                else
+            //                {
+            //                    if (appearance.Wearables[(int)WearableType.Shape][0].ItemID == UUID.Zero)
+            //                    {
+            //                        m_log.WarnFormat("[AVFACTORY]: Shape is UUID.Zero and broken, {0} {1}",
+            //                                         appearance.Wearables[(int)WearableType.Shape][0].ItemID,
+            //                                         appearance.Wearables[(int)WearableType.Shape][0].AssetID);
+            //                        TryAndRepairBrokenWearable(WearableType.Shape, invService, userID, appearance);
+            //                        resetwearable = true;
+            //
+            //                    }
+            //
+            //                }
+            //                // I don't know why we have to test for this again...  but the above switches do not capture these scenarios for some reason....
+            //                if (appearance.Wearables[(int)WearableType.Hair] == null)
+            //                {
+            //                    m_log.WarnFormat("[AVFACTORY]: {0} Hair is Null, passing existing values.", (WearableType.Hair));
+            //
+            //                    TryAndRepairBrokenWearable(WearableType.Hair, invService, userID, appearance);
+            //                    resetwearable = true;
+            //                }
+            //                else
+            //                {
+            //                    if (appearance.Wearables[(int)WearableType.Hair][0].ItemID == UUID.Zero)
+            //                    {
+            //                        m_log.WarnFormat("[AVFACTORY]: Hair is UUID.Zero and broken, {0} {1}",
+            //                                         appearance.Wearables[(int)WearableType.Hair][0].ItemID,
+            //                                         appearance.Wearables[(int)WearableType.Hair][0].AssetID);
+            //                        TryAndRepairBrokenWearable(WearableType.Hair, invService, userID, appearance);
+            //                        resetwearable = true;
+            //
+            //                    }
+            //
+            //                }
+            //                // I don't know why we have to test for this again...  but the above switches do not capture these scenarios for some reason....
+            //                if (appearance.Wearables[(int)WearableType.Skin] == null)
+            //                {
+            //                    m_log.WarnFormat("[AVFACTORY]: {0} Skin is Null, passing existing values.", (WearableType.Skin));
+            //
+            //                    TryAndRepairBrokenWearable(WearableType.Skin, invService, userID, appearance);
+            //                    resetwearable = true;
+            //                }
+            //                else
+            //                {
+            //                    if (appearance.Wearables[(int)WearableType.Skin][0].ItemID == UUID.Zero)
+            //                    {
+            //                        m_log.WarnFormat("[AVFACTORY]: Skin is UUID.Zero and broken, {0} {1}",
+            //                                         appearance.Wearables[(int)WearableType.Skin][0].ItemID,
+            //                                         appearance.Wearables[(int)WearableType.Skin][0].AssetID);
+            //                        TryAndRepairBrokenWearable(WearableType.Skin, invService, userID, appearance);
+            //                        resetwearable = true;
+            //
+            //                    }
+            //
+            //                }
+            //                if (resetwearable)
+            //                {
+            //                    ScenePresence presence = null;
+            //                    if (m_scene.TryGetScenePresence(userID, out presence))
+            //                    {
+            //                        presence.ControllingClient.SendWearables(presence.Appearance.Wearables,
+            //                                                                 presence.Appearance.Serial++);
+            //                    }
+            //                }
+            //
+            //            }
+            //            else
+            //            {
+            //                m_log.WarnFormat("[AVFACTORY]: user {0} has no inventory, appearance isn't going to work", userID);
+            //            }
         }
 
-        private void TryAndRepairBrokenWearable(WearableType type, IInventoryService invService, UUID userID,AvatarAppearance appearance)
+        private void TryAndRepairBrokenWearable(WearableType type, IInventoryService invService, UUID userID, AvatarAppearance appearance)
         {
             UUID defaultwearable = GetDefaultItem(type);
             if (defaultwearable != UUID.Zero)
             {
                 UUID newInvItem = UUID.Random();
                 InventoryItemBase itembase = new InventoryItemBase(newInvItem, userID)
-                            {
-                                AssetID = defaultwearable,
-                                AssetType = (int)FolderType.BodyPart,
-                                CreatorId = userID.ToString(),
-                                //InvType = (int)InventoryType.Wearable,
-                                Description = "Failed Wearable Replacement",
-                                Folder = invService.GetFolderForType(userID, FolderType.BodyPart).ID,
-                                Flags = (uint) type, Name = Enum.GetName(typeof (WearableType), type),
-                                BasePermissions = (uint) PermissionMask.Copy,
-                                CurrentPermissions = (uint) PermissionMask.Copy,
-                                EveryOnePermissions = (uint) PermissionMask.Copy,
-                                GroupPermissions = (uint) PermissionMask.Copy,
-                                NextPermissions = (uint) PermissionMask.Copy
-                            };
+                {
+                    AssetID = defaultwearable,
+                    AssetType = (int)FolderType.BodyPart,
+                    CreatorId = userID.ToString(),
+                    //InvType = (int)InventoryType.Wearable,
+                    Description = "Failed Wearable Replacement",
+                    Folder = invService.GetFolderForType(userID, FolderType.BodyPart).ID,
+                    Flags = (uint)type,
+                    Name = Enum.GetName(typeof(WearableType), type),
+                    BasePermissions = (uint)PermissionMask.Copy,
+                    CurrentPermissions = (uint)PermissionMask.Copy,
+                    EveryOnePermissions = (uint)PermissionMask.Copy,
+                    GroupPermissions = (uint)PermissionMask.Copy,
+                    NextPermissions = (uint)PermissionMask.Copy
+                };
                 invService.AddItem(itembase);
                 UUID LinkInvItem = UUID.Random();
                 itembase = new InventoryItemBase(LinkInvItem, userID)
-                            {
-                                AssetID = newInvItem,
-                                AssetType = (int)AssetType.Link,
-                                CreatorId = userID.ToString(),
-                                InvType = (int) InventoryType.Wearable,
-                                Description = "Failed Wearable Replacement",
-                                Folder = invService.GetFolderForType(userID, FolderType.CurrentOutfit).ID,
-                                Flags = (uint) type,
-                                Name = Enum.GetName(typeof (WearableType), type),
-                                BasePermissions = (uint) PermissionMask.Copy,
-                                CurrentPermissions = (uint) PermissionMask.Copy,
-                                EveryOnePermissions = (uint) PermissionMask.Copy,
-                                GroupPermissions = (uint) PermissionMask.Copy,
-                                NextPermissions = (uint) PermissionMask.Copy
-                            };
+                {
+                    AssetID = newInvItem,
+                    AssetType = (int)AssetType.Link,
+                    CreatorId = userID.ToString(),
+                    InvType = (int)InventoryType.Wearable,
+                    Description = "Failed Wearable Replacement",
+                    Folder = invService.GetFolderForType(userID, FolderType.CurrentOutfit).ID,
+                    Flags = (uint)type,
+                    Name = Enum.GetName(typeof(WearableType), type),
+                    BasePermissions = (uint)PermissionMask.Copy,
+                    CurrentPermissions = (uint)PermissionMask.Copy,
+                    EveryOnePermissions = (uint)PermissionMask.Copy,
+                    GroupPermissions = (uint)PermissionMask.Copy,
+                    NextPermissions = (uint)PermissionMask.Copy
+                };
                 invService.AddItem(itembase);
                 appearance.Wearables[(int)type] = new AvatarWearable(newInvItem, GetDefaultItem(type));
                 ScenePresence presence = null;
@@ -1207,7 +1146,7 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
         /// <param name="client"></param>
         private void Client_OnRequestWearables(IClientAPI client)
         {
-            Util.FireAndForget(delegate(object x)
+            Util.FireAndForget(delegate (object x)
             {
                 Thread.Sleep(4000);
 
@@ -1231,7 +1170,7 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
             // m_log.WarnFormat("[AVFACTORY]: Client_OnSetAppearance called for {0} ({1})", client.Name, client.AgentId);
             ScenePresence sp = m_scene.GetScenePresence(client.AgentId);
             if (sp != null)
-                SetAppearance(sp, textureEntry, visualParams,avSize, cacheItems);
+                SetAppearance(sp, textureEntry, visualParams, avSize, cacheItems);
             else
                 m_log.WarnFormat("[AVFACTORY]: Client_OnSetAppearance unable to find presence for {0}", client.AgentId);
         }
@@ -1251,9 +1190,6 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
                 return;
             }
 
-            // we need to clean out the existing textures
-            sp.Appearance.ResetAppearance();
-
             // operate on a copy of the appearance so we don't have to lock anything yet
             AvatarAppearance avatAppearance = new AvatarAppearance(sp.Appearance, false);
 
@@ -1265,7 +1201,7 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
                     int currentLength = avatAppearance.Wearables.Length;
                     AvatarWearable[] wears = avatAppearance.Wearables;
                     Array.Resize(ref wears, wear.Type + 1);
-                    for (int i = currentLength ; i <= wear.Type ; i++)
+                    for (int i = currentLength; i <= wear.Type; i++)
                         wears[i] = new AvatarWearable();
                     avatAppearance.Wearables = wears;
                 }
@@ -1280,15 +1216,13 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
                 // often sends AvatarIsWearing and SetAppearance packets at once, and AvatarIsWearing
                 // shouldn't overwrite the changes made in SetAppearance.
                 sp.Appearance.Wearables = avatAppearance.Wearables;
-                sp.Appearance.Texture = avatAppearance.Texture;
-
                 // We don't need to send the appearance here since the "iswearing" will trigger a new set
                 // of visual param and baked texture changes. When those complete, the new appearance will be sent
-
                 QueueAppearanceSave(client.AgentId);
             }
         }
 
+/*
         /// <summary>
         /// Respond to the cached textures request from the client
         /// </summary>
@@ -1308,23 +1242,9 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
 
                 if (m_reusetextures)
                 {
-                    // this is the most insanely dumb way to do this... however it seems to
-                    // actually work. if the appearance has been reset because wearables have
-                    // changed then the texture entries are zero'd out until the bakes are
-                    // uploaded. on login, if the textures exist in the cache (eg if you logged
-                    // into the simulator recently, then the appearance will pull those and send
-                    // them back in the packet and you won't have to rebake. if the textures aren't
-                    // in the cache then the intial makeroot() call in scenepresence will zero
-                    // them out.
-                    //
-                    // a better solution (though how much better is an open question) is to
-                    // store the hashes in the appearance and compare them. Thats's coming.
-
                     Primitive.TextureEntryFace face = sp.Appearance.Texture.FaceTextures[index];
                     if (face != null)
                         texture = face.TextureID;
-
-                    // m_log.WarnFormat("[AVFACTORY]: reuse texture {0} for index {1}",texture,index);
                 }
 
                 CachedTextureResponseArg response = new CachedTextureResponseArg();
@@ -1334,21 +1254,16 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
 
                 cachedTextureResponse.Add(response);
             }
-
-            // m_log.WarnFormat("[AVFACTORY]: serial is {0}",serial);
-            // The serial number appears to be used to match requests and responses
-            // in the texture transaction. We just send back the serial number
-            // that was provided in the request. The viewer bumps this for us.
             client.SendCachedTextureResponse(sp, serial, cachedTextureResponse);
         }
-
+*/
 
         #endregion
 
         public void WriteBakedTexturesReport(IScenePresence sp, ReportOutputAction outputAction)
         {
-            outputAction("For {0} in {1}", sp.Name, m_scene.RegionInfo.RegionName);
-            outputAction(BAKED_TEXTURES_REPORT_FORMAT, "Bake Type", "UUID");
+            outputAction("For {0} in {1}", null, sp.Name, m_scene.RegionInfo.RegionName);
+            outputAction(BAKED_TEXTURES_REPORT_FORMAT, null, "Bake Type", "UUID");
 
             Dictionary<BakeType, Primitive.TextureEntryFace> bakedTextures = GetBakedTextureFaces(sp.UUID);
 
@@ -1362,19 +1277,38 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
                 }
                 else
                 {
-                    rawTextureID = bakedTextures[bt].TextureID.ToString();
-
-                    if (m_scene.AssetService.Get(rawTextureID) == null)
-                        rawTextureID += " (not found)";
+                    if(bakedTextures[bt].TextureID == AppearanceManager.DEFAULT_AVATAR_TEXTURE)
+                        rawTextureID = "not set";
                     else
-                        rawTextureID += " (uploaded)";
+                    {
+                        rawTextureID = bakedTextures[bt].TextureID.ToString();
+
+                        if (m_scene.AssetService.Get(rawTextureID) == null)
+                            rawTextureID += " (not found)";
+                        else
+                            rawTextureID += " (uploaded)";
+                    }
                 }
 
                 outputAction(BAKED_TEXTURES_REPORT_FORMAT, null, bt, rawTextureID);
             }
 
             bool bakedTextureValid = m_scene.AvatarFactory.ValidateBakedTextureCache(sp);
-            outputAction("{0} baked appearance texture is {1}", sp.Name, bakedTextureValid ? "OK" : "incomplete");
+            outputAction("{0} baked appearance texture is {1}", null, sp.Name, bakedTextureValid ? "OK" : "incomplete");
+        }
+
+        public void SetPreferencesHoverZ(UUID agentId, float val)
+        {
+            ScenePresence sp = m_scene.GetScenePresence(agentId);
+            if (sp == null || sp.IsDeleted || sp.IsNPC || sp.IsInTransit)
+                return;
+            float last = sp.Appearance.AvatarPreferencesHoverZ;
+            if(val != last)
+            {
+                sp.Appearance.AvatarPreferencesHoverZ = val;
+                //sp.SendAppearanceToAgentNF(sp);
+                QueueAppearanceSend(agentId);
+            }
         }
     }
 }

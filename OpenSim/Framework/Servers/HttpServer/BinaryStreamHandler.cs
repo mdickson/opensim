@@ -37,7 +37,7 @@ namespace OpenSim.Framework.Servers.HttpServer
         private BinaryMethod m_method;
 
         public BinaryStreamHandler(string httpMethod, string path, BinaryMethod binaryMethod)
-            : this(httpMethod, path, binaryMethod, null, null) {}
+            : this(httpMethod, path, binaryMethod, null, null) { }
 
         public BinaryStreamHandler(string httpMethod, string path, BinaryMethod binaryMethod, string name, string description)
             : base(httpMethod, path, name, description)
@@ -57,7 +57,7 @@ namespace OpenSim.Framework.Servers.HttpServer
         private static byte[] ReadFully(Stream stream)
         {
             byte[] buffer = new byte[1024];
-            using (MemoryStream ms = new MemoryStream(1024*256))
+            using (MemoryStream ms = new MemoryStream(1024 * 256))
             {
                 while (true)
                 {

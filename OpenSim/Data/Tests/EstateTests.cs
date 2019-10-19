@@ -25,24 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using log4net.Config;
-using NUnit.Framework;
-using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Tests.Common;
-using System.Text;
-using log4net;
-using System.Reflection;
-using System.Data.Common;
-
+using Mono.Data.Sqlite;
 // DBMS-specific:
 using MySql.Data.MySqlClient;
+using NUnit.Framework;
+using OpenMetaverse;
 using OpenSim.Data.MySQL;
-
-using Mono.Data.Sqlite;
 using OpenSim.Data.SQLite;
+using OpenSim.Framework;
+using OpenSim.Tests.Common;
+using System.Data.Common;
 
 namespace OpenSim.Data.Tests
 {
@@ -203,7 +195,7 @@ namespace OpenSim.Data.Tests
             // Letting estate store generate rows to database for us
             EstateSettings originalSettings = db.LoadEstateSettings(REGION_ID, true);
             new PropertyScrambler<EstateSettings>()
-                .DontScramble(x=>x.EstateID)
+                .DontScramble(x => x.EstateID)
                 .Scramble(originalSettings);
 
             // Saving settings.

@@ -36,7 +36,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain.FloodBrushes
         public void FloodEffect(ITerrainChannel map, bool[,] fillArea, double strength,
             int startX, int endX, int startY, int endY)
         {
-            int x,y;
+            int x, y;
             for (x = startX; x <= endX; x++)
             {
                 for (y = startY; y <= endY; y++)

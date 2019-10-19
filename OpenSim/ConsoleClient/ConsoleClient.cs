@@ -26,16 +26,13 @@
  */
 
 using Nini.Config;
-using log4net;
-using System.Reflection;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Server.Base;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using System.Collections.Generic;
-using OpenSim.Server.Base;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenMetaverse;
 
 namespace OpenSim.ConsoleClient
 {
@@ -73,7 +70,7 @@ namespace OpenSim.ConsoleClient
             m_Port = serverConfig.GetInt("port", 8003);
             m_Pass = serverConfig.GetString("pass", "secret");
 
-            Requester.MakeRequest("http://"+m_Host+":"+m_Port.ToString()+"/StartSession/", String.Format("USER={0}&PASS={1}", m_User, m_Pass), LoginReply);
+            Requester.MakeRequest("http://" + m_Host + ":" + m_Port.ToString() + "/StartSession/", String.Format("USER={0}&PASS={1}", m_User, m_Pass), LoginReply);
 
             string pidFile = serverConfig.GetString("PIDFile", String.Empty);
 
@@ -104,7 +101,7 @@ namespace OpenSim.ConsoleClient
                 sendCmd += " \"" + String.Join("\" \"", cmdlist) + "\"";
             }
 
-            Requester.MakeRequest("http://"+m_Host+":"+m_Port.ToString()+"/SessionCommand/", String.Format("ID={0}&COMMAND={1}", m_SessionID, sendCmd), CommandReply);
+            Requester.MakeRequest("http://" + m_Host + ":" + m_Port.ToString() + "/SessionCommand/", String.Format("ID={0}&COMMAND={1}", m_SessionID, sendCmd), CommandReply);
         }
 
         public static void LoginReply(string requestUrl, string requestData, string replyData)
@@ -163,7 +160,7 @@ namespace OpenSim.ConsoleClient
 
             MainConsole.Instance.Commands.FromXml(helpNode, SendCommand);
 
-            Requester.MakeRequest("http://"+m_Host+":"+m_Port.ToString()+"/ReadResponses/"+m_SessionID.ToString()+"/", String.Empty, ReadResponses);
+            Requester.MakeRequest("http://" + m_Host + ":" + m_Port.ToString() + "/ReadResponses/" + m_SessionID.ToString() + "/", String.Empty, ReadResponses);
         }
 
         public static void ReadResponses(string requestUrl, string requestData, string replyData)
@@ -199,7 +196,7 @@ namespace OpenSim.ConsoleClient
 
             foreach (string l in lines)
             {
-                string[] parts = l.Split(new char[] {':'}, 3);
+                string[] parts = l.Split(new char[] { ':' }, 3);
                 if (parts.Length != 3)
                     continue;
 

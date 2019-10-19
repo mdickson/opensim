@@ -25,14 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
-using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.Framework.Scenes
 {
@@ -70,7 +65,7 @@ namespace OpenSim.Region.Framework.Scenes
     /// </remarks>
     public class AsyncInventorySender
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         protected Scene m_scene;
 
@@ -100,8 +95,8 @@ namespace OpenSim.Region.Framework.Scenes
         {
             lock (m_fetchHolder)
             {
-//                m_log.DebugFormat(
-//                    "[ASYNC INVENTORY SENDER]: Putting request from {0} for {1} on queue", remoteClient.Name, itemID);
+                //                m_log.DebugFormat(
+                //                    "[ASYNC INVENTORY SENDER]: Putting request from {0} for {1} on queue", remoteClient.Name, itemID);
 
                 m_fetchHolder.Enqueue(new FetchHolder(remoteClient, itemID));
             }
@@ -124,7 +119,7 @@ namespace OpenSim.Region.Framework.Scenes
             {
                 lock (m_fetchHolder)
                 {
-//                    m_log.DebugFormat("[ASYNC INVENTORY SENDER]: {0} items left to process", m_fetchHolder.Count);
+                    //                    m_log.DebugFormat("[ASYNC INVENTORY SENDER]: {0} items left to process", m_fetchHolder.Count);
 
                     if (m_fetchHolder.Count == 0)
                     {
@@ -140,15 +135,15 @@ namespace OpenSim.Region.Framework.Scenes
                 if (!fh.Client.IsActive)
                     continue;
 
-//                m_log.DebugFormat(
-//                    "[ASYNC INVENTORY SENDER]: Handling request from {0} for {1} on queue", fh.Client.Name, fh.ItemID);
+                //                m_log.DebugFormat(
+                //                    "[ASYNC INVENTORY SENDER]: Handling request from {0} for {1} on queue", fh.Client.Name, fh.ItemID);
 
                 InventoryItemBase item = m_scene.InventoryService.GetItem(fh.Client.AgentId, fh.ItemID);
 
                 if (item != null)
                     fh.Client.SendInventoryItemDetails(item.Owner, item);
 
-                 // TODO: Possibly log any failure
+                // TODO: Possibly log any failure
             }
         }
     }

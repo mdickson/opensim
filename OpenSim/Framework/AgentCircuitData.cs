@@ -25,12 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
-using System.Collections.Generic;
 using log4net;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Framework
 {
@@ -40,11 +40,11 @@ namespace OpenSim.Framework
     /// </summary>
     public class AgentCircuitData
     {
-// DEBUG ON
+        // DEBUG ON
         private static readonly ILog m_log =
                 LogManager.GetLogger(
                 MethodBase.GetCurrentMethod().DeclaringType);
-// DEBUG OFF
+        // DEBUG OFF
 
         /// <summary>
         /// Avatar Unique Agent Identifier
@@ -220,7 +220,7 @@ namespace OpenSim.Framework
             args["channel"] = OSD.FromString(Channel);
             args["mac"] = OSD.FromString(Mac);
             args["id0"] = OSD.FromString(Id0);
-            if(startfar > 0)
+            if (startfar > 0)
                 args["far"] = OSD.FromReal(startfar);
 
             if (Appearance != null)
@@ -271,7 +271,7 @@ namespace OpenSim.Framework
             if (args.TryGetValue("agent_id", out tmpOSD))
                 AgentID = tmpOSD.AsUUID();
             if (args.TryGetValue("base_folder", out tmpOSD))
-                BaseFolder =tmpOSD.AsUUID();
+                BaseFolder = tmpOSD.AsUUID();
             if (args.TryGetValue("caps_path", out tmpOSD))
                 CapsPath = tmpOSD.AsString();
 
@@ -337,7 +337,7 @@ namespace OpenSim.Framework
             if (args.TryGetValue("start_pos", out tmpOSD))
                 Vector3.TryParse(tmpOSD.AsString(), out startpos);
 
-            if(args.TryGetValue("far", out tmpOSD))
+            if (args.TryGetValue("far", out tmpOSD))
                 startfar = (float)tmpOSD.AsReal();
 
             //m_log.InfoFormat("[AGENTCIRCUITDATA]: agentid={0}, child={1}, startpos={2}", AgentID, child, startpos);
@@ -355,7 +355,7 @@ namespace OpenSim.Framework
                 if (args.TryGetValue("packed_appearance", out tmpOSD) && (tmpOSD is OSDMap))
                 {
                     Appearance.Unpack((OSDMap)tmpOSD);
-//                    m_log.InfoFormat("[AGENTCIRCUITDATA] unpacked appearance");
+                    //                    m_log.InfoFormat("[AGENTCIRCUITDATA] unpacked appearance");
                 }
                 else
                 {
@@ -364,7 +364,7 @@ namespace OpenSim.Framework
             }
             catch (Exception e)
             {
-                m_log.ErrorFormat("[AGENTCIRCUITDATA] failed to unpack appearance; {0}",e.Message);
+                m_log.ErrorFormat("[AGENTCIRCUITDATA] failed to unpack appearance; {0}", e.Message);
             }
 
             ServiceURLs = new Dictionary<string, object>();

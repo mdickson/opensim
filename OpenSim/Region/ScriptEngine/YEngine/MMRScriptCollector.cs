@@ -25,10 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
@@ -46,7 +44,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     /**
      * @brief This is a list that keeps track of types pushed on the evaluation stack.
      */
-    public class StackDepth: List<Type>
+    public class StackDepth : List<Type>
     {
         public List<bool> isBoxeds = new List<bool>();
 
@@ -66,9 +64,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             int n = pis.Length;
             int c = this.Count;
-            if(n > c)
+            if (n > c)
                 throw new Exception("stack going negative");
-            for(int i = n; --i >= 0;)
+            for (int i = n; --i >= 0;)
             {
                 --c;
                 ExpectedVsOnStack(pis[i].ParameterType, this[c], isBoxeds[c]);
@@ -83,9 +81,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             int n = ts.Length;
             int c = this.Count;
-            if(n > c)
+            if (n > c)
                 throw new Exception("stack going negative");
-            for(int i = ts.Length; --i >= 0;)
+            for (int i = ts.Length; --i >= 0;)
             {
                 --c;
                 ExpectedVsOnStack(ts[i], this[c], isBoxeds[c]);
@@ -99,7 +97,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public void Pop(Type t)
         {
             int c = this.Count;
-            if(c < 1)
+            if (c < 1)
                 throw new Exception("stack going negative");
             ExpectedVsOnStack(t, this[c - 1], isBoxeds[c - 1]);
             Pop(1);
@@ -111,18 +109,18 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public Type PopNumVal()
         {
             int c = this.Count;
-            if(c < 1)
+            if (c < 1)
                 throw new Exception("stack going negative");
             Type st = this[--c];
-            if(st == null)
+            if (st == null)
             {
                 throw new Exception("stack has null, expecting a numeric");
             }
-            if(isBoxeds[c])
+            if (isBoxeds[c])
             {
                 throw new Exception("stack is boxed " + st.Name + ", expecting a numeric");
             }
-            if((st != typeof(bool)) && (st != typeof(char)) && (st != typeof(int)) &&
+            if ((st != typeof(bool)) && (st != typeof(char)) && (st != typeof(int)) &&
                 (st != typeof(long)) && (st != typeof(float)) && (st != typeof(double)))
             {
                 throw new Exception("stack has " + st.Name + ", expecting a numeric");
@@ -136,10 +134,10 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public Type PopRef()
         {
             int c = this.Count;
-            if(c < 1)
+            if (c < 1)
                 throw new Exception("stack going negative");
             Type st = this[--c];
-            if((st != null) && !isBoxeds[c] && st.IsValueType)
+            if ((st != null) && !isBoxeds[c] && st.IsValueType)
             {
                 throw new Exception("stack has " + st.Name + ", expecting a ref type");
             }
@@ -152,18 +150,18 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public Type PopValue()
         {
             int c = this.Count;
-            if(c < 1)
+            if (c < 1)
                 throw new Exception("stack going negative");
             Type st = this[--c];
-            if(st == null)
+            if (st == null)
             {
                 throw new Exception("stack has null, expecting a value type");
             }
-            if(!st.IsValueType)
+            if (!st.IsValueType)
             {
                 throw new Exception("stack has " + st.Name + ", expecting a value type");
             }
-            if(isBoxeds[c])
+            if (isBoxeds[c])
             {
                 throw new Exception("stack has boxed " + st.Name + ", expecting an unboxed value type");
             }
@@ -176,9 +174,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public static void ExpectedVsOnStack(Type ex, Type st, bool stBoxed)
         {
             // ldnull pushed on stack can go into any pointer type
-            if(st == null)
+            if (st == null)
             {
-                if(ex.IsByRef || ex.IsPointer || ex.IsClass || ex.IsInterface)
+                if (ex.IsByRef || ex.IsPointer || ex.IsClass || ex.IsInterface)
                     return;
                 throw new Exception("stack has null, expect " + ex.Name);
             }
@@ -186,28 +184,28 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             // simple case of expecting an object
             // ...so the stack can have object,string, etc
             // but we cant allow int = boxed int here
-            if(ex.IsAssignableFrom(st) && !stBoxed)
+            if (ex.IsAssignableFrom(st) && !stBoxed)
                 return;
 
             // case of expecting an enum on the stack
             // but all the CIL code knows about are ints etc
             // so convert the Enum type to integer or whatever
             // and that should be assignable from what's on stack
-            if(ex.IsEnum && typeof(int).IsAssignableFrom(st))
+            if (ex.IsEnum && typeof(int).IsAssignableFrom(st))
                 return;
 
             // bool, char, int are interchangeable on the stack
-            if((ex == typeof(bool) || ex == typeof(char) || ex == typeof(int)) &&
+            if ((ex == typeof(bool) || ex == typeof(char) || ex == typeof(int)) &&
                 (st == typeof(bool) || st == typeof(char) || st == typeof(int)))
                 return;
 
             // float and double are interchangeable on the stack
-            if((ex == typeof(float) || ex == typeof(double)) &&
+            if ((ex == typeof(float) || ex == typeof(double)) &&
                 (st == typeof(float) || st == typeof(double)))
                 return;
 
             // object can accept any boxed type
-            if((ex == typeof(object)) && stBoxed)
+            if ((ex == typeof(object)) && stBoxed)
                 return;
 
             // otherwise, it is disallowed
@@ -219,19 +217,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public Type Pop(int n)
         {
-            if(this.Count != isBoxeds.Count)
+            if (this.Count != isBoxeds.Count)
                 throw new Exception("isBoxeds count bad");
             Type lastPopped = null;
             int c = this.Count;
-            if(n > c)
+            if (n > c)
                 throw new Exception("stack going negative");
-            if(n > 0)
+            if (n > 0)
             {
                 lastPopped = this[c - n];
                 this.RemoveRange(c - n, n);
                 isBoxeds.RemoveRange(c - n, n);
             }
-            if(this.Count != isBoxeds.Count)
+            if (this.Count != isBoxeds.Count)
                 throw new Exception("isBoxeds count bad");
             return lastPopped;
         }
@@ -245,18 +243,18 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         public Type Peek(int n)
         {
             int c = this.Count;
-            if(n > c - 1)
+            if (n > c - 1)
                 throw new Exception("stack going negative");
-            if(this.Count != isBoxeds.Count)
+            if (this.Count != isBoxeds.Count)
                 throw new Exception("isBoxeds count bad");
             return this[c - n - 1];
         }
         public bool PeekBoxed(int n)
         {
             int c = isBoxeds.Count;
-            if(n > c - 1)
+            if (n > c - 1)
                 throw new Exception("stack going negative");
-            if(this.Count != isBoxeds.Count)
+            if (this.Count != isBoxeds.Count)
                 throw new Exception("isBoxeds count bad");
             return isBoxeds[c - n - 1];
         }
@@ -270,7 +268,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public void Push(Type t, bool isBoxed)
         {
-            if(this.Count != isBoxeds.Count)
+            if (this.Count != isBoxeds.Count)
                 throw new Exception("isBoxeds count bad");
             this.Add(t);
             isBoxeds.Add(isBoxed);
@@ -287,43 +285,43 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             bool[] tsBoxeds = label.stackBoxeds;
             int i;
 
-            if(this.Count != isBoxeds.Count)
+            if (this.Count != isBoxeds.Count)
                 throw new Exception("isBoxeds count bad");
 
-            if(ts == null)
+            if (ts == null)
             {
                 label.stackDepth = this.ToArray();
                 label.stackBoxeds = isBoxeds.ToArray();
             }
-            else if(ts.Length != this.Count)
+            else if (ts.Length != this.Count)
             {
                 throw new Exception("stack depth mismatch");
             }
             else
             {
-                for(i = this.Count; --i >= 0;)
+                for (i = this.Count; --i >= 0;)
                 {
-                    if(tsBoxeds[i] != this.isBoxeds[i])
+                    if (tsBoxeds[i] != this.isBoxeds[i])
                         goto mismatch;
-                    if(ts[i] == this[i])
+                    if (ts[i] == this[i])
                         continue;
-                    if((ts[i] == typeof(bool) || ts[i] == typeof(char) || ts[i] == typeof(int)) &&
+                    if ((ts[i] == typeof(bool) || ts[i] == typeof(char) || ts[i] == typeof(int)) &&
                         (this[i] == typeof(bool) || this[i] == typeof(char) || this[i] == typeof(int)))
                         continue;
-                    if((ts[i] == typeof(double) || ts[i] == typeof(float)) &&
+                    if ((ts[i] == typeof(double) || ts[i] == typeof(float)) &&
                         (this[i] == typeof(double) || this[i] == typeof(float)))
                         continue;
                     goto mismatch;
                 }
             }
             return;
-            mismatch:
+        mismatch:
             throw new Exception("stack type mismatch: " + StackTypeString(ts[i], tsBoxeds[i]) + " vs " + StackTypeString(this[i], this.isBoxeds[i]));
         }
 
         private static string StackTypeString(Type ts, bool isBoxed)
         {
-            if(!isBoxed)
+            if (!isBoxed)
                 return ts.Name;
             return "[" + ts.Name + "]";
         }
@@ -376,7 +374,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             this.tryBlock = coll.curTryBlock;
             this.excBlock = coll.curExcBlock;
 
-            if(DEBUG)
+            if (DEBUG)
             {
                 StringBuilder sb = new StringBuilder("ChainLin*:");
                 sb.Append(coll.stackDepth.Count.ToString("D2"));
@@ -396,15 +394,15 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             sb.Append(": ");
             this.DebString(sb);
 
-            if(this.ReadsLocal() != null)
+            if (this.ReadsLocal() != null)
                 ScriptCollector.PadToLength(sb, x + 60, " [read]");
-            if(this.WritesLocal() != null)
+            if (this.WritesLocal() != null)
                 ScriptCollector.PadToLength(sb, x + 68, " [write]");
             ScriptCollector.PadToLength(sb, x + 72, " ->");
             bool first = true;
-            foreach(GraphNode nn in this.NextNodes)
+            foreach (GraphNode nn in this.NextNodes)
             {
-                if(first)
+                if (first)
                 {
                     sb.Append(nn.linSeqNo.ToString().PadLeft(5));
                     first = false;
@@ -468,7 +466,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             get
             {
-                if(nextNodes == null)
+                if (nextNodes == null)
                 {
                     nextNodes = GetNNEnumerable();
                     nextNodesCatchFinally = new NNEnumerableCatchFinally(this);
@@ -483,7 +481,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          *        says that every instruction in a try { } can conditionally branch to 
          *        the beginning of the corresponding catch { } or finally { }.
          */
-        private class NNEnumerableCatchFinally: System.Collections.Generic.IEnumerable<GraphNode>
+        private class NNEnumerableCatchFinally : System.Collections.Generic.IEnumerable<GraphNode>
         {
             private GraphNode gn;
             public NNEnumerableCatchFinally(GraphNode gn)
@@ -499,7 +497,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 return new NNEnumeratorCatchFinally(gn);
             }
         }
-        private class NNEnumeratorCatchFinally: NNEnumeratorBase
+        private class NNEnumeratorCatchFinally : NNEnumeratorBase
         {
             private GraphNode gn;
             private int index = 0;
@@ -512,7 +510,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             public override bool MoveNext()
             {
                 // First off, return any targets the instruction can come up with.
-                if(realEnumerator.MoveNext())
+                if (realEnumerator.MoveNext())
                 {
                     nn = realEnumerator.Current;
                     return true;
@@ -521,7 +519,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 // Then if this instruction is in a try section, say this instruction 
                 // can potentially branch to the beginning of the corresponding 
                 // catch/finally.
-                if((index == 0) && (gn.tryBlock != null))
+                if ((index == 0) && (gn.tryBlock != null))
                 {
                     index++;
                     nn = gn.tryBlock.catchFinallyBlock;
@@ -556,7 +554,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return new NNEnumerable(this, typeof(NNEnumerator));
         }
 
-        private class NNEnumerator: NNEnumeratorBase
+        private class NNEnumerator : NNEnumeratorBase
         {
             private GraphNode gn;
             private int index;
@@ -566,19 +564,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
             public override bool MoveNext()
             {
-                switch(index)
+                switch (index)
                 {
                     case 0:
-                    {
-                        index++;
-                        nn = gn.nextLin;
-                        return nn != null;
-                    }
+                        {
+                            index++;
+                            nn = gn.nextLin;
+                            return nn != null;
+                        }
                     case 1:
-                    {
-                        nn = null;
-                        return false;
-                    }
+                        {
+                            nn = null;
+                            return false;
+                        }
                 }
                 throw new Exception();
             }
@@ -595,7 +593,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
      *        A block of code is that which begins with a label or is the beginning of all code
      *        and it contains no labels, ie, it can't be jumped into other than at its beginning.
      */
-    public abstract class GraphNodeBlock: GraphNode
+    public abstract class GraphNodeBlock : GraphNode
     {
         public List<ScriptMyLocal> localsWrittenBeforeRead = new List<ScriptMyLocal>();
         public List<ScriptMyLocal> localsReadBeforeWritten = new List<ScriptMyLocal>();
@@ -607,7 +605,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
      * @brief This placeholder is at the beginning of the code so the first few instructions 
      *        belong to some block.
      */
-    public class GraphNodeBegin: GraphNodeBlock
+    public class GraphNodeBegin : GraphNodeBlock
     {
         public GraphNodeBegin(ScriptCollector coll) : base(coll) { }
         public override void DebString(StringBuilder sb)
@@ -622,7 +620,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     /**
      * @brief Beginning of try block.
      */
-    public class GraphNodeBeginExceptionBlock: GraphNodeBlock
+    public class GraphNodeBeginExceptionBlock : GraphNodeBlock
     {
         public GraphNodeBeginExceptionBlock outerTryBlock;      // next outer try opcode or null
         public GraphNodeCatchFinallyBlock catchFinallyBlock;  // start of associated catch or finally
@@ -639,7 +637,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
             // we should always start try blocks with nothing on stack
             // ...as CLI wipes stack for various conditions
-            if(coll.stackDepth.Count != 0)
+            if (coll.stackDepth.Count != 0)
             {
                 throw new Exception("stack depth " + coll.stackDepth.Count);
             }
@@ -660,7 +658,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     /**
      * @brief Beginning of catch or finally block.
      */
-    public abstract class GraphNodeCatchFinallyBlock: GraphNodeBlock
+    public abstract class GraphNodeCatchFinallyBlock : GraphNodeBlock
     {
         public GraphNodeCatchFinallyBlock(ScriptCollector coll) : base(coll)
         {
@@ -672,7 +670,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
             // we should always start catch/finally blocks with nothing on stack
             // ...as CLI wipes stack for various conditions
-            if(coll.stackDepth.Count != 0)
+            if (coll.stackDepth.Count != 0)
             {
                 throw new Exception("stack depth " + coll.stackDepth.Count);
             }
@@ -682,7 +680,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     /**
      * @brief Beginning of catch block.
      */
-    public class GraphNodeBeginCatchBlock: GraphNodeCatchFinallyBlock
+    public class GraphNodeBeginCatchBlock : GraphNodeCatchFinallyBlock
     {
         public Type excType;
 
@@ -696,7 +694,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             base.ChainLin();
 
             // catch block always enters with one value on stack
-            if(coll.stackDepth.Count != 0)
+            if (coll.stackDepth.Count != 0)
             {
                 throw new Exception("stack depth " + coll.stackDepth.Count);
             }
@@ -723,7 +721,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return new NNEnumerable(this, typeof(NNEnumerator));
         }
 
-        private class NNEnumerator: NNEnumeratorBase
+        private class NNEnumerator : NNEnumeratorBase
         {
             private GraphNodeBeginCatchBlock gn;
             private int index;
@@ -733,54 +731,54 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
             public override bool MoveNext()
             {
-                while(true)
+                while (true)
                 {
-                    switch(index)
+                    switch (index)
                     {
                         case 0:
-                        {
-                            // start with the fallthru
-                            nn = gn.nextLin;
-                            index++;
-                            return true;
-                        }
+                            {
+                                // start with the fallthru
+                                nn = gn.nextLin;
+                                index++;
+                                return true;
+                            }
 
                         case 1:
-                        {
-                            // get the first outer catch { } or finally { }
-                            // pretend we last returned beginning of this catch { }
-                            // then loop back to get next outer catch { } or finally { }
-                            nn = gn;
-                            break;
-                        }
+                            {
+                                // get the first outer catch { } or finally { }
+                                // pretend we last returned beginning of this catch { }
+                                // then loop back to get next outer catch { } or finally { }
+                                nn = gn;
+                                break;
+                            }
 
                         case 2:
-                        {
-                            // nn points to a catch { } previously returned
-                            // get the corresponding try { }
-                            GraphNodeBeginExceptionBlock nntry = nn.excBlock;
+                            {
+                                // nn points to a catch { } previously returned
+                                // get the corresponding try { }
+                                GraphNodeBeginExceptionBlock nntry = nn.excBlock;
 
-                            // step out to next outer try { }
-                            nntry = nntry.excBlock;
-                            if(nntry == null)
-                                break;
+                                // step out to next outer try { }
+                                nntry = nntry.excBlock;
+                                if (nntry == null)
+                                    break;
 
-                            // return corresponding catch { } or finally { }
-                            nn = nntry.catchFinallyBlock;
+                                // return corresponding catch { } or finally { }
+                                nn = nntry.catchFinallyBlock;
 
-                            // if it's a finally { } we don't do anything after that
-                            if(nn is GraphNodeBeginFinallyBlock)
-                                index++;
-                            return true;
-                        }
+                                // if it's a finally { } we don't do anything after that
+                                if (nn is GraphNodeBeginFinallyBlock)
+                                    index++;
+                                return true;
+                            }
 
                         case 3:
-                        {
-                            // we've returned the fallthru, catches and one finally
-                            // so there's nothing more to say
-                            nn = null;
-                            return false;
-                        }
+                            {
+                                // we've returned the fallthru, catches and one finally
+                                // so there's nothing more to say
+                                nn = null;
+                                return false;
+                            }
 
                         default:
                             throw new Exception();
@@ -799,7 +797,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     /**
      * @brief Beginning of finally block.
      */
-    public class GraphNodeBeginFinallyBlock: GraphNodeCatchFinallyBlock
+    public class GraphNodeBeginFinallyBlock : GraphNodeCatchFinallyBlock
     {
 
         // leaveTargets has a list of all the targets of any contained 
@@ -831,7 +829,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     /**
      * @brief End of try/catch/finally block.
      */
-    public class GraphNodeEndExceptionBlock: GraphNode
+    public class GraphNodeEndExceptionBlock : GraphNode
     {
         public GraphNodeEndExceptionBlock(ScriptCollector coll) : base(coll)
         {
@@ -843,7 +841,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
             // we should always end exception blocks with nothing on stack
             // ...as CLI wipes stack for various conditions
-            if(coll.stackDepth.Count != 0)
+            if (coll.stackDepth.Count != 0)
             {
                 throw new Exception("stack depth " + coll.stackDepth.Count);
             }
@@ -864,7 +862,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     /**
      * @brief Actual instruction emits...
      */
-    public abstract class GraphNodeEmit: GraphNode
+    public abstract class GraphNodeEmit : GraphNode
     {
         public OpCode opcode;
         public Token errorAt;
@@ -882,11 +880,11 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             // compute resultant stack depth
             int stack = coll.stackDepth.Count;
 
-            if((stack != 0) && ((opcode == OpCodes.Endfinally) || (opcode == OpCodes.Leave) || (opcode == OpCodes.Rethrow)))
+            if ((stack != 0) && ((opcode == OpCodes.Endfinally) || (opcode == OpCodes.Leave) || (opcode == OpCodes.Rethrow)))
             {
                 throw new Exception(opcode + " stack depth " + stack);
             }
-            if((stack != 1) && (opcode == OpCodes.Throw))
+            if ((stack != 1) && (opcode == OpCodes.Throw))
             {
                 throw new Exception(opcode + " stack depth " + stack);
             }
@@ -897,7 +895,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public override bool CanFallThrough()
         {
-            switch(opcode.FlowControl)
+            switch (opcode.FlowControl)
             {
                 case FlowControl.Branch:
                     return false;  // unconditional branch
@@ -914,12 +912,12 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 case FlowControl.Throw:
                     return false;  // throw
                 default:
-                {
-                    string op = opcode.ToString();
-                    if(op == "volatile.")
-                        return true;
-                    throw new Exception("unknown flow control " + opcode.FlowControl + " for " + op);
-                }
+                    {
+                        string op = opcode.ToString();
+                        if (op == "volatile.")
+                            return true;
+                        throw new Exception("unknown flow control " + opcode.FlowControl + " for " + op);
+                    }
             }
         }
 
@@ -957,7 +955,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return new NNEnumerable(this, typeof(NNEnumerator));
         }
 
-        private class NNEnumerator: NNEnumeratorBase
+        private class NNEnumerator : NNEnumeratorBase
         {
             private GraphNodeEmit gn;
             private int index;
@@ -967,23 +965,23 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
             public override bool MoveNext()
             {
-                switch(index)
+                switch (index)
                 {
                     case 0:
-                    {
-                        if(gn.CanFallThrough())
                         {
-                            index++;
-                            nn = gn.nextLin;
-                            return nn != null;
+                            if (gn.CanFallThrough())
+                            {
+                                index++;
+                                nn = gn.nextLin;
+                                return nn != null;
+                            }
+                            return false;
                         }
-                        return false;
-                    }
                     case 1:
-                    {
-                        nn = null;
-                        return false;
-                    }
+                        {
+                            nn = null;
+                            return false;
+                        }
                 }
                 throw new Exception();
             }
@@ -995,7 +993,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class GraphNodeEmitNull: GraphNodeEmit
+    public class GraphNodeEmitNull : GraphNodeEmit
     {
         public GraphNodeEmitNull(ScriptCollector coll, Token errorAt, OpCode opcode) : base(coll, errorAt, opcode)
         {
@@ -1005,7 +1003,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             base.ChainLin();
 
-            switch(opcode.ToString())
+            switch (opcode.ToString())
             {
                 case "nop":
                     break;
@@ -1038,33 +1036,33 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 case "ldc.i4.6":
                 case "ldc.i4.7":
                 case "ldc.i4.8":
-                {
-                    coll.stackDepth.Push(typeof(int));
-                    break;
-                }
-                case "dup":
-                {
-                    Type t = coll.stackDepth.Peek(0);
-                    bool b = coll.stackDepth.PeekBoxed(0);
-                    coll.stackDepth.Push(t, b);
-                    break;
-                }
-                case "pop":
-                {
-                    coll.stackDepth.Pop(1);
-                    break;
-                }
-                case "ret":
-                {
-                    int sd = (coll.wrapped.retType != typeof(void)) ? 1 : 0;
-                    if(coll.stackDepth.Count != sd)
-                        throw new Exception("bad stack depth");
-                    if(sd > 0)
                     {
-                        coll.stackDepth.Pop(coll.wrapped.retType);
+                        coll.stackDepth.Push(typeof(int));
+                        break;
                     }
-                    break;
-                }
+                case "dup":
+                    {
+                        Type t = coll.stackDepth.Peek(0);
+                        bool b = coll.stackDepth.PeekBoxed(0);
+                        coll.stackDepth.Push(t, b);
+                        break;
+                    }
+                case "pop":
+                    {
+                        coll.stackDepth.Pop(1);
+                        break;
+                    }
+                case "ret":
+                    {
+                        int sd = (coll.wrapped.retType != typeof(void)) ? 1 : 0;
+                        if (coll.stackDepth.Count != sd)
+                            throw new Exception("bad stack depth");
+                        if (sd > 0)
+                        {
+                            coll.stackDepth.Pop(coll.wrapped.retType);
+                        }
+                        break;
+                    }
                 case "add":
                 case "sub":
                 case "mul":
@@ -1084,19 +1082,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 case "mul.ovf.un":
                 case "sub.ovf":
                 case "sub.ovf.un":
-                {
-                    coll.stackDepth.PopNumVal();
-                    Type t = coll.stackDepth.PopNumVal();
-                    coll.stackDepth.Push(t);
-                    break;
-                }
+                    {
+                        coll.stackDepth.PopNumVal();
+                        Type t = coll.stackDepth.PopNumVal();
+                        coll.stackDepth.Push(t);
+                        break;
+                    }
                 case "neg":
                 case "not":
-                {
-                    Type t = coll.stackDepth.PopNumVal();
-                    coll.stackDepth.Push(t);
-                    break;
-                }
+                    {
+                        Type t = coll.stackDepth.PopNumVal();
+                        coll.stackDepth.Push(t);
+                        break;
+                    }
                 case "conv.i1":
                 case "conv.i2":
                 case "conv.i4":
@@ -1130,24 +1128,24 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 case "conv.ovf.i":
                 case "conv.ovf.u":
                 case "conv.u":
-                {
-                    coll.stackDepth.PopNumVal();
-                    coll.stackDepth.Push(ConvToType(opcode));
-                    break;
-                }
+                    {
+                        coll.stackDepth.PopNumVal();
+                        coll.stackDepth.Push(ConvToType(opcode));
+                        break;
+                    }
                 case "throw":
-                {
-                    if(coll.stackDepth.Count != 1)
-                        throw new Exception("bad stack depth " + coll.stackDepth.Count);
-                    coll.stackDepth.PopRef();
-                    break;
-                }
+                    {
+                        if (coll.stackDepth.Count != 1)
+                            throw new Exception("bad stack depth " + coll.stackDepth.Count);
+                        coll.stackDepth.PopRef();
+                        break;
+                    }
                 case "ldlen":
-                {
-                    coll.stackDepth.Pop(typeof(string));
-                    coll.stackDepth.Push(typeof(int));
-                    break;
-                }
+                    {
+                        coll.stackDepth.Pop(typeof(string));
+                        coll.stackDepth.Push(typeof(int));
+                        break;
+                    }
                 case "ldelem.i1":
                 case "ldelem.u1":
                 case "ldelem.i2":
@@ -1159,13 +1157,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 case "ldelem.r4":
                 case "ldelem.r8":
                 case "ldelem.ref":
-                {
-                    Type t = coll.stackDepth.Peek(1).GetElementType();
-                    coll.stackDepth.Pop(typeof(int));
-                    coll.stackDepth.Pop(t.MakeArrayType());
-                    coll.stackDepth.Push(t);
-                    break;
-                }
+                    {
+                        Type t = coll.stackDepth.Peek(1).GetElementType();
+                        coll.stackDepth.Pop(typeof(int));
+                        coll.stackDepth.Pop(t.MakeArrayType());
+                        coll.stackDepth.Push(t);
+                        break;
+                    }
                 case "stelem.i":
                 case "stelem.i1":
                 case "stelem.i2":
@@ -1174,56 +1172,56 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 case "stelem.r4":
                 case "stelem.r8":
                 case "stelem.ref":
-                {
-                    Type t = coll.stackDepth.Peek(2).GetElementType();
-                    coll.stackDepth.Pop(t);
-                    coll.stackDepth.Pop(typeof(int));
-                    coll.stackDepth.Pop(t.MakeArrayType());
-                    break;
-                }
+                    {
+                        Type t = coll.stackDepth.Peek(2).GetElementType();
+                        coll.stackDepth.Pop(t);
+                        coll.stackDepth.Pop(typeof(int));
+                        coll.stackDepth.Pop(t.MakeArrayType());
+                        break;
+                    }
                 case "endfinally":
                 case "rethrow":
-                {
-                    if(coll.stackDepth.Count != 0)
-                        throw new Exception("bad stack depth " + coll.stackDepth.Count);
-                    break;
-                }
+                    {
+                        if (coll.stackDepth.Count != 0)
+                            throw new Exception("bad stack depth " + coll.stackDepth.Count);
+                        break;
+                    }
                 case "ceq":
-                {
-                    Type t = coll.stackDepth.Pop(1);
-                    if(t == null)
                     {
-                        coll.stackDepth.PopRef();
+                        Type t = coll.stackDepth.Pop(1);
+                        if (t == null)
+                        {
+                            coll.stackDepth.PopRef();
+                        }
+                        else
+                        {
+                            coll.stackDepth.Pop(t);
+                        }
+                        coll.stackDepth.Push(typeof(int));
+                        break;
                     }
-                    else
-                    {
-                        coll.stackDepth.Pop(t);
-                    }
-                    coll.stackDepth.Push(typeof(int));
-                    break;
-                }
                 case "cgt":
                 case "cgt.un":
                 case "clt":
                 case "clt.un":
-                {
-                    coll.stackDepth.PopNumVal();
-                    coll.stackDepth.PopNumVal();
-                    coll.stackDepth.Push(typeof(int));
-                    break;
-                }
+                    {
+                        coll.stackDepth.PopNumVal();
+                        coll.stackDepth.PopNumVal();
+                        coll.stackDepth.Push(typeof(int));
+                        break;
+                    }
                 case "ldind.i4":
-                {
-                    coll.stackDepth.Pop(typeof(int).MakeByRefType());
-                    coll.stackDepth.Push(typeof(int));
-                    break;
-                }
+                    {
+                        coll.stackDepth.Pop(typeof(int).MakeByRefType());
+                        coll.stackDepth.Push(typeof(int));
+                        break;
+                    }
                 case "stind.i4":
-                {
-                    coll.stackDepth.Pop(typeof(int));
-                    coll.stackDepth.Pop(typeof(int).MakeByRefType());
-                    break;
-                }
+                    {
+                        coll.stackDepth.Pop(typeof(int));
+                        coll.stackDepth.Pop(typeof(int).MakeByRefType());
+                        break;
+                    }
                 default:
                     throw new Exception("unknown opcode " + opcode.ToString());
             }
@@ -1233,12 +1231,12 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             string s = opcode.ToString();
             s = s.Substring(5);  // strip off "conv."
-            if(s.StartsWith("ovf."))
+            if (s.StartsWith("ovf."))
                 s = s.Substring(4);
-            if(s.EndsWith(".un"))
+            if (s.EndsWith(".un"))
                 s = s.Substring(0, s.Length - 3);
 
-            switch(s)
+            switch (s)
             {
                 case "i":
                     return typeof(IntPtr);
@@ -1276,7 +1274,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class GraphNodeEmitNullEndfinally: GraphNodeEmitNull
+    public class GraphNodeEmitNullEndfinally : GraphNodeEmitNull
     {
         public GraphNodeEmitNullEndfinally(ScriptCollector coll, Token errorAt) : base(coll, errorAt, OpCodes.Endfinally)
         {
@@ -1293,7 +1291,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return new NNEnumerable(this, typeof(NNEnumerator));
         }
 
-        private class NNEnumerator: NNEnumeratorBase
+        private class NNEnumerator : NNEnumeratorBase
         {
             private GraphNodeEmitNullEndfinally gn;
             private IEnumerator<GraphNodeBlock> leaveTargetEnumerator;
@@ -1313,60 +1311,60 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
             public override bool MoveNext()
             {
-                while(true)
+                while (true)
                 {
-                    switch(index)
+                    switch (index)
                     {
 
                         // to start, return end of our finally { }
                         case 0:
-                        {
-                            GraphNodeBeginExceptionBlock thistry = gn.excBlock;
-                            nn = thistry.endExcBlock;
-                            if(nn == null)
-                                throw new NullReferenceException("thistry.endExcBlock");
-                            index++;
-                            return true;
-                        }
+                            {
+                                GraphNodeBeginExceptionBlock thistry = gn.excBlock;
+                                nn = thistry.endExcBlock;
+                                if (nn == null)
+                                    throw new NullReferenceException("thistry.endExcBlock");
+                                index++;
+                                return true;
+                            }
 
                         // return next one of our finally { }'s leave targets
                         // ie, where any leave instructions in the try { } want 
                         // the finally { } to go to when it finishes
                         case 1:
-                        {
-                            if(this.leaveTargetEnumerator.MoveNext())
                             {
-                                nn = this.leaveTargetEnumerator.Current;
-                                if(nn == null)
-                                    throw new NullReferenceException("this.leaveTargetEnumerator.Current");
-                                return true;
+                                if (this.leaveTargetEnumerator.MoveNext())
+                                {
+                                    nn = this.leaveTargetEnumerator.Current;
+                                    if (nn == null)
+                                        throw new NullReferenceException("this.leaveTargetEnumerator.Current");
+                                    return true;
+                                }
+                                break;
                             }
-                            break;
-                        }
 
                         // return beginning of next outer finally { }
                         case 2:
-                        {
-                            GraphNodeBeginExceptionBlock nntry = gn.excBlock;
-                            while((nntry = nntry.excBlock) != null)
                             {
-                                if(nntry.catchFinallyBlock is GraphNodeBeginFinallyBlock)
+                                GraphNodeBeginExceptionBlock nntry = gn.excBlock;
+                                while ((nntry = nntry.excBlock) != null)
                                 {
-                                    nn = nntry.catchFinallyBlock;
-                                    if(nn == null)
-                                        throw new NullReferenceException("nntry.catchFinallyBlock");
-                                    index++;
-                                    return true;
+                                    if (nntry.catchFinallyBlock is GraphNodeBeginFinallyBlock)
+                                    {
+                                        nn = nntry.catchFinallyBlock;
+                                        if (nn == null)
+                                            throw new NullReferenceException("nntry.catchFinallyBlock");
+                                        index++;
+                                        return true;
+                                    }
                                 }
+                                break;
                             }
-                            break;
-                        }
 
                         // got nothing more
                         case 3:
-                        {
-                            return false;
-                        }
+                            {
+                                return false;
+                            }
 
                         default:
                             throw new Exception();
@@ -1383,7 +1381,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class GraphNodeEmitField: GraphNodeEmit
+    public class GraphNodeEmitField : GraphNodeEmit
     {
         public FieldInfo field;
 
@@ -1396,7 +1394,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             base.ChainLin();
 
-            switch(opcode.ToString())
+            switch (opcode.ToString())
             {
                 case "ldfld":
                     PopPointer();
@@ -1426,11 +1424,11 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         private void PopPointer()
         {
             Type t = field.DeclaringType;               // get class/field type
-            if(t.IsValueType)
+            if (t.IsValueType)
             {
                 Type brt = t.MakeByRefType();      // if value type, eg Vector, it can be pushed by reference or by value
                 int c = coll.stackDepth.Count;
-                if((c > 0) && (coll.stackDepth[c - 1] == brt))
+                if ((c > 0) && (coll.stackDepth[c - 1] == brt))
                     t = brt;
             }
             coll.stackDepth.Pop(t);                    // type of what should be on the stack pointing to object or struct
@@ -1448,7 +1446,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class GraphNodeEmitLocal: GraphNodeEmit
+    public class GraphNodeEmitLocal : GraphNodeEmit
     {
         public ScriptMyLocal myLocal;
 
@@ -1461,7 +1459,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             base.ChainLin();
 
-            switch(opcode.ToString())
+            switch (opcode.ToString())
             {
                 case "ldloc":
                     coll.stackDepth.Push(myLocal.type);
@@ -1485,21 +1483,21 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public override ScriptMyLocal ReadsLocal()
         {
-            if(opcode == OpCodes.Ldloc)
+            if (opcode == OpCodes.Ldloc)
                 return myLocal;
-            if(opcode == OpCodes.Ldloca)
+            if (opcode == OpCodes.Ldloca)
                 return myLocal;
-            if(opcode == OpCodes.Stloc)
+            if (opcode == OpCodes.Stloc)
                 return null;
             throw new Exception("unknown opcode " + opcode);
         }
         public override ScriptMyLocal WritesLocal()
         {
-            if(opcode == OpCodes.Ldloc)
+            if (opcode == OpCodes.Ldloc)
                 return null;
-            if(opcode == OpCodes.Ldloca)
+            if (opcode == OpCodes.Ldloca)
                 return myLocal;
-            if(opcode == OpCodes.Stloc)
+            if (opcode == OpCodes.Stloc)
                 return myLocal;
             throw new Exception("unknown opcode " + opcode);
         }
@@ -1510,7 +1508,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class GraphNodeEmitType: GraphNodeEmit
+    public class GraphNodeEmitType : GraphNodeEmit
     {
         public Type type;
 
@@ -1523,65 +1521,65 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             base.ChainLin();
 
-            switch(opcode.ToString())
+            switch (opcode.ToString())
             {
                 case "castclass":
                 case "isinst":
-                {
-                    coll.stackDepth.PopRef();
-                    coll.stackDepth.Push(type, type.IsValueType);
-                    break;
-                }
+                    {
+                        coll.stackDepth.PopRef();
+                        coll.stackDepth.Push(type, type.IsValueType);
+                        break;
+                    }
                 case "box":
-                {
-                    if(!type.IsValueType)
-                        throw new Exception("can't box a non-value type");
-                    coll.stackDepth.Pop(type);
-                    coll.stackDepth.Push(type, true);
-                    break;
-                }
+                    {
+                        if (!type.IsValueType)
+                            throw new Exception("can't box a non-value type");
+                        coll.stackDepth.Pop(type);
+                        coll.stackDepth.Push(type, true);
+                        break;
+                    }
                 case "unbox":
                 case "unbox.any":
-                {
-                    if(!type.IsValueType)
-                        throw new Exception("can't unbox to a non-value type");
-                    coll.stackDepth.PopRef();
-                    coll.stackDepth.Push(type);
-                    break;
-                }
+                    {
+                        if (!type.IsValueType)
+                            throw new Exception("can't unbox to a non-value type");
+                        coll.stackDepth.PopRef();
+                        coll.stackDepth.Push(type);
+                        break;
+                    }
                 case "newarr":
-                {
-                    coll.stackDepth.Pop(typeof(int));
-                    coll.stackDepth.Push(type.MakeArrayType());
-                    break;
-                }
+                    {
+                        coll.stackDepth.Pop(typeof(int));
+                        coll.stackDepth.Push(type.MakeArrayType());
+                        break;
+                    }
                 case "sizeof":
-                {
-                    coll.stackDepth.Pop(1);
-                    coll.stackDepth.Push(typeof(int));
-                    break;
-                }
+                    {
+                        coll.stackDepth.Pop(1);
+                        coll.stackDepth.Push(typeof(int));
+                        break;
+                    }
                 case "ldelem":
-                {
-                    coll.stackDepth.Pop(typeof(int));
-                    coll.stackDepth.Pop(type.MakeArrayType());
-                    coll.stackDepth.Push(type);
-                    break;
-                }
+                    {
+                        coll.stackDepth.Pop(typeof(int));
+                        coll.stackDepth.Pop(type.MakeArrayType());
+                        coll.stackDepth.Push(type);
+                        break;
+                    }
                 case "ldelema":
-                {
-                    coll.stackDepth.Pop(typeof(int));
-                    coll.stackDepth.Pop(type.MakeArrayType());
-                    coll.stackDepth.Push(type.MakeByRefType());
-                    break;
-                }
+                    {
+                        coll.stackDepth.Pop(typeof(int));
+                        coll.stackDepth.Pop(type.MakeArrayType());
+                        coll.stackDepth.Push(type.MakeByRefType());
+                        break;
+                    }
                 case "stelem":
-                {
-                    coll.stackDepth.Pop(type);
-                    coll.stackDepth.Pop(typeof(int));
-                    coll.stackDepth.Pop(type.MakeArrayType());
-                    break;
-                }
+                    {
+                        coll.stackDepth.Pop(type);
+                        coll.stackDepth.Pop(typeof(int));
+                        coll.stackDepth.Pop(type.MakeArrayType());
+                        break;
+                    }
                 default:
                     throw new Exception("unknown opcode " + opcode.ToString());
             }
@@ -1599,7 +1597,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class GraphNodeEmitLabel: GraphNodeEmit
+    public class GraphNodeEmitLabel : GraphNodeEmit
     {
         public ScriptMyLabel myLabel;
 
@@ -1612,16 +1610,16 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             base.ChainLin();
 
-            switch(opcode.ToString())
+            switch (opcode.ToString())
             {
                 case "brfalse.s":
                 case "brtrue.s":
                 case "brfalse":
                 case "brtrue":
-                {
-                    coll.stackDepth.Pop(1);
-                    break;
-                }
+                    {
+                        coll.stackDepth.Pop(1);
+                        break;
+                    }
                 case "beq.s":
                 case "bge.s":
                 case "bgt.s":
@@ -1642,20 +1640,20 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 case "bgt.un":
                 case "ble.un":
                 case "blt.un":
-                {
-                    coll.stackDepth.PopNumVal();
-                    coll.stackDepth.PopNumVal();
-                    break;
-                }
+                    {
+                        coll.stackDepth.PopNumVal();
+                        coll.stackDepth.PopNumVal();
+                        break;
+                    }
                 case "br":
                 case "br.s":
                     break;
                 case "leave":
-                {
-                    if(coll.stackDepth.Count != 0)
-                        throw new Exception("bad stack depth " + coll.stackDepth.Count);
-                    break;
-                }
+                    {
+                        if (coll.stackDepth.Count != 0)
+                            throw new Exception("bad stack depth " + coll.stackDepth.Count);
+                        break;
+                    }
                 default:
                     throw new Exception("unknown opcode " + opcode.ToString());
             }
@@ -1686,7 +1684,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return new NNEnumerable(this, typeof(NNEnumerator));
         }
 
-        private class NNEnumerator: NNEnumeratorBase
+        private class NNEnumerator : NNEnumeratorBase
         {
             private GraphNodeEmitLabel gn;
             private int index;
@@ -1696,50 +1694,50 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
             public override bool MoveNext()
             {
-                switch(gn.opcode.FlowControl)
+                switch (gn.opcode.FlowControl)
                 {
                     case FlowControl.Branch:
-                    {
-                        // unconditional branch just goes to target and nothing else
-                        switch(index)
                         {
-                            case 0:
+                            // unconditional branch just goes to target and nothing else
+                            switch (index)
                             {
-                                nn = gn.myLabel.whereAmI;
-                                index++;
-                                return nn != null;
+                                case 0:
+                                    {
+                                        nn = gn.myLabel.whereAmI;
+                                        index++;
+                                        return nn != null;
+                                    }
+                                case 1:
+                                    {
+                                        return false;
+                                    }
                             }
-                            case 1:
-                            {
-                                return false;
-                            }
+                            throw new Exception();
                         }
-                        throw new Exception();
-                    }
                     case FlowControl.Cond_Branch:
-                    {
-                        // conditional branch goes inline and to target
-                        switch(index)
                         {
-                            case 0:
+                            // conditional branch goes inline and to target
+                            switch (index)
                             {
-                                nn = gn.nextLin;
-                                index++;
-                                return true;
+                                case 0:
+                                    {
+                                        nn = gn.nextLin;
+                                        index++;
+                                        return true;
+                                    }
+                                case 1:
+                                    {
+                                        nn = gn.myLabel.whereAmI;
+                                        index++;
+                                        return nn != null;
+                                    }
+                                case 2:
+                                    {
+                                        return false;
+                                    }
                             }
-                            case 1:
-                            {
-                                nn = gn.myLabel.whereAmI;
-                                index++;
-                                return nn != null;
-                            }
-                            case 2:
-                            {
-                                return false;
-                            }
+                            throw new Exception();
                         }
-                        throw new Exception();
-                    }
                     default:
                         throw new Exception("unknown flow control " + gn.opcode.FlowControl.ToString() +
                                              " of " + gn.opcode.ToString());
@@ -1753,7 +1751,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class GraphNodeEmitLabelLeave: GraphNodeEmitLabel
+    public class GraphNodeEmitLabelLeave : GraphNodeEmitLabel
     {
         public GraphNodeBlock unwindTo;  // if unwinding, innermost finally block being unwound
                                          //         else, same as myTarget.whereAmI
@@ -1773,7 +1771,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return new NNEnumerable(this, typeof(NNEnumerator));
         }
 
-        private class NNEnumerator: NNEnumeratorBase
+        private class NNEnumerator : NNEnumeratorBase
         {
             private GraphNodeEmitLabelLeave gn;
             private int index;
@@ -1783,7 +1781,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
             public override bool MoveNext()
             {
-                if(index == 0)
+                if (index == 0)
                 {
                     nn = gn.unwindTo;
                     index++;
@@ -1800,7 +1798,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class GraphNodeEmitLabels: GraphNodeEmit
+    public class GraphNodeEmitLabels : GraphNodeEmit
     {
         public ScriptMyLabel[] myLabels;
 
@@ -1813,20 +1811,20 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             base.ChainLin();
 
-            switch(opcode.ToString())
+            switch (opcode.ToString())
             {
                 case "switch":
-                {
-                    coll.stackDepth.Pop(typeof(int));
-                    break;
-                }
+                    {
+                        coll.stackDepth.Pop(typeof(int));
+                        break;
+                    }
                 default:
                     throw new Exception("unknown opcode " + opcode.ToString());
             }
 
             // if a target doesn't have a depth yet, set its depth to the depth after instruction executes
             // otherwise, make sure it matches all other branches to that target and what fell through to it
-            foreach(ScriptMyLabel myLabel in myLabels)
+            foreach (ScriptMyLabel myLabel in myLabels)
             {
                 coll.stackDepth.Matches(myLabel);
             }
@@ -1836,9 +1834,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             base.DebString(sb);
             bool first = true;
-            foreach(ScriptMyLabel lbl in myLabels)
+            foreach (ScriptMyLabel lbl in myLabels)
             {
-                if(!first)
+                if (!first)
                     sb.Append(',');
                 sb.Append(lbl.name);
                 first = false;
@@ -1859,7 +1857,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return new NNEnumerable(this, typeof(NNEnumerator));
         }
 
-        private class NNEnumerator: NNEnumeratorBase
+        private class NNEnumerator : NNEnumeratorBase
         {
             private GraphNodeEmitLabels gn;
             private int index;
@@ -1870,15 +1868,15 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             public override bool MoveNext()
             {
                 // Return next from list of switch case labels.
-                while(index < gn.myLabels.Length)
+                while (index < gn.myLabels.Length)
                 {
                     nn = gn.myLabels[index++].whereAmI;
-                    if(nn != null)
+                    if (nn != null)
                         return true;
                 }
 
                 // If all ran out, the switch instruction falls through.
-                if(index == gn.myLabels.Length)
+                if (index == gn.myLabels.Length)
                 {
                     index++;
                     nn = gn.nextLin;
@@ -1897,7 +1895,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class GraphNodeEmitIntMeth: GraphNodeEmit
+    public class GraphNodeEmitIntMeth : GraphNodeEmit
     {
         public ScriptObjWriter method;
 
@@ -1910,20 +1908,20 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             base.ChainLin();
 
-            switch(opcode.ToString())
+            switch (opcode.ToString())
             {
                 case "call":
-                {
+                    {
 
-                    // calls have Varpop so pop the number of arguments
-                    // they are all static so there is no separate 'this' parameter
-                    coll.stackDepth.Pop(this.method.argTypes);
+                        // calls have Varpop so pop the number of arguments
+                        // they are all static so there is no separate 'this' parameter
+                        coll.stackDepth.Pop(this.method.argTypes);
 
-                    // calls are also Varpush so they push a return value iff non-void
-                    if(this.method.retType != typeof(void))
-                        coll.stackDepth.Push(this.method.retType);
-                    break;
-                }
+                        // calls are also Varpush so they push a return value iff non-void
+                        if (this.method.retType != typeof(void))
+                            coll.stackDepth.Push(this.method.retType);
+                        break;
+                    }
 
                 default:
                     throw new Exception("unknown opcode " + opcode.ToString());
@@ -1942,7 +1940,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class GraphNodeEmitExtMeth: GraphNodeEmit
+    public class GraphNodeEmitExtMeth : GraphNodeEmit
     {
         public MethodInfo method;
 
@@ -1955,24 +1953,24 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             base.ChainLin();
 
-            switch(opcode.ToString())
+            switch (opcode.ToString())
             {
                 case "call":
                 case "callvirt":
-                {
-
-                    // calls have Varpop so pop the number of arguments
-                    coll.stackDepth.Pop(this.method.GetParameters());
-                    if((this.method.CallingConvention & CallingConventions.HasThis) != 0)
                     {
-                        coll.stackDepth.Pop(method.DeclaringType);
-                    }
 
-                    // calls are also Varpush so they push a return value iff non-void
-                    if(this.method.ReturnType != typeof(void))
-                        coll.stackDepth.Push(this.method.ReturnType);
-                    break;
-                }
+                        // calls have Varpop so pop the number of arguments
+                        coll.stackDepth.Pop(this.method.GetParameters());
+                        if ((this.method.CallingConvention & CallingConventions.HasThis) != 0)
+                        {
+                            coll.stackDepth.Pop(method.DeclaringType);
+                        }
+
+                        // calls are also Varpush so they push a return value iff non-void
+                        if (this.method.ReturnType != typeof(void))
+                            coll.stackDepth.Push(this.method.ReturnType);
+                        break;
+                    }
 
                 default:
                     throw new Exception("unknown opcode " + opcode.ToString());
@@ -1991,7 +1989,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class GraphNodeEmitCtor: GraphNodeEmit
+    public class GraphNodeEmitCtor : GraphNodeEmit
     {
         public ConstructorInfo ctor;
 
@@ -2004,14 +2002,14 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             base.ChainLin();
 
-            switch(opcode.ToString())
+            switch (opcode.ToString())
             {
                 case "newobj":
-                {
-                    coll.stackDepth.Pop(ctor.GetParameters());
-                    coll.stackDepth.Push(ctor.DeclaringType);
-                    break;
-                }
+                    {
+                        coll.stackDepth.Pop(ctor.GetParameters());
+                        coll.stackDepth.Push(ctor.DeclaringType);
+                        break;
+                    }
 
                 default:
                     throw new Exception("unknown opcode " + opcode.ToString());
@@ -2030,7 +2028,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class GraphNodeEmitDouble: GraphNodeEmit
+    public class GraphNodeEmitDouble : GraphNodeEmit
     {
         public double value;
 
@@ -2043,7 +2041,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             base.ChainLin();
 
-            switch(opcode.ToString())
+            switch (opcode.ToString())
             {
                 case "ldc.r8":
                     coll.stackDepth.Push(typeof(double));
@@ -2065,7 +2063,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class GraphNodeEmitFloat: GraphNodeEmit
+    public class GraphNodeEmitFloat : GraphNodeEmit
     {
         public float value;
 
@@ -2078,7 +2076,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             base.ChainLin();
 
-            switch(opcode.ToString())
+            switch (opcode.ToString())
             {
                 case "ldc.r4":
                     coll.stackDepth.Push(typeof(float));
@@ -2100,7 +2098,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class GraphNodeEmitInt: GraphNodeEmit
+    public class GraphNodeEmitInt : GraphNodeEmit
     {
         public int value;
 
@@ -2113,7 +2111,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             base.ChainLin();
 
-            switch(opcode.ToString())
+            switch (opcode.ToString())
             {
                 case "ldarg":
                 case "ldarg.s":
@@ -2148,7 +2146,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class GraphNodeEmitString: GraphNodeEmit
+    public class GraphNodeEmitString : GraphNodeEmit
     {
         public string value;
 
@@ -2161,7 +2159,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             base.ChainLin();
 
-            switch(opcode.ToString())
+            switch (opcode.ToString())
             {
                 case "ldstr":
                     coll.stackDepth.Push(typeof(string));
@@ -2185,7 +2183,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
     }
 
-    public class GraphNodeMarkLabel: GraphNodeBlock
+    public class GraphNodeMarkLabel : GraphNodeBlock
     {
         public ScriptMyLabel myLabel;
 
@@ -2204,19 +2202,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             // else,
             //     label must have had a forward branch to it so we can know stack depth
             //     set the current stack depth to the label's stack depth as of that forward branch
-            if(myLabel.whereAmI.prevLin.CanFallThrough())
+            if (myLabel.whereAmI.prevLin.CanFallThrough())
             {
                 coll.stackDepth.Matches(myLabel);
             }
             else
             {
-                if(myLabel.stackDepth == null)
+                if (myLabel.stackDepth == null)
                 {
                     throw new Exception("stack depth unknown at " + myLabel.name);
                 }
                 coll.stackDepth.Clear();
                 int n = myLabel.stackDepth.Length;
-                for(int i = 0; i < n; i++)
+                for (int i = 0; i < n; i++)
                 {
                     coll.stackDepth.Push(myLabel.stackDepth[i], myLabel.stackBoxeds[i]);
                 }
@@ -2227,7 +2225,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             sb.Append(myLabel.name);
             sb.Append(':');
-            if(myLabel.stackDepth != null)
+            if (myLabel.stackDepth != null)
             {
                 sb.Append("  [");
                 sb.Append(myLabel.stackDepth.Length);
@@ -2246,7 +2244,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
      * @brief Generates enumerator that steps through list of nodes that can
      *        possibly be next in a flow-control sense.
      */
-    public class NNEnumerable: System.Collections.Generic.IEnumerable<GraphNode>
+    public class NNEnumerable : System.Collections.Generic.IEnumerable<GraphNode>
     {
         private object[] cps;
         private ConstructorInfo ci;
@@ -2270,7 +2268,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     /**
      * @brief Steps through list of nodes that can possible be next in a flow-control sense.
      */
-    public abstract class NNEnumeratorBase: System.Collections.Generic.IEnumerator<GraphNode>
+    public abstract class NNEnumeratorBase : System.Collections.Generic.IEnumerator<GraphNode>
     {
         protected GraphNode nn;
 
@@ -2297,7 +2295,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
     }
 
 
-    public class ScriptCollector: ScriptMyILGen
+    public class ScriptCollector : ScriptMyILGen
     {
         public static readonly bool DEBUG = false;
 
@@ -2368,7 +2366,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             GraphNodeBeginCatchBlock catchBlock = new GraphNodeBeginCatchBlock(this, excType);
             catchBlock.ChainLin();
-            if(curExcBlock.catchFinallyBlock != null)
+            if (curExcBlock.catchFinallyBlock != null)
                 throw new Exception("only one catch/finally allowed per try");
             curExcBlock.catchFinallyBlock = catchBlock;
             curTryBlock = curExcBlock.tryBlock;
@@ -2378,7 +2376,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             GraphNodeBeginFinallyBlock finallyBlock = new GraphNodeBeginFinallyBlock(this);
             finallyBlock.ChainLin();
-            if(curExcBlock.catchFinallyBlock != null)
+            if (curExcBlock.catchFinallyBlock != null)
                 throw new Exception("only one catch/finally allowed per try");
             curExcBlock.catchFinallyBlock = finallyBlock;
             curTryBlock = curExcBlock.tryBlock;
@@ -2395,7 +2393,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public void Emit(Token errorAt, OpCode opcode)
         {
-            if(opcode == OpCodes.Endfinally)
+            if (opcode == OpCodes.Endfinally)
             {
                 new GraphNodeEmitNullEndfinally(this, errorAt).ChainLin();
             }
@@ -2407,7 +2405,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public void Emit(Token errorAt, OpCode opcode, FieldInfo field)
         {
-            if(field == null)
+            if (field == null)
                 throw new ArgumentNullException("field");
             new GraphNodeEmitField(this, errorAt, opcode, field).ChainLin();
         }
@@ -2424,7 +2422,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public void Emit(Token errorAt, OpCode opcode, ScriptMyLabel myLabel)
         {
-            if(opcode == OpCodes.Leave)
+            if (opcode == OpCodes.Leave)
             {
                 new GraphNodeEmitLabelLeave(this, errorAt, myLabel).ChainLin();
             }
@@ -2441,21 +2439,21 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public void Emit(Token errorAt, OpCode opcode, ScriptObjWriter method)
         {
-            if(method == null)
+            if (method == null)
                 throw new ArgumentNullException("method");
             new GraphNodeEmitIntMeth(this, errorAt, opcode, method).ChainLin();
         }
 
         public void Emit(Token errorAt, OpCode opcode, MethodInfo method)
         {
-            if(method == null)
+            if (method == null)
                 throw new ArgumentNullException("method");
             new GraphNodeEmitExtMeth(this, errorAt, opcode, method).ChainLin();
         }
 
         public void Emit(Token errorAt, OpCode opcode, ConstructorInfo ctor)
         {
-            if(ctor == null)
+            if (ctor == null)
                 throw new ArgumentNullException("ctor");
             new GraphNodeEmitCtor(this, errorAt, opcode, ctor).ChainLin();
         }
@@ -2491,16 +2489,16 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public ScriptMyILGen WriteOutAll()
         {
-            foreach(ScriptMyLocal loc in declaredLocals)
+            foreach (ScriptMyLocal loc in declaredLocals)
             {
-                if(loc.isReferenced)
+                if (loc.isReferenced)
                     wrapped.DeclareLocal(loc);
             }
-            foreach(ScriptMyLabel lbl in definedLabels)
+            foreach (ScriptMyLabel lbl in definedLabels)
             {
                 wrapped.DefineLabel(lbl);
             }
-            for(GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
+            for (GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
             {
                 gn.WriteOutOne(wrapped);
             }
@@ -2512,20 +2510,20 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public void Optimize()
         {
-            if(curExcBlock != null)
+            if (curExcBlock != null)
                 throw new Exception("exception block still open");
 
             // If an instruction says it doesn't fall through, remove all instructions to
             // the end of the block.
-            for(GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
+            for (GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
             {
-                if(!gn.CanFallThrough())
+                if (!gn.CanFallThrough())
                 {
                     GraphNode nn;
-                    while(((nn = gn.nextLin) != null) && !(nn is GraphNodeBlock) &&
+                    while (((nn = gn.nextLin) != null) && !(nn is GraphNodeBlock) &&
                                               !(nn is GraphNodeEndExceptionBlock))
                     {
-                        if((gn.nextLin = nn.nextLin) != null)
+                        if ((gn.nextLin = nn.nextLin) != null)
                         {
                             nn.nextLin.prevLin = gn;
                         }
@@ -2537,9 +2535,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             // For each found, its target for flow analysis purposes is the beginning of the corresponding
             // finally block.  And the end of the finally block gets a conditional branch target of the 
             // leave instruction's target.  A leave instruction can unwind zero or more finally blocks.
-            for(GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
+            for (GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
             {
-                if(gn is GraphNodeEmitLabelLeave)
+                if (gn is GraphNodeEmitLabelLeave)
                 {
                     GraphNodeEmitLabelLeave leaveInstr = (GraphNodeEmitLabelLeave)gn;         // the leave instruction
                     GraphNodeMarkLabel leaveTarget = leaveInstr.myLabel.whereAmI;             // label being targeted by leave
@@ -2551,16 +2549,16 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     // The end of the last one found conditionally branches to the leave instruction's target.
                     // If none found, the leave is a simple unconditional branch to its target.
                     GraphNodeBeginFinallyBlock innerFinallyBlock = null;
-                    for(GraphNodeBeginExceptionBlock tryBlock = leaveInstr.tryBlock;
+                    for (GraphNodeBeginExceptionBlock tryBlock = leaveInstr.tryBlock;
                          tryBlock != leaveTargetsTryBlock;
                          tryBlock = tryBlock.tryBlock)
                     {
-                        if(tryBlock == null)
+                        if (tryBlock == null)
                             throw new Exception("leave target not at or outer to leave instruction");
                         GraphNodeCatchFinallyBlock cfb = tryBlock.catchFinallyBlock;
-                        if(cfb is GraphNodeBeginFinallyBlock)
+                        if (cfb is GraphNodeBeginFinallyBlock)
                         {
-                            if(innerFinallyBlock == null)
+                            if (innerFinallyBlock == null)
                             {
                                 leaveInstr.unwindTo = cfb;
                             }
@@ -2570,11 +2568,11 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
                     // The end of the outermost finally being unwound can conditionally jump to the target of the leave instruction.
                     // In the case of no finallies being unwound, the leave is just a simple unconditional branch.
-                    if(innerFinallyBlock == null)
+                    if (innerFinallyBlock == null)
                     {
                         leaveInstr.unwindTo = leaveTarget;
                     }
-                    else if(!innerFinallyBlock.leaveTargets.Contains(leaveTarget))
+                    else if (!innerFinallyBlock.leaveTargets.Contains(leaveTarget))
                     {
                         innerFinallyBlock.leaveTargets.Add(leaveTarget);
                     }
@@ -2584,19 +2582,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             // See which variables a particular block reads before writing.
             // This just considers the block itself and nothing that it branches to or fallsthru to.
             GraphNodeBlock currentBlock = null;
-            for(GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
+            for (GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
             {
-                if(gn is GraphNodeBlock)
+                if (gn is GraphNodeBlock)
                     currentBlock = (GraphNodeBlock)gn;
                 ScriptMyLocal rdlcl = gn.ReadsLocal();
-                if((rdlcl != null) &&
+                if ((rdlcl != null) &&
                     !currentBlock.localsWrittenBeforeRead.Contains(rdlcl) &&
                     !currentBlock.localsReadBeforeWritten.Contains(rdlcl))
                 {
                     currentBlock.localsReadBeforeWritten.Add(rdlcl);
                 }
                 ScriptMyLocal wrlcl = gn.WritesLocal();
-                if((wrlcl != null) &&
+                if ((wrlcl != null) &&
                     !currentBlock.localsWrittenBeforeRead.Contains(wrlcl) &&
                     !currentBlock.localsReadBeforeWritten.Contains(wrlcl))
                 {
@@ -2614,7 +2612,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 resolvedSomething = false;
                 resolveSequence++;
                 ResolveBlock((GraphNodeBlock)firstLin);
-            } while(resolvedSomething);
+            } while (resolvedSomething);
 
             // Repeat the cutting loops as long as we keep finding stuff.
             bool didSomething;
@@ -2623,27 +2621,27 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 didSomething = false;
 
                 // Strip out ldc.i4.1/xor/ldc.i4.1/xor
-                for(GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
+                for (GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
                 {
-                    if(!(gn is GraphNodeEmit))
+                    if (!(gn is GraphNodeEmit))
                         continue;
                     GraphNodeEmit xor2 = (GraphNodeEmit)gn;
-                    if(xor2.opcode != OpCodes.Xor)
+                    if (xor2.opcode != OpCodes.Xor)
                         continue;
-                    if(!(xor2.prevLin is GraphNodeEmit))
+                    if (!(xor2.prevLin is GraphNodeEmit))
                         continue;
                     GraphNodeEmit ld12 = (GraphNodeEmit)xor2.prevLin;
-                    if(ld12.opcode != OpCodes.Ldc_I4_1)
+                    if (ld12.opcode != OpCodes.Ldc_I4_1)
                         continue;
-                    if(!(ld12.prevLin is GraphNodeEmit))
+                    if (!(ld12.prevLin is GraphNodeEmit))
                         continue;
                     GraphNodeEmit xor1 = (GraphNodeEmit)ld12.prevLin;
-                    if(xor1.opcode != OpCodes.Xor)
+                    if (xor1.opcode != OpCodes.Xor)
                         continue;
-                    if(!(xor2.prevLin is GraphNodeEmit))
+                    if (!(xor2.prevLin is GraphNodeEmit))
                         continue;
                     GraphNodeEmit ld11 = (GraphNodeEmit)xor1.prevLin;
-                    if(ld11.opcode != OpCodes.Ldc_I4_1)
+                    if (ld11.opcode != OpCodes.Ldc_I4_1)
                         continue;
                     ld11.prevLin.nextLin = xor2.nextLin;
                     xor2.nextLin.prevLin = ld11.prevLin;
@@ -2651,29 +2649,29 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 }
 
                 // Replace c{cond}/ldc.i4.1/xor/br{false,true} -> c{cond}/br{true,false}
-                for(GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
+                for (GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
                 {
-                    if(!(gn is GraphNodeEmit))
+                    if (!(gn is GraphNodeEmit))
                         continue;
                     GraphNodeEmit brft = (GraphNodeEmit)gn;
-                    if((brft.opcode != OpCodes.Brfalse) && (brft.opcode != OpCodes.Brtrue))
+                    if ((brft.opcode != OpCodes.Brfalse) && (brft.opcode != OpCodes.Brtrue))
                         continue;
-                    if(!(brft.prevLin is GraphNodeEmit))
+                    if (!(brft.prevLin is GraphNodeEmit))
                         continue;
                     GraphNodeEmit xor = (GraphNodeEmit)brft.prevLin;
-                    if(xor.opcode != OpCodes.Xor)
+                    if (xor.opcode != OpCodes.Xor)
                         continue;
-                    if(!(xor.prevLin is GraphNodeEmit))
+                    if (!(xor.prevLin is GraphNodeEmit))
                         continue;
                     GraphNodeEmit ldc = (GraphNodeEmit)xor.prevLin;
-                    if(ldc.opcode != OpCodes.Ldc_I4_1)
+                    if (ldc.opcode != OpCodes.Ldc_I4_1)
                         continue;
-                    if(!(ldc.prevLin is GraphNodeEmit))
+                    if (!(ldc.prevLin is GraphNodeEmit))
                         continue;
                     GraphNodeEmit cmp = (GraphNodeEmit)ldc.prevLin;
-                    if(cmp.opcode.StackBehaviourPop != StackBehaviour.Pop1_pop1)
+                    if (cmp.opcode.StackBehaviourPop != StackBehaviour.Pop1_pop1)
                         continue;
-                    if(cmp.opcode.StackBehaviourPush != StackBehaviour.Pushi)
+                    if (cmp.opcode.StackBehaviourPush != StackBehaviour.Pushi)
                         continue;
                     cmp.nextLin = brft;
                     brft.prevLin = cmp;
@@ -2682,32 +2680,32 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 }
 
                 // Replace c{cond}/br{false,true} -> b{!,}{cond}
-                for(GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
+                for (GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
                 {
-                    if(!(gn is GraphNodeEmit))
+                    if (!(gn is GraphNodeEmit))
                         continue;
                     GraphNodeEmit brft = (GraphNodeEmit)gn;
-                    if((brft.opcode != OpCodes.Brfalse) && (brft.opcode != OpCodes.Brtrue))
+                    if ((brft.opcode != OpCodes.Brfalse) && (brft.opcode != OpCodes.Brtrue))
                         continue;
-                    if(!(brft.prevLin is GraphNodeEmit))
+                    if (!(brft.prevLin is GraphNodeEmit))
                         continue;
                     GraphNodeEmit cmp = (GraphNodeEmit)brft.prevLin;
-                    if(cmp.opcode.StackBehaviourPop != StackBehaviour.Pop1_pop1)
+                    if (cmp.opcode.StackBehaviourPop != StackBehaviour.Pop1_pop1)
                         continue;
-                    if(cmp.opcode.StackBehaviourPush != StackBehaviour.Pushi)
+                    if (cmp.opcode.StackBehaviourPush != StackBehaviour.Pushi)
                         continue;
                     cmp.prevLin.nextLin = brft;
                     brft.prevLin = cmp.prevLin;
                     bool brtru = (brft.opcode == OpCodes.Brtrue);
-                    if(cmp.opcode == OpCodes.Ceq)
+                    if (cmp.opcode == OpCodes.Ceq)
                         brft.opcode = brtru ? OpCodes.Beq : OpCodes.Bne_Un;
-                    else if(cmp.opcode == OpCodes.Cgt)
+                    else if (cmp.opcode == OpCodes.Cgt)
                         brft.opcode = brtru ? OpCodes.Bgt : OpCodes.Ble;
-                    else if(cmp.opcode == OpCodes.Cgt_Un)
+                    else if (cmp.opcode == OpCodes.Cgt_Un)
                         brft.opcode = brtru ? OpCodes.Bgt_Un : OpCodes.Ble_Un;
-                    else if(cmp.opcode == OpCodes.Clt)
+                    else if (cmp.opcode == OpCodes.Clt)
                         brft.opcode = brtru ? OpCodes.Blt : OpCodes.Bge;
-                    else if(cmp.opcode == OpCodes.Clt_Un)
+                    else if (cmp.opcode == OpCodes.Clt_Un)
                         brft.opcode = brtru ? OpCodes.Blt_Un : OpCodes.Bge_Un;
                     else
                         throw new Exception();
@@ -2715,17 +2713,17 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 }
 
                 // Replace ld{c.i4.0,null}/br{ne.un,eq} -> br{true,false}
-                for(GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
+                for (GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
                 {
-                    if(!(gn is GraphNodeEmit))
+                    if (!(gn is GraphNodeEmit))
                         continue;
                     GraphNodeEmit brcc = (GraphNodeEmit)gn;
-                    if((brcc.opcode != OpCodes.Bne_Un) && (brcc.opcode != OpCodes.Beq))
+                    if ((brcc.opcode != OpCodes.Bne_Un) && (brcc.opcode != OpCodes.Beq))
                         continue;
-                    if(!(brcc.prevLin is GraphNodeEmit))
+                    if (!(brcc.prevLin is GraphNodeEmit))
                         continue;
                     GraphNodeEmit ldc0 = (GraphNodeEmit)brcc.prevLin;
-                    if((ldc0.opcode != OpCodes.Ldc_I4_0) && (ldc0.opcode != OpCodes.Ldnull))
+                    if ((ldc0.opcode != OpCodes.Ldc_I4_0) && (ldc0.opcode != OpCodes.Ldnull))
                         continue;
                     ldc0.prevLin.nextLin = brcc;
                     brcc.prevLin = ldc0.prevLin;
@@ -2742,44 +2740,44 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 // With:
                 //    ld<anything> except ld<anything> v2
                 //    ldloc v1
-                for(GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
+                for (GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
                 {
 
                     // check for 'ldloc v1' instruction
-                    if(!(gn is GraphNodeEmitLocal))
+                    if (!(gn is GraphNodeEmitLocal))
                         continue;
                     GraphNodeEmitLocal ldlv1 = (GraphNodeEmitLocal)gn;
-                    if(ldlv1.opcode != OpCodes.Ldloc)
+                    if (ldlv1.opcode != OpCodes.Ldloc)
                         continue;
 
                     // check for 'stloc v2' instruction
-                    if(!(ldlv1.nextLin is GraphNodeEmitLocal))
+                    if (!(ldlv1.nextLin is GraphNodeEmitLocal))
                         continue;
                     GraphNodeEmitLocal stlv2 = (GraphNodeEmitLocal)ldlv1.nextLin;
-                    if(stlv2.opcode != OpCodes.Stloc)
+                    if (stlv2.opcode != OpCodes.Stloc)
                         continue;
 
                     // check for 'ld<anything> except ld<anything> v2' instruction
-                    if(!(stlv2.nextLin is GraphNodeEmit))
+                    if (!(stlv2.nextLin is GraphNodeEmit))
                         continue;
                     GraphNodeEmit ldany = (GraphNodeEmit)stlv2.nextLin;
-                    if(!ldany.opcode.ToString().StartsWith("ld"))
+                    if (!ldany.opcode.ToString().StartsWith("ld"))
                         continue;
-                    if((ldany is GraphNodeEmitLocal) &&
+                    if ((ldany is GraphNodeEmitLocal) &&
                         ((GraphNodeEmitLocal)ldany).myLocal == stlv2.myLocal)
                         continue;
 
                     // check for 'ldloc v2' instruction
-                    if(!(ldany.nextLin is GraphNodeEmitLocal))
+                    if (!(ldany.nextLin is GraphNodeEmitLocal))
                         continue;
                     GraphNodeEmitLocal ldlv2 = (GraphNodeEmitLocal)ldany.nextLin;
-                    if(ldlv2.opcode != OpCodes.Ldloc)
+                    if (ldlv2.opcode != OpCodes.Ldloc)
                         continue;
-                    if(ldlv2.myLocal != stlv2.myLocal)
+                    if (ldlv2.myLocal != stlv2.myLocal)
                         continue;
 
                     // check that v2 is not needed after this at all
-                    if(IsLocalNeededAfterThis(ldlv2, ldlv2.myLocal))
+                    if (IsLocalNeededAfterThis(ldlv2, ldlv2.myLocal))
                         continue;
 
                     // make 'ld<anything>...' the first instruction
@@ -2800,18 +2798,18 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 // Remove all the stloc/ldloc that are back-to-back without the local
                 // being needed afterwards.  If it is needed afterwards, replace the 
                 // stloc/ldloc with dup/stloc.
-                for(GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
+                for (GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
                 {
-                    if((gn is GraphNodeEmitLocal) &&
+                    if ((gn is GraphNodeEmitLocal) &&
                         (gn.prevLin is GraphNodeEmitLocal))
                     {
                         GraphNodeEmitLocal stloc = (GraphNodeEmitLocal)gn.prevLin;
                         GraphNodeEmitLocal ldloc = (GraphNodeEmitLocal)gn;
-                        if((stloc.opcode == OpCodes.Stloc) &&
+                        if ((stloc.opcode == OpCodes.Stloc) &&
                             (ldloc.opcode == OpCodes.Ldloc) &&
                             (stloc.myLocal == ldloc.myLocal))
                         {
-                            if(IsLocalNeededAfterThis(ldloc, ldloc.myLocal))
+                            if (IsLocalNeededAfterThis(ldloc, ldloc.myLocal))
                             {
                                 GraphNodeEmitNull dup = new GraphNodeEmitNull(this, stloc.errorAt, OpCodes.Dup);
                                 dup.nextLin = stloc;
@@ -2835,18 +2833,18 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
                 // Remove all write-only local variables, ie, those with no ldloc[a] references.
                 // Replace any stloc instructions with pops.
-                for(GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
+                for (GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
                 {
                     ScriptMyLocal rdlcl = gn.ReadsLocal();
-                    if(rdlcl != null)
+                    if (rdlcl != null)
                         rdlcl.isReferenced = true;
                 }
-                for(GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
+                for (GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
                 {
                     ScriptMyLocal wrlcl = gn.WritesLocal();
-                    if((wrlcl != null) && !wrlcl.isReferenced)
+                    if ((wrlcl != null) && !wrlcl.isReferenced)
                     {
-                        if(!(gn is GraphNodeEmitLocal) || (((GraphNodeEmitLocal)gn).opcode != OpCodes.Stloc))
+                        if (!(gn is GraphNodeEmitLocal) || (((GraphNodeEmitLocal)gn).opcode != OpCodes.Stloc))
                         {
                             throw new Exception("expecting stloc");
                         }
@@ -2861,14 +2859,14 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 }
 
                 // Remove any Ld<const>/Dup,Pop.
-                for(GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
+                for (GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
                 {
-                    if((gn is GraphNodeEmit) &&
+                    if ((gn is GraphNodeEmit) &&
                         (gn.nextLin is GraphNodeEmit))
                     {
                         GraphNodeEmit gne = (GraphNodeEmit)gn;
                         GraphNodeEmit nne = (GraphNodeEmit)gn.nextLin;
-                        if(gne.isPoppable && (nne.opcode == OpCodes.Pop))
+                        if (gne.isPoppable && (nne.opcode == OpCodes.Pop))
                         {
                             gne.prevLin.nextLin = nne.nextLin;
                             nne.nextLin.prevLin = gne.prevLin;
@@ -2877,23 +2875,23 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                         }
                     }
                 }
-            } while(didSomething);
+            } while (didSomething);
 
             // Dump out the results.
-            if(DEBUG)
+            if (DEBUG)
             {
                 Console.WriteLine("");
                 Console.WriteLine(methName);
                 Console.WriteLine("  resolveSequence=" + this.resolveSequence);
 
                 Console.WriteLine("  Locals:");
-                foreach(ScriptMyLocal loc in declaredLocals)
+                foreach (ScriptMyLocal loc in declaredLocals)
                 {
                     Console.WriteLine("    " + loc.type.Name + "  " + loc.name);
                 }
 
                 Console.WriteLine("  Labels:");
-                foreach(ScriptMyLabel lbl in definedLabels)
+                foreach (ScriptMyLabel lbl in definedLabels)
                 {
                     Console.WriteLine("    " + lbl.name);
                 }
@@ -2906,19 +2904,19 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         private void DumpCode()
         {
             int linSeqNos = 0;
-            for(GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
+            for (GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
             {
                 gn.linSeqNo = ++linSeqNos;
             }
-            for(GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
+            for (GraphNode gn = firstLin; gn != null; gn = gn.nextLin)
             {
                 StringBuilder sb = new StringBuilder();
                 gn.DebStringExt(sb);
                 Console.WriteLine(sb.ToString());
-                if(gn is GraphNodeBlock)
+                if (gn is GraphNodeBlock)
                 {
                     GraphNodeBlock gnb = (GraphNodeBlock)gn;
-                    foreach(ScriptMyLocal lcl in gnb.localsReadBeforeWritten)
+                    foreach (ScriptMyLocal lcl in gnb.localsReadBeforeWritten)
                     {
                         Console.WriteLine("         reads " + lcl.name);
                     }
@@ -2935,7 +2933,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         private void ResolveBlock(GraphNodeBlock currentBlock)
         {
-            if(currentBlock.hasBeenResolved == this.resolveSequence)
+            if (currentBlock.hasBeenResolved == this.resolveSequence)
                 return;
 
             // So we don't recurse forever on a backward branch.
@@ -2945,12 +2943,12 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             List<ScriptMyLocal> localsWrittenSoFar = new List<ScriptMyLocal>();
 
             // Scan through the instructions in this block.
-            for(GraphNode gn = currentBlock; gn != null;)
+            for (GraphNode gn = currentBlock; gn != null;)
             {
 
                 // See if the instruction writes a local we don't know about yet.
                 ScriptMyLocal wrlcl = gn.WritesLocal();
-                if((wrlcl != null) && !localsWrittenSoFar.Contains(wrlcl))
+                if ((wrlcl != null) && !localsWrittenSoFar.Contains(wrlcl))
                 {
                     localsWrittenSoFar.Add(wrlcl);
                 }
@@ -2960,18 +2958,18 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 // every instruction conditionally branches to the beginning of the 
                 // second part (the catch/finally block).
                 GraphNode nextFallthruNode = null;
-                foreach(GraphNode nn in gn.NextNodes)
+                foreach (GraphNode nn in gn.NextNodes)
                 {
-                    if(nn is GraphNodeBlock)
+                    if (nn is GraphNodeBlock)
                     {
                         // Start of a block, go through all locals needed by that block on entry.
                         GraphNodeBlock nextBlock = (GraphNodeBlock)nn;
                         ResolveBlock(nextBlock);
-                        foreach(ScriptMyLocal readByNextBlock in nextBlock.localsReadBeforeWritten)
+                        foreach (ScriptMyLocal readByNextBlock in nextBlock.localsReadBeforeWritten)
                         {
                             // If this block hasn't written it by now and this block doesn't already
                             // require it on entry, say this block requires it on entry.
-                            if(!localsWrittenSoFar.Contains(readByNextBlock) &&
+                            if (!localsWrittenSoFar.Contains(readByNextBlock) &&
                                 !currentBlock.localsReadBeforeWritten.Contains(readByNextBlock))
                             {
                                 currentBlock.localsReadBeforeWritten.Add(readByNextBlock);
@@ -2982,14 +2980,14 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     else
                     {
                         // Not start of a block, should be normal fallthru instruction.
-                        if(nextFallthruNode != null)
+                        if (nextFallthruNode != null)
                             throw new Exception("more than one fallthru from " + gn.ToString());
                         nextFallthruNode = nn;
                     }
                 }
 
                 // Process next instruction if it isn't the start of a block.
-                if(nextFallthruNode == gn)
+                if (nextFallthruNode == gn)
                     throw new Exception("can't fallthru to self");
                 gn = nextFallthruNode;
             }
@@ -3006,11 +3004,11 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             do
             {
                 GraphNode nextFallthruNode = null;
-                foreach(GraphNode nn in node.NextNodes)
+                foreach (GraphNode nn in node.NextNodes)
                 {
-                    if(nn is GraphNodeBlock)
+                    if (nn is GraphNodeBlock)
                     {
-                        if(((GraphNodeBlock)nn).localsReadBeforeWritten.Contains(local))
+                        if (((GraphNodeBlock)nn).localsReadBeforeWritten.Contains(local))
                         {
                             return true;
                         }
@@ -3021,18 +3019,18 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     }
                 }
                 node = nextFallthruNode;
-                if(node == null)
+                if (node == null)
                     return false;
-                if(node.ReadsLocal() == local)
+                if (node.ReadsLocal() == local)
                     return true;
-            } while(node.WritesLocal() != local);
+            } while (node.WritesLocal() != local);
             return false;
         }
 
         public static void PadToLength(StringBuilder sb, int len, string str)
         {
             int pad = len - sb.Length;
-            if(pad < 0)
+            if (pad < 0)
                 pad = 0;
             sb.Append(str.PadLeft(pad));
         }

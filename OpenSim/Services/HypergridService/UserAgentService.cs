@@ -25,23 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Data;
+using OpenSim.Framework;
+using OpenSim.Server.Base;
+using OpenSim.Services.Connectors.Friends;
+using OpenSim.Services.Connectors.Hypergrid;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
-
-using OpenSim.Data;
-using OpenSim.Framework;
-using OpenSim.Services.Connectors.Friends;
-using OpenSim.Services.Connectors.Hypergrid;
-using OpenSim.Services.Interfaces;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using OpenSim.Server.Base;
 using FriendInfo = OpenSim.Services.Interfaces.FriendInfo;
-
-using OpenMetaverse;
-using log4net;
-using Nini.Config;
+using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Services.HypergridService
 {
@@ -154,11 +152,11 @@ namespace OpenSim.Services.HypergridService
                     if (!m_GridName.EndsWith("/"))
                         m_GridName = m_GridName + "/";
                     Uri gateURI;
-                    if(!Uri.TryCreate(m_GridName, UriKind.Absolute, out gateURI))
+                    if (!Uri.TryCreate(m_GridName, UriKind.Absolute, out gateURI))
                         throw new Exception(String.Format("[UserAgentService] could not parse gatekeeper uri"));
                     string host = gateURI.DnsSafeHost;
                     IPAddress ip = Util.GetHostFromDNS(host);
-                    if(ip == null)
+                    if (ip == null)
                         throw new Exception(String.Format("[UserAgentService] failed to resolve gatekeeper host"));
                     m_MyExternalIP = ip.ToString();
                 }
@@ -280,7 +278,7 @@ namespace OpenSim.Services.HypergridService
             TravelingAgentInfo old = null;
             TravelingAgentInfo travel = CreateTravelInfo(agentCircuit, region, fromLogin, out old);
 
-            if(!fromLogin && old != null && !string.IsNullOrEmpty(old.ClientIPAddress))
+            if (!fromLogin && old != null && !string.IsNullOrEmpty(old.ClientIPAddress))
             {
                 m_log.DebugFormat("[USER AGENT SERVICE]: stored IP = {0}. Old circuit IP: {1}", old.ClientIPAddress, agentCircuit.IPAddress);
                 agentCircuit.IPAddress = old.ClientIPAddress;
@@ -393,7 +391,7 @@ namespace OpenSim.Services.HypergridService
             TravelingAgentInfo travel = new TravelingAgentInfo(hgt);
 
             bool result = travel.ClientIPAddress == reportedIP;
-            if(!result && !string.IsNullOrEmpty(m_MyExternalIP))
+            if (!result && !string.IsNullOrEmpty(m_MyExternalIP))
                 result = reportedIP == m_MyExternalIP; // NATed
 
             m_log.DebugFormat("[USER AGENT SERVICE]: Comparing {0} with login IP {1} and MyIP {2}; result is {3}",
@@ -572,7 +570,7 @@ namespace OpenSim.Services.HypergridService
             return online;
         }
 
-        public Dictionary<string, object> GetUserInfo(UUID  userID)
+        public Dictionary<string, object> GetUserInfo(UUID userID)
         {
             Dictionary<string, object> info = new Dictionary<string, object>();
 
@@ -641,7 +639,7 @@ namespace OpenSim.Services.HypergridService
             // Let's see if it's a local user
             UserAccount account = m_UserAccountService.GetUserAccount(UUID.Zero, targetUserID);
             if (account != null)
-                return targetUserID.ToString() + ";" + m_GridName + ";" + account.FirstName + " " + account.LastName ;
+                return targetUserID.ToString() + ";" + m_GridName + ";" + account.FirstName + " " + account.LastName;
 
             // Let's try the list of friends
             FriendInfo[] friends = m_FriendsService.GetFriends(userID);
@@ -690,7 +688,7 @@ namespace OpenSim.Services.HypergridService
                 if (!destination.EndsWith("/"))
                     destination += "/";
 
-                if (exceptions[level].Find(delegate(string s)
+                if (exceptions[level].Find(delegate (string s)
                 {
                     if (!s.EndsWith("/"))
                         s += "/";

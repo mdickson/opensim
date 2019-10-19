@@ -40,9 +40,9 @@
 
 // Extensive change Ubit 2012
 
-using System;
 using OpenMetaverse;
 using OpenSim.Region.PhysicsModules.SharedBase;
+using System;
 
 namespace OpenSim.Region.PhysicsModule.ubOde
 {
@@ -65,14 +65,14 @@ namespace OpenSim.Region.PhysicsModule.ubOde
 
         private Vehicle m_type = Vehicle.TYPE_NONE;                     // If a 'VEHICLE', and what kind
 
-        private VehicleFlag m_flags = (VehicleFlag) 0;                  // Boolean settings:
-                                                                        // HOVER_TERRAIN_ONLY
-                                                                        // HOVER_GLOBAL_HEIGHT
-                                                                        // NO_DEFLECTION_UP
-                                                                        // HOVER_WATER_ONLY
-                                                                        // HOVER_UP_ONLY
-                                                                        // LIMIT_MOTOR_UP
-                                                                        // LIMIT_ROLL_ONLY
+        private VehicleFlag m_flags = (VehicleFlag)0;                  // Boolean settings:
+                                                                       // HOVER_TERRAIN_ONLY
+                                                                       // HOVER_GLOBAL_HEIGHT
+                                                                       // NO_DEFLECTION_UP
+                                                                       // HOVER_WATER_ONLY
+                                                                       // HOVER_UP_ONLY
+                                                                       // LIMIT_MOTOR_UP
+                                                                       // LIMIT_ROLL_ONLY
         private Vector3 m_BlockingEndPoint = Vector3.Zero;              // not sl
 
         // Linear properties
@@ -104,9 +104,9 @@ namespace OpenSim.Region.PhysicsModule.ubOde
         private float m_VhoverEfficiency = 0f;
         private float m_VhoverTimescale = 1000f;
         private float m_VehicleBuoyancy = 0f;           //KF: m_VehicleBuoyancy is set by VEHICLE_BUOYANCY for a vehicle.
-                    // Modifies gravity. Slider between -1 (double-gravity) and 1 (full anti-gravity)
-                    // KF: So far I have found no good method to combine a script-requested .Z velocity and gravity.
-                    // Therefore only m_VehicleBuoyancy=1 (0g) will use the script-requested .Z velocity.
+                                                        // Modifies gravity. Slider between -1 (double-gravity) and 1 (full anti-gravity)
+                                                        // KF: So far I have found no good method to combine a script-requested .Z velocity and gravity.
+                                                        // Therefore only m_VehicleBuoyancy=1 (0g) will use the script-requested .Z velocity.
 
         //Attractor properties
         private float m_verticalAttractionEfficiency = 1.0f;        // damped
@@ -237,7 +237,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
         internal void ProcessFloatVehicleParam(Vehicle pParam, float pValue)
         {
             float len;
-            if(float.IsNaN(pValue) || float.IsInfinity(pValue))
+            if (float.IsNaN(pValue) || float.IsInfinity(pValue))
                 return;
 
             switch (pParam)
@@ -304,7 +304,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                 case Vehicle.LINEAR_MOTOR_DECAY_TIMESCALE:
                     if (pValue < m_timestep) pValue = m_timestep;
                     else if (pValue > 120) pValue = 120;
-                    m_linearMotorDecayTimescale = (0.2f +pValue) * m_invtimestep;
+                    m_linearMotorDecayTimescale = (0.2f + pValue) * m_invtimestep;
                     m_lmDecay = (1.0f - 1.0f / m_linearMotorDecayTimescale);
                     break;
                 case Vehicle.LINEAR_MOTOR_TIMESCALE:
@@ -333,7 +333,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                     if (len > 12.566f)
                         m_angularMotorDirection *= (12.566f / len);
 
-                    m_amEfect = 1.0f ; // turn it on
+                    m_amEfect = 1.0f; // turn it on
                     m_amDecay = 1.0f - 1.0f / m_angularMotorDecayTimescale;
 
                     if (rootPrim.Body != IntPtr.Zero && !SafeNativeMethods.BodyIsEnabled(rootPrim.Body)
@@ -371,7 +371,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
         internal void ProcessVectorVehicleParam(Vehicle pParam, Vector3 pValue)
         {
             float len;
-            if(!pValue.IsFinite())
+            if (!pValue.IsFinite())
                 return;
 
             switch (pParam)
@@ -481,7 +481,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                     m_linearMotorTimescale = 1000;
                     m_linearMotorDecayTimescale = 120 * m_invtimestep;
                     m_angularMotorTimescale = 1000;
-                    m_angularMotorDecayTimescale = 1000  * m_invtimestep;
+                    m_angularMotorDecayTimescale = 1000 * m_invtimestep;
                     m_VhoverHeight = 0;
                     m_VhoverEfficiency = 1;
                     m_VhoverTimescale = 1000;
@@ -578,7 +578,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                     m_flags &= ~(VehicleFlag.HOVER_TERRAIN_ONLY |
                             VehicleFlag.HOVER_GLOBAL_HEIGHT |
                             VehicleFlag.HOVER_UP_ONLY); // |
-//                            VehicleFlag.LIMIT_ROLL_ONLY);
+                                                        //                            VehicleFlag.LIMIT_ROLL_ONLY);
                     m_flags |= (VehicleFlag.NO_DEFLECTION_UP |
                                 VehicleFlag.LIMIT_MOTOR_UP |
                                 VehicleFlag.HOVER_UP_ONLY |  // new sl
@@ -638,18 +638,18 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                         VehicleFlag.HOVER_TERRAIN_ONLY |
                         VehicleFlag.HOVER_UP_ONLY |
                         VehicleFlag.NO_DEFLECTION_UP |
-                        VehicleFlag.LIMIT_MOTOR_UP  | //);
+                        VehicleFlag.LIMIT_MOTOR_UP | //);
                         VehicleFlag.LIMIT_ROLL_ONLY | // new sl
                         VehicleFlag.HOVER_GLOBAL_HEIGHT); // new sl
 
-//                    m_flags |= (VehicleFlag.LIMIT_ROLL_ONLY |
-//                        VehicleFlag.HOVER_GLOBAL_HEIGHT);
+                    //                    m_flags |= (VehicleFlag.LIMIT_ROLL_ONLY |
+                    //                        VehicleFlag.HOVER_GLOBAL_HEIGHT);
                     break;
 
             }
             // disable mouse steering
             m_flags &= ~(VehicleFlag.MOUSELOOK_STEER |
-                         VehicleFlag.MOUSELOOK_BANK  |
+                         VehicleFlag.MOUSELOOK_BANK |
                          VehicleFlag.CAMERA_DECOUPLED);
 
             m_lmDecay = (1.0f - 1.0f / m_linearMotorDecayTimescale);
@@ -759,7 +759,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
 
                 roll = (float)Math.Atan2(minuszY, zZ);
             }
-            return ;
+            return;
         }
 
         internal void Step()
@@ -803,14 +803,14 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             float bankingEfficiency;
             float verticalAttractionTimescale = m_verticalAttractionTimescale;
 
-            if((m_flags & (VehicleFlag.MOUSELOOK_STEER | VehicleFlag.MOUSELOOK_BANK)) != 0 )
+            if ((m_flags & (VehicleFlag.MOUSELOOK_STEER | VehicleFlag.MOUSELOOK_BANK)) != 0)
             {
                 mousemode = true;
                 mousemodebank = (m_flags & VehicleFlag.MOUSELOOK_BANK) != 0;
-                if(mousemodebank)
+                if (mousemodebank)
                 {
                     bankingEfficiency = m_bankingEfficiency;
-                    if(verticalAttractionTimescale < 149.9)
+                    if (verticalAttractionTimescale < 149.9)
                         verticalAttractionTimescale *= 2.0f; // reduce current instability
                 }
                 else
@@ -843,7 +843,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                 }
 
                 m_lmEfect *= m_lmDecay;
-//                m_ffactor = 0.01f + 1e-4f * curVel.LengthSquared();
+                //                m_ffactor = 0.01f + 1e-4f * curVel.LengthSquared();
                 m_ffactor = 0.0f;
             }
             else
@@ -885,7 +885,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                     }
                 }
                 else if (t > m_VhoverHeight)
-                        perr = t - pos.Z; ;
+                    perr = t - pos.Z; ;
 
                 if ((m_flags & VehicleFlag.HOVER_UP_ONLY) == 0 || perr > -0.1)
                 {
@@ -947,7 +947,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                 tmpV.Z = -curLocalVel.Z / m_linearFrictionTimescale.Z;
                 tmpV *= rotq; // to world
 
-                if(ldampZ != 0 && Math.Abs(ldampZ) > Math.Abs(tmpV.Z))
+                if (ldampZ != 0 && Math.Abs(ldampZ) > Math.Abs(tmpV.Z))
                     tmpV.Z = ldampZ;
                 force.X += tmpV.X;
                 force.Y += tmpV.Y;
@@ -1043,26 +1043,26 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                 m_amdampZ = 1 / m_angularFrictionTimescale.Z;
             }
 
-            if(mousemode)
+            if (mousemode)
             {
                 CameraData cam = rootPrim.TryGetCameraData();
-                if(cam.Valid && cam.MouseLook)
+                if (cam.Valid && cam.MouseLook)
                 {
                     Vector3 dirv = cam.CameraAtAxis * irotq;
 
-                    float invamts = 1.0f/m_angularMotorTimescale;
+                    float invamts = 1.0f / m_angularMotorTimescale;
                     float tmp;
 
                     // get out of x == 0 plane
-                    if(Math.Abs(dirv.X) < 0.001f)
+                    if (Math.Abs(dirv.X) < 0.001f)
                         dirv.X = 0.001f;
 
                     if (Math.Abs(dirv.Z) > 0.01)
                     {
                         tmp = -(float)Math.Atan2(dirv.Z, dirv.X) * m_angularMotorDirection.Y;
-                        if(tmp < -4f)
+                        if (tmp < -4f)
                             tmp = -4f;
-                        else if(tmp > 4f)
+                        else if (tmp > 4f)
                             tmp = 4f;
                         torque.Y += (tmp - curLocalAngVel.Y) * invamts;
                         torque.Y -= curLocalAngVel.Y * m_amdampY;
@@ -1072,12 +1072,12 @@ namespace OpenSim.Region.PhysicsModule.ubOde
 
                     if (Math.Abs(dirv.Y) > 0.01)
                     {
-                        if(mousemodebank)
+                        if (mousemodebank)
                         {
                             tmp = -(float)Math.Atan2(dirv.Y, dirv.X) * m_angularMotorDirection.X;
-                            if(tmp < -4f)
+                            if (tmp < -4f)
                                 tmp = -4f;
-                            else if(tmp > 4f)
+                            else if (tmp > 4f)
                                 tmp = 4f;
                             torque.X += (tmp - curLocalAngVel.X) * invamts;
                         }
@@ -1085,9 +1085,9 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                         {
                             tmp = (float)Math.Atan2(dirv.Y, dirv.X) * m_angularMotorDirection.Z;
                             tmp *= invamts;
-                            if(tmp < -4f)
+                            if (tmp < -4f)
                                 tmp = -4f;
-                            else if(tmp > 4f)
+                            else if (tmp > 4f)
                                 tmp = 4f;
                             torque.Z += (tmp - curLocalAngVel.Z) * invamts;
                         }
@@ -1096,7 +1096,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                     }
                     else
                     {
-                        if(mousemodebank)
+                        if (mousemodebank)
                             torque.X -= curLocalAngVel.X * m_invtimestep;
                         else
                             torque.Z -= curLocalAngVel.Z * m_invtimestep;
@@ -1150,7 +1150,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
 
                     if (Math.Abs(dirv.Z) > 0.01)
                     {
-                        torque.Y += - (float)Math.Atan2(dirv.Z, dirv.X) * ftmp;
+                        torque.Y += -(float)Math.Atan2(dirv.Z, dirv.X) * ftmp;
                     }
 
                     if (Math.Abs(dirv.Y) > 0.01)
@@ -1181,7 +1181,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             if (torque.X != 0 || torque.Y != 0 || torque.Z != 0)
             {
                 torque *= m_referenceFrame; // to object frame
-                dtorque.X = torque.X ;
+                dtorque.X = torque.X;
                 dtorque.Y = torque.Y;
                 dtorque.Z = torque.Z;
 
@@ -1193,7 +1193,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             torque += rootPrim.m_angularForceacc;
             rootPrim.m_angularForceacc = Vector3.Zero;
             if (torque.X != 0 || torque.Y != 0 || torque.Z != 0)
-                SafeNativeMethods.BodyAddTorque(Body,torque.X, torque.Y, torque.Z);
+                SafeNativeMethods.BodyAddTorque(Body, torque.X, torque.Y, torque.Z);
         }
     }
 }

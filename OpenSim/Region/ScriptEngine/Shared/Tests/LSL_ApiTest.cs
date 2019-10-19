@@ -25,17 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
-using NUnit.Framework;
-using OpenSim.Framework;
-using OpenSim.Tests.Common;
-using OpenSim.Region.ScriptEngine.Shared;
-using OpenSim.Region.Framework.Scenes;
 using Nini.Config;
-using OpenSim.Region.ScriptEngine.Shared.Api;
-using OpenSim.Region.ScriptEngine.Shared.Instance;
-using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
+using NUnit.Framework;
 using OpenMetaverse;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Region.ScriptEngine.Shared.Api;
+using OpenSim.Tests.Common;
 using System;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Tests
@@ -73,40 +68,40 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         {
             TestHelpers.InMethod();
 
-            CheckllAngleBetween(new Vector3(1, 0, 0), 0,   1, 1);
-            CheckllAngleBetween(new Vector3(1, 0, 0), 90,  1, 1);
+            CheckllAngleBetween(new Vector3(1, 0, 0), 0, 1, 1);
+            CheckllAngleBetween(new Vector3(1, 0, 0), 90, 1, 1);
             CheckllAngleBetween(new Vector3(1, 0, 0), 180, 1, 1);
 
-            CheckllAngleBetween(new Vector3(0, 1, 0), 0,   1, 1);
-            CheckllAngleBetween(new Vector3(0, 1, 0), 90,  1, 1);
+            CheckllAngleBetween(new Vector3(0, 1, 0), 0, 1, 1);
+            CheckllAngleBetween(new Vector3(0, 1, 0), 90, 1, 1);
             CheckllAngleBetween(new Vector3(0, 1, 0), 180, 1, 1);
 
-            CheckllAngleBetween(new Vector3(0, 0, 1), 0,   1, 1);
-            CheckllAngleBetween(new Vector3(0, 0, 1), 90,  1, 1);
+            CheckllAngleBetween(new Vector3(0, 0, 1), 0, 1, 1);
+            CheckllAngleBetween(new Vector3(0, 0, 1), 90, 1, 1);
             CheckllAngleBetween(new Vector3(0, 0, 1), 180, 1, 1);
 
-            CheckllAngleBetween(new Vector3(1, 1, 1), 0,   1, 1);
-            CheckllAngleBetween(new Vector3(1, 1, 1), 90,  1, 1);
+            CheckllAngleBetween(new Vector3(1, 1, 1), 0, 1, 1);
+            CheckllAngleBetween(new Vector3(1, 1, 1), 90, 1, 1);
             CheckllAngleBetween(new Vector3(1, 1, 1), 180, 1, 1);
 
-            CheckllAngleBetween(new Vector3(1, 0, 0), 0,   1.6f, 1.8f);
-            CheckllAngleBetween(new Vector3(1, 0, 0), 90,  0.3f, 3.9f);
+            CheckllAngleBetween(new Vector3(1, 0, 0), 0, 1.6f, 1.8f);
+            CheckllAngleBetween(new Vector3(1, 0, 0), 90, 0.3f, 3.9f);
             CheckllAngleBetween(new Vector3(1, 0, 0), 180, 8.8f, 7.4f);
 
-            CheckllAngleBetween(new Vector3(0, 1, 0), 0,   9.8f, -9.4f);
-            CheckllAngleBetween(new Vector3(0, 1, 0), 90,  8.4f, -8.2f);
+            CheckllAngleBetween(new Vector3(0, 1, 0), 0, 9.8f, -9.4f);
+            CheckllAngleBetween(new Vector3(0, 1, 0), 90, 8.4f, -8.2f);
             CheckllAngleBetween(new Vector3(0, 1, 0), 180, 0.4f, -5.8f);
 
-            CheckllAngleBetween(new Vector3(0, 0, 1), 0,   -6.8f, 3.4f);
-            CheckllAngleBetween(new Vector3(0, 0, 1), 90,  -3.6f, 5.6f);
+            CheckllAngleBetween(new Vector3(0, 0, 1), 0, -6.8f, 3.4f);
+            CheckllAngleBetween(new Vector3(0, 0, 1), 90, -3.6f, 5.6f);
             CheckllAngleBetween(new Vector3(0, 0, 1), 180, -3.8f, 1.1f);
 
-            CheckllAngleBetween(new Vector3(1, 1, 1), 0,   -7.7f, -2.0f);
-            CheckllAngleBetween(new Vector3(1, 1, 1), 90,  -3.0f, -9.1f);
+            CheckllAngleBetween(new Vector3(1, 1, 1), 0, -7.7f, -2.0f);
+            CheckllAngleBetween(new Vector3(1, 1, 1), 90, -3.0f, -9.1f);
             CheckllAngleBetween(new Vector3(1, 1, 1), 180, -7.9f, -8.0f);
         }
 
-        private void CheckllAngleBetween(Vector3 axis,float originalAngle, float denorm1, float denorm2)
+        private void CheckllAngleBetween(Vector3 axis, float originalAngle, float denorm1, float denorm2)
         {
             Quaternion rotation1 = Quaternion.CreateFromAxisAngle(axis, 0);
             Quaternion rotation2 = Quaternion.CreateFromAxisAngle(axis, ToRadians(originalAngle));

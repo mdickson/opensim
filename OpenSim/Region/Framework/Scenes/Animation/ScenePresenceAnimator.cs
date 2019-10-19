@@ -25,17 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
 using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.PhysicsModules.SharedBase;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.Framework.Scenes.Animation
 {
@@ -201,9 +197,9 @@ namespace OpenSim.Region.Framework.Scenes.Animation
             bool ret = false;
             if (!m_scenePresence.IsChildAgent)
             {
-//                m_log.DebugFormat(
-//                    "[SCENE PRESENCE ANIMATOR]: Setting movement animation {0} for {1}",
-//                    anim, m_scenePresence.Name);
+                //                m_log.DebugFormat(
+                //                    "[SCENE PRESENCE ANIMATOR]: Setting movement animation {0} for {1}",
+                //                    anim, m_scenePresence.Name);
 
                 if (aoSitGndAnim != UUID.Zero)
                 {
@@ -239,9 +235,9 @@ namespace OpenSim.Region.Framework.Scenes.Animation
 
                     if (m_animations.TrySetDefaultAnimation(anim, m_scenePresence.ControllingClient.NextAnimationSequenceNumber, m_scenePresence.UUID))
                     {
-//                    m_log.DebugFormat(
-//                        "[SCENE PRESENCE ANIMATOR]: Updating movement animation to {0} for {1}",
-//                        anim, m_scenePresence.Name);
+                        //                    m_log.DebugFormat(
+                        //                        "[SCENE PRESENCE ANIMATOR]: Updating movement animation to {0} for {1}",
+                        //                        anim, m_scenePresence.Name);
 
                         // 16384 is CHANGED_ANIMATION
                         m_scenePresence.SendScriptEventToAttachments("changed", new Object[] { (int)Changed.ANIMATION });
@@ -399,7 +395,7 @@ namespace OpenSim.Region.Framework.Scenes.Animation
                 float fallVelocity = actor.Velocity.Z;
 
                 // if stable on Hover assume falling
-                if(actor.PIDHoverActive && fallVelocity < 0.05f)
+                if (actor.PIDHoverActive && fallVelocity < 0.05f)
                 {
                     Falling = true;
                     currentControlState = motionControlStates.falling;
@@ -573,9 +569,9 @@ namespace OpenSim.Region.Framework.Scenes.Animation
                 {
                     CurrentMovementAnimation = newMovementAnimation;
 
-//                    m_log.DebugFormat(
-//                        "[SCENE PRESENCE ANIMATOR]: Determined animation {0} for {1} in UpdateMovementAnimations()",
-//                        CurrentMovementAnimation, m_scenePresence.Name);
+                    //                    m_log.DebugFormat(
+                    //                        "[SCENE PRESENCE ANIMATOR]: Determined animation {0} for {1} in UpdateMovementAnimations()",
+                    //                        CurrentMovementAnimation, m_scenePresence.Name);
 
                     // Only set it if it's actually changed, give a script
                     // a chance to stop a default animation

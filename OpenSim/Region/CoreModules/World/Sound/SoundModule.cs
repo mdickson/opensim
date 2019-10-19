@@ -24,39 +24,35 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Reflection;
-
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
-using log4net;
-using Mono.Addins;
-
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.IO;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.World.Sound
 {
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "SoundModule")]
     public class SoundModule : INonSharedRegionModule, ISoundModule
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(
-//                MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(
+        //                MethodBase.GetCurrentMethod().DeclaringType);
 
         private Scene m_scene;
 
-        public enum SoundFlags: byte
+        public enum SoundFlags : byte
         {
-            NONE =         0,
-            LOOP =         1 << 0,
-            SYNC_MASTER =  1<<1,
-            SYNC_SLAVE =   1<<2,
-            SYNC_PENDING = 1<<3,
-            QUEUE =        1<<4,
-            STOP =         1<<5,
+            NONE = 0,
+            LOOP = 1 << 0,
+            SYNC_MASTER = 1 << 1,
+            SYNC_SLAVE = 1 << 2,
+            SYNC_PENDING = 1 << 3,
+            QUEUE = 1 << 4,
+            STOP = 1 << 5,
             SYNC_MASK = SYNC_MASTER | SYNC_SLAVE | SYNC_PENDING
         }
 
@@ -139,7 +135,7 @@ namespace OpenSim.Region.CoreModules.World.Sound
                 flags |= (byte)SoundFlags.QUEUE;
 
             SceneObjectGroup grp = part.ParentGroup;
-            if(grp == null | grp.IsDeleted)
+            if (grp == null | grp.IsDeleted)
                 return;
 
             if (grp.IsAttachment)
@@ -159,7 +155,7 @@ namespace OpenSim.Region.CoreModules.World.Sound
                     return;
             }
 
-            m_scene.ForEachRootScenePresence(delegate(ScenePresence sp)
+            m_scene.ForEachRootScenePresence(delegate (ScenePresence sp)
             {
                 sp.ControllingClient.SendPlayAttachedSound(soundID, objectID,
                         ownerID, (float)gain, flags);
@@ -185,18 +181,18 @@ namespace OpenSim.Region.CoreModules.World.Sound
             {
                 SceneObjectGroup grp = part.ParentGroup;
 
-                if(grp.IsAttachment)
+                if (grp.IsAttachment)
                 {
-                    if(!m_scene.TryGetScenePresence(grp.AttachedAvatar, out ssp))
+                    if (!m_scene.TryGetScenePresence(grp.AttachedAvatar, out ssp))
                         return;
 
-                    if(!ssp.ParcelAllowThisAvatarSounds)
+                    if (!ssp.ParcelAllowThisAvatarSounds)
                         return;
 
                 }
 
                 radius = (float)part.SoundRadius;
-                if(radius == 0)
+                if (radius == 0)
                 {
                     radius = MaxDistance;
                     part.SoundRadius = MaxDistance;
@@ -205,7 +201,7 @@ namespace OpenSim.Region.CoreModules.World.Sound
             }
 
             radius *= radius;
-            m_scene.ForEachRootScenePresence(delegate(ScenePresence sp)
+            m_scene.ForEachRootScenePresence(delegate (ScenePresence sp)
             {
                 if (Vector3.DistanceSquared(sp.AbsolutePosition, position) > radius) // Max audio distance
                     return;
@@ -251,7 +247,7 @@ namespace OpenSim.Region.CoreModules.World.Sound
             }
 
             radius *= 4.0f * radius; // avatars and prims do move
-            m_scene.ForEachRootScenePresence(delegate(ScenePresence sp)
+            m_scene.ForEachRootScenePresence(delegate (ScenePresence sp)
             {
                 if (Vector3.DistanceSquared(sp.AbsolutePosition, part.AbsolutePosition) < radius)
                     sp.ControllingClient.SendPreLoadSound(objectID, objectID, soundID);
@@ -310,7 +306,7 @@ namespace OpenSim.Region.CoreModules.World.Sound
             Vector3 position = part.AbsolutePosition; // region local
             ulong regionHandle = m_scene.RegionInfo.RegionHandle;
 
-            if(triggered)
+            if (triggered)
                 TriggerSound(soundID, part.OwnerID, part.UUID, parentID, volume, position, regionHandle);
             else
             {
@@ -335,7 +331,7 @@ namespace OpenSim.Region.CoreModules.World.Sound
             if (!m_scene.TryGetSceneObjectPart(objectID, out part))
                 return;
 
-            m_scene.ForEachRootScenePresence(delegate(ScenePresence sp)
+            m_scene.ForEachRootScenePresence(delegate (ScenePresence sp)
             {
                 double dis = Util.GetDistanceTo(sp.AbsolutePosition,
                         part.AbsolutePosition);

@@ -25,15 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Data;
-using System.Reflection;
-using System.Collections.Generic;
-using OpenMetaverse;
 using log4net;
-using OpenSim.Framework;
 using Npgsql;
-using NpgsqlTypes;
+using OpenMetaverse;
+using OpenSim.Framework;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Data.PGSQL
 {
@@ -203,33 +201,33 @@ namespace OpenSim.Data.PGSQL
                 {
                     command.ExecuteNonQuery();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
-                    m_log.Error("[ASSET DB]: Error storing item :" + e.Message + " sql "+sql);
+                    m_log.Error("[ASSET DB]: Error storing item :" + e.Message + " sql " + sql);
                 }
             }
             return true;
         }
 
 
-// Commented out since currently unused - this probably should be called in GetAsset()
-//        private void UpdateAccessTime(AssetBase asset)
-//        {
-//            using (AutoClosingSqlCommand cmd = m_database.Query("UPDATE assets SET access_time = :access_time WHERE id=:id"))
-//            {
-//                int now = (int)((System.DateTime.Now.Ticks - m_ticksToEpoch) / 10000000);
-//                cmd.Parameters.AddWithValue(":id", asset.FullID.ToString());
-//                cmd.Parameters.AddWithValue(":access_time", now);
-//                try
-//                {
-//                    cmd.ExecuteNonQuery();
-//                }
-//                catch (Exception e)
-//                {
-//                    m_log.Error(e.ToString());
-//                }
-//            }
-//        }
+        // Commented out since currently unused - this probably should be called in GetAsset()
+        //        private void UpdateAccessTime(AssetBase asset)
+        //        {
+        //            using (AutoClosingSqlCommand cmd = m_database.Query("UPDATE assets SET access_time = :access_time WHERE id=:id"))
+        //            {
+        //                int now = (int)((System.DateTime.Now.Ticks - m_ticksToEpoch) / 10000000);
+        //                cmd.Parameters.AddWithValue(":id", asset.FullID.ToString());
+        //                cmd.Parameters.AddWithValue(":access_time", now);
+        //                try
+        //                {
+        //                    cmd.ExecuteNonQuery();
+        //                }
+        //                catch (Exception e)
+        //                {
+        //                    m_log.Error(e.ToString());
+        //                }
+        //            }
+        //        }
 
         /// <summary>
         /// Check if the assets exist in the database.

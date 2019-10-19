@@ -25,16 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using Nini.Config;
 using log4net;
-using OpenSim.Framework;
-using OpenSim.Data;
-using OpenSim.Services.Interfaces;
+using Nini.Config;
 using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Services.AssetService
 {
@@ -74,14 +71,14 @@ namespace OpenSim.Services.AssetService
 
                         m_AssetLoader.ForEachDefaultXmlAsset(
                             loaderArgs,
-                            delegate(AssetBase a)
+                            delegate (AssetBase a)
                             {
                                 AssetBase existingAsset = Get(a.ID);
-//                                AssetMetadata existingMetadata = GetMetadata(a.ID);
+                                //                                AssetMetadata existingMetadata = GetMetadata(a.ID);
 
                                 if (existingAsset == null || Util.SHA1Hash(existingAsset.Data) != Util.SHA1Hash(a.Data))
                                 {
-//                                    m_log.DebugFormat("[ASSET]: Storing {0} {1}", a.Name, a.ID);
+                                    //                                    m_log.DebugFormat("[ASSET]: Storing {0} {1}", a.Name, a.ID);
                                     m_Database.StoreAsset(a);
                                 }
                             });
@@ -94,7 +91,7 @@ namespace OpenSim.Services.AssetService
 
         public virtual AssetBase Get(string id)
         {
-//            m_log.DebugFormat("[ASSET SERVICE]: Get asset for {0}", id);
+            //            m_log.DebugFormat("[ASSET SERVICE]: Get asset for {0}", id);
 
             UUID assetID;
 
@@ -122,7 +119,7 @@ namespace OpenSim.Services.AssetService
 
         public virtual AssetMetadata GetMetadata(string id)
         {
-//            m_log.DebugFormat("[ASSET SERVICE]: Get asset metadata for {0}", id);
+            //            m_log.DebugFormat("[ASSET SERVICE]: Get asset metadata for {0}", id);
 
             AssetBase asset = Get(id);
 
@@ -134,7 +131,7 @@ namespace OpenSim.Services.AssetService
 
         public virtual byte[] GetData(string id)
         {
-//            m_log.DebugFormat("[ASSET SERVICE]: Get asset data for {0}", id);
+            //            m_log.DebugFormat("[ASSET SERVICE]: Get asset data for {0}", id);
 
             AssetBase asset = Get(id);
 
@@ -172,18 +169,18 @@ namespace OpenSim.Services.AssetService
             bool exists = m_Database.AssetsExist(new[] { asset.FullID })[0];
             if (!exists)
             {
-//                m_log.DebugFormat(
-//                    "[ASSET SERVICE]: Storing asset {0} {1}, bytes {2}", asset.Name, asset.FullID, asset.Data.Length);
-               if (!m_Database.StoreAsset(asset))
+                //                m_log.DebugFormat(
+                //                    "[ASSET SERVICE]: Storing asset {0} {1}, bytes {2}", asset.Name, asset.FullID, asset.Data.Length);
+                if (!m_Database.StoreAsset(asset))
                 {
-                return UUID.Zero.ToString();
+                    return UUID.Zero.ToString();
                 }
             }
-//            else
-//            {
-//                m_log.DebugFormat(
-//                    "[ASSET SERVICE]: Not storing asset {0} {1}, bytes {2} as it already exists", asset.Name, asset.FullID, asset.Data.Length);
-//            }
+            //            else
+            //            {
+            //                m_log.DebugFormat(
+            //                    "[ASSET SERVICE]: Not storing asset {0} {1}, bytes {2} as it already exists", asset.Name, asset.FullID, asset.Data.Length);
+            //            }
 
             return asset.ID;
         }
@@ -195,7 +192,7 @@ namespace OpenSim.Services.AssetService
 
         public virtual bool Delete(string id)
         {
-//            m_log.DebugFormat("[ASSET SERVICE]: Deleting asset {0}", id);
+            //            m_log.DebugFormat("[ASSET SERVICE]: Deleting asset {0}", id);
 
             UUID assetID;
             if (!UUID.TryParse(id, out assetID))

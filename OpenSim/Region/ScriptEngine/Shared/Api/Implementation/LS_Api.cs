@@ -25,31 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.Remoting.Lifetime;
-using System.Threading;
-using OpenMetaverse;
 using Nini.Config;
-using OpenSim;
+using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.CoreModules.World.LightShare;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.ScriptEngine.Shared;
-using OpenSim.Region.ScriptEngine.Shared.Api.Plugins;
-using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
 using OpenSim.Region.ScriptEngine.Interfaces;
 using OpenSim.Region.ScriptEngine.Shared.Api.Interfaces;
-
+using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
+using System;
+using System.Runtime.Remoting.Lifetime;
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
 using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
 using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
 using LSL_Rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
-using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_Vector = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Vector3;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Api
@@ -70,7 +61,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             m_host = host;
 
             m_osslconfig = m_ScriptEngine.ConfigSource.Configs["OSSL"];
-            if(m_osslconfig == null)
+            if (m_osslconfig == null)
                 m_osslconfig = m_ScriptEngine.Config;
 
             if (m_osslconfig.GetBoolean("AllowLightShareFunctions", false))
@@ -238,8 +229,8 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                         toadd.Add(new LSL_Rotation(wl.sunMoonColor.X, wl.sunMoonColor.Y, wl.sunMoonColor.Z, wl.sunMoonColor.W));
                         break;
                     case (int)ScriptBaseClass.WL_SUN_MOON_POSITION:
-                         toadd.Add(new LSL_Float(wl.sunMoonPosition));
-                         break;
+                        toadd.Add(new LSL_Float(wl.sunMoonPosition));
+                        break;
                     case (int)ScriptBaseClass.WL_UNDERWATER_FOG_MODIFIER:
                         toadd.Add(new LSL_Float(wl.underwaterFogModifier));
                         break;
@@ -266,7 +257,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
         {
             RegionLightShareData wl = (RegionLightShareData)m_host.ParentGroup.Scene.RegionInfo.WindlightSettings.Clone();
 
-//            LSL_List values = new LSL_List();
+            //            LSL_List values = new LSL_List();
             int idx = 0;
             while (idx < rules.Length)
             {
@@ -743,7 +734,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                 {
                     wl = getWindlightProfileFromRules(rules);
                 }
-                catch(InvalidCastException e)
+                catch (InvalidCastException e)
                 {
                     LSShoutError(e.Message);
                     return 0;
@@ -821,7 +812,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                 {
                     wl = getWindlightProfileFromRules(rules);
                 }
-                catch(InvalidCastException e)
+                catch (InvalidCastException e)
                 {
                     LSShoutError(e.Message);
                     return 0;

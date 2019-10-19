@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-
-using log4net;
 using OpenMetaverse;
-
 using OpenSim.Services.Interfaces;
+using System.Collections.Generic;
 
 namespace OpenSim.Services.HypergridService
 {
@@ -13,9 +8,9 @@ namespace OpenSim.Services.HypergridService
     {
         private const double CACHE_EXPIRATION_SECONDS = 120000.0; // 33 hours!
 
-//        private static readonly ILog m_log =
-//                LogManager.GetLogger(
-//                MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log =
+        //                LogManager.GetLogger(
+        //                MethodBase.GetCurrentMethod().DeclaringType);
 
         private ExpiringCache<UUID, UserAccount> m_UUIDCache;
 

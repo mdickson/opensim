@@ -25,19 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
-using Nini.Config;
 using log4net;
-using OpenMetaverse;
+using Mono.Addins;
+using Nini.Config;
 using OpenSim.Framework;
 using OpenSim.Framework.Monitoring;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-
-using Mono.Addins;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading;
 
 namespace OpenSim.Region.CoreModules.Agent.Xfer
 {
@@ -49,10 +47,10 @@ namespace OpenSim.Region.CoreModules.Agent.Xfer
         private Dictionary<ulong, XferDownLoad> Transfers = new Dictionary<ulong, XferDownLoad>();
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private object  timeTickLock = new object();
-        private int  lastTimeTick = 0;
-        private int  lastFilesExpire = 0;
-        private bool    inTimeTick = false;
+        private object timeTickLock = new object();
+        private int lastTimeTick = 0;
+        private int lastFilesExpire = 0;
+        private bool inTimeTick = false;
 
         public struct XferRequest
         {
@@ -117,14 +115,14 @@ namespace OpenSim.Region.CoreModules.Agent.Xfer
         public void OnTimeTick(Scene scene)
         {
             // we are on a heartbeat thread we there can be several
-            if(Monitor.TryEnter(timeTickLock))
+            if (Monitor.TryEnter(timeTickLock))
             {
-                if(!inTimeTick)
+                if (!inTimeTick)
                 {
                     int now = (int)Util.GetTimeStampMS();
-                    if(now - lastTimeTick > 750)
+                    if (now - lastTimeTick > 750)
                     {
-                        if(Transfers.Count == 0 && NewFiles.Count == 0)
+                        if (Transfers.Count == 0 && NewFiles.Count == 0)
                             lastTimeTick = now;
                         else
                         {
@@ -187,16 +185,16 @@ namespace OpenSim.Region.CoreModules.Agent.Xfer
             lock (NewFiles)
             {
                 // hopefully we will not have many files so nasty code will do it
-                if(now - lastFilesExpire > 120000)
+                if (now - lastFilesExpire > 120000)
                 {
                     lastFilesExpire = now;
                     List<string> expires = new List<string>();
-                    foreach(string fname in NewFiles.Keys)
+                    foreach (string fname in NewFiles.Keys)
                     {
-                        if(NewFiles[fname].refsCount == 0 && now - NewFiles[fname].timeStampMS > 120000)
+                        if (NewFiles[fname].refsCount == 0 && now - NewFiles[fname].timeStampMS > 120000)
                             expires.Add(fname);
                     }
-                    foreach(string fname in expires)
+                    foreach (string fname in expires)
                         NewFiles.Remove(fname);
                 }
             }
@@ -232,23 +230,23 @@ namespace OpenSim.Region.CoreModules.Agent.Xfer
         public void transfersTimeTick(int now)
         {
             XferDownLoad[] xfrs;
-            lock(Transfers)
+            lock (Transfers)
             {
-                if(Transfers.Count == 0)
+                if (Transfers.Count == 0)
                     return;
 
                 xfrs = new XferDownLoad[Transfers.Count];
-                Transfers.Values.CopyTo(xfrs,0);
+                Transfers.Values.CopyTo(xfrs, 0);
             }
-            
-            foreach(XferDownLoad xfr in xfrs)
+
+            foreach (XferDownLoad xfr in xfrs)
             {
-                if(xfr.checkTime(now))
+                if (xfr.checkTime(now))
                 {
                     ulong xfrID = xfr.XferID;
-                    lock(Transfers)
+                    lock (Transfers)
                     {
-                        if(Transfers.ContainsKey(xfrID))
+                        if (Transfers.ContainsKey(xfrID))
                             Transfers.Remove(xfrID);
                     }
                 }
@@ -267,7 +265,7 @@ namespace OpenSim.Region.CoreModules.Agent.Xfer
             {
                 if (NewFiles.ContainsKey(fileName))
                 {
-                    lock(Transfers)
+                    lock (Transfers)
                     {
                         if (!Transfers.ContainsKey(xferID))
                         {
@@ -275,7 +273,7 @@ namespace OpenSim.Region.CoreModules.Agent.Xfer
                             int burstSize = remoteClient.GetAgentThrottleSilent((int)ThrottleOutPacketType.Task) >> 10;
                             burstSize *= remoteClient.PingTimeMS;
                             burstSize >>= 10; //  ping is ms, 1 round trip
-                            if(burstSize > 32)
+                            if (burstSize > 32)
                                 burstSize = 32;
                             XferDownLoad transaction =
                                 new XferDownLoad(fileName, fileData, xferID, remoteClient, burstSize);
@@ -351,7 +349,7 @@ namespace OpenSim.Region.CoreModules.Agent.Xfer
 
             public void done()
             {
-                if(!isDeleted)
+                if (!isDeleted)
                 {
                     Data = null;
                     isDeleted = true;
@@ -364,9 +362,9 @@ namespace OpenSim.Region.CoreModules.Agent.Xfer
             /// <returns>True if the transfer is complete, false if not</returns>
             public void StartSend()
             {
-                lock(myLock)
+                lock (myLock)
                 {
-                    if(Data.Length == 0) //??
+                    if (Data.Length == 0) //??
                     {
                         LastPacket = 0;
                         lastBytes = 0;
@@ -377,7 +375,7 @@ namespace OpenSim.Region.CoreModules.Agent.Xfer
                         // payload of 1024bytes
                         LastPacket = Data.Length >> 10;
                         lastBytes = Data.Length & 0x3ff;
-                        if(lastBytes == 0)
+                        if (lastBytes == 0)
                         {
                             lastBytes = 1024;
                             LastPacket--;
@@ -406,7 +404,7 @@ namespace OpenSim.Region.CoreModules.Agent.Xfer
 
             private void SendPacket(int pkt)
             {
-                if(pkt > LastPacket)
+                if (pkt > LastPacket)
                     return;
 
                 int pktsize;
@@ -414,7 +412,7 @@ namespace OpenSim.Region.CoreModules.Agent.Xfer
                 if (pkt == LastPacket)
                 {
                     pktsize = lastBytes;
-                    pktid = (uint)pkt |  0x80000000u;
+                    pktid = (uint)pkt | 0x80000000u;
                 }
                 else
                 {
@@ -434,9 +432,9 @@ namespace OpenSim.Region.CoreModules.Agent.Xfer
             /// <returns>True if the transfer is complete, false otherwise</returns>
             public bool AckPacket(uint packet)
             {
-                lock(myLock)
+                lock (myLock)
                 {
-                    if(isDeleted)
+                    if (isDeleted)
                         return true;
 
                     packet &= 0x7fffffff;
@@ -465,7 +463,7 @@ namespace OpenSim.Region.CoreModules.Agent.Xfer
                         int tout = 5 * remoteClient.PingTimeMS;
                         if (tout < 1000)
                             tout = 1000;
-                        else if(tout > 10000)
+                        else if (tout > 10000)
                             tout = 10000;
 
                         if (timeMS > tout)

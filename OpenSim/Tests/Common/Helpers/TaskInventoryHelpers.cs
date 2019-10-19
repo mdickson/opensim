@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
 using OpenSim.Framework;
@@ -80,8 +79,13 @@ namespace OpenSim.Tests.Common
 
             TaskInventoryItem ncItem
                 = new TaskInventoryItem
-                    { Name = itemName, AssetID = assetID, ItemID = itemID,
-                      Type = (int)AssetType.Notecard, InvType = (int)InventoryType.Notecard };
+                {
+                    Name = itemName,
+                    AssetID = assetID,
+                    ItemID = itemID,
+                    Type = (int)AssetType.Notecard,
+                    InvType = (int)InventoryType.Notecard
+                };
             part.Inventory.AddInventoryItem(ncItem, true);
 
             return ncItem;
@@ -146,8 +150,13 @@ namespace OpenSim.Tests.Common
             assetService.Store(asset);
             TaskInventoryItem item
                 = new TaskInventoryItem
-            { Name = scriptName, AssetID = assetId, ItemID = itemId,
-                Type = (int)AssetType.LSLText, InvType = (int)InventoryType.LSL };
+                {
+                    Name = scriptName,
+                    AssetID = assetId,
+                    ItemID = itemId,
+                    Type = (int)AssetType.LSLText,
+                    InvType = (int)InventoryType.LSL
+                };
             part.Inventory.AddInventoryItem(item, true);
 
             return item;
@@ -174,12 +183,14 @@ namespace OpenSim.Tests.Common
             assetService.Store(taskSceneObjectAsset);
             TaskInventoryItem taskSceneObjectItem
                 = new TaskInventoryItem
-            { Name = itemName,
-                AssetID = taskSceneObjectAsset.FullID,
-                ItemID = itemId,
-                OwnerID = soToAdd.OwnerID,
-                Type = (int)AssetType.Object,
-                InvType = (int)InventoryType.Object };
+                {
+                    Name = itemName,
+                    AssetID = taskSceneObjectAsset.FullID,
+                    ItemID = itemId,
+                    OwnerID = soToAdd.OwnerID,
+                    Type = (int)AssetType.Object,
+                    InvType = (int)InventoryType.Object
+                };
             sop.Inventory.AddInventoryItem(taskSceneObjectItem, true);
 
             return taskSceneObjectItem;

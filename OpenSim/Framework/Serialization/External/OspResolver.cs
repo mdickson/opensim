@@ -25,12 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Reflection;
-using System.Text;
 using log4net;
 using OpenMetaverse;
-using OpenSim.Framework;
 using OpenSim.Services.Interfaces;
+using System.Reflection;
+using System.Text;
 
 namespace OpenSim.Framework.Serialization
 {
@@ -68,11 +67,11 @@ namespace OpenSim.Framework.Serialization
             {
                 return MakeOspa(account.FirstName, account.LastName);
             }
-//            else
-//            {
-//                m_log.WarnFormat("[OSP RESOLVER]: No user account for {0}", userId);
-//                System.Console.WriteLine("[OSP RESOLVER]: No user account for {0}", userId);
-//            }
+            //            else
+            //            {
+            //                m_log.WarnFormat("[OSP RESOLVER]: No user account for {0}", userId);
+            //                System.Console.WriteLine("[OSP RESOLVER]: No user account for {0}", userId);
+            //            }
 
             return null;
         }
@@ -87,8 +86,8 @@ namespace OpenSim.Framework.Serialization
             string ospa
                 = OSPA_PREFIX + OSPA_NAME_KEY + OSPA_PAIR_SEPARATOR + firstName + OSPA_NAME_VALUE_SEPARATOR + lastName;
 
-//            m_log.DebugFormat("[OSP RESOLVER]: Made OSPA {0} for {1} {2}", ospa, firstName, lastName);
-//            System.Console.WriteLine("[OSP RESOLVER]: Made OSPA {0} for {1} {2}", ospa, firstName, lastName);
+            //            m_log.DebugFormat("[OSP RESOLVER]: Made OSPA {0} for {1} {2}", ospa, firstName, lastName);
+            //            System.Console.WriteLine("[OSP RESOLVER]: Made OSPA {0} for {1} {2}", ospa, firstName, lastName);
 
             return ospa;
         }
@@ -110,11 +109,11 @@ namespace OpenSim.Framework.Serialization
         {
             if (!ospa.StartsWith(OSPA_PREFIX))
             {
-//                m_log.DebugFormat("[OSP RESOLVER]: ResolveOspa() got unrecognized format [{0}]", ospa);
+                //                m_log.DebugFormat("[OSP RESOLVER]: ResolveOspa() got unrecognized format [{0}]", ospa);
                 return UUID.Zero;
             }
 
-//            m_log.DebugFormat("[OSP RESOLVER]: Resolving {0}", ospa);
+            //            m_log.DebugFormat("[OSP RESOLVER]: Resolving {0}", ospa);
 
             string ospaMeat = ospa.Substring(OSPA_PREFIX.Length);
             string[] ospaTuples = ospaMeat.Split(OSPA_TUPLE_SEPARATOR_ARRAY);
@@ -177,16 +176,16 @@ namespace OpenSim.Framework.Serialization
             UserAccount account = userService.GetUserAccount(UUID.Zero, firstName, lastName);
             if (account != null)
             {
-//                m_log.DebugFormat(
-//                    "[OSP RESOLVER]: Found user account with uuid {0} for {1} {2}",
-//                    account.PrincipalID, firstName, lastName);
+                //                m_log.DebugFormat(
+                //                    "[OSP RESOLVER]: Found user account with uuid {0} for {1} {2}",
+                //                    account.PrincipalID, firstName, lastName);
 
                 return account.PrincipalID;
             }
-//            else
-//            {
-//                m_log.DebugFormat("[OSP RESOLVER]: No resolved OSPA user account for {0}", name);
-//            }
+            //            else
+            //            {
+            //                m_log.DebugFormat("[OSP RESOLVER]: No resolved OSPA user account for {0}", name);
+            //            }
 
             // XXX: Disable temporary user profile creation for now as implementation is incomplete - justincc
             /*

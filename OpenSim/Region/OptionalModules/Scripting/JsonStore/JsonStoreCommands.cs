@@ -24,29 +24,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using Mono.Addins;
-
-using System;
-using System.Reflection;
-using System.Threading;
-using System.Text;
-using System.Net;
-using System.Net.Sockets;
 using log4net;
+using Mono.Addins;
 using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
 {
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "JsonStoreCommandsModule")]
 
-    public class JsonStoreCommandsModule  : INonSharedRegionModule
+    public class JsonStoreCommandsModule : INonSharedRegionModule
     {
         private static readonly ILog m_log =
             LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -58,7 +49,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         //private IJsonStoreModule m_store;
         private JsonStoreModule m_store;
 
-#region Region Module interface
+        #region Region Module interface
 
         // -----------------------------------------------------------------
         /// <summary>
@@ -153,7 +144,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
             {
                 m_scene = scene;
 
-                m_store = (JsonStoreModule) m_scene.RequestModuleInterface<IJsonStoreModule>();
+                m_store = (JsonStoreModule)m_scene.RequestModuleInterface<IJsonStoreModule>();
                 if (m_store == null)
                 {
                     m_log.ErrorFormat("[JsonStoreCommands]: JsonModule interface not defined");
@@ -176,9 +167,9 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
             get { return null; }
         }
 
-#endregion
+        #endregion
 
-#region Commands
+        #region Commands
 
         private void CmdStats(string module, string[] cmd)
         {
@@ -189,7 +180,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
             MainConsole.Instance.Output("{0}\t{1}", null, m_scene.RegionInfo.RegionName, stats.StoreCount);
         }
 
-#endregion
+        #endregion
 
     }
 }

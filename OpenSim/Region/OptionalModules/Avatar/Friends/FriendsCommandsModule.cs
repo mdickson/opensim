@@ -25,24 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using log4net;
 using Mono.Addins;
 using NDesk.Options;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Framework.Monitoring;
-using OpenSim.Region.ClientStack.LindenUDP;
 using OpenSim.Region.CoreModules.Avatar.Friends;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
 using FriendInfo = OpenSim.Services.Interfaces.FriendInfo;
 
 namespace OpenSim.Region.OptionalModules.Avatar.Friends
@@ -53,14 +46,14 @@ namespace OpenSim.Region.OptionalModules.Avatar.Friends
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "FriendsCommandModule")]
     public class FriendsCommandsModule : ISharedRegionModule
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private Scene m_scene;
         private IFriendsModule m_friendsModule;
         private IUserManagement m_userManagementModule;
         private IPresenceService m_presenceService;
 
-//        private IAvatarFactoryModule m_avatarFactory;
+        //        private IAvatarFactoryModule m_avatarFactory;
 
         public string Name { get { return "Appearance Information Module"; } }
 
@@ -68,32 +61,32 @@ namespace OpenSim.Region.OptionalModules.Avatar.Friends
 
         public void Initialise(IConfigSource source)
         {
-//            m_log.DebugFormat("[FRIENDS COMMAND MODULE]: INITIALIZED MODULE");
+            //            m_log.DebugFormat("[FRIENDS COMMAND MODULE]: INITIALIZED MODULE");
         }
 
         public void PostInitialise()
         {
-//            m_log.DebugFormat("[FRIENDS COMMAND MODULE]: POST INITIALIZED MODULE");
+            //            m_log.DebugFormat("[FRIENDS COMMAND MODULE]: POST INITIALIZED MODULE");
         }
 
         public void Close()
         {
-//            m_log.DebugFormat("[FRIENDS COMMAND MODULE]: CLOSED MODULE");
+            //            m_log.DebugFormat("[FRIENDS COMMAND MODULE]: CLOSED MODULE");
         }
 
         public void AddRegion(Scene scene)
         {
-//            m_log.DebugFormat("[FRIENDS COMMANDO MODULE]: REGION {0} ADDED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[FRIENDS COMMANDO MODULE]: REGION {0} ADDED", scene.RegionInfo.RegionName);
         }
 
         public void RemoveRegion(Scene scene)
         {
-//            m_log.DebugFormat("[FRIENDS COMMAND MODULE]: REGION {0} REMOVED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[FRIENDS COMMAND MODULE]: REGION {0} REMOVED", scene.RegionInfo.RegionName);
         }
 
         public void RegionLoaded(Scene scene)
         {
-//            m_log.DebugFormat("[APPEARANCE INFO MODULE]: REGION {0} LOADED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[APPEARANCE INFO MODULE]: REGION {0} LOADED", scene.RegionInfo.RegionName);
 
             if (m_scene == null)
                 m_scene = scene;
@@ -131,8 +124,8 @@ namespace OpenSim.Region.OptionalModules.Avatar.Friends
 
             UUID userId = m_userManagementModule.GetUserIdByName(firstName, lastName);
 
-//            UserAccount ua
-//                = m_Scenes[0].UserAccountService.GetUserAccount(m_Scenes[0].RegionInfo.ScopeID, firstName, lastName);
+            //            UserAccount ua
+            //                = m_Scenes[0].UserAccountService.GetUserAccount(m_Scenes[0].RegionInfo.ScopeID, firstName, lastName);
 
             if (userId == UUID.Zero)
             {
@@ -169,12 +162,12 @@ namespace OpenSim.Region.OptionalModules.Avatar.Friends
 
             foreach (FriendInfo friend in friends)
             {
-//                MainConsole.Instance.OutputFormat(friend.PrincipalID.ToString());
+                //                MainConsole.Instance.OutputFormat(friend.PrincipalID.ToString());
 
-//                string friendFirstName, friendLastName;
-//
-//                UserAccount friendUa
-//                    = m_Scenes[0].UserAccountService.GetUserAccount(m_Scenes[0].RegionInfo.ScopeID, friend.PrincipalID);
+                //                string friendFirstName, friendLastName;
+                //
+                //                UserAccount friendUa
+                //                    = m_Scenes[0].UserAccountService.GetUserAccount(m_Scenes[0].RegionInfo.ScopeID, friend.PrincipalID);
 
                 UUID friendId;
                 string friendName;

@@ -25,6 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Npgsql;
+using OpenMetaverse;
+using OpenSim.Framework;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -32,12 +36,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Reflection;
 using System.Security.Cryptography;
-using System.Text;
-using log4net;
-using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Data;
-using Npgsql;
 
 namespace OpenSim.Data.PGSQL
 {
@@ -130,7 +128,7 @@ namespace OpenSim.Data.PGSQL
         /// <remarks>On failure : throw an exception and attempt to reconnect to database</remarks>
         public AssetBase GetAsset(UUID assetID)
         {
-//            m_log.DebugFormat("[PGSQL XASSET DATA]: Looking for asset {0}", assetID);
+            //            m_log.DebugFormat("[PGSQL XASSET DATA]: Looking for asset {0}", assetID);
 
             AssetBase asset = null;
             lock (m_dbLock)
@@ -173,12 +171,12 @@ namespace OpenSim.Data.PGSQL
 
                                     if (m_enableCompression)
                                     {
-                                        using(MemoryStream ms = new MemoryStream(asset.Data))
-                                        using(GZipStream decompressionStream = new GZipStream(ms, CompressionMode.Decompress))
+                                        using (MemoryStream ms = new MemoryStream(asset.Data))
+                                        using (GZipStream decompressionStream = new GZipStream(ms, CompressionMode.Decompress))
                                         {
-                                            using(MemoryStream outputStream = new MemoryStream())
+                                            using (MemoryStream outputStream = new MemoryStream())
                                             {
-                                                decompressionStream.CopyTo(outputStream,int.MaxValue);
+                                                decompressionStream.CopyTo(outputStream, int.MaxValue);
                                                 //                                        int compressedLength = asset.Data.Length;
                                                 asset.Data = outputStream.ToArray();
                                             }
@@ -210,7 +208,7 @@ namespace OpenSim.Data.PGSQL
         /// <remarks>On failure : Throw an exception and attempt to reconnect to database</remarks>
         public void StoreAsset(AssetBase asset)
         {
-//            m_log.DebugFormat("[XASSETS DB]: Storing asset {0} {1}", asset.Name, asset.ID);
+            //            m_log.DebugFormat("[XASSETS DB]: Storing asset {0} {1}", asset.Name, asset.ID);
 
             lock (m_dbLock)
             {
@@ -244,7 +242,7 @@ namespace OpenSim.Data.PGSQL
 
                             using (GZipStream compressionStream = new GZipStream(outputStream, CompressionMode.Compress, false))
                             {
-    //                            Console.WriteLine(WebUtil.CopyTo(new MemoryStream(asset.Data), compressionStream, int.MaxValue));
+                                //                            Console.WriteLine(WebUtil.CopyTo(new MemoryStream(asset.Data), compressionStream, int.MaxValue));
                                 // We have to close the compression stream in order to make sure it writes everything out to the underlying memory output stream.
                                 compressionStream.Close();
                                 byte[] compressedData = outputStream.ToArray();
@@ -257,9 +255,9 @@ namespace OpenSim.Data.PGSQL
                         UUID asset_id;
                         UUID.TryParse(asset.ID, out asset_id);
 
-//                        m_log.DebugFormat(
-//                            "[XASSET DB]: Compressed data size for {0} {1}, hash {2} is {3}",
-//                            asset.ID, asset.Name, hash, compressedData.Length);
+                        //                        m_log.DebugFormat(
+                        //                            "[XASSET DB]: Compressed data size for {0} {1}, hash {2} is {3}",
+                        //                            asset.ID, asset.Name, hash, compressedData.Length);
 
                         try
                         {
@@ -393,7 +391,7 @@ namespace OpenSim.Data.PGSQL
         /// <returns></returns>
         private bool ExistsData(NpgsqlConnection dbcon, NpgsqlTransaction transaction, byte[] hash)
         {
-//            m_log.DebugFormat("[ASSETS DB]: Checking for asset {0}", uuid);
+            //            m_log.DebugFormat("[ASSETS DB]: Checking for asset {0}", uuid);
 
             bool exists = false;
 
@@ -407,7 +405,7 @@ namespace OpenSim.Data.PGSQL
                     {
                         if (dbReader.Read())
                         {
-//                                    m_log.DebugFormat("[ASSETS DB]: Found asset {0}", uuid);
+                            //                                    m_log.DebugFormat("[ASSETS DB]: Found asset {0}", uuid);
                             exists = true;
                         }
                     }
@@ -467,7 +465,7 @@ namespace OpenSim.Data.PGSQL
         /// <returns>true if it exists, false otherwise.</returns>
         public bool ExistsAsset(UUID uuid)
         {
-//            m_log.DebugFormat("[ASSETS DB]: Checking for asset {0}", uuid);
+            //            m_log.DebugFormat("[ASSETS DB]: Checking for asset {0}", uuid);
 
             bool assetExists = false;
 
@@ -486,7 +484,7 @@ namespace OpenSim.Data.PGSQL
                             {
                                 if (dbReader.Read())
                                 {
-//                                    m_log.DebugFormat("[ASSETS DB]: Found asset {0}", uuid);
+                                    //                                    m_log.DebugFormat("[ASSETS DB]: Found asset {0}", uuid);
                                     assetExists = true;
                                 }
                             }
@@ -520,11 +518,11 @@ namespace OpenSim.Data.PGSQL
                 using (NpgsqlConnection dbcon = new NpgsqlConnection(m_connectionString))
                 {
                     dbcon.Open();
-                    using(NpgsqlCommand cmd = new NpgsqlCommand(@"SELECT name, description, access_time, ""AssetType"", temporary, id, asset_flags, creatorid
+                    using (NpgsqlCommand cmd = new NpgsqlCommand(@"SELECT name, description, access_time, ""AssetType"", temporary, id, asset_flags, creatorid
                                             FROM XAssetsMeta
-                                            LIMIT :start, :count",dbcon))
+                                            LIMIT :start, :count", dbcon))
                     {
-                        cmd.Parameters.Add(m_database.CreateParameter("start",start));
+                        cmd.Parameters.Add(m_database.CreateParameter("start", start));
                         cmd.Parameters.Add(m_database.CreateParameter("count", count));
 
                         try
@@ -543,7 +541,7 @@ namespace OpenSim.Data.PGSQL
                                     metadata.CreatorID = dbReader["creatorid"].ToString();
 
                                     // We'll ignore this for now - it appears unused!
-    //                                metadata.SHA1 = dbReader["hash"]);
+                                    //                                metadata.SHA1 = dbReader["hash"]);
 
                                     UpdateAccessTime(metadata, (int)dbReader["access_time"]);
 
@@ -555,7 +553,7 @@ namespace OpenSim.Data.PGSQL
                         {
                             m_log.Error("[XASSETS DB]: PGSql failure fetching asset set" + Environment.NewLine + e.ToString());
                         }
-                   }
+                    }
                 }
             }
 
@@ -564,7 +562,7 @@ namespace OpenSim.Data.PGSQL
 
         public bool Delete(string id)
         {
-//            m_log.DebugFormat("[XASSETS DB]: Deleting asset {0}", id);
+            //            m_log.DebugFormat("[XASSETS DB]: Deleting asset {0}", id);
 
             lock (m_dbLock)
             {

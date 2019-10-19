@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenSim.Framework.ServiceAuth;
 using System.IO;
 using System.Net;
-using OpenSim.Framework.ServiceAuth;
 
 namespace OpenSim.Framework.Servers.HttpServer
 {
@@ -44,7 +44,7 @@ namespace OpenSim.Framework.Servers.HttpServer
         protected BaseStreamHandler(string httpMethod, string path) : this(httpMethod, path, null, null) { }
 
         protected BaseStreamHandler(string httpMethod, string path, string name, string description)
-            : base(httpMethod, path, name, description) {}
+            : base(httpMethod, path, name, description) { }
 
         protected BaseStreamHandler(string httpMethod, string path, IServiceAuth auth)
             : base(httpMethod, path, null, null)

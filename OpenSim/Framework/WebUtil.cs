@@ -25,6 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nwc.XmlRpc;
+using OpenMetaverse.StructuredData;
+using OpenSim.Framework.ServiceAuth;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -37,12 +41,8 @@ using System.Reflection;
 using System.Text;
 using System.Web;
 using System.Xml;
-using System.Xml.Serialization;
 using System.Xml.Linq;
-using log4net;
-using Nwc.XmlRpc;
-using OpenMetaverse.StructuredData;
-using OpenSim.Framework.ServiceAuth;
+using System.Xml.Serialization;
 using XMLResponseHelper = OpenSim.Framework.SynchronousRestObjectRequester.XMLResponseHelper;
 
 
@@ -100,12 +100,12 @@ namespace OpenSim.Framework
         /// </summary>
         public static OSDMap PutToServiceCompressed(string url, OSDMap data, int timeout)
         {
-            return ServiceOSDRequest(url,data, "PUT", timeout, true, false);
+            return ServiceOSDRequest(url, data, "PUT", timeout, true, false);
         }
 
         public static OSDMap PutToService(string url, OSDMap data, int timeout)
         {
-            return ServiceOSDRequest(url,data, "PUT", timeout, false, false);
+            return ServiceOSDRequest(url, data, "PUT", timeout, false, false);
         }
 
         public static OSDMap PostToService(string url, OSDMap data, int timeout, bool rpc)
@@ -333,10 +333,10 @@ namespace OpenSim.Framework
             result["_RawResult"] = OSD.FromString(response);
             result["_Result"] = new OSDMap();
 
-            if (response.Equals("true",System.StringComparison.OrdinalIgnoreCase))
+            if (response.Equals("true", System.StringComparison.OrdinalIgnoreCase))
                 return result;
 
-            if (response.Equals("false",System.StringComparison.OrdinalIgnoreCase))
+            if (response.Equals("false", System.StringComparison.OrdinalIgnoreCase))
             {
                 result["Success"] = OSD.FromBoolean(false);
                 result["success"] = OSD.FromBoolean(false);
@@ -355,7 +355,7 @@ namespace OpenSim.Framework
             catch
             {
                 // don't need to treat this as an error... we're just guessing anyway
-//                m_log.DebugFormat("[WEB UTIL] couldn't decode <{0}>: {1}",response,e.Message);
+                //                m_log.DebugFormat("[WEB UTIL] couldn't decode <{0}>: {1}",response,e.Message);
             }
 
             return result;
@@ -371,7 +371,7 @@ namespace OpenSim.Framework
         /// </summary>
         public static OSDMap PostToService(string url, NameValueCollection data)
         {
-            return ServiceFormRequest(url,data, 30000);
+            return ServiceFormRequest(url, data, 30000);
         }
 
         public static OSDMap ServiceFormRequest(string url, NameValueCollection data, int timeout)
@@ -440,7 +440,7 @@ namespace OpenSim.Framework
                 if (we.Status == WebExceptionStatus.ProtocolError)
                 {
                     using (HttpWebResponse webResponse = (HttpWebResponse)we.Response)
-                        errorMessage = String.Format("[{0}] {1}",webResponse.StatusCode,webResponse.StatusDescription);
+                        errorMessage = String.Format("[{0}] {1}", webResponse.StatusCode, webResponse.StatusDescription);
                 }
             }
             catch (Exception ex)
@@ -693,7 +693,7 @@ namespace OpenSim.Framework
             if (types.Length > 0)
             {
                 List<string> list = new List<string>(types);
-                list.RemoveAll(delegate(string s) { return !s.ToLower().StartsWith("image"); });
+                list.RemoveAll(delegate (string s) { return !s.ToLower().StartsWith("image"); });
                 ArrayList tlist = new ArrayList(list);
                 tlist.Sort(new QBasedComparer());
 
@@ -816,7 +816,7 @@ namespace OpenSim.Framework
                     if (WebUtil.DebugLevel >= 5)
                         WebUtil.LogOutgoingDetail("SEND", reqnum, System.Text.Encoding.UTF8.GetString(data));
 
-                    request.BeginGetRequestStream(delegate(IAsyncResult res)
+                    request.BeginGetRequestStream(delegate (IAsyncResult res)
                     {
                         using (Stream requestStream = request.EndGetRequestStream(res))
                             requestStream.Write(data, 0, length);
@@ -824,7 +824,7 @@ namespace OpenSim.Framework
                         // capture how much time was spent writing
                         tickdata = Util.EnvironmentTickCountSubtract(tickstart);
 
-                        request.BeginGetResponse(delegate(IAsyncResult ar)
+                        request.BeginGetResponse(delegate (IAsyncResult ar)
                         {
                             using (WebResponse response = request.EndGetResponse(ar))
                             {
@@ -848,7 +848,7 @@ namespace OpenSim.Framework
                 }
                 else
                 {
-                    request.BeginGetResponse(delegate(IAsyncResult res2)
+                    request.BeginGetResponse(delegate (IAsyncResult res2)
                     {
                         try
                         {
@@ -930,10 +930,10 @@ namespace OpenSim.Framework
                         if (originalRequest.Length > WebUtil.MaxRequestDiagLength)
                             originalRequest = originalRequest.Remove(WebUtil.MaxRequestDiagLength);
                     }
-                     m_log.InfoFormat(
-                        "[LOGHTTP]: Slow AsynchronousRequestObject request {0} {1} to {2} took {3}ms, {4}ms writing, {5}",
-                        reqnum, verb, requestUrl, tickdiff, tickdata,
-                        originalRequest);
+                    m_log.InfoFormat(
+                       "[LOGHTTP]: Slow AsynchronousRequestObject request {0} {1} to {2} took {3}ms, {4}ms writing, {5}",
+                       reqnum, verb, requestUrl, tickdiff, tickdata,
+                       originalRequest);
                 }
                 else if (WebUtil.DebugLevel >= 4)
                 {
@@ -981,7 +981,7 @@ namespace OpenSim.Framework
             request.Method = verb;
             if (timeoutsecs > 0)
                 request.Timeout = timeoutsecs * 1000;
-            if(!keepalive && request is HttpWebRequest)
+            if (!keepalive && request is HttpWebRequest)
                 ((HttpWebRequest)request).KeepAlive = false;
 
             if (auth != null)
@@ -1013,8 +1013,8 @@ namespace OpenSim.Framework
 
                     try
                     {
-                        using(Stream requestStream = request.GetRequestStream())
-                            requestStream.Write(data,0,length);
+                        using (Stream requestStream = request.GetRequestStream())
+                            requestStream.Write(data, 0, length);
                     }
                     catch (Exception e)
                     {
@@ -1036,8 +1036,8 @@ namespace OpenSim.Framework
                         if (resp.ContentLength != 0)
                         {
                             using (Stream respStream = resp.GetResponseStream())
-                                using (StreamReader reader = new StreamReader(respStream))
-                                    respstring = reader.ReadToEnd();
+                            using (StreamReader reader = new StreamReader(respStream))
+                                respstring = reader.ReadToEnd();
                         }
                     }
                 }
@@ -1278,7 +1278,7 @@ namespace OpenSim.Framework
                                 "[SynchronousRestObjectRequester]: WebException for {0} {1} {2} {3}",
                                 verb, requestUrl, typeof(TResponse).ToString(), e.Message);
 
-                       return deserial;
+                        return deserial;
                     }
                 }
                 catch (System.InvalidOperationException)
@@ -1340,7 +1340,7 @@ namespace OpenSim.Framework
                     int curcount;
                     using (MemoryStream ms = new MemoryStream(4 * blockLength))
                     {
-                        if(contentLength == -1)
+                        if (contentLength == -1)
                         {
                             while (true)
                             {

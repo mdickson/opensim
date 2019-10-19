@@ -25,26 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Collections.Generic;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using OpenSim;
-using OpenSim.Region;
-using OpenSim.Region.Framework;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Framework;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Servers.HttpServer;
-using Nini.Config;
 using log4net;
 using Mono.Addins;
-using Caps = OpenSim.Framework.Capabilities.Caps;
-using OSDMap = OpenMetaverse.StructuredData.OSDMap;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 namespace OpenSim.Region.OptionalModules.ViewerSupport
 {
@@ -159,7 +150,7 @@ namespace OpenSim.Region.OptionalModules.ViewerSupport
                 xparts.Add(x);
             }
 
-            for (int i = 0 ; i < xparts.Count ; i++)
+            for (int i = 0; i < xparts.Count; i++)
                 SendToClient(sp, String.Format("># floater {2} create {0}/{1} " + xparts[i], i + 1, xparts.Count, dialogData.FloaterName));
 
             SendToClient(sp, String.Format("># floater {0} {{notify:1}} {{channel: {1}}} {{node:cancel {{notify:1}}}} {{node:ok {{notify:1}}}} {2}", dialogData.FloaterName, (uint)dialogData.Channel, configuration));
@@ -177,7 +168,7 @@ namespace OpenSim.Region.OptionalModules.ViewerSupport
             if (!m_floaters.ContainsKey(client.AgentId))
                 return;
 
-            string[] parts = msg.Message.Split(new char[] {':'});
+            string[] parts = msg.Message.Split(new char[] { ':' });
             if (parts.Length == 0)
                 return;
 
@@ -196,7 +187,7 @@ namespace OpenSim.Region.OptionalModules.ViewerSupport
                 {
                     foreach (FloaterData dd in d.Values)
                     {
-                        if(dd.Handler(client, dd, parts))
+                        if (dd.Handler(client, dd, parts))
                         {
                             m_floaters[client.AgentId].Remove(dd.Channel);
                             SendToClient(sp, String.Format("># floater {0} destroy", dd.FloaterName));

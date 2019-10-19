@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Threading;
 
 namespace Amib.Threading
 {
@@ -28,28 +27,28 @@ namespace Amib.Threading.Internal
     internal enum STPPerformanceCounterType
     {
         // Fields
-        ActiveThreads				= 0,
-        InUseThreads				= 1,
-        OverheadThreads				= 2,
-        OverheadThreadsPercent		= 3,
-        OverheadThreadsPercentBase	= 4,
+        ActiveThreads = 0,
+        InUseThreads = 1,
+        OverheadThreads = 2,
+        OverheadThreadsPercent = 3,
+        OverheadThreadsPercentBase = 4,
 
-        WorkItems					= 5,
-        WorkItemsInQueue			= 6,
-        WorkItemsProcessed			= 7,
+        WorkItems = 5,
+        WorkItemsInQueue = 6,
+        WorkItemsProcessed = 7,
 
-        WorkItemsQueuedPerSecond	= 8,
-        WorkItemsProcessedPerSecond	= 9,
+        WorkItemsQueuedPerSecond = 8,
+        WorkItemsProcessedPerSecond = 9,
 
-        AvgWorkItemWaitTime			= 10,
-        AvgWorkItemWaitTimeBase		= 11,
+        AvgWorkItemWaitTime = 10,
+        AvgWorkItemWaitTimeBase = 11,
 
-        AvgWorkItemProcessTime		= 12,
-        AvgWorkItemProcessTimeBase	= 13,
+        AvgWorkItemProcessTime = 12,
+        AvgWorkItemProcessTimeBase = 13,
 
-        WorkItemsGroups				= 14,
+        WorkItemsGroups = 14,
 
-        LastCounter					= 14,
+        LastCounter = 14,
     }
 
 
@@ -166,7 +165,7 @@ namespace Amib.Threading.Internal
                 return _instance;
             }
         }
-     }
+    }
 
     internal class STPInstancePerformanceCounter : IDisposable
     {
@@ -187,7 +186,7 @@ namespace Amib.Threading.Internal
             STPPerformanceCounters counters = STPPerformanceCounters.Instance;
             _pcs = new PerformanceCounter(
                 STPPerformanceCounters._stpCategoryName,
-                counters._stpPerformanceCounters[(int) spcType].Name,
+                counters._stpPerformanceCounters[(int)spcType].Name,
                 instance,
                 false);
             _pcs.RawValue = _pcs.RawValue;
@@ -240,9 +239,9 @@ namespace Amib.Threading.Internal
     internal class STPInstanceNullPerformanceCounter : STPInstancePerformanceCounter
     {
         // Methods
-        public override void Increment() {}
-        public override void IncrementBy(long value) {}
-        public override void Set(long val) {}
+        public override void Increment() { }
+        public override void IncrementBy(long value) { }
+        public override void Set(long val) { }
     }
 
 
@@ -275,7 +274,7 @@ namespace Amib.Threading.Internal
                 {
                     _pcs[i] = new STPInstancePerformanceCounter(
                         instance,
-                        (STPPerformanceCounterType) i);
+                        (STPPerformanceCounterType)i);
                 }
                 else
                 {
@@ -319,22 +318,22 @@ namespace Amib.Threading.Internal
 
         private STPInstancePerformanceCounter GetCounter(STPPerformanceCounterType spcType)
         {
-            return _pcs[(int) spcType];
+            return _pcs[(int)spcType];
         }
 
         public void SampleThreads(long activeThreads, long inUseThreads)
         {
             GetCounter(STPPerformanceCounterType.ActiveThreads).Set(activeThreads);
             GetCounter(STPPerformanceCounterType.InUseThreads).Set(inUseThreads);
-            GetCounter(STPPerformanceCounterType.OverheadThreads).Set(activeThreads-inUseThreads);
+            GetCounter(STPPerformanceCounterType.OverheadThreads).Set(activeThreads - inUseThreads);
 
-            GetCounter(STPPerformanceCounterType.OverheadThreadsPercentBase).Set(activeThreads-inUseThreads);
+            GetCounter(STPPerformanceCounterType.OverheadThreadsPercentBase).Set(activeThreads - inUseThreads);
             GetCounter(STPPerformanceCounterType.OverheadThreadsPercent).Set(inUseThreads);
         }
 
         public void SampleWorkItems(long workItemsQueued, long workItemsProcessed)
         {
-            GetCounter(STPPerformanceCounterType.WorkItems).Set(workItemsQueued+workItemsProcessed);
+            GetCounter(STPPerformanceCounterType.WorkItems).Set(workItemsQueued + workItemsProcessed);
             GetCounter(STPPerformanceCounterType.WorkItemsInQueue).Set(workItemsQueued);
             GetCounter(STPPerformanceCounterType.WorkItemsProcessed).Set(workItemsProcessed);
 
@@ -365,13 +364,13 @@ namespace Amib.Threading.Internal
             get { return _instance; }
         }
 
-         public void Close() {}
-        public void Dispose() {}
+        public void Close() { }
+        public void Dispose() { }
 
-        public void SampleThreads(long activeThreads, long inUseThreads) {}
-        public void SampleWorkItems(long workItemsQueued, long workItemsProcessed) {}
-        public void SampleWorkItemsWaitTime(TimeSpan workItemWaitTime) {}
-        public void SampleWorkItemsProcessTime(TimeSpan workItemProcessTime) {}
+        public void SampleThreads(long activeThreads, long inUseThreads) { }
+        public void SampleWorkItems(long workItemsQueued, long workItemsProcessed) { }
+        public void SampleWorkItemsWaitTime(TimeSpan workItemWaitTime) { }
+        public void SampleWorkItemsProcessTime(TimeSpan workItemProcessTime) { }
         public long InUseThreads
         {
             get { return 0; }

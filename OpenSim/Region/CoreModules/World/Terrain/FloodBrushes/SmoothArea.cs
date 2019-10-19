@@ -39,7 +39,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain.FloodBrushes
             double area = strength;
             double step = strength / 4.0;
 
-            double[,] manipulate = new double[map.Width,map.Height];
+            double[,] manipulate = new double[map.Width, map.Height];
             int x, y;
             for (x = startX; x <= endX; x++)
             {
@@ -94,10 +94,10 @@ namespace OpenSim.Region.CoreModules.World.Terrain.FloodBrushes
                 y = 0.0;
 
             const int stepSize = 1;
-            double h00 = map[(int) x, (int) y];
-            double h10 = map[(int) x + stepSize, (int) y];
-            double h01 = map[(int) x, (int) y + stepSize];
-            double h11 = map[(int) x + stepSize, (int) y + stepSize];
+            double h00 = map[(int)x, (int)y];
+            double h10 = map[(int)x + stepSize, (int)y];
+            double h01 = map[(int)x, (int)y + stepSize];
+            double h11 = map[(int)x + stepSize, (int)y + stepSize];
             double h1 = h00;
             double h2 = h10;
             double h3 = h01;
@@ -106,8 +106,8 @@ namespace OpenSim.Region.CoreModules.World.Terrain.FloodBrushes
             double a10 = h2 - h1;
             double a01 = h3 - h1;
             double a11 = h1 - h2 - h3 + h4;
-            double partialx = x - (int) x;
-            double partialz = y - (int) y;
+            double partialx = x - (int)x;
+            double partialz = y - (int)y;
             double hi = a00 + (a10 * partialx) + (a01 * partialz) + (a11 * partialx * partialz);
             return hi;
         }

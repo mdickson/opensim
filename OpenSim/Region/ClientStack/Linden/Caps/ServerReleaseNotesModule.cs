@@ -27,18 +27,16 @@
 
 // Dedicated to Quill Littlefeather
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections;
+using System.Reflection;
 using Caps = OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Region.ClientStack.LindenCaps
@@ -78,7 +76,7 @@ namespace OpenSim.Region.ClientStack.LindenCaps
                 return;
 
             Uri dummy;
-            if(!Uri.TryCreate(m_ServerReleaseNotesURL,UriKind.Absolute, out dummy))
+            if (!Uri.TryCreate(m_ServerReleaseNotesURL, UriKind.Absolute, out dummy))
             {
                 m_log.Error("[Cap_ServerReleaseNotes]: Invalid ServerReleaseNotesURL. Cap Disabled");
                 return;
@@ -113,7 +111,7 @@ namespace OpenSim.Region.ClientStack.LindenCaps
         {
             string capUrl = "/CAPS/" + UUID.Random() + "/";
 
-            IRequestHandler ServerReleaseNote  = new RestHTTPHandler("GET", capUrl,
+            IRequestHandler ServerReleaseNote = new RestHTTPHandler("GET", capUrl,
                 delegate (Hashtable request)
                 {
                     return ProcessServerReleaseNotes(request, agentID);

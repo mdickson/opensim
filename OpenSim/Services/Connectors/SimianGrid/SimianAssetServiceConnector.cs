@@ -25,21 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.IO;
-using System.Net;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
+using System;
+using System.Collections.Specialized;
+using System.Reflection;
 
 namespace OpenSim.Services.Connectors.SimianGrid
 {
@@ -123,7 +120,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
                 m_Enabled = true;
         }
 
-#region IAssetService
+        #region IAssetService
 
         public AssetBase Get(string id)
         {
@@ -229,7 +226,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
             }
 
             Util.FireAndForget(
-                delegate(object o)
+                delegate (object o)
                 {
                     AssetBase asset = SimianGetOperation(id);
                     handler(id, sender, asset);
@@ -353,9 +350,9 @@ namespace OpenSim.Services.Connectors.SimianGrid
             return SimianDeleteOperation(id);
         }
 
-#endregion IAssetService
+        #endregion IAssetService
 
-#region SimianOperations
+        #region SimianOperations
         /// <summary>
         /// Invokes the xRemoveAsset operation on the simian server to delete an asset
         /// </summary>
@@ -371,10 +368,10 @@ namespace OpenSim.Services.Connectors.SimianGrid
                             { "AssetID", id }
                     };
 
-                OSDMap response = SimianGrid.PostToService(m_serverUrl,requestArgs);
-                if (! response["Success"].AsBoolean())
+                OSDMap response = SimianGrid.PostToService(m_serverUrl, requestArgs);
+                if (!response["Success"].AsBoolean())
                 {
-                    m_log.WarnFormat("[SIMIAN ASSET CONNECTOR]: failed to delete asset; {0}",response["Message"].AsString());
+                    m_log.WarnFormat("[SIMIAN ASSET CONNECTOR]: failed to delete asset; {0}", response["Message"].AsString());
                     return false;
                 }
 
@@ -409,10 +406,10 @@ namespace OpenSim.Services.Connectors.SimianGrid
                             { "Name", asset.Name }
                     };
 
-                OSDMap response = SimianGrid.PostToService(m_serverUrl,requestArgs);
-                if (! response["Success"].AsBoolean())
+                OSDMap response = SimianGrid.PostToService(m_serverUrl, requestArgs);
+                if (!response["Success"].AsBoolean())
                 {
-                    m_log.WarnFormat("[SIMIAN ASSET CONNECTOR] failed to store asset; {0}",response["Message"].AsString());
+                    m_log.WarnFormat("[SIMIAN ASSET CONNECTOR] failed to store asset; {0}", response["Message"].AsString());
                     return null;
                 }
 
@@ -422,7 +419,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
             }
             catch (Exception ex)
             {
-                m_log.ErrorFormat("[SIMIAN ASSET CONNECTOR] failed to store asset; {0}",ex.Message);
+                m_log.ErrorFormat("[SIMIAN ASSET CONNECTOR] failed to store asset; {0}", ex.Message);
             }
 
             return null;
@@ -443,10 +440,10 @@ namespace OpenSim.Services.Connectors.SimianGrid
                             { "ID", id }
                     };
 
-                OSDMap response = SimianGrid.PostToService(m_serverUrl,requestArgs);
-                if (! response["Success"].AsBoolean())
+                OSDMap response = SimianGrid.PostToService(m_serverUrl, requestArgs);
+                if (!response["Success"].AsBoolean())
                 {
-                    m_log.WarnFormat("[SIMIAN ASSET CONNECTOR] Failed to get asset; {0}",response["Message"].AsString());
+                    m_log.WarnFormat("[SIMIAN ASSET CONNECTOR] Failed to get asset; {0}", response["Message"].AsString());
                     return null;
                 }
 
@@ -486,8 +483,8 @@ namespace OpenSim.Services.Connectors.SimianGrid
                             { "ID", id }
                     };
 
-                OSDMap response = SimianGrid.PostToService(m_serverUrl,requestArgs);
-                if (! response["Success"].AsBoolean())
+                OSDMap response = SimianGrid.PostToService(m_serverUrl, requestArgs);
+                if (!response["Success"].AsBoolean())
                 {
                     // this is not really an error, this call is used to test existence
                     // m_log.DebugFormat("[SIMIAN ASSET CONNECTOR] Failed to get asset metadata; {0}",response["Message"].AsString());
@@ -502,7 +499,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
                 metadata.Temporary = response["Temporary"];
 
                 string lastModifiedStr = response["Last-Modified"].AsString();
-                if (! String.IsNullOrEmpty(lastModifiedStr))
+                if (!String.IsNullOrEmpty(lastModifiedStr))
                 {
                     DateTime lastModified;
                     if (DateTime.TryParse(lastModifiedStr, out lastModified))
@@ -518,7 +515,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
 
             return null;
         }
-#endregion
+        #endregion
 
         // private AssetMetadata GetRemoteMetadata(string id)
         // {

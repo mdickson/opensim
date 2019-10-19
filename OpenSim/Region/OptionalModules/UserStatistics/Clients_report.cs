@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 using Mono.Data.SqliteClient;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
 
 namespace OpenSim.Region.UserStatistics
 {
@@ -56,8 +56,9 @@ namespace OpenSim.Region.UserStatistics
         /// </summary>
         /// <param name="pModelResult"></param>
         /// <returns></returns>
-        public string RenderJson(Hashtable pModelResult) {
-            stats_default_page_values values = (stats_default_page_values) pModelResult["hdata"];
+        public string RenderJson(Hashtable pModelResult)
+        {
+            stats_default_page_values values = (stats_default_page_values)pModelResult["hdata"];
 
             OSDMap summaryInfo = new OpenMetaverse.StructuredData.OSDMap();
             summaryInfo.Add("totalUsers", new OSDString(values.total_num_users.ToString()));
@@ -171,10 +172,10 @@ namespace OpenSim.Region.UserStatistics
 
         public string RenderView(Hashtable pModelResult)
         {
-            List<ClientVersionData> clidata = (List<ClientVersionData>) pModelResult["ClientData"];
+            List<ClientVersionData> clidata = (List<ClientVersionData>)pModelResult["ClientData"];
             int totalclients = (int)pModelResult["Total"];
-            Hashtable regionTotals = (Hashtable) pModelResult["RegionTotals"];
-            List<ClientVersionData> cliRegData = (List<ClientVersionData>) pModelResult["ClientRegionData"];
+            Hashtable regionTotals = (Hashtable)pModelResult["RegionTotals"];
+            List<ClientVersionData> cliRegData = (List<ClientVersionData>)pModelResult["ClientRegionData"];
             List<Scene> m_scenes = (List<Scene>)pModelResult["Scenes"];
             Dictionary<string, IStatsController> reports = (Dictionary<string, IStatsController>)pModelResult["Reports"];
 
@@ -226,7 +227,7 @@ TD.align_top { vertical-align: top; }
                 output.Append(cvd.count);
                 output.Append("/");
                 if (totalclients > 0)
-                    output.Append((((float)cvd.count / (float)totalclients)*100).ToString());
+                    output.Append((((float)cvd.count / (float)totalclients) * 100).ToString());
                 else
                     output.Append(0);
 

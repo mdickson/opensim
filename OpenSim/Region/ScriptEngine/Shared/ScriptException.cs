@@ -33,12 +33,12 @@ namespace OpenSim.Region.ScriptEngine.Shared
     [Serializable]
     public class ScriptException : Exception
     {
-        public ScriptException() : base() {}
+        public ScriptException() : base() { }
 
-        public ScriptException(string message) : base(message) {}
+        public ScriptException(string message) : base(message) { }
 
-        public ScriptException(string message, Exception innerException) : base(message, innerException) {}
+        public ScriptException(string message, Exception innerException) : base(message, innerException) { }
 
-        public ScriptException(SerializationInfo info, StreamingContext context) :base(info, context) {}
+        public ScriptException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

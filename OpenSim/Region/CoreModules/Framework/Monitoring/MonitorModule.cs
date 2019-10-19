@@ -25,13 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
+using Mono.Addins;
 using Nini.Config;
-using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Monitoring;
 using OpenSim.Framework.Servers;
@@ -39,7 +35,10 @@ using OpenSim.Region.CoreModules.Framework.Monitoring.Alerts;
 using OpenSim.Region.CoreModules.Framework.Monitoring.Monitors;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using Mono.Addins;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.Framework.Monitoring
 {
@@ -345,7 +344,7 @@ namespace OpenSim.Region.CoreModules.Framework.Monitoring
             // eg url/?monitor=Monitor.Name
             if (request.ContainsKey("monitor"))
             {
-                string monID = (string) request["monitor"];
+                string monID = (string)request["monitor"];
 
                 foreach (IMonitor monitor in m_staticMonitors)
                 {
@@ -383,7 +382,7 @@ namespace OpenSim.Region.CoreModules.Framework.Monitoring
             {
                 string elemName = monitor.GetName();
                 xml += "<" + elemName + ">" + monitor.GetValue().ToString() + "</" + elemName + ">";
-//                m_log.DebugFormat("[MONITOR MODULE]: {0} = {1}", elemName, monitor.GetValue());
+                //                m_log.DebugFormat("[MONITOR MODULE]: {0} = {1}", elemName, monitor.GetValue());
             }
 
             foreach (KeyValuePair<string, float> tuple in m_scene.StatsReporter.GetExtraSimStats())

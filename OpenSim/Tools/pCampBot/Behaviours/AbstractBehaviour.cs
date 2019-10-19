@@ -25,12 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenMetaverse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using pCampBot.Interfaces;
+using System.Threading;
 
 namespace pCampBot
 {
@@ -47,7 +43,7 @@ namespace pCampBot
 
         public abstract void Action();
 
-        public virtual void Interrupt() {}
+        public virtual void Interrupt() { }
 
         protected AutoResetEvent m_interruptEvent = new AutoResetEvent(false);
 

@@ -25,14 +25,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Concurrent;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
 using log4net;
 using OpenSim.Framework;
-using OpenSim.Framework.Monitoring;
+using System;
+using System.Net;
+using System.Net.Sockets;
 
 namespace OpenMetaverse
 {
@@ -178,7 +175,7 @@ namespace OpenMetaverse
 
         ~OpenSimUDPBase()
         {
-            if(m_udpSocket !=null)
+            if (m_udpSocket != null)
                 try { m_udpSocket.Close(); } catch { }
         }
 
@@ -261,11 +258,11 @@ namespace OpenMetaverse
                     // This udp socket flag is not supported under mono,
                     // so we'll catch the exception and continue
                     // Try does not protect some mono versions on mac
-                    if(Util.IsWindows())
+                    if (Util.IsWindows())
                     {
                         m_udpSocket.IOControl(SIO_UDP_CONNRESET, new byte[] { 0 }, null);
                         m_log.Debug("[UDPBASE]: SIO_UDP_CONNRESET flag set");
-                    }               
+                    }
                     else
                     {
                         m_log.Debug("[UDPBASE]: SIO_UDP_CONNRESET flag not supported on this platform, ignoring");
@@ -392,7 +389,7 @@ namespace OpenMetaverse
             if (IsRunningInbound)
             {
                 UdpReceives++;
- 
+
                 try
                 {
                     // get the buffer that was created in AsyncBeginReceive
@@ -446,49 +443,49 @@ namespace OpenMetaverse
             }
         }
 
-/* not in use
-        public void AsyncBeginSend(UDPPacketBuffer buf)
-        {
-//            if (IsRunningOutbound)
-//            {
-
-                // This is strictly for debugging purposes to simulate dropped
-                // packets when testing throttles & retransmission code
-                // if (DropOutgoingPacket())
-                //     return;
-
-                try
+        /* not in use
+                public void AsyncBeginSend(UDPPacketBuffer buf)
                 {
-                    m_udpSocket.BeginSendTo(
-                        buf.Data,
-                        0,
-                        buf.DataLength,
-                        SocketFlags.None,
-                        buf.RemoteEndPoint,
-                        AsyncEndSend,
-                        buf);
+        //            if (IsRunningOutbound)
+        //            {
+
+                        // This is strictly for debugging purposes to simulate dropped
+                        // packets when testing throttles & retransmission code
+                        // if (DropOutgoingPacket())
+                        //     return;
+
+                        try
+                        {
+                            m_udpSocket.BeginSendTo(
+                                buf.Data,
+                                0,
+                                buf.DataLength,
+                                SocketFlags.None,
+                                buf.RemoteEndPoint,
+                                AsyncEndSend,
+                                buf);
+                        }
+                        catch (SocketException) { }
+                        catch (ObjectDisposedException) { }
+         //           }
                 }
-                catch (SocketException) { }
-                catch (ObjectDisposedException) { }
- //           }
-        }
 
-        void AsyncEndSend(IAsyncResult result)
-        {
-            try
-            {
-//                UDPPacketBuffer buf = (UDPPacketBuffer)result.AsyncState;
-                m_udpSocket.EndSendTo(result);
+                void AsyncEndSend(IAsyncResult result)
+                {
+                    try
+                    {
+        //                UDPPacketBuffer buf = (UDPPacketBuffer)result.AsyncState;
+                        m_udpSocket.EndSendTo(result);
 
-                UdpSends++;
-            }
-            catch (SocketException) { }
-            catch (ObjectDisposedException) { }
-        }
-*/
+                        UdpSends++;
+                    }
+                    catch (SocketException) { }
+                    catch (ObjectDisposedException) { }
+                }
+        */
         public void SyncSend(UDPPacketBuffer buf)
         {
-            if(buf.RemoteEndPoint == null)
+            if (buf.RemoteEndPoint == null)
                 return; // already expired
             try
             {
@@ -499,7 +496,7 @@ namespace OpenMetaverse
                     SocketFlags.None,
                     buf.RemoteEndPoint
                     );
-                 UdpSends++;
+                UdpSends++;
             }
             catch (SocketException e)
             {

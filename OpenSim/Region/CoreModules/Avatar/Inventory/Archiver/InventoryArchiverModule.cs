@@ -25,20 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using log4net;
+using Mono.Addins;
 using NDesk.Options;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Console;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-using Mono.Addins;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
 {
@@ -92,11 +91,11 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
         }
 
 
-        public InventoryArchiverModule() {}
+        public InventoryArchiverModule() { }
 
-//        public InventoryArchiverModule(bool disablePresenceChecks)
-//        {
-//            DisablePresenceChecks = disablePresenceChecks;
+        //        public InventoryArchiverModule(bool disablePresenceChecks)
+        //        {
+        //            DisablePresenceChecks = disablePresenceChecks;
         //        }
 
         #region ISharedRegionModule
@@ -155,7 +154,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
         {
         }
 
-        public void Close() {}
+        public void Close() { }
 
         public void RegionLoaded(Scene scene)
         {
@@ -183,7 +182,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
         {
             InventoryArchiveSaved handlerInventoryArchiveSaved = OnInventoryArchiveSaved;
             if (handlerInventoryArchiveSaved != null)
-                handlerInventoryArchiveSaved(id, succeeded, userInfo, invPath, saveStream, reportedException, SaveCount , FilterCount);
+                handlerInventoryArchiveSaved(id, succeeded, userInfo, invPath, saveStream, reportedException, SaveCount, FilterCount);
         }
 
         /// <summary>
@@ -214,31 +213,31 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
 
                 if (userInfo != null)
                 {
-//                    if (CheckPresence(userInfo.PrincipalID))
-//                    {
-                        try
-                        {
-                            InventoryArchiveWriteRequest iarReq = new InventoryArchiveWriteRequest(id, this, m_aScene, userInfo, invPath, saveStream);
-                            iarReq.Execute(options, UserAccountService);
-                        }
-                        catch (EntryPointNotFoundException e)
-                        {
-                            m_log.ErrorFormat(
-                                "[INVENTORY ARCHIVER]: Mismatch between Mono and zlib1g library version when trying to create compression stream."
-                                    + "If you've manually installed Mono, have you appropriately updated zlib1g as well?");
-                            m_log.Error(e);
+                    //                    if (CheckPresence(userInfo.PrincipalID))
+                    //                    {
+                    try
+                    {
+                        InventoryArchiveWriteRequest iarReq = new InventoryArchiveWriteRequest(id, this, m_aScene, userInfo, invPath, saveStream);
+                        iarReq.Execute(options, UserAccountService);
+                    }
+                    catch (EntryPointNotFoundException e)
+                    {
+                        m_log.ErrorFormat(
+                            "[INVENTORY ARCHIVER]: Mismatch between Mono and zlib1g library version when trying to create compression stream."
+                                + "If you've manually installed Mono, have you appropriately updated zlib1g as well?");
+                        m_log.Error(e);
 
-                            return false;
-                        }
+                        return false;
+                    }
 
-                        return true;
-//                    }
-//                    else
-//                    {
-//                        m_log.ErrorFormat(
-//                            "[INVENTORY ARCHIVER]: User {0} {1} {2} not logged in to this region simulator",
-//                            userInfo.FirstName, userInfo.LastName, userInfo.PrincipalID);
-//                    }
+                    return true;
+                    //                    }
+                    //                    else
+                    //                    {
+                    //                        m_log.ErrorFormat(
+                    //                            "[INVENTORY ARCHIVER]: User {0} {1} {2} not logged in to this region simulator",
+                    //                            userInfo.FirstName, userInfo.LastName, userInfo.PrincipalID);
+                    //                    }
                 }
             }
 
@@ -249,8 +248,8 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
             UUID id, string firstName, string lastName, string invPath, string pass, string savePath,
             Dictionary<string, object> options)
         {
-//            if (!ConsoleUtil.CheckFileDoesNotExist(MainConsole.Instance, savePath))
-//                return false;
+            //            if (!ConsoleUtil.CheckFileDoesNotExist(MainConsole.Instance, savePath))
+            //                return false;
 
             if (m_scenes.Count > 0)
             {
@@ -258,31 +257,31 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
 
                 if (userInfo != null)
                 {
-//                    if (CheckPresence(userInfo.PrincipalID))
-//                    {
-                        try
-                        {
-                            InventoryArchiveWriteRequest iarReq  = new InventoryArchiveWriteRequest(id, this, m_aScene, userInfo, invPath, savePath);
-                            iarReq.Execute(options, UserAccountService);
-                        }
-                        catch (EntryPointNotFoundException e)
-                        {
-                            m_log.ErrorFormat(
-                                "[INVENTORY ARCHIVER]: Mismatch between Mono and zlib1g library version when trying to create compression stream."
-                                    + "If you've manually installed Mono, have you appropriately updated zlib1g as well?");
-                            m_log.Error(e);
+                    //                    if (CheckPresence(userInfo.PrincipalID))
+                    //                    {
+                    try
+                    {
+                        InventoryArchiveWriteRequest iarReq = new InventoryArchiveWriteRequest(id, this, m_aScene, userInfo, invPath, savePath);
+                        iarReq.Execute(options, UserAccountService);
+                    }
+                    catch (EntryPointNotFoundException e)
+                    {
+                        m_log.ErrorFormat(
+                            "[INVENTORY ARCHIVER]: Mismatch between Mono and zlib1g library version when trying to create compression stream."
+                                + "If you've manually installed Mono, have you appropriately updated zlib1g as well?");
+                        m_log.Error(e);
 
-                            return false;
-                        }
+                        return false;
+                    }
 
-                        return true;
-//                    }
-//                    else
-//                    {
-//                        m_log.ErrorFormat(
-//                            "[INVENTORY ARCHIVER]: User {0} {1} {2} not logged in to this region simulator",
-//                            userInfo.FirstName, userInfo.LastName, userInfo.PrincipalID);
-//                    }
+                    return true;
+                    //                    }
+                    //                    else
+                    //                    {
+                    //                        m_log.ErrorFormat(
+                    //                            "[INVENTORY ARCHIVER]: User {0} {1} {2} not logged in to this region simulator",
+                    //                            userInfo.FirstName, userInfo.LastName, userInfo.PrincipalID);
+                    //                    }
                 }
             }
 
@@ -304,35 +303,35 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
 
                 if (userInfo != null)
                 {
-//                    if (CheckPresence(userInfo.PrincipalID))
-//                    {
-                        InventoryArchiveReadRequest request;
-                        bool merge = (options.ContainsKey("merge") ? (bool)options["merge"] : false);
+                    //                    if (CheckPresence(userInfo.PrincipalID))
+                    //                    {
+                    InventoryArchiveReadRequest request;
+                    bool merge = (options.ContainsKey("merge") ? (bool)options["merge"] : false);
 
-                        try
-                        {
-                            request = new InventoryArchiveReadRequest(id, this, m_aScene.InventoryService, m_aScene.AssetService, m_aScene.UserAccountService, userInfo, invPath, loadStream, merge);
-                        }
-                        catch (EntryPointNotFoundException e)
-                        {
-                            m_log.ErrorFormat(
-                                "[INVENTORY ARCHIVER]: Mismatch between Mono and zlib1g library version when trying to create compression stream."
-                                    + "If you've manually installed Mono, have you appropriately updated zlib1g as well?");
-                            m_log.Error(e);
+                    try
+                    {
+                        request = new InventoryArchiveReadRequest(id, this, m_aScene.InventoryService, m_aScene.AssetService, m_aScene.UserAccountService, userInfo, invPath, loadStream, merge);
+                    }
+                    catch (EntryPointNotFoundException e)
+                    {
+                        m_log.ErrorFormat(
+                            "[INVENTORY ARCHIVER]: Mismatch between Mono and zlib1g library version when trying to create compression stream."
+                                + "If you've manually installed Mono, have you appropriately updated zlib1g as well?");
+                        m_log.Error(e);
 
-                            return false;
-                        }
+                        return false;
+                    }
 
-                        UpdateClientWithLoadedNodes(userInfo, request.Execute());
+                    UpdateClientWithLoadedNodes(userInfo, request.Execute());
 
-                        return true;
-//                    }
-//                    else
-//                    {
-//                        m_log.ErrorFormat(
-//                            "[INVENTORY ARCHIVER]: User {0} {1} {2} not logged in to this region simulator",
-//                            userInfo.FirstName, userInfo.LastName, userInfo.PrincipalID);
-//                    }
+                    return true;
+                    //                    }
+                    //                    else
+                    //                    {
+                    //                        m_log.ErrorFormat(
+                    //                            "[INVENTORY ARCHIVER]: User {0} {1} {2} not logged in to this region simulator",
+                    //                            userInfo.FirstName, userInfo.LastName, userInfo.PrincipalID);
+                    //                    }
                 }
                 else
                     m_log.ErrorFormat("[INVENTORY ARCHIVER]: User {0} {1} not found",
@@ -352,35 +351,35 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
 
                 if (userInfo != null)
                 {
-//                    if (CheckPresence(userInfo.PrincipalID))
-//                    {
-                        InventoryArchiveReadRequest request;
-                        bool merge = (options.ContainsKey("merge") ? (bool)options["merge"] : false);
+                    //                    if (CheckPresence(userInfo.PrincipalID))
+                    //                    {
+                    InventoryArchiveReadRequest request;
+                    bool merge = (options.ContainsKey("merge") ? (bool)options["merge"] : false);
 
-                        try
-                        {
-                            request = new InventoryArchiveReadRequest(id, this, m_aScene.InventoryService, m_aScene.AssetService, m_aScene.UserAccountService, userInfo, invPath, loadPath, merge);
-                        }
-                        catch (EntryPointNotFoundException e)
-                        {
-                            m_log.ErrorFormat(
-                                "[INVENTORY ARCHIVER]: Mismatch between Mono and zlib1g library version when trying to create compression stream."
-                                    + "If you've manually installed Mono, have you appropriately updated zlib1g as well?");
-                            m_log.Error(e);
+                    try
+                    {
+                        request = new InventoryArchiveReadRequest(id, this, m_aScene.InventoryService, m_aScene.AssetService, m_aScene.UserAccountService, userInfo, invPath, loadPath, merge);
+                    }
+                    catch (EntryPointNotFoundException e)
+                    {
+                        m_log.ErrorFormat(
+                            "[INVENTORY ARCHIVER]: Mismatch between Mono and zlib1g library version when trying to create compression stream."
+                                + "If you've manually installed Mono, have you appropriately updated zlib1g as well?");
+                        m_log.Error(e);
 
-                            return false;
-                        }
+                        return false;
+                    }
 
-                        UpdateClientWithLoadedNodes(userInfo, request.Execute());
+                    UpdateClientWithLoadedNodes(userInfo, request.Execute());
 
-                        return true;
-//                    }
-//                    else
-//                    {
-//                        m_log.ErrorFormat(
-//                            "[INVENTORY ARCHIVER]: User {0} {1} {2} not logged in to this region simulator",
-//                            userInfo.FirstName, userInfo.LastName, userInfo.PrincipalID);
-//                    }
+                    return true;
+                    //                    }
+                    //                    else
+                    //                    {
+                    //                        m_log.ErrorFormat(
+                    //                            "[INVENTORY ARCHIVER]: User {0} {1} {2} not logged in to this region simulator",
+                    //                            userInfo.FirstName, userInfo.LastName, userInfo.PrincipalID);
+                    //                    }
                 }
             }
 
@@ -442,23 +441,23 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
 
             OptionSet ops = new OptionSet();
             //ops.Add("v|version=", delegate(string v) { options["version"] = v; });
-            ops.Add("h|home=", delegate(string v) { options["home"] = v; });
-            ops.Add("v|verbose", delegate(string v) { options["verbose"] = v; });
-            ops.Add("c|creators", delegate(string v) { options["creators"] = v; });
-            ops.Add("noassets", delegate(string v) { options["noassets"] = v != null; });
-            ops.Add("e|exclude=", delegate(string v)
+            ops.Add("h|home=", delegate (string v) { options["home"] = v; });
+            ops.Add("v|verbose", delegate (string v) { options["verbose"] = v; });
+            ops.Add("c|creators", delegate (string v) { options["creators"] = v; });
+            ops.Add("noassets", delegate (string v) { options["noassets"] = v != null; });
+            ops.Add("e|exclude=", delegate (string v)
                 {
                     if (!options.ContainsKey("exclude"))
                         options["exclude"] = new List<String>();
                     ((List<String>)options["exclude"]).Add(v);
                 });
-            ops.Add("f|excludefolder=", delegate(string v)
+            ops.Add("f|excludefolder=", delegate (string v)
                 {
                     if (!options.ContainsKey("excludefolders"))
                         options["excludefolders"] = new List<String>();
                     ((List<String>)options["excludefolders"]).Add(v);
                 });
-            ops.Add("perm=", delegate(string v) { options["checkPermissions"] = v; });
+            ops.Add("perm=", delegate (string v) { options["checkPermissions"] = v; });
 
             List<string> mainParams = ops.Parse(cmdparams);
 
@@ -510,7 +509,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
             if (succeeded)
             {
                 // Report success and include item count and filter count (Skipped items due to --perm or --exclude switches)
-                if(FilterCount == 0)
+                if (FilterCount == 0)
                     m_log.InfoFormat("[INVENTORY ARCHIVER]: Saved archive with {0} items for {1} {2}", SaveCount, userInfo.FirstName, userInfo.LastName);
                 else
                     m_log.InfoFormat("[INVENTORY ARCHIVER]: Saved archive with {0} items for {1} {2}. Skipped {3} items due to exclude and/or perm switches", SaveCount, userInfo.FirstName, userInfo.LastName, FilterCount);
@@ -606,9 +605,9 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
                 {
                     foreach (InventoryNodeBase node in loadedNodes.Values)
                     {
-//                        m_log.DebugFormat(
-//                            "[INVENTORY ARCHIVER]: Notifying {0} of loaded inventory node {1}",
-//                            user.Name, node.Name);
+                        //                        m_log.DebugFormat(
+                        //                            "[INVENTORY ARCHIVER]: Notifying {0} of loaded inventory node {1}",
+                        //                            user.Name, node.Name);
 
                         user.ControllingClient.SendBulkUpdateInventory(node);
                     }
@@ -618,27 +617,27 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
             }
         }
 
-//        /// <summary>
-//        /// Check if the given user is present in any of the scenes.
-//        /// </summary>
-//        /// <param name="userId">The user to check</param>
-//        /// <returns>true if the user is in any of the scenes, false otherwise</returns>
-//        protected bool CheckPresence(UUID userId)
-//        {
-//            if (DisablePresenceChecks)
-//                return true;
-//
-//            foreach (Scene scene in m_scenes.Values)
-//            {
-//                ScenePresence p;
-//                if ((p = scene.GetScenePresence(userId)) != null)
-//                {
-//                    p.ControllingClient.SendAgentAlertMessage("Inventory operation has been started", false);
-//                    return true;
-//                }
-//            }
-//
-//            return false;
-//        }
+        //        /// <summary>
+        //        /// Check if the given user is present in any of the scenes.
+        //        /// </summary>
+        //        /// <param name="userId">The user to check</param>
+        //        /// <returns>true if the user is in any of the scenes, false otherwise</returns>
+        //        protected bool CheckPresence(UUID userId)
+        //        {
+        //            if (DisablePresenceChecks)
+        //                return true;
+        //
+        //            foreach (Scene scene in m_scenes.Values)
+        //            {
+        //                ScenePresence p;
+        //                if ((p = scene.GetScenePresence(userId)) != null)
+        //                {
+        //                    p.ControllingClient.SendAgentAlertMessage("Inventory operation has been started", false);
+        //                    return true;
+        //                }
+        //            }
+        //
+        //            return false;
+        //        }
     }
 }

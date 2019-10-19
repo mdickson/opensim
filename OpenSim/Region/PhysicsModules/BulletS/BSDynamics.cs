@@ -30,13 +30,9 @@
  * (http://creativecommons.org/licenses/by-sa/3.0/).
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using OpenMetaverse;
-using OpenSim.Framework;
 using OpenSim.Region.PhysicsModules.SharedBase;
+using System;
 
 namespace OpenSim.Region.PhysicsModule.BulletS
 {
@@ -58,14 +54,14 @@ namespace OpenSim.Region.PhysicsModule.BulletS
         public Vehicle Type { get; set; }
 
         // private Quaternion m_referenceFrame = Quaternion.Identity;   // Axis modifier
-        private VehicleFlag m_flags = (VehicleFlag) 0;                  // Boolean settings:
-                                                                        // HOVER_TERRAIN_ONLY
-                                                                        // HOVER_GLOBAL_HEIGHT
-                                                                        // NO_DEFLECTION_UP
-                                                                        // HOVER_WATER_ONLY
-                                                                        // HOVER_UP_ONLY
-                                                                        // LIMIT_MOTOR_UP
-                                                                        // LIMIT_ROLL_ONLY
+        private VehicleFlag m_flags = (VehicleFlag)0;                  // Boolean settings:
+                                                                       // HOVER_TERRAIN_ONLY
+                                                                       // HOVER_GLOBAL_HEIGHT
+                                                                       // NO_DEFLECTION_UP
+                                                                       // HOVER_WATER_ONLY
+                                                                       // HOVER_UP_ONLY
+                                                                       // LIMIT_MOTOR_UP
+                                                                       // LIMIT_ROLL_ONLY
         private Vector3 m_BlockingEndPoint = Vector3.Zero;
         private Quaternion m_RollreferenceFrame = Quaternion.Identity;
         private Quaternion m_referenceFrame = Quaternion.Identity;
@@ -461,7 +457,7 @@ namespace OpenSim.Region.PhysicsModule.BulletS
                     m_angularMotorDirection = Vector3.Zero;
                     m_angularMotorTimescale = 4;
                     m_angularMotorDecayTimescale = 4;
-                    m_angularFrictionTimescale = new Vector3(10,10,10);
+                    m_angularFrictionTimescale = new Vector3(10, 10, 10);
 
                     m_VhoverHeight = 0;
                     m_VhoverEfficiency = 0.5f;
@@ -603,7 +599,7 @@ namespace OpenSim.Region.PhysicsModule.BulletS
         {
             // If asking for a refresh, reset the physical parameters before the next simulation step.
             // Called whether active or not since the active state may be updated before the next step.
-            m_physicsScene.PostTaintObject("BSDynamics.Refresh", ControllingPrim.LocalID, delegate()
+            m_physicsScene.PostTaintObject("BSDynamics.Refresh", ControllingPrim.LocalID, delegate ()
             {
                 SetPhysicalParameters();
             });
@@ -730,16 +726,16 @@ namespace OpenSim.Region.PhysicsModule.BulletS
         private Vector3 m_knownRotationalForce;
         private Vector3 m_knownRotationalImpulse;
 
-        private const int m_knownChangedPosition           = 1 << 0;
-        private const int m_knownChangedVelocity           = 1 << 1;
-        private const int m_knownChangedForce              = 1 << 2;
-        private const int m_knownChangedForceImpulse       = 1 << 3;
-        private const int m_knownChangedOrientation        = 1 << 4;
+        private const int m_knownChangedPosition = 1 << 0;
+        private const int m_knownChangedVelocity = 1 << 1;
+        private const int m_knownChangedForce = 1 << 2;
+        private const int m_knownChangedForceImpulse = 1 << 3;
+        private const int m_knownChangedOrientation = 1 << 4;
         private const int m_knownChangedRotationalVelocity = 1 << 5;
-        private const int m_knownChangedRotationalForce    = 1 << 6;
-        private const int m_knownChangedRotationalImpulse  = 1 << 7;
-        private const int m_knownChangedTerrainHeight      = 1 << 8;
-        private const int m_knownChangedWaterLevel         = 1 << 9;
+        private const int m_knownChangedRotationalForce = 1 << 6;
+        private const int m_knownChangedRotationalImpulse = 1 << 7;
+        private const int m_knownChangedTerrainHeight = 1 << 8;
+        private const int m_knownChangedWaterLevel = 1 << 9;
 
         public void ForgetKnownVehicleProperties()
         {
@@ -1056,7 +1052,7 @@ namespace OpenSim.Region.PhysicsModule.BulletS
                 VehicleVelocity = Vector3.Zero;
             }
 
-            VDetailLog("{0},  MoveLinear,done,isColl={1},newVel={2}", ControllingPrim.LocalID, ControllingPrim.HasSomeCollision, VehicleVelocity );
+            VDetailLog("{0},  MoveLinear,done,isColl={1},newVel={2}", ControllingPrim.LocalID, ControllingPrim.HasSomeCollision, VehicleVelocity);
 
         } // end MoveLinear()
 
@@ -1616,7 +1612,7 @@ namespace OpenSim.Region.PhysicsModule.BulletS
                 predictedPointingDirection.Normalize();
 
                 // The difference between what is and what should be.
-               // Vector3 deflectionError = movingDirection - predictedPointingDirection;
+                // Vector3 deflectionError = movingDirection - predictedPointingDirection;
                 Vector3 deflectionError = Vector3.Cross(movingDirection, predictedPointingDirection);
 
                 // Don't try to correct very large errors (not our job)
@@ -1631,7 +1627,7 @@ namespace OpenSim.Region.PhysicsModule.BulletS
 
                 // Scale the correction by recovery timescale and efficiency
                 //    Not modeling a spring so clamp the scale to no more then the arc
-                deflectContributionV = (-deflectionError) * ClampInRange(0, m_angularDeflectionEfficiency/m_angularDeflectionTimescale,1f);
+                deflectContributionV = (-deflectionError) * ClampInRange(0, m_angularDeflectionEfficiency / m_angularDeflectionTimescale, 1f);
                 //deflectContributionV /= m_angularDeflectionTimescale;
 
                 VehicleRotationalVelocity += deflectContributionV;
@@ -1687,7 +1683,7 @@ namespace OpenSim.Region.PhysicsModule.BulletS
                 // Figure out the yaw value for this much roll.
                 float yawAngle = m_angularMotorDirection.X * m_bankingEfficiency;
                 //        actual error  =       static turn error            +           dynamic turn error
-                float mixedYawAngle =(yawAngle * (1f - m_bankingMix)) + ((yawAngle * m_bankingMix) * VehicleForwardSpeed);
+                float mixedYawAngle = (yawAngle * (1f - m_bankingMix)) + ((yawAngle * m_bankingMix) * VehicleForwardSpeed);
 
                 // TODO: the banking effect should not go to infinity but what to limit it to?
                 //     And what should happen when this is being added to a user defined yaw that is already PI*4?
@@ -1772,7 +1768,7 @@ namespace OpenSim.Region.PhysicsModule.BulletS
                 clampa = clampb;
                 clampb = temp;
             }
-           return ClampInRange(clampa, val, clampb);
+            return ClampInRange(clampa, val, clampb);
 
         }
 

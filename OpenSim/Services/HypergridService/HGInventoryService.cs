@@ -25,18 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using OpenMetaverse;
 using log4net;
 using Nini.Config;
-using System.Reflection;
-using OpenSim.Services.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Services.InventoryService;
+using OpenMetaverse;
 using OpenSim.Data;
 using OpenSim.Framework;
 using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
+using OpenSim.Services.InventoryService;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Services.HypergridService
 {
@@ -108,7 +107,7 @@ namespace OpenSim.Services.HypergridService
             //m_log.DebugFormat("[HG INVENTORY SERVICE]: GetRootFolder for {0}", principalID);
             // Warp! Root folder for travelers
             XInventoryFolder[] folders = m_Database.GetFolders(
-                    new string[] { "agentID", "folderName"},
+                    new string[] { "agentID", "folderName" },
                     new string[] { principalID.ToString(), "My Suitcase" });
 
             if (folders.Length > 0)
@@ -183,7 +182,7 @@ namespace OpenSim.Services.HypergridService
 
         private List<InventoryFolderBase> GetDescendents(List<InventoryFolderBase> lst, UUID root)
         {
-            List<InventoryFolderBase> direct = lst.FindAll(delegate(InventoryFolderBase f) { return f.ParentID == root; });
+            List<InventoryFolderBase> direct = lst.FindAll(delegate (InventoryFolderBase f) { return f.ParentID == root; });
             if (direct == null)
                 return new List<InventoryFolderBase>();
 

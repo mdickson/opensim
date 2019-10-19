@@ -25,16 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Reflection;
 using log4net;
 using MySql.Data.MySqlClient;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Data;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Reflection;
 
 namespace OpenSim.Data.MySQL
 {
@@ -405,7 +403,7 @@ namespace OpenSim.Data.MySQL
                 cmd.CommandText = sql;
                 cmd.Parameters.AddWithValue("?EstateID", estateID);
 
-                EstateSettings e =  DoLoad(cmd, UUID.Zero, false);
+                EstateSettings e = DoLoad(cmd, UUID.Zero, false);
                 if (e.EstateID != estateID)
                     return null;
                 return e;
@@ -518,8 +516,8 @@ namespace OpenSim.Data.MySQL
                 try
                 {
                     // Delete any existing association of this region with an estate.
-                     using (MySqlCommand cmd = dbcon.CreateCommand())
-                     {
+                    using (MySqlCommand cmd = dbcon.CreateCommand())
+                    {
                         cmd.Transaction = transaction;
                         cmd.CommandText = "delete from estate_map where RegionID = ?RegionID";
                         cmd.Parameters.AddWithValue("?RegionID", regionID);
@@ -575,7 +573,7 @@ namespace OpenSim.Data.MySQL
 
                         using (IDataReader reader = cmd.ExecuteReader())
                         {
-                            while(reader.Read())
+                            while (reader.Read())
                                 result.Add(DBGuid.FromDB(reader["RegionID"]));
                             reader.Close();
                         }

@@ -26,30 +26,26 @@
 *
 */
 
+using log4net;
+using OpenMetaverse;
+using OpenSim.Framework.Servers;
+using OpenSim.Region.Framework.Scenes;
 using System.Collections;
 using System.Reflection;
 using System.Xml;
-using log4net;
-using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Framework.Capabilities;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Region.Framework.Scenes;
-using Caps = OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Region.DataSnapshot
 {
     public class DataRequestHandler
     {
-//        private Scene m_scene = null;
+        //        private Scene m_scene = null;
         private DataSnapshotManager m_externalData = null;
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private ExpiringCache<string, int> throotleGen = new ExpiringCache<string, int>();
 
         public DataRequestHandler(Scene scene, DataSnapshotManager externalData)
         {
-//            m_scene = scene;
+            //            m_scene = scene;
             m_externalData = externalData;
 
             //Register HTTP handler
@@ -100,15 +96,15 @@ namespace OpenSim.Region.DataSnapshot
             Hashtable reply = new Hashtable();
             string reqtag;
             string snapObj = (string)keysvals["region"];
-            if(string.IsNullOrWhiteSpace(snapObj))
+            if (string.IsNullOrWhiteSpace(snapObj))
                 reqtag = GetClientString(keysvals);
             else
                 reqtag = snapObj + GetClientString(keysvals);
 
 
-            if(!string.IsNullOrWhiteSpace(reqtag))
+            if (!string.IsNullOrWhiteSpace(reqtag))
             {
-                if(throotleGen.Contains(reqtag))
+                if (throotleGen.Contains(reqtag))
                 {
                     reply["str_response_string"] = "Please try your request again later";
                     reply["int_response_code"] = 503;
@@ -120,13 +116,13 @@ namespace OpenSim.Region.DataSnapshot
                 throotleGen.AddOrUpdate(reqtag, 0, 60);
             }
 
-            if(string.IsNullOrWhiteSpace(snapObj))
+            if (string.IsNullOrWhiteSpace(snapObj))
                 m_log.DebugFormat("[DATASNAPSHOT] Received collection request for all");
             else
-               m_log.DebugFormat("[DATASNAPSHOT] Received collection request for {0}", snapObj);
+                m_log.DebugFormat("[DATASNAPSHOT] Received collection request for {0}", snapObj);
 
             XmlDocument response = m_externalData.GetSnapshot(snapObj);
-            if(response == null)
+            if (response == null)
             {
                 reply["str_response_string"] = "Please try your request again later";
                 reply["int_response_code"] = 503;

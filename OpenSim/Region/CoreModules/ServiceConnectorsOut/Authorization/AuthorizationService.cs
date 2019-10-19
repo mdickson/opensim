@@ -25,19 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Nini.Config;
 using log4net;
-using OpenSim.Framework;
-using OpenSim.Services.Interfaces;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
+using Nini.Config;
 using OpenMetaverse;
-
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Authorization
 {
@@ -55,7 +49,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Authorization
                 MethodBase.GetCurrentMethod().DeclaringType);
 
         private IUserManagement m_UserManagement;
-//        private IGridService m_GridService;
+        //        private IGridService m_GridService;
 
         private Scene m_Scene;
         AccessFlags m_accessValue = AccessFlags.None;
@@ -65,7 +59,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Authorization
         {
             m_Scene = scene;
             m_UserManagement = scene.RequestModuleInterface<IUserManagement>();
-//            m_GridService = scene.GridService;
+            //            m_GridService = scene.GridService;
 
             if (config != null)
             {

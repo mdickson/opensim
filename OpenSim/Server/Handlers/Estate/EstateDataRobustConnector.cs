@@ -24,22 +24,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Framework.ServiceAuth;
+using OpenSim.Server.Base;
+using OpenSim.Server.Handlers.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Net;
-
-using Nini.Config;
-using log4net;
-using OpenMetaverse;
-
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Framework;
-using OpenSim.Framework.ServiceAuth;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Server.Handlers.Base;
+using System.Reflection;
 
 namespace OpenSim.Server.Handlers
 {
@@ -73,7 +71,7 @@ namespace OpenSim.Server.Handlers
 
     public class EstateServerGetHandler : BaseStreamHandler
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         IEstateDataService m_EstateService;
 
@@ -283,7 +281,7 @@ namespace OpenSim.Server.Handlers
                 if ("estate".Equals(resource))
                 {
                     string body;
-                    using(StreamReader sr = new StreamReader(request))
+                    using (StreamReader sr = new StreamReader(request))
                         body = sr.ReadToEnd();
 
                     body = body.Trim();

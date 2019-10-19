@@ -25,11 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.IO;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.IO;
 
 namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
 {
@@ -218,8 +218,8 @@ namespace OpenSim.Region.CoreModules.World.Terrain.FileLoaders
 
                         index = LookupHeightTable[index].Index;
 
-                        byte red = (byte) (index & 0xFF);
-                        byte green = (byte) ((index >> 8) & 0xFF);
+                        byte red = (byte)(index & 0xFF);
+                        byte green = (byte)((index >> 8) & 0xFF);
                         const byte blue = 20;
                         const byte alpha1 = 0;
                         const byte alpha2 = 0;

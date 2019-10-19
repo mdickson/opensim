@@ -25,23 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Xml;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
-using System.Timers;
-using Timer = System.Timers.Timer;
+using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using log4net;
-using Nini.Config;
 using OpenSim.Framework;
-using OpenSim.Framework.Client;
-using OpenSim.Framework.Monitoring;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes.Types;
-using OpenSim.Services.Interfaces;
 
 namespace OpenSim.Region.Framework.Scenes
 {
@@ -93,7 +80,7 @@ namespace OpenSim.Region.Framework.Scenes
                     Util.GetConfigVarFromSections<bool>(config,
                     "force_grid_gods_only", sections, false);
 
-            if(!m_forceGridGodsOnly)
+            if (!m_forceGridGodsOnly)
             {
                 // The owner of a region is a god in his region only.
                 m_regionOwnerIsGod =
@@ -108,7 +95,7 @@ namespace OpenSim.Region.Framework.Scenes
             }
             else
                 m_allowGridGods = true; // reduce potencial user mistakes
-                 
+
             // God mode should be turned on in the viewer whenever
             // the user has god rights somewhere. They may choose
             // to turn it off again, though.
@@ -125,13 +112,13 @@ namespace OpenSim.Region.Framework.Scenes
 
             m_rightsGodLevel = CalcRightsGodLevel();
 
-            if(m_allowGodActionsWithoutGodMode)
+            if (m_allowGodActionsWithoutGodMode)
             {
                 m_godlevel = m_rightsGodLevel;
                 m_forceGodModeAlwaysOn = false;
             }
 
-            else if(m_forceGodModeAlwaysOn)
+            else if (m_forceGodModeAlwaysOn)
             {
                 m_viewergodlevel = m_rightsGodLevel;
                 m_godlevel = m_rightsGodLevel;
@@ -150,13 +137,13 @@ namespace OpenSim.Region.Framework.Scenes
             if (m_allowGridGods && m_userLevel >= 200)
                 level = m_userLevel;
 
-            if(m_forceGridGodsOnly || level >= (int)ImplicitGodLevels.RegionOwner)
+            if (m_forceGridGodsOnly || level >= (int)ImplicitGodLevels.RegionOwner)
                 return level;
 
             if (m_regionOwnerIsGod && m_scene.RegionInfo.EstateSettings.IsEstateOwner(m_scenePresence.UUID))
                 level = (int)ImplicitGodLevels.RegionOwner;
 
-            if(level >= (int)ImplicitGodLevels.EstateManager)
+            if (level >= (int)ImplicitGodLevels.EstateManager)
                 return level;
 
             if (m_regionManagerIsGod && m_scene.Permissions.IsEstateManager(m_scenePresence.UUID))
@@ -172,7 +159,7 @@ namespace OpenSim.Region.Framework.Scenes
 
         protected void UpdateGodLevels(bool viewerState)
         {
-            if(!CanBeGod())
+            if (!CanBeGod())
             {
                 m_viewergodlevel = 0;
                 m_godlevel = 0;
@@ -182,9 +169,9 @@ namespace OpenSim.Region.Framework.Scenes
             }
 
             // legacy some are controled by viewer, others are static
-            if(m_allowGodActionsWithoutGodMode)
+            if (m_allowGodActionsWithoutGodMode)
             {
-                if(viewerState)
+                if (viewerState)
                     m_viewergodlevel = m_rightsGodLevel;
                 else
                     m_viewergodlevel = 0;
@@ -194,7 +181,7 @@ namespace OpenSim.Region.Framework.Scenes
             else
             {
                 // new all change with viewer
-                if(viewerState)
+                if (viewerState)
                 {
                     m_viewergodlevel = m_rightsGodLevel;
                     m_godlevel = m_rightsGodLevel;
@@ -211,13 +198,13 @@ namespace OpenSim.Region.Framework.Scenes
 
         public void SyncViewerState()
         {
-            if(m_lastLevelToViewer == m_viewergodlevel)
+            if (m_lastLevelToViewer == m_viewergodlevel)
                 return;
 
             m_lastLevelToViewer = m_viewergodlevel;
 
-            if(m_scenePresence.IsChildAgent)
-                return;            
+            if (m_scenePresence.IsChildAgent)
+                return;
 
             m_scenePresence.ControllingClient.SendAdminResponse(UUID.Zero, (uint)m_viewergodlevel);
         }
@@ -226,14 +213,14 @@ namespace OpenSim.Region.Framework.Scenes
         {
             UpdateGodLevels(god);
 
-            if(m_lastLevelToViewer != m_viewergodlevel)
+            if (m_lastLevelToViewer != m_viewergodlevel)
             {
                 m_scenePresence.ControllingClient.SendAdminResponse(UUID.Zero, (uint)m_viewergodlevel);
                 m_lastLevelToViewer = m_viewergodlevel;
             }
         }
 
-       public OSD State()
+        public OSD State()
         {
             OSDMap godMap = new OSDMap(2);
             bool m_viewerUiIsGod = m_viewergodlevel >= 200;
@@ -245,23 +232,23 @@ namespace OpenSim.Region.Framework.Scenes
         public void SetState(OSD state)
         {
             bool newstate = false;
-            if(m_forceGodModeAlwaysOn)
+            if (m_forceGodModeAlwaysOn)
                 newstate = m_viewergodlevel >= 200;
-            if(state != null)
+            if (state != null)
             {
                 OSDMap s = (OSDMap)state;
 
                 if (s.ContainsKey("ViewerUiIsGod"))
                     newstate = s["ViewerUiIsGod"].AsBoolean();
                 m_lastLevelToViewer = m_viewergodlevel; // we are not changing viewer level by default
-            }       
+            }
             UpdateGodLevels(newstate);
         }
 
         public void HasMovedAway()
         {
             m_lastLevelToViewer = 0;
-            if(m_forceGodModeAlwaysOn)
+            if (m_forceGodModeAlwaysOn)
             {
                 m_viewergodlevel = m_rightsGodLevel;
                 m_godlevel = m_rightsGodLevel;

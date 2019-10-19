@@ -25,10 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
 using NUnit.Framework;
 using OpenSim.Tests.Common;
-using OpenSim.Region.ScriptEngine.Shared;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Tests
 {
@@ -94,7 +93,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
 
             foreach (KeyValuePair<double, string> number in m_doubleStringSet)
             {
-                testString = (LSL_Types.LSLString) new LSL_Types.LSLFloat(number.Key);
+                testString = (LSL_Types.LSLString)new LSL_Types.LSLFloat(number.Key);
                 Assert.AreEqual(number.Value, testString.m_string);
             }
         }
@@ -111,8 +110,8 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
             LSL_Types.LSLString quaternionLSLString = new LSL_Types.LSLString(quaternionString);
 
             LSL_Types.Quaternion expectedQuaternion = new LSL_Types.Quaternion(0.0, 0.70711, 0.0, 0.70711);
-            LSL_Types.Quaternion stringQuaternion = (LSL_Types.Quaternion) quaternionString;
-            LSL_Types.Quaternion LSLStringQuaternion = (LSL_Types.Quaternion) quaternionLSLString;
+            LSL_Types.Quaternion stringQuaternion = (LSL_Types.Quaternion)quaternionString;
+            LSL_Types.Quaternion LSLStringQuaternion = (LSL_Types.Quaternion)quaternionLSLString;
 
             Assert.AreEqual(expectedQuaternion, stringQuaternion);
             Assert.AreEqual(expectedQuaternion, LSLStringQuaternion);
@@ -128,16 +127,16 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
 
             LSL_Types.LSLString testString;
 
-            testString = (LSL_Types.LSLString) (1 == 0);
+            testString = (LSL_Types.LSLString)(1 == 0);
             Assert.AreEqual("0", testString.m_string);
 
-            testString = (LSL_Types.LSLString) (1 == 1);
+            testString = (LSL_Types.LSLString)(1 == 1);
             Assert.AreEqual("1", testString.m_string);
 
-            testString = (LSL_Types.LSLString) false;
+            testString = (LSL_Types.LSLString)false;
             Assert.AreEqual("0", testString.m_string);
 
-            testString = (LSL_Types.LSLString) true;
+            testString = (LSL_Types.LSLString)true;
             Assert.AreEqual("1", testString.m_string);
         }
     }

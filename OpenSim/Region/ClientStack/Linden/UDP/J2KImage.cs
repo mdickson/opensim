@@ -25,14 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
+using log4net;
 using OpenMetaverse;
 using OpenMetaverse.Imaging;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Services.Interfaces;
-using log4net;
+using System;
 using System.Reflection;
 
 namespace OpenSim.Region.ClientStack.LindenUDP
@@ -148,9 +147,9 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             {
                 if (!m_assetRequested || DateTime.UtcNow.Ticks > AssetRequestTime + ASSET_REQUEST_TIMEOUT)
                 {
-//                    m_log.DebugFormat(
-//                        "[J2KIMAGE]: Requesting asset {0} from request in packet {1}, already requested? {2}, due to timeout? {3}",
-//                        TextureID, LastSequence, m_assetRequested, DateTime.UtcNow.Ticks > AssetRequestTime + ASSET_REQUEST_TIMEOUT);
+                    //                    m_log.DebugFormat(
+                    //                        "[J2KIMAGE]: Requesting asset {0} from request in packet {1}, already requested? {2}, due to timeout? {3}",
+                    //                        TextureID, LastSequence, m_assetRequested, DateTime.UtcNow.Ticks > AssetRequestTime + ASSET_REQUEST_TIMEOUT);
 
                     m_assetRequested = true;
                     AssetRequestTime = DateTime.UtcNow.Ticks;
@@ -168,7 +167,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         //Request decode
                         m_decodeRequested = true;
 
-//                        m_log.DebugFormat("[J2KIMAGE]: Requesting decode of asset {0}", TextureID);
+                        //                        m_log.DebugFormat("[J2KIMAGE]: Requesting decode of asset {0}", TextureID);
 
                         // Do we have a jpeg decoder?
                         if (J2KDecoder != null)
@@ -408,8 +407,8 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
         private void AssetReceived(string id, Object sender, AssetBase asset)
         {
-//            m_log.DebugFormat(
-//                "[J2KIMAGE]: Received asset {0} ({1} bytes)", id, asset != null ? asset.Data.Length.ToString() : "n/a");
+            //            m_log.DebugFormat(
+            //                "[J2KIMAGE]: Received asset {0} ({1} bytes)", id, asset != null ? asset.Data.Length.ToString() : "n/a");
 
             UUID assetID = UUID.Zero;
             if (asset != null)
@@ -429,7 +428,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                     if (!assetServerURL.EndsWith("/") && !assetServerURL.EndsWith("="))
                         assetServerURL = assetServerURL + "/";
 
-//                    m_log.DebugFormat("[J2KIMAGE]: texture {0} not found in local asset storage. Trying user's storage.", assetServerURL + id);
+                    //                    m_log.DebugFormat("[J2KIMAGE]: texture {0} not found in local asset storage. Trying user's storage.", assetServerURL + id);
                     AssetService.Get(assetServerURL + id, InventoryAccessModule, AssetReceived);
                     return;
                 }

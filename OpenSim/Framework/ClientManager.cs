@@ -25,10 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using OpenMetaverse;
 
 namespace OpenSim.Framework
 {
@@ -55,7 +55,7 @@ namespace OpenSim.Framework
         {
             get
             {
-                lock (m_syncRoot) 
+                lock (m_syncRoot)
                     return m_dict1.Count;
             }
         }

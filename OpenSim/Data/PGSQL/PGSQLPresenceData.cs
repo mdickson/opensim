@@ -25,15 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Reflection;
-using System.Threading;
-using log4net;
-using OpenMetaverse;
-using OpenSim.Framework;
 using Npgsql;
+using OpenMetaverse;
+using System;
 
 namespace OpenSim.Data.PGSQL
 {
@@ -43,7 +37,7 @@ namespace OpenSim.Data.PGSQL
     public class PGSQLPresenceData : PGSQLGenericTableHandler<PresenceData>,
             IPresenceData
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public PGSQLPresenceData(string connectionString, string realm) :
                 base(connectionString, realm, "Presence")
@@ -107,7 +101,7 @@ namespace OpenSim.Data.PGSQL
             if (ret.Length == 0)
                 return false;
 
-            if(ret[0].UserID != agentId.ToString())
+            if (ret[0].UserID != agentId.ToString())
                 return false;
 
             return true;

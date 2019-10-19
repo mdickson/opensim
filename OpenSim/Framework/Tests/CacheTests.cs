@@ -25,10 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Tests.Common;
+using System;
 
 namespace OpenSim.Framework.Tests
 {
@@ -41,9 +41,9 @@ namespace OpenSim.Framework.Tests
         public void Build()
         {
             cache = new Cache();
-            cache = new Cache(CacheMedium.Memory,CacheStrategy.Aggressive,CacheFlags.AllowUpdate);
+            cache = new Cache(CacheMedium.Memory, CacheStrategy.Aggressive, CacheFlags.AllowUpdate);
             cacheItemUUID = UUID.Random();
-            MemoryCacheItem cachedItem = new MemoryCacheItem(cacheItemUUID.ToString(),DateTime.Now + TimeSpan.FromDays(1));
+            MemoryCacheItem cachedItem = new MemoryCacheItem(cacheItemUUID.ToString(), DateTime.Now + TimeSpan.FromDays(1));
             byte[] foo = new byte[1];
             foo[0] = 255;
             cachedItem.Store(foo);
@@ -53,7 +53,7 @@ namespace OpenSim.Framework.Tests
         public void TestRetreive()
         {
             CacheItemBase citem = (CacheItemBase)cache.Get(cacheItemUUID.ToString());
-            byte[] data = (byte[]) citem.Retrieve();
+            byte[] data = (byte[])citem.Retrieve();
             Assert.That(data.Length == 1, "Cached Item should have one byte element");
             Assert.That(data[0] == 255, "Cached Item element should be 255");
         }

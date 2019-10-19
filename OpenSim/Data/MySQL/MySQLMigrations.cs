@@ -25,15 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
-using System.IO;
-using System.Reflection;
-using System.Text.RegularExpressions;
-using log4net;
 using MySql.Data.MySqlClient;
+using System;
+using System.Data.Common;
+using System.Reflection;
 
 namespace OpenSim.Data.MySQL
 {
@@ -71,7 +66,7 @@ namespace OpenSim.Data.MySQL
                 foreach (string sql in script)
                 {
                     scr.Query = sql;
-                    scr.Error += delegate(object sender, MySqlScriptErrorEventArgs args)
+                    scr.Error += delegate (object sender, MySqlScriptErrorEventArgs args)
                     {
                         throw new Exception(sql);
                     };

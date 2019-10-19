@@ -25,11 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using OpenSim.Framework;
 using OpenMetaverse;
+using OpenSim.Framework;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Inventory
 {
@@ -47,11 +45,11 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Inventory
 
         public void RemoveAll(UUID userID)
         {
-            if(m_RootFolders.Contains(userID))
+            if (m_RootFolders.Contains(userID))
                 m_RootFolders.Remove(userID);
-            if(m_FolderTypes.Contains(userID))
+            if (m_FolderTypes.Contains(userID))
                 m_FolderTypes.Remove(userID);
-            if(m_Inventories.Contains(userID))
+            if (m_Inventories.Contains(userID))
                 m_Inventories.Remove(userID);
         }
 
@@ -119,11 +117,11 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Inventory
                 c = new InventoryCollection();
                 c.OwnerID = userID;
 
-                c.Folders = inv.Folders.FindAll(delegate(InventoryFolderBase f)
+                c.Folders = inv.Folders.FindAll(delegate (InventoryFolderBase f)
                 {
                     return f.ParentID == folderID;
                 });
-                c.Items = inv.Items.FindAll(delegate(InventoryItemBase i)
+                c.Items = inv.Items.FindAll(delegate (InventoryItemBase i)
                 {
                     return i.Folder == folderID;
                 });
@@ -137,7 +135,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Inventory
             InventoryCollection inv = null;
             if (m_Inventories.TryGetValue(userID, out inv))
             {
-                List<InventoryItemBase> items = inv.Items.FindAll(delegate(InventoryItemBase i)
+                List<InventoryItemBase> items = inv.Items.FindAll(delegate (InventoryItemBase i)
                 {
                     return i.Folder == folderID;
                 });

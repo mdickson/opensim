@@ -25,9 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Framework;
@@ -47,7 +44,7 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
         public void TestSetAppearance()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID userId = TestHelpers.ParseTail(0x1);
             UUID bakedTextureID = TestHelpers.ParseTail(0x2);
@@ -105,7 +102,7 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
         public void TestSetAppearanceAlphaBakedTextures()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID userId = TestHelpers.ParseTail(0x1);
             UUID alphaTextureID = new UUID("3a367d1c-bef1-6d43-7595-e88c1e3aadb3");
@@ -150,7 +147,7 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
         public void TestSaveBakedTextures()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             UUID userId = TestHelpers.ParseTail(0x1);
             UUID eyesTextureId = TestHelpers.ParseTail(0x2);
@@ -183,7 +180,7 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
 
             afm.SetAppearance(sp, bakedTextureEntry, visualParams, new WearableCacheItem[0]);
             afm.SaveBakedTextures(userId);
-//            Dictionary<BakeType, Primitive.TextureEntryFace> bakedTextures = afm.GetBakedTextureFaces(userId);
+            //            Dictionary<BakeType, Primitive.TextureEntryFace> bakedTextures = afm.GetBakedTextureFaces(userId);
 
             // We should also inpsect the asset data store layer directly, but this is difficult to get at right now.
             assetCache.Clear();

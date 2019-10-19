@@ -25,27 +25,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using Nini.Config;
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net;
-using System.Reflection;
-
-using Nini.Config;
-using log4net;
 
 namespace OpenSim.Framework.ServiceAuth
 {
     public class BasicHttpAuthentication : IServiceAuth
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public string Name { get { return "BasicHttp"; } }
 
         private string m_Username, m_Password;
         private string m_CredentialsB64;
 
-//        private string remove_me;
+        //        private string remove_me;
 
         public string Credentials
         {
@@ -54,14 +50,14 @@ namespace OpenSim.Framework.ServiceAuth
 
         public BasicHttpAuthentication(IConfigSource config, string section)
         {
-//            remove_me = section;
+            //            remove_me = section;
             m_Username = Util.GetConfigVarFromSections<string>(config, "HttpAuthUsername", new string[] { "Network", section }, string.Empty);
             m_Password = Util.GetConfigVarFromSections<string>(config, "HttpAuthPassword", new string[] { "Network", section }, string.Empty);
             string str = m_Username + ":" + m_Password;
             byte[] encData_byte = Util.UTF8.GetBytes(str);
 
             m_CredentialsB64 = Convert.ToBase64String(encData_byte);
-//            m_log.DebugFormat("[HTTP BASIC AUTH]: {0} {1} [{2}]", m_Username, m_Password, section);
+            //            m_log.DebugFormat("[HTTP BASIC AUTH]: {0} {1} [{2}]", m_Username, m_Password, section);
         }
 
         public void AddAuthorization(NameValueCollection headers)
@@ -87,7 +83,7 @@ namespace OpenSim.Framework.ServiceAuth
 
         public bool Authenticate(NameValueCollection requestHeaders, AddHeaderDelegate d, out HttpStatusCode statusCode)
         {
-//            m_log.DebugFormat("[HTTP BASIC AUTH]: Authenticate in {0}", "BasicHttpAuthentication");
+            //            m_log.DebugFormat("[HTTP BASIC AUTH]: Authenticate in {0}", "BasicHttpAuthentication");
 
             string value = requestHeaders.Get("Authorization");
             if (value != null)

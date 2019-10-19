@@ -24,22 +24,17 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Client;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using Mono.Addins;
-
-using OpenSim.Server.Base;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
 {
@@ -84,7 +79,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
             }
 
             IMuteListService srv = scene.RequestModuleInterface<IMuteListService>();
-            if(srv == null)
+            if (srv == null)
             {
                 m_log.ErrorFormat("[MuteListModule]: MuteListService not available in region {0}. Module Disabled", scene.Name);
                 m_Enabled = false;
@@ -93,10 +88,10 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
 
             lock (m_SceneList)
             {
-                if(m_service == null)
+                if (m_service == null)
                     m_service = srv;
-                if(m_userManagementModule == null)
-                     m_userManagementModule = scene.RequestModuleInterface<IUserManagement>();
+                if (m_userManagementModule == null)
+                    m_userManagementModule = scene.RequestModuleInterface<IUserManagement>();
                 m_SceneList.Add(scene);
                 scene.EventManager.OnNewClient += OnNewClient;
             }
@@ -106,7 +101,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
         {
             lock (m_SceneList)
             {
-                if(m_SceneList.Contains(scene))
+                if (m_SceneList.Contains(scene))
                 {
                     m_SceneList.Remove(scene);
                     scene.EventManager.OnNewClient -= OnNewClient;
@@ -138,7 +133,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
 
         private bool IsForeign(IClientAPI client)
         {
-            if(m_userManagementModule == null)
+            if (m_userManagementModule == null)
                 return false; // we can't check
 
             return !m_userManagementModule.IsLocalGridUser(client.AgentId);
@@ -155,7 +150,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
         {
             if (!m_Enabled || IsForeign(client))
             {
-                if(crc == 0)
+                if (crc == 0)
                     client.SendEmpytMuteList();
                 else
                     client.SendUseCachedMuteList();
@@ -165,7 +160,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
             IXfer xfer = client.Scene.RequestModuleInterface<IXfer>();
             if (xfer == null)
             {
-                if(crc == 0)
+                if (crc == 0)
                     client.SendEmpytMuteList();
                 else
                     client.SendUseCachedMuteList();
@@ -175,7 +170,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
             Byte[] data = m_service.MuteListRequest(client.AgentId, crc);
             if (data == null)
             {
-                if(crc == 0)
+                if (crc == 0)
                     client.SendEmpytMuteList();
                 else
                     client.SendUseCachedMuteList();
@@ -190,7 +185,7 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
 
             if (data.Length == 1)
             {
-                if(crc == 0)
+                if (crc == 0)
                     client.SendEmpytMuteList();
                 else
                     client.SendUseCachedMuteList();
@@ -208,11 +203,11 @@ namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
                 return;
 
             UUID agentID = client.AgentId;
-            if(muteType == 1) // agent
+            if (muteType == 1) // agent
             {
-                if(agentID == muteID)
+                if (agentID == muteID)
                     return;
-                if(m_SceneList[0].Permissions.IsAdministrator(muteID))
+                if (m_SceneList[0].Permissions.IsAdministrator(muteID))
                 {
                     OnMuteListRequest(client, 0);
                     return;

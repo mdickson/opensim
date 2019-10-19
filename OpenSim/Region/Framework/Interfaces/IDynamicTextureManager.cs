@@ -25,10 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using System;
 using System.Drawing;
-using System.IO;
-using OpenMetaverse;
 
 namespace OpenSim.Region.Framework.Interfaces
 {
@@ -117,16 +116,16 @@ namespace OpenSim.Region.Framework.Interfaces
         string GetContentType();
         bool SupportsAsynchronous();
 
-//        /// <summary>
-//        /// Return true if converting the input body and extra params data will always result in the same byte[] array
-//        /// </summary>
-//        /// <remarks>
-//        /// This method allows the caller to use a previously generated asset if it has one.
-//        /// </remarks>
-//        /// <returns></returns>
-//        /// <param name='bodyData'></param>
-//        /// <param name='extraParams'></param>
-//        bool AlwaysIdenticalConversion(string bodyData, string extraParams);
+        //        /// <summary>
+        //        /// Return true if converting the input body and extra params data will always result in the same byte[] array
+        //        /// </summary>
+        //        /// <remarks>
+        //        /// This method allows the caller to use a previously generated asset if it has one.
+        //        /// </remarks>
+        //        /// <returns></returns>
+        //        /// <param name='bodyData'></param>
+        //        /// <param name='extraParams'></param>
+        //        bool AlwaysIdenticalConversion(string bodyData, string extraParams);
 
         IDynamicTexture ConvertUrl(string url, string extraParams);
         IDynamicTexture ConvertData(string bodyData, string extraParams);

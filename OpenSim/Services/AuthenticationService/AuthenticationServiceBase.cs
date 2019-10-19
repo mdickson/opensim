@@ -25,16 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using OpenMetaverse;
 using log4net;
 using Nini.Config;
-using System.Reflection;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
+using OpenMetaverse;
 using OpenSim.Data;
 using OpenSim.Framework;
 using OpenSim.Services.Base;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Services.AuthenticationService
 {
@@ -94,7 +93,7 @@ namespace OpenSim.Services.AuthenticationService
                 throw new Exception("No StorageProvider configured");
 
             m_Database = LoadPlugin<IAuthenticationData>(dllName,
-                    new Object[] {connString, realm});
+                    new Object[] { connString, realm });
             if (m_Database == null)
                 throw new Exception(string.Format("Could not find a storage interface in module {0}", dllName));
         }
@@ -147,13 +146,13 @@ namespace OpenSim.Services.AuthenticationService
             {
                 AuthInfo info
                     = new AuthInfo()
-                        {
-                            PrincipalID = data.PrincipalID,
-                            AccountType = data.Data["accountType"] as string,
-                            PasswordHash = data.Data["passwordHash"] as string,
-                            PasswordSalt = data.Data["passwordSalt"] as string,
-                            WebLoginKey = data.Data["webLoginKey"] as string
-                        };
+                    {
+                        PrincipalID = data.PrincipalID,
+                        AccountType = data.Data["accountType"] as string,
+                        PasswordHash = data.Data["passwordHash"] as string,
+                        PasswordSalt = data.Data["passwordSalt"] as string,
+                        WebLoginKey = data.Data["webLoginKey"] as string
+                    };
 
                 return info;
             }

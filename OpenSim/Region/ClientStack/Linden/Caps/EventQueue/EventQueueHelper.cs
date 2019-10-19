@@ -25,21 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Text;
-using System.Net;
 using OpenMetaverse;
 using OpenMetaverse.Packets;
 using OpenMetaverse.StructuredData;
-using OpenMetaverse.Messages.Linden;
-
 using OpenSim.Framework;
+using System;
+using System.Text;
 
 namespace OpenSim.Region.ClientStack.Linden
 {
     public class EventQueueHelper
     {
-        private EventQueueHelper() {} // no construction possible, it's an utility class
+        private EventQueueHelper() { } // no construction possible, it's an utility class
 
         public static StringBuilder StartEvent(string eventName)
         {
@@ -113,33 +110,33 @@ namespace OpenSim.Region.ClientStack.Linden
             messageParams.Add("ttl", new OSDInteger((int)ttl));
             messageParams.Add("from_id", new OSDUUID(fromAgent));
             messageParams.Add("from_group", new OSDInteger(fromGroup ? 1 : 0));
-/*
-            StringBuilder sb = new StringBuilder(256);
-            LLSDxmlEncode.AddMap(sb); //messageParams
+            /*
+                        StringBuilder sb = new StringBuilder(256);
+                        LLSDxmlEncode.AddMap(sb); //messageParams
 
-            LLSDxmlEncode.AddElem("type", dialog, sb);
-            LLSDxmlEncode.AddElem("position", position, sb);
-            LLSDxmlEncode.AddElem("region_id", UUID.Zero, sb);
-            LLSDxmlEncode.AddElem("to_id", toAgent, sb);
-            LLSDxmlEncode.AddElem("source", 0, sb);
+                        LLSDxmlEncode.AddElem("type", dialog, sb);
+                        LLSDxmlEncode.AddElem("position", position, sb);
+                        LLSDxmlEncode.AddElem("region_id", UUID.Zero, sb);
+                        LLSDxmlEncode.AddElem("to_id", toAgent, sb);
+                        LLSDxmlEncode.AddElem("source", 0, sb);
 
-            LLSDxmlEncode.AddMap("data", sb); //messageParams data
-            LLSDxmlEncode.AddElem("binary_bucket", binaryBucket, sb);
-            LLSDxmlEncode.AddEndMap(sb); //messageParams data
+                        LLSDxmlEncode.AddMap("data", sb); //messageParams data
+                        LLSDxmlEncode.AddElem("binary_bucket", binaryBucket, sb);
+                        LLSDxmlEncode.AddEndMap(sb); //messageParams data
 
-            LLSDxmlEncode.AddElem("message", message, sb);
-            LLSDxmlEncode.AddElem("id", transactionID, sb);
-            LLSDxmlEncode.AddElem("from_name", fromName, sb);
-            LLSDxmlEncode.AddElem("timestamp", timeStamp, sb);
-            LLSDxmlEncode.AddElem("offline", (offline ? 1 : 0), sb);
-            LLSDxmlEncode.AddElem("parent_estate_id", parentEstateID, sb);
-            LLSDxmlEncode.AddElem("ttl", (int)ttl, sb);
-            LLSDxmlEncode.AddElem("from_id", fromAgent, sb);
-            LLSDxmlEncode.AddElem("from_group",fromGroup, sb);
+                        LLSDxmlEncode.AddElem("message", message, sb);
+                        LLSDxmlEncode.AddElem("id", transactionID, sb);
+                        LLSDxmlEncode.AddElem("from_name", fromName, sb);
+                        LLSDxmlEncode.AddElem("timestamp", timeStamp, sb);
+                        LLSDxmlEncode.AddElem("offline", (offline ? 1 : 0), sb);
+                        LLSDxmlEncode.AddElem("parent_estate_id", parentEstateID, sb);
+                        LLSDxmlEncode.AddElem("ttl", (int)ttl, sb);
+                        LLSDxmlEncode.AddElem("from_id", fromAgent, sb);
+                        LLSDxmlEncode.AddElem("from_group",fromGroup, sb);
 
-            LLSDxmlEncode.AddEndMap(sb); //messageParams
-            string tt = sb.ToString();
-*/
+                        LLSDxmlEncode.AddEndMap(sb); //messageParams
+                        string tt = sb.ToString();
+            */
             return messageParams;
         }
 
@@ -196,10 +193,10 @@ namespace OpenSim.Region.ClientStack.Linden
             infoDetail.Add("mutes", mutes);
             OSDMap info = new OSDMap();
             info.Add("info", infoDetail);
-            if(isEnterorLeave)
-                info.Add("transition",OSD.FromString("ENTER"));
+            if (isEnterorLeave)
+                info.Add("transition", OSD.FromString("ENTER"));
             else
-                info.Add("transition",OSD.FromString("LEAVE"));
+                info.Add("transition", OSD.FromString("LEAVE"));
             agentUpdates.Add(agentID.ToString(), info);
 
             // foreach end

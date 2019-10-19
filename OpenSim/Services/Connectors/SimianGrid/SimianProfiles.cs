@@ -25,10 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -39,6 +35,10 @@ using OpenSim.Framework.Client;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Reflection;
 
 namespace OpenSim.Services.Connectors.SimianGrid
 {
@@ -283,7 +283,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
 
         private void RequestAvatarPropertiesHandler(IClientAPI client, UUID avatarID)
         {
-            m_log.DebugFormat("[SIMIAN PROFILES]: Request avatar properties for {0}",avatarID);
+            m_log.DebugFormat("[SIMIAN PROFILES]: Request avatar properties for {0}", avatarID);
 
             OSDMap user = FetchUserData(avatarID);
 
@@ -454,7 +454,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
 
         private OSDMap FetchUserData(UUID userID)
         {
-            m_log.DebugFormat("[SIMIAN PROFILES]: Fetch information about {0}",userID);
+            m_log.DebugFormat("[SIMIAN PROFILES]: Fetch information about {0}", userID);
 
             NameValueCollection requestArgs = new NameValueCollection
             {

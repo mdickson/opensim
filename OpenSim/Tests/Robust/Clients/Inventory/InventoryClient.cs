@@ -25,18 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-
-using OpenMetaverse;
 using NUnit.Framework;
-
+using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Services.Interfaces;
 using OpenSim.Services.Connectors;
-
 using OpenSim.Tests.Common;
 
 namespace Robust.Tests
@@ -44,9 +36,9 @@ namespace Robust.Tests
     [TestFixture]
     public class InventoryClient
     {
-//        private static readonly ILog m_log =
-//                LogManager.GetLogger(
-//                MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log =
+        //                LogManager.GetLogger(
+        //                MethodBase.GetCurrentMethod().DeclaringType);
 
         private UUID m_userID = new UUID("00000000-0000-0000-0000-333333333333");
         private UUID m_rootFolderID;

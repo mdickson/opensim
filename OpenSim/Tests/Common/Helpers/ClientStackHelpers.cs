@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Net;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.Packets;
 using OpenSim.Framework;
 using OpenSim.Region.ClientStack.LindenUDP;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Net;
 
 namespace OpenSim.Tests.Common
 {

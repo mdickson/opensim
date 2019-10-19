@@ -25,13 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Text;
-using System.Net;
 using OpenMetaverse;
-using OpenMetaverse.Packets;
-using OpenMetaverse.Messages.Linden;
 using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
+using System.Net;
+using System.Text;
 
 namespace OpenSim.Region.Framework.Interfaces
 {
@@ -40,7 +38,7 @@ namespace OpenSim.Region.Framework.Interfaces
         bool Enqueue(OSD o, UUID avatarID);
 
         // These are required to decouple Scenes from EventQueueHelper
-//        void DisableSimulator(ulong handle, UUID avatarID);
+        //        void DisableSimulator(ulong handle, UUID avatarID);
         void EnableSimulator(ulong handle, IPEndPoint endPoint, UUID avatarID, int regionSizeX, int regionSizeY);
         void EstablishAgentCommunication(UUID avatarID, IPEndPoint endPoint,
                                          string capsPath, ulong regionHandle, int regionSizeX, int regionSizeY);

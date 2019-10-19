@@ -25,28 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Timers;
-using Timer = System.Timers.Timer;
-using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
-using OpenSim.Framework;
 using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Region.ClientStack.Linden;
 using OpenSim.Region.CoreModules.Framework;
-using OpenSim.Region.CoreModules.Framework.EntityTransfer;
-using OpenSim.Region.CoreModules.World.Serialiser;
-using OpenSim.Region.CoreModules.ServiceConnectorsOut.Simulation;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Tests.Common;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Region.Framework.Scenes.Tests
 {
@@ -57,7 +41,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public void TestChildAgentSingleRegionCapabilities()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID spUuid = TestHelpers.ParseTail(0x1);
 
@@ -77,10 +61,10 @@ namespace OpenSim.Region.Framework.Scenes.Tests
 
             // TODO: Need to add tests for other ICapabiltiesModule methods.
 
-//            scene.IncomingCloseAgent(sp.UUID, false);
-//            //Assert.That(capsMod.GetCapsForUser(spUuid), Is.Null);
+            //            scene.IncomingCloseAgent(sp.UUID, false);
+            //            //Assert.That(capsMod.GetCapsForUser(spUuid), Is.Null);
             scene.CloseAgent(sp.UUID, false);
-//            Assert.That(capsMod.GetCapsForUser(spUuid), Is.Null);
+            //            Assert.That(capsMod.GetCapsForUser(spUuid), Is.Null);
 
             // TODO: Need to add tests for other ICapabiltiesModule methods.
         }

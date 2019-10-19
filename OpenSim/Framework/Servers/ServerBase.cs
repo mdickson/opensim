@@ -25,6 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using log4net.Appender;
+using log4net.Core;
+using log4net.Repository;
+using Nini.Config;
+using OpenSim.Framework.Console;
+using OpenSim.Framework.Monitoring;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -35,13 +42,6 @@ using System.Runtime;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using log4net;
-using log4net.Appender;
-using log4net.Core;
-using log4net.Repository;
-using Nini.Config;
-using OpenSim.Framework.Console;
-using OpenSim.Framework.Monitoring;
 
 namespace OpenSim.Framework.Servers
 {
@@ -275,13 +275,13 @@ namespace OpenSim.Framework.Servers
                 "Show thread status.  Synonym for \"show threads\"",
                 (string module, string[] args) => Notice(GetThreadsReport()));
 
-            m_console.Commands.AddCommand (
+            m_console.Commands.AddCommand(
                 "Debug", false, "debug threadpool set",
                 "debug threadpool set worker|iocp min|max <n>",
                 "Set threadpool parameters.  For debug purposes.",
                 HandleDebugThreadpoolSet);
 
-            m_console.Commands.AddCommand (
+            m_console.Commands.AddCommand(
                 "Debug", false, "debug threadpool status",
                 "debug threadpool status",
                 "Show current debug threadpool parameters.",
@@ -298,11 +298,11 @@ namespace OpenSim.Framework.Servers
                     + "  3 = full stack trace, including common threads\n",
                 HandleDebugThreadpoolLevel);
 
-//            m_console.Commands.AddCommand(
-//                "Debug", false, "show threadpool calls active",
-//                "show threadpool calls active",
-//                "Show details about threadpool calls that are still active (currently waiting or in progress)",
-//                HandleShowThreadpoolCallsActive);
+            //            m_console.Commands.AddCommand(
+            //                "Debug", false, "show threadpool calls active",
+            //                "show threadpool calls active",
+            //                "Show details about threadpool calls that are still active (currently waiting or in progress)",
+            //                HandleShowThreadpoolCallsActive);
 
             m_console.Commands.AddCommand(
                 "Debug", false, "show threadpool calls complete",
@@ -332,7 +332,7 @@ namespace OpenSim.Framework.Servers
 
         public void RegisterCommonComponents(IConfigSource configSource)
         {
-//            IConfig networkConfig = configSource.Configs["Network"];
+            //            IConfig networkConfig = configSource.Configs["Network"];
 
             m_serverStatsCollector = new ServerStatsCollector();
             m_serverStatsCollector.Initialise(configSource);
@@ -600,7 +600,7 @@ namespace OpenSim.Framework.Servers
                             IConfig config = Config.Configs[cmdparams[1]];
                             if (config == null)
                             {
-                                Notice("Section \"{0}\" does not exist.",cmdparams[1]);
+                                Notice("Section \"{0}\" does not exist.", cmdparams[1]);
                                 break;
                             }
                             else
@@ -782,26 +782,26 @@ namespace OpenSim.Framework.Servers
             }
             else if (File.Exists(gitRefPointerPath))
             {
-//                m_log.DebugFormat("[SERVER BASE]: Found {0}", gitRefPointerPath);
+                //                m_log.DebugFormat("[SERVER BASE]: Found {0}", gitRefPointerPath);
 
                 string rawPointer = "";
 
                 using (StreamReader pointerFile = File.OpenText(gitRefPointerPath))
                     rawPointer = pointerFile.ReadLine();
 
-//                m_log.DebugFormat("[SERVER BASE]: rawPointer [{0}]", rawPointer);
+                //                m_log.DebugFormat("[SERVER BASE]: rawPointer [{0}]", rawPointer);
 
                 Match m = Regex.Match(rawPointer, "^ref: (.+)$");
 
                 if (m.Success)
                 {
-//                    m_log.DebugFormat("[SERVER BASE]: Matched [{0}]", m.Groups[1].Value);
+                    //                    m_log.DebugFormat("[SERVER BASE]: Matched [{0}]", m.Groups[1].Value);
 
                     string gitRef = m.Groups[1].Value;
                     string gitRefPath = gitDir + gitRef;
                     if (File.Exists(gitRefPath))
                     {
-//                        m_log.DebugFormat("[SERVER BASE]: Found gitRefPath [{0}]", gitRefPath);
+                        //                        m_log.DebugFormat("[SERVER BASE]: Found gitRefPath [{0}]", gitRefPath);
 
                         using (StreamReader refFile = File.OpenText(gitRefPath))
                         {
@@ -831,7 +831,7 @@ namespace OpenSim.Framework.Servers
                         // using the dir svn revision at the top of entries file
                         strcmp = String.Compare(inputLine, "dir");
                         if (strcmp == 0)
-                       {
+                        {
                             buildVersion = EntriesFile.ReadLine();
                             break;
                         }
@@ -956,7 +956,7 @@ namespace OpenSim.Framework.Servers
                     waitingCallbacks = stpi.WaitingCallbacks;
                 }
             }
- 
+
             if (threadPoolUsed != null)
             {
                 sb.Append("\nThreadpool (excluding script engine pools)\n");
@@ -1032,6 +1032,6 @@ namespace OpenSim.Framework.Servers
         /// <summary>
         /// Should be overriden and referenced by descendents if they need to perform extra shutdown processing
         /// </summary>
-        protected virtual void ShutdownSpecific() {}
+        protected virtual void ShutdownSpecific() { }
     }
 }

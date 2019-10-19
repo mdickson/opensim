@@ -25,10 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
 using OpenMetaverse;
 using OpenSim.Framework;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
 {
@@ -114,9 +113,9 @@ namespace OpenSim.Region.OptionalModules.Avatar.XmlRpcGroups
 
     public class GroupInviteInfo
     {
-        public UUID GroupID  = UUID.Zero;
-        public UUID RoleID   = UUID.Zero;
-        public UUID AgentID  = UUID.Zero;
+        public UUID GroupID = UUID.Zero;
+        public UUID RoleID = UUID.Zero;
+        public UUID AgentID = UUID.Zero;
         public UUID InviteID = UUID.Zero;
     }
 }

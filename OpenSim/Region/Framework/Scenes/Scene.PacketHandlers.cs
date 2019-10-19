@@ -25,13 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using OpenMetaverse;
 using OpenMetaverse.Packets;
 using OpenSim.Framework;
-using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace OpenSim.Region.Framework.Scenes
 {
@@ -77,9 +76,9 @@ namespace OpenSim.Region.Framework.Scenes
             args.From = fromName;
             //args.
 
-//            m_log.DebugFormat(
-//                "[SCENE]: Sending message {0} on channel {1}, type {2} from {3}, broadcast {4}",
-//                args.Message.Replace("\n", "\\n"), args.Channel, args.Type, fromName, broadcast);
+            //            m_log.DebugFormat(
+            //                "[SCENE]: Sending message {0} on channel {1}, type {2} from {3}, broadcast {4}",
+            //                args.Message.Replace("\n", "\\n"), args.Channel, args.Type, fromName, broadcast);
 
             if (broadcast)
                 EventManager.TriggerOnChatBroadcast(this, args);
@@ -157,7 +156,7 @@ namespace OpenSim.Region.Framework.Scenes
             if (part != null)
             {
                 SceneObjectGroup sog = part.ParentGroup;
-                if(!sog.IsDeleted)
+                if (!sog.IsDeleted)
                 {
                     PrimUpdateFlags update = PrimUpdateFlags.FullUpdate;
                     if (sog.RootPart.Shape.MeshFlagEntry)
@@ -179,7 +178,7 @@ namespace OpenSim.Region.Framework.Scenes
         /// <param name="remoteClient"></param>
         public void SelectPrim(List<uint> primIDs, IClientAPI remoteClient)
         {
-            foreach(uint primLocalID in primIDs)
+            foreach (uint primLocalID in primIDs)
             {
                 SceneObjectPart part = GetSceneObjectPart(primLocalID);
 
@@ -192,7 +191,7 @@ namespace OpenSim.Region.Framework.Scenes
 
                 // waste of time because properties do not send prim flags as they should
                 // if a friend got or lost edit rights after login, a full update is needed
-                if(sog.OwnerID != remoteClient.AgentId)
+                if (sog.OwnerID != remoteClient.AgentId)
                     part.SendFullUpdate(remoteClient);
 
                 // A prim is only tainted if it's allowed to be edited by the person clicking it.
@@ -200,7 +199,7 @@ namespace OpenSim.Region.Framework.Scenes
                 {
                     bool oldsel = part.IsSelected;
                     part.IsSelected = true;
-                    if(!oldsel)
+                    if (!oldsel)
                         EventManager.TriggerParcelPrimCountTainted();
                 }
 
@@ -229,9 +228,9 @@ namespace OpenSim.Region.Framework.Scenes
 
                 if (gmd == null)
                 {
-//                    m_log.WarnFormat(
-//                        "[GROUPS]: User {0} is not a member of group {1} so they can't update {2} to this group",
-//                        remoteClient.Name, GroupID, objectLocalID);
+                    //                    m_log.WarnFormat(
+                    //                        "[GROUPS]: User {0} is not a member of group {1} so they can't update {2} to this group",
+                    //                        remoteClient.Name, GroupID, objectLocalID);
 
                     return;
                 }
@@ -338,7 +337,7 @@ namespace OpenSim.Region.Framework.Scenes
                 return;
 
             SceneObjectGroup group = part.ParentGroup;
-            if(group == null || group.IsDeleted)
+            if (group == null || group.IsDeleted)
                 return;
 
             if (Permissions.CanMoveObject(group, remoteClient))
@@ -434,23 +433,23 @@ namespace OpenSim.Region.Framework.Scenes
 
         public virtual void ProcessSpinObjectStop(UUID objectID, IClientAPI remoteClient)
         {
-/* no op for now
-            SceneObjectGroup group = GetGroupByPrim(objectID);
-            if (group != null)
-            {
-                if (Permissions.CanMoveObject(group.UUID, remoteClient.AgentId))// && PermissionsMngr.)
-                {
-//                    group.SpinMovement(rotation, remoteClient);
-                }
-                group.SendGroupTerseUpdate();
-            }
-*/
+            /* no op for now
+                        SceneObjectGroup group = GetGroupByPrim(objectID);
+                        if (group != null)
+                        {
+                            if (Permissions.CanMoveObject(group.UUID, remoteClient.AgentId))// && PermissionsMngr.)
+                            {
+            //                    group.SpinMovement(rotation, remoteClient);
+                            }
+                            group.SendGroupTerseUpdate();
+                        }
+            */
         }
 
         public void ProcessScriptReset(IClientAPI remoteClient, UUID objectID,
                 UUID itemID)
         {
-            SceneObjectPart part=GetSceneObjectPart(objectID);
+            SceneObjectPart part = GetSceneObjectPart(objectID);
             if (part == null)
                 return;
 
@@ -529,9 +528,9 @@ namespace OpenSim.Region.Framework.Scenes
         public void HandleFetchInventoryDescendents(IClientAPI remoteClient, UUID folderID, UUID ownerID,
                                                     bool fetchFolders, bool fetchItems, int sortOrder)
         {
-//            m_log.DebugFormat(
-//                "[USER INVENTORY]: HandleFetchInventoryDescendents() for {0}, folder={1}, fetchFolders={2}, fetchItems={3}, sortOrder={4}",
-//                remoteClient.Name, folderID, fetchFolders, fetchItems, sortOrder);
+            //            m_log.DebugFormat(
+            //                "[USER INVENTORY]: HandleFetchInventoryDescendents() for {0}, folder={1}, fetchFolders={2}, fetchItems={3}, sortOrder={4}",
+            //                remoteClient.Name, folderID, fetchFolders, fetchItems, sortOrder);
 
             if (folderID == UUID.Zero)
                 return;
@@ -654,8 +653,8 @@ namespace OpenSim.Region.Framework.Scenes
         public void HandleUpdateInventoryFolder(IClientAPI remoteClient, UUID folderID, ushort type, string name,
                                                 UUID parentID)
         {
-//            m_log.DebugFormat(
-//                "[AGENT INVENTORY]: Updating inventory folder {0} {1} for {2} {3}", folderID, name, remoteClient.Name, remoteClient.AgentId);
+            //            m_log.DebugFormat(
+            //                "[AGENT INVENTORY]: Updating inventory folder {0} {1} for {2} {3}", folderID, name, remoteClient.Name, remoteClient.AgentId);
 
             InventoryFolderBase folder = InventoryService.GetFolder(remoteClient.AgentId, folderID);
             if (folder != null)
@@ -713,7 +712,7 @@ namespace OpenSim.Region.Framework.Scenes
         {
             InventoryFolderBase folder = new InventoryFolderBase(folderID, userID);
 
-           try
+            try
             {
                 if (InventoryService.PurgeFolder(folder))
                     m_log.DebugFormat("[AGENT INVENTORY]: folder {0} purged successfully", folderID);

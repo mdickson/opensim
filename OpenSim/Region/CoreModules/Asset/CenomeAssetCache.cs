@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.Asset
 {
@@ -212,7 +212,7 @@ namespace OpenSim.Region.CoreModules.Asset
         {
             if (asset != null)
             {
-//                m_log.DebugFormat("[CENOME ASSET CACHE]: Caching asset {0}", asset.ID);
+                //                m_log.DebugFormat("[CENOME ASSET CACHE]: Caching asset {0}", asset.ID);
 
                 long size = asset.Data != null ? asset.Data.Length : 1;
                 m_cache.Set(asset.ID, asset, size);
@@ -272,7 +272,7 @@ namespace OpenSim.Region.CoreModules.Asset
                     "[ASSET CACHE]: Cached = {0}, Get = {1}, Hits = {2}%, Size = {3} bytes, Avg. A. Size = {4} bytes",
                     m_cachedCount,
                     m_getCount,
-                    ((double) m_hitCount / m_getCount) * 100.0,
+                    ((double)m_hitCount / m_getCount) * 100.0,
                     m_cache.Size,
                     m_cache.Size / m_cache.Count);
                 m_getCount = 0;
@@ -280,8 +280,8 @@ namespace OpenSim.Region.CoreModules.Asset
                 m_cachedCount = 0;
             }
 
-//            if (null == assetBase)
-//                m_log.DebugFormat("[CENOME ASSET CACHE]: Asset {0} not in cache", id);
+            //            if (null == assetBase)
+            //                m_log.DebugFormat("[CENOME ASSET CACHE]: Asset {0} not in cache", id);
 
             return true;
         }
@@ -339,7 +339,7 @@ namespace OpenSim.Region.CoreModules.Asset
             m_cache = null;
             m_enabled = false;
 
-            IConfig moduleConfig = source.Configs[ "Modules" ];
+            IConfig moduleConfig = source.Configs["Modules"];
             if (moduleConfig == null)
                 return;
 

@@ -25,10 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using HttpServer;
 using System.IO;
 using System.Net;
 using System.Text;
-using HttpServer;
 
 namespace OpenSim.Framework.Servers.HttpServer
 {
@@ -251,12 +251,12 @@ namespace OpenSim.Framework.Servers.HttpServer
         {
             get
             {
-               return _httpResponse.Chunked;
+                return _httpResponse.Chunked;
             }
 
             set
             {
-               _httpResponse.Chunked = value;
+                _httpResponse.Chunked = value;
             }
         }
 
@@ -295,7 +295,7 @@ namespace OpenSim.Framework.Servers.HttpServer
 
         protected IHttpResponse _httpResponse;
 
-        public OSHttpResponse() {}
+        public OSHttpResponse() { }
 
         public OSHttpResponse(IHttpResponse resp)
         {

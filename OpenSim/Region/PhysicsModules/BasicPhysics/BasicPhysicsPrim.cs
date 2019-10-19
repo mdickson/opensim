@@ -25,9 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.PhysicsModules.SharedBase;
@@ -37,7 +34,7 @@ namespace OpenSim.Region.PhysicsModule.BasicPhysics
     public class BasicPhysicsPrim : PhysicsActor
     {
         private Vector3 _size;
-//        private PrimitiveBaseShape _shape;
+        //        private PrimitiveBaseShape _shape;
 
         public BasicPhysicsPrim(
             string name, uint localId, Vector3 position, Vector3 size, Quaternion orientation, PrimitiveBaseShape shape)
@@ -52,7 +49,7 @@ namespace OpenSim.Region.PhysicsModule.BasicPhysics
 
         public override int PhysicsActorType
         {
-            get { return (int) ActorTypes.Agent; }
+            get { return (int)ActorTypes.Agent; }
             set { return; }
         }
 
@@ -128,16 +125,17 @@ namespace OpenSim.Region.PhysicsModule.BasicPhysics
         public override Vector3 Size
         {
             get { return _size; }
-            set {
-                  _size = value;
-                  _size.Z = _size.Z / 2.0f;
-                }
+            set
+            {
+                _size = value;
+                _size.Z = _size.Z / 2.0f;
+            }
         }
 
         public override PrimitiveBaseShape Shape
         {
-//            set { _shape = value; }
-            set {}
+            //            set { _shape = value; }
+            set { }
         }
 
         public override float Mass

@@ -16,29 +16,31 @@
  * along with OpenSim-MoneyModule-Gloebit.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using MySql.Data.MySqlClient;
+using Npgsql;
+using NpgsqlTypes;
+using OpenMetaverse;  // Necessary for UUID type
+using OpenSim.Data.MySQL;
+using OpenSim.Data.PGSQL;
+using OpenSim.Data.SQLite;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Text;
-using MySql.Data.MySqlClient;
-using Nini.Config;
-using OpenSim.Data.MySQL;
-using OpenSim.Data.PGSQL;
-using OpenSim.Data.SQLite;
-using Npgsql;
-using NpgsqlTypes;
-using OpenMetaverse;  // Necessary for UUID type
 
 
 namespace Gloebit.GloebitMoneyModule
 {
-    class GloebitSubscriptionData {
+    class GloebitSubscriptionData
+    {
 
         private static IGloebitSubscriptionData m_impl;
 
-        public static void Initialise(string storageProvider, string connectionString) {
-            switch(storageProvider) {
+        public static void Initialise(string storageProvider, string connectionString)
+        {
+            switch (storageProvider)
+            {
                 case "OpenSim.Data.SQLite.dll":
                     m_impl = new SQLiteImpl(connectionString);
                     break;
@@ -53,11 +55,13 @@ namespace Gloebit.GloebitMoneyModule
             }
         }
 
-        public static IGloebitSubscriptionData Instance {
+        public static IGloebitSubscriptionData Instance
+        {
             get { return m_impl; }
         }
 
-        public interface IGloebitSubscriptionData {
+        public interface IGloebitSubscriptionData
+        {
             GloebitSubscription[] Get(string field, string key);
 
             GloebitSubscription[] Get(string[] fields, string[] keys);
@@ -67,7 +71,8 @@ namespace Gloebit.GloebitMoneyModule
             bool UpdateFromGloebit(GloebitSubscription subscription);
         }
 
-        private class SQLiteImpl : SQLiteGenericTableHandler<GloebitSubscription>, IGloebitSubscriptionData {
+        private class SQLiteImpl : SQLiteGenericTableHandler<GloebitSubscription>, IGloebitSubscriptionData
+        {
             public SQLiteImpl(string connectionString)
                 : base(connectionString, "GloebitSubscriptions", "GloebitSubscriptionsSQLite")
             {
@@ -75,39 +80,42 @@ namespace Gloebit.GloebitMoneyModule
             /// TODO: Likely need to override Store() function to handle bools, DateTimes and nulls.
             /// Start with SQLiteGenericTableHandler impl and see MySql override below
 
-            public bool UpdateFromGloebit(GloebitSubscription subscription) {
+            public bool UpdateFromGloebit(GloebitSubscription subscription)
+            {
                 // TODO: may need a similar treatment to PGSQL
                 return Store(subscription);
             }
-            
+
         }
 
-        private class MySQLImpl : MySQLGenericTableHandler<GloebitSubscription>, IGloebitSubscriptionData {
+        private class MySQLImpl : MySQLGenericTableHandler<GloebitSubscription>, IGloebitSubscriptionData
+        {
             public MySQLImpl(string connectionString)
                 : base(connectionString, "GloebitSubscriptions", "GloebitSubscriptionsMySQL")
             {
             }
 
-            public bool UpdateFromGloebit(GloebitSubscription subscription) {
+            public bool UpdateFromGloebit(GloebitSubscription subscription)
+            {
                 // Works because MySql usese Replace Into
                 return Store(subscription);
             }
-            
+
             public override bool Store(GloebitSubscription subscription)
             {
                 //            m_log.DebugFormat("[MYSQL GENERIC TABLE HANDLER]: Store(T row) invoked");
-                
+
                 using (MySqlCommand cmd = new MySqlCommand())
                 {
                     string query = "";
                     List<String> names = new List<String>();
                     List<String> values = new List<String>();
-                    
+
                     foreach (FieldInfo fi in m_Fields.Values)
                     {
                         names.Add(fi.Name);
                         values.Add("?" + fi.Name);
-                        
+
                         // Temporarily return more information about what field is unexpectedly null for
                         // http://opensimulator.org/mantis/view.php?id=5403.  This might be due to a bug in the
                         // InventoryTransferModule or we may be required to substitute a DBNull here.
@@ -116,10 +124,10 @@ namespace Gloebit.GloebitMoneyModule
                                                              string.Format(
                                                                            "[MYSQL GENERIC TABLE HANDLER]: Trying to store field {0} for {1} which is unexpectedly null",
                                                                            fi.Name, asset));*/
-                        
+
                         cmd.Parameters.AddWithValue(fi.Name, fi.GetValue(subscription));
                     }
-                    
+
                     /*if (m_DataField != null)
                     {
                         Dictionary<string, string> data =
@@ -132,31 +140,33 @@ namespace Gloebit.GloebitMoneyModule
                             cmd.Parameters.AddWithValue("?" + kvp.Key, kvp.Value);
                         }
                     }*/
-                    
+
                     query = String.Format("replace into {0} (`", m_Realm) + String.Join("`,`", names.ToArray()) + "`) values (" + String.Join(",", values.ToArray()) + ")";
-                    
+
                     cmd.CommandText = query;
-                    
+
                     if (ExecuteNonQuery(cmd) > 0)
                         return true;
-                    
+
                     return false;
                 }
             }
         }
 
-        private class PGSQLImpl : PGSQLGenericTableHandler<GloebitSubscription>, IGloebitSubscriptionData {
+        private class PGSQLImpl : PGSQLGenericTableHandler<GloebitSubscription>, IGloebitSubscriptionData
+        {
             public PGSQLImpl(string connectionString)
                 : base(connectionString, "GloebitSubscriptions", "GloebitSubscriptionsPGSQL")
             {
             }
-                
-            public bool UpdateFromGloebit(GloebitSubscription subscription) {
+
+            public bool UpdateFromGloebit(GloebitSubscription subscription)
+            {
                 // set Enabled=subscription.Enabled and SubscriptionID=subscription.SubscriptionID)
                 //// UPDATE GloebitSubscriptions
                 //// SET SubscriptionID=val, Enabled=val
                 //// WHERE ObjectID=val AND AppKey=val AND GlbApiUrl=Val
-                
+
                 using (NpgsqlConnection conn = new NpgsqlConnection(m_ConnectionString))
                 using (NpgsqlCommand cmd = new NpgsqlCommand())
                 {
@@ -165,60 +175,72 @@ namespace Gloebit.GloebitMoneyModule
                     query.AppendFormat("UPDATE {0} ", m_Realm);
                     query.AppendFormat("SET \"{0}\" = :{0}, \"{1}\" = :{1} ", "SubscriptionID", "Enabled");
                     query.AppendFormat("WHERE \"{0}\" = :{0} AND \"{1}\" = :{1} AND \"{2}\" = :{2}", "ObjectID", "AppKey", "GlbApiUrl");
-                    
+
                     // Add parameters we are going to set or use in where clause
                     string pgFieldType = "";
-                    string[] pList = new string[5] {"SubscriptionID", "Enabled", "ObjectID", "AppKey", "GlbApiUrl"};
-                    foreach (FieldInfo fi in m_Fields.Values) {
+                    string[] pList = new string[5] { "SubscriptionID", "Enabled", "ObjectID", "AppKey", "GlbApiUrl" };
+                    foreach (FieldInfo fi in m_Fields.Values)
+                    {
                         // if (pList.Contains(fi.Name)) { --- Can't use Contains before .NET 3.5
-                        if (Array.Exists(pList, delegate(string s) { return s.Equals(fi.Name); })) {
-                            if (m_FieldTypes.ContainsKey(fi.Name)) {
+                        if (Array.Exists(pList, delegate (string s) { return s.Equals(fi.Name); }))
+                        {
+                            if (m_FieldTypes.ContainsKey(fi.Name))
+                            {
                                 pgFieldType = m_FieldTypes[fi.Name];
-                            } else {
+                            }
+                            else
+                            {
                                 pgFieldType = "";
                             }
                             cmd.Parameters.Add(createParameter(fi.Name, fi.GetValue(subscription), pgFieldType, true));
                         }
                     }
-                    
+
                     // Execute query
                     cmd.Connection = conn;
                     cmd.CommandText = query.ToString();
                     conn.Open();
-                    if (cmd.ExecuteNonQuery() > 0) {
+                    if (cmd.ExecuteNonQuery() > 0)
+                    {
                         //m_log.Info("[PGSQLGenericTable]: UpdateFromGloebit completed successfully");
                         return true;
-                    } else {
+                    }
+                    else
+                    {
                         //m_log.Error("[PGSQLGenericTable]: UpdateFromGloebit FAILED!!!!!");
                         return false;
                     }
-                    
+
                 }
             }
-            
-            private NpgsqlParameter createParameter(string pName, object pValue, string pgFieldType, bool input) {
+
+            private NpgsqlParameter createParameter(string pName, object pValue, string pgFieldType, bool input)
+            {
                 //HACK if object is null, it is turned into a string, there are no nullable type till now
                 if (pValue == null) pValue = "";
-                
+
                 NpgsqlDbType dbType = dbtypeFromString(pValue.GetType(), pgFieldType);
                 NpgsqlParameter parameter = new NpgsqlParameter(pName, dbType);
-                if (input) {
+                if (input)
+                {
                     parameter.Direction = ParameterDirection.Input;
                     // TODO: convert cpv to use dbType instead of pgFieldType
                     parameter.Value = createParameterValue(pValue, pgFieldType);
-                } else {
+                }
+                else
+                {
                     parameter.Direction = ParameterDirection.Output;
                 }
                 return parameter;
             }
-            
+
             private NpgsqlDbType dbtypeFromString(Type type, string PGFieldType)
             {
                 if (PGFieldType == "")
                 {
                     return dbtypeFromType(type);
                 }
-                
+
                 if (PGFieldType == "character varying")
                 {
                     return NpgsqlDbType.Varchar;
@@ -247,10 +269,10 @@ namespace Gloebit.GloebitMoneyModule
                 {
                     return NpgsqlDbType.Bytea;
                 }
-                
+
                 return dbtypeFromType(type);
             }
-            
+
             private NpgsqlDbType dbtypeFromType(Type type)
             {
                 if (type == typeof(string))
@@ -301,17 +323,17 @@ namespace Gloebit.GloebitMoneyModule
                 {
                     return NpgsqlDbType.Timestamp;
                 }
-                
+
                 return NpgsqlDbType.Varchar;
             }
-            
+
             private static object createParameterValue(object value)
             {
                 Type valueType = value.GetType();
-                
+
                 if (valueType == typeof(UUID)) //TODO check if this works
                 {
-                    return ((UUID) value).Guid;
+                    return ((UUID)value).Guid;
                 }
                 if (valueType == typeof(bool))
                 {
@@ -319,7 +341,7 @@ namespace Gloebit.GloebitMoneyModule
                 }
                 return value;
             }
-            
+
             private static object createParameterValue(object value, string PGFieldType)
             {
                 if (PGFieldType == "uuid")
@@ -352,7 +374,7 @@ namespace Gloebit.GloebitMoneyModule
                 }
                 return createParameterValue(value);
             }
-            
+
         }
     }
 }

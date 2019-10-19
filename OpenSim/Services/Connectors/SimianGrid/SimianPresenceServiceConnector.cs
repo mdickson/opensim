@@ -25,20 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Reflection;
-using log4net;
-using Mono.Addins;
-using Nini.Config;
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-
 using PresenceInfo = OpenSim.Services.Interfaces.PresenceInfo;
 
 namespace OpenSim.Services.Connectors.SimianGrid
@@ -207,7 +205,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
             OSDMap sessionResponse = GetSessionDataFromSessionID(sessionID);
             if (sessionResponse == null)
             {
-                m_log.WarnFormat("[SIMIAN PRESENCE CONNECTOR]: Failed to retrieve session {0}: {1}",sessionID.ToString(),sessionResponse["Message"].AsString());
+                m_log.WarnFormat("[SIMIAN PRESENCE CONNECTOR]: Failed to retrieve session {0}: {1}", sessionID.ToString(), sessionResponse["Message"].AsString());
                 return null;
             }
 
@@ -215,7 +213,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
             OSDMap userResponse = GetUserData(userID);
             if (userResponse == null)
             {
-                m_log.WarnFormat("[SIMIAN PRESENCE CONNECTOR]: Failed to retrieve user data for {0}: {1}",userID.ToString(),userResponse["Message"].AsString());
+                m_log.WarnFormat("[SIMIAN PRESENCE CONNECTOR]: Failed to retrieve user data for {0}: {1}", userID.ToString(), userResponse["Message"].AsString());
                 return null;
             }
 
@@ -233,9 +231,9 @@ namespace OpenSim.Services.Connectors.SimianGrid
             };
 
             OSDMap sessionListResponse = SimianGrid.PostToService(m_serverUrl, requestArgs);
-            if (! sessionListResponse["Success"].AsBoolean())
+            if (!sessionListResponse["Success"].AsBoolean())
             {
-                m_log.WarnFormat("[SIMIAN PRESENCE CONNECTOR]: Failed to retrieve sessions: {0}",sessionListResponse["Message"].AsString());
+                m_log.WarnFormat("[SIMIAN PRESENCE CONNECTOR]: Failed to retrieve sessions: {0}", sessionListResponse["Message"].AsString());
                 return null;
             }
 
@@ -344,7 +342,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
             if (response["Success"].AsBoolean() && response["User"] is OSDMap)
                 return response;
 
-            m_log.WarnFormat("[SIMIAN PRESENCE CONNECTOR]: Failed to retrieve user data for {0}; {1}",userID.ToString(),response["Message"].AsString());
+            m_log.WarnFormat("[SIMIAN PRESENCE CONNECTOR]: Failed to retrieve user data for {0}; {1}", userID.ToString(), response["Message"].AsString());
             return null;
         }
 
@@ -360,7 +358,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
             if (response["Success"].AsBoolean())
                 return response;
 
-            m_log.WarnFormat("[SIMIAN PRESENCE CONNECTOR]: Failed to retrieve session data for {0}; {1}",sessionID.ToString(),response["Message"].AsString());
+            m_log.WarnFormat("[SIMIAN PRESENCE CONNECTOR]: Failed to retrieve session data for {0}; {1}", sessionID.ToString(), response["Message"].AsString());
             return null;
         }
 
@@ -453,7 +451,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
         public GridUserInfo[] GetGridUserInfo(string[] userIDs)
         {
             return new GridUserInfo[0];
-         }
+        }
         #endregion Helpers
     }
 }

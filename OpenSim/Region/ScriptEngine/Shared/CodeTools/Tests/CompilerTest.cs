@@ -25,15 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.IO;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
 using Microsoft.CSharp;
 using NUnit.Framework;
-using OpenSim.Region.ScriptEngine.Shared.CodeTools;
 using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
 using OpenSim.Tests.Common;
+using System;
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.IO;
 
 namespace OpenSim.Region.ScriptEngine.Shared.CodeTools.Tests
 {
@@ -133,60 +132,60 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools.Tests
 
             return compilerResults;
         }
-/*  test too depedent on counting lines and columns maping code generation changes
-erros position is better tested on viewers
-        /// <summary>
-        /// Test that line number errors are resolved as expected when preceding code contains a jump.
-        /// </summary>
-        [Test]
-        public void TestJumpAndSyntaxError()
+        /*  test too depedent on counting lines and columns maping code generation changes
+        erros position is better tested on viewers
+                /// <summary>
+                /// Test that line number errors are resolved as expected when preceding code contains a jump.
+                /// </summary>
+                [Test]
+                public void TestJumpAndSyntaxError()
+                {
+                    TestHelpers.InMethod();
+
+                    Dictionary<KeyValuePair<int, int>, KeyValuePair<int, int>> positionMap;
+
+                    CompilerResults compilerResults = CompileScript(
+        @"default
         {
-            TestHelpers.InMethod();
+            state_entry()
+            {
+                jump l;
+                @l;
+                i = 1;
+            }
+        }", out positionMap);
 
-            Dictionary<KeyValuePair<int, int>, KeyValuePair<int, int>> positionMap;
-
-            CompilerResults compilerResults = CompileScript(
-@"default
-{
-    state_entry()
-    {
-        jump l;
-        @l;
-        i = 1;
-    }
-}", out positionMap);
-
-            Assert.AreEqual(
-                new KeyValuePair<int, int>(7, 9),
-                positionMap[new KeyValuePair<int, int>(compilerResults.Errors[0].Line, compilerResults.Errors[0].Column)]);
-        }
+                    Assert.AreEqual(
+                        new KeyValuePair<int, int>(7, 9),
+                        positionMap[new KeyValuePair<int, int>(compilerResults.Errors[0].Line, compilerResults.Errors[0].Column)]);
+                }
 
 
-        /// <summary>
-        /// Test the C# compiler error message can be mapped to the correct
-        /// line/column in the LSL source when an undeclared variable is used.
-        /// </summary>
-        [Test]
-        public void TestUseUndeclaredVariable()
+                /// <summary>
+                /// Test the C# compiler error message can be mapped to the correct
+                /// line/column in the LSL source when an undeclared variable is used.
+                /// </summary>
+                [Test]
+                public void TestUseUndeclaredVariable()
+                {
+                    TestHelpers.InMethod();
+
+                    Dictionary<KeyValuePair<int, int>, KeyValuePair<int, int>> positionMap;
+
+                    CompilerResults compilerResults = CompileScript(
+        @"default
         {
-            TestHelpers.InMethod();
+            state_entry()
+            {
+                integer y = x + 3;
+            }
+        }", out positionMap);
 
-            Dictionary<KeyValuePair<int, int>, KeyValuePair<int, int>> positionMap;
-
-            CompilerResults compilerResults = CompileScript(
-@"default
-{
-    state_entry()
-    {
-        integer y = x + 3;
-    }
-}", out positionMap);
-
-            Assert.AreEqual(
-                new KeyValuePair<int, int>(5, 21),
-                positionMap[new KeyValuePair<int, int>(compilerResults.Errors[0].Line, compilerResults.Errors[0].Column)]);
-        }
-*/
+                    Assert.AreEqual(
+                        new KeyValuePair<int, int>(5, 21),
+                        positionMap[new KeyValuePair<int, int>(compilerResults.Errors[0].Line, compilerResults.Errors[0].Column)]);
+                }
+        */
         /// <summary>
         /// Test that a string can be cast to string and another string
         /// concatenated.

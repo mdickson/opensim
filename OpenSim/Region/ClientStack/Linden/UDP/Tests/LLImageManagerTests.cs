@@ -25,20 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.IO;
-using System.Net;
-using System.Reflection;
-using System.Threading;
-using log4net.Config;
-using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
-using OpenMetaverse.Packets;
 using OpenSim.Framework;
 using OpenSim.Region.CoreModules.Agent.TextureSender;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Tests.Common;
+using System.IO;
 
 namespace OpenSim.Region.ClientStack.LindenUDP.Tests
 {
@@ -104,7 +97,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP.Tests
         public void TestSendImage()
         {
             TestHelpers.InMethod();
-//            XmlConfigurator.Configure();
+            //            XmlConfigurator.Configure();
 
             scene.AssetService.Store(m_testImageAsset);
 
@@ -125,7 +118,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP.Tests
         public void TestDiscardImage()
         {
             TestHelpers.InMethod();
-//            XmlConfigurator.Configure();
+            //            XmlConfigurator.Configure();
 
             scene.AssetService.Store(m_testImageAsset);
 
@@ -155,7 +148,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP.Tests
         public void TestMissingImage()
         {
             TestHelpers.InMethod();
-//            XmlConfigurator.Configure();
+            //            XmlConfigurator.Configure();
 
             TextureRequestArgs args = new TextureRequestArgs();
             args.RequestedAssetID = m_testImageAsset.FullID;

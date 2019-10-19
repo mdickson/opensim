@@ -25,17 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Data;
+using OpenSim.Framework;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Reflection;
-using Nini.Config;
-using log4net;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Data;
-using OpenSim.Services.Interfaces;
-using OpenMetaverse;
 
 namespace OpenSim.Services.AvatarService
 {
@@ -60,14 +58,14 @@ namespace OpenSim.Services.AvatarService
         public bool SetAppearance(UUID principalID, AvatarAppearance appearance)
         {
             AvatarData avatar = new AvatarData(appearance);
-            return SetAvatar(principalID,avatar);
+            return SetAvatar(principalID, avatar);
         }
 
         public AvatarData GetAvatar(UUID principalID)
         {
             AvatarBaseData[] av = m_Database.Get("PrincipalID", principalID.ToString());
             AvatarData ret = new AvatarData();
-            ret.Data = new Dictionary<string,string>();
+            ret.Data = new Dictionary<string, string>();
 
             if (av.Length == 0)
             {
@@ -93,11 +91,11 @@ namespace OpenSim.Services.AvatarService
                 if (kvp.Key.StartsWith("_"))
                     count++;
 
-//            m_log.DebugFormat("[AVATAR SERVICE]: SetAvatar for {0}, attachs={1}", principalID, count);
+            //            m_log.DebugFormat("[AVATAR SERVICE]: SetAvatar for {0}, attachs={1}", principalID, count);
             m_Database.Delete("PrincipalID", principalID.ToString());
 
             AvatarBaseData av = new AvatarBaseData();
-            av.Data = new Dictionary<string,string>();
+            av.Data = new Dictionary<string, string>();
 
             av.PrincipalID = principalID;
             av.Data["Name"] = "AvatarType";
@@ -106,7 +104,7 @@ namespace OpenSim.Services.AvatarService
             if (!m_Database.Store(av))
                 return false;
 
-            foreach (KeyValuePair<string,string> kvp in avatar.Data)
+            foreach (KeyValuePair<string, string> kvp in avatar.Data)
             {
                 av.Data["Name"] = kvp.Key;
 
@@ -155,13 +153,13 @@ namespace OpenSim.Services.AvatarService
         public bool SetItems(UUID principalID, string[] names, string[] values)
         {
             AvatarBaseData av = new AvatarBaseData();
-            av.Data = new Dictionary<string,string>();
+            av.Data = new Dictionary<string, string>();
             av.PrincipalID = principalID;
 
             if (names.Length != values.Length)
                 return false;
 
-            for (int i = 0 ; i < names.Length ; i++)
+            for (int i = 0; i < names.Length; i++)
             {
                 av.Data["Name"] = names[i];
                 av.Data["Value"] = values[i];

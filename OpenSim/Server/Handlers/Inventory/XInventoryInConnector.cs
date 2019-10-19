@@ -25,23 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
-using System.Text;
-using System.Xml;
-using System.Collections.Generic;
-using System.IO;
+using log4net;
 using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Framework;
+using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Framework.ServiceAuth;
 using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Server.Handlers.Base;
-using log4net;
-using OpenMetaverse;
-
-using System.Threading;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Xml;
 
 namespace OpenSim.Server.Handlers.Inventory
 {
@@ -96,7 +93,7 @@ namespace OpenSim.Server.Handlers.Inventory
                 IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
             string body;
-            using(StreamReader sr = new StreamReader(requestData))
+            using (StreamReader sr = new StreamReader(requestData))
                 body = sr.ReadToEnd();
             body = body.Trim();
 
@@ -200,9 +197,9 @@ namespace OpenSim.Server.Handlers.Inventory
             return Util.DocToBytes(doc);
         }
 
-        byte[] HandleCreateUserInventory(Dictionary<string,object> request)
+        byte[] HandleCreateUserInventory(Dictionary<string, object> request)
         {
-            Dictionary<string,object> result = new Dictionary<string,object>();
+            Dictionary<string, object> result = new Dictionary<string, object>();
 
             if (!request.ContainsKey("PRINCIPAL"))
                 return FailureResult();
@@ -218,9 +215,9 @@ namespace OpenSim.Server.Handlers.Inventory
             return Util.UTF8NoBomEncoding.GetBytes(xmlString);
         }
 
-        byte[] HandleGetInventorySkeleton(Dictionary<string,object> request)
+        byte[] HandleGetInventorySkeleton(Dictionary<string, object> request)
         {
-            Dictionary<string,object> result = new Dictionary<string,object>();
+            Dictionary<string, object> result = new Dictionary<string, object>();
 
             if (!request.ContainsKey("PRINCIPAL"))
                 return FailureResult();
@@ -246,9 +243,9 @@ namespace OpenSim.Server.Handlers.Inventory
             return Util.UTF8NoBomEncoding.GetBytes(xmlString);
         }
 
-        byte[] HandleGetRootFolder(Dictionary<string,object> request)
+        byte[] HandleGetRootFolder(Dictionary<string, object> request)
         {
-            Dictionary<string,object> result = new Dictionary<string,object>();
+            Dictionary<string, object> result = new Dictionary<string, object>();
 
             UUID principal = UUID.Zero;
             UUID.TryParse(request["PRINCIPAL"].ToString(), out principal);
@@ -262,9 +259,9 @@ namespace OpenSim.Server.Handlers.Inventory
             return Util.UTF8NoBomEncoding.GetBytes(xmlString);
         }
 
-        byte[] HandleGetFolderForType(Dictionary<string,object> request)
+        byte[] HandleGetFolderForType(Dictionary<string, object> request)
         {
-            Dictionary<string,object> result = new Dictionary<string,object>();
+            Dictionary<string, object> result = new Dictionary<string, object>();
             UUID principal = UUID.Zero;
             UUID.TryParse(request["PRINCIPAL"].ToString(), out principal);
             int type = 0;
@@ -279,9 +276,9 @@ namespace OpenSim.Server.Handlers.Inventory
             return Util.UTF8NoBomEncoding.GetBytes(xmlString);
         }
 
-        byte[] HandleGetFolderContent(Dictionary<string,object> request)
+        byte[] HandleGetFolderContent(Dictionary<string, object> request)
         {
-            Dictionary<string,object> result = new Dictionary<string,object>();
+            Dictionary<string, object> result = new Dictionary<string, object>();
             UUID principal = UUID.Zero;
             UUID.TryParse(request["PRINCIPAL"].ToString(), out principal);
             UUID folderID = UUID.Zero;
@@ -388,7 +385,7 @@ namespace OpenSim.Server.Handlers.Inventory
 
         byte[] HandleGetFolderItems(Dictionary<string, object> request)
         {
-            Dictionary<string,object> result = new Dictionary<string,object>();
+            Dictionary<string, object> result = new Dictionary<string, object>();
             UUID principal = UUID.Zero;
             UUID.TryParse(request["PRINCIPAL"].ToString(), out principal);
             UUID folderID = UUID.Zero;
@@ -414,7 +411,7 @@ namespace OpenSim.Server.Handlers.Inventory
             return Util.UTF8NoBomEncoding.GetBytes(xmlString);
         }
 
-        byte[] HandleAddFolder(Dictionary<string,object> request)
+        byte[] HandleAddFolder(Dictionary<string, object> request)
         {
             InventoryFolderBase folder = BuildFolder(request);
 
@@ -424,7 +421,7 @@ namespace OpenSim.Server.Handlers.Inventory
                 return FailureResult();
         }
 
-        byte[] HandleUpdateFolder(Dictionary<string,object> request)
+        byte[] HandleUpdateFolder(Dictionary<string, object> request)
         {
             InventoryFolderBase folder = BuildFolder(request);
 
@@ -434,7 +431,7 @@ namespace OpenSim.Server.Handlers.Inventory
                 return FailureResult();
         }
 
-        byte[] HandleMoveFolder(Dictionary<string,object> request)
+        byte[] HandleMoveFolder(Dictionary<string, object> request)
         {
             UUID parentID = UUID.Zero;
             UUID.TryParse(request["ParentID"].ToString(), out parentID);
@@ -451,7 +448,7 @@ namespace OpenSim.Server.Handlers.Inventory
 
         }
 
-        byte[] HandleDeleteFolders(Dictionary<string,object> request)
+        byte[] HandleDeleteFolders(Dictionary<string, object> request)
         {
             UUID principal = UUID.Zero;
             UUID.TryParse(request["PRINCIPAL"].ToString(), out principal);
@@ -471,7 +468,7 @@ namespace OpenSim.Server.Handlers.Inventory
                     FailureResult();
         }
 
-        byte[] HandlePurgeFolder(Dictionary<string,object> request)
+        byte[] HandlePurgeFolder(Dictionary<string, object> request)
         {
             UUID folderID = UUID.Zero;
             UUID.TryParse(request["ID"].ToString(), out folderID);
@@ -483,7 +480,7 @@ namespace OpenSim.Server.Handlers.Inventory
                 return FailureResult();
         }
 
-        byte[] HandleAddItem(Dictionary<string,object> request)
+        byte[] HandleAddItem(Dictionary<string, object> request)
         {
             InventoryItemBase item = BuildItem(request);
 
@@ -493,7 +490,7 @@ namespace OpenSim.Server.Handlers.Inventory
                 return FailureResult();
         }
 
-        byte[] HandleUpdateItem(Dictionary<string,object> request)
+        byte[] HandleUpdateItem(Dictionary<string, object> request)
         {
             InventoryItemBase item = BuildItem(request);
 
@@ -503,7 +500,7 @@ namespace OpenSim.Server.Handlers.Inventory
                 return FailureResult();
         }
 
-        byte[] HandleMoveItems(Dictionary<string,object> request)
+        byte[] HandleMoveItems(Dictionary<string, object> request)
         {
             List<string> idlist = (List<string>)request["IDLIST"];
             List<string> destlist = (List<string>)request["DESTLIST"];
@@ -541,7 +538,7 @@ namespace OpenSim.Server.Handlers.Inventory
                 return FailureResult();
         }
 
-        byte[] HandleDeleteItems(Dictionary<string,object> request)
+        byte[] HandleDeleteItems(Dictionary<string, object> request)
         {
             UUID principal = UUID.Zero;
             UUID.TryParse(request["PRINCIPAL"].ToString(), out principal);
@@ -561,9 +558,9 @@ namespace OpenSim.Server.Handlers.Inventory
                     FailureResult();
         }
 
-        byte[] HandleGetItem(Dictionary<string,object> request)
+        byte[] HandleGetItem(Dictionary<string, object> request)
         {
-            Dictionary<string,object> result = new Dictionary<string,object>();
+            Dictionary<string, object> result = new Dictionary<string, object>();
             UUID id = UUID.Zero;
             UUID.TryParse(request["ID"].ToString(), out id);
             UUID user = UUID.Zero;
@@ -614,7 +611,7 @@ namespace OpenSim.Server.Handlers.Inventory
             return Util.UTF8NoBomEncoding.GetBytes(xmlString);
         }
 
-        byte[] HandleGetFolder(Dictionary<string,object> request)
+        byte[] HandleGetFolder(Dictionary<string, object> request)
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
             UUID id = UUID.Zero;
@@ -633,9 +630,9 @@ namespace OpenSim.Server.Handlers.Inventory
             return Util.UTF8NoBomEncoding.GetBytes(xmlString);
         }
 
-        byte[] HandleGetActiveGestures(Dictionary<string,object> request)
+        byte[] HandleGetActiveGestures(Dictionary<string, object> request)
         {
-            Dictionary<string,object> result = new Dictionary<string,object>();
+            Dictionary<string, object> result = new Dictionary<string, object>();
             UUID principal = UUID.Zero;
             UUID.TryParse(request["PRINCIPAL"].ToString(), out principal);
 
@@ -658,9 +655,9 @@ namespace OpenSim.Server.Handlers.Inventory
             return Util.UTF8NoBomEncoding.GetBytes(xmlString);
         }
 
-        byte[] HandleGetAssetPermissions(Dictionary<string,object> request)
+        byte[] HandleGetAssetPermissions(Dictionary<string, object> request)
         {
-            Dictionary<string,object> result = new Dictionary<string,object>();
+            Dictionary<string, object> result = new Dictionary<string, object>();
             UUID principal = UUID.Zero;
             UUID.TryParse(request["PRINCIPAL"].ToString(), out principal);
             UUID assetID = UUID.Zero;
@@ -724,21 +721,21 @@ namespace OpenSim.Server.Handlers.Inventory
             return ret;
         }
 
-        private InventoryFolderBase BuildFolder(Dictionary<string,object> data)
+        private InventoryFolderBase BuildFolder(Dictionary<string, object> data)
         {
             InventoryFolderBase folder = new InventoryFolderBase();
 
-            folder.ParentID =  new UUID(data["ParentID"].ToString());
+            folder.ParentID = new UUID(data["ParentID"].ToString());
             folder.Type = short.Parse(data["Type"].ToString());
             folder.Version = ushort.Parse(data["Version"].ToString());
             folder.Name = data["Name"].ToString();
-            folder.Owner =  new UUID(data["Owner"].ToString());
+            folder.Owner = new UUID(data["Owner"].ToString());
             folder.ID = new UUID(data["ID"].ToString());
 
             return folder;
         }
 
-        private InventoryItemBase BuildItem(Dictionary<string,object> data)
+        private InventoryItemBase BuildItem(Dictionary<string, object> data)
         {
             InventoryItemBase item = new InventoryItemBase();
 

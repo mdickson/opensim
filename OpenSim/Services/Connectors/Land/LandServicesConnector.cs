@@ -26,17 +26,13 @@
  */
 
 using log4net;
+using Nwc.XmlRpc;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
-using Nini.Config;
-using OpenSim.Framework;
-
-using OpenSim.Services.Interfaces;
-using OpenMetaverse;
-using Nwc.XmlRpc;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Services.Connectors
@@ -79,7 +75,7 @@ namespace OpenSim.Services.Connectors
                 if (info != null) // just to be sure
                 {
                     string targetHandlestr = info.RegionHandle.ToString();
-                    if( ypos == 0 ) //HG proxy?
+                    if (ypos == 0) //HG proxy?
                     {
                         // this is real region handle on hg proxies hack
                         targetHandlestr = info.RegionSecret;
@@ -117,7 +113,7 @@ namespace OpenSim.Services.Connectors
                             landData.UserLocation = Vector3.Parse((string)hash["UserLocation"]);
                             if (hash["RegionAccess"] != null)
                                 regionAccess = (byte)Convert.ToInt32((string)hash["RegionAccess"]);
-                            if(hash["Dwell"] != null)
+                            if (hash["Dwell"] != null)
                                 landData.Dwell = Convert.ToSingle((string)hash["Dwell"]);
                             m_log.DebugFormat("[LAND CONNECTOR]: Got land data for parcel {0}", landData.Name);
                         }

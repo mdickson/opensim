@@ -25,21 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using log4net.Appender;
+using log4net.Repository;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Console;
+using OpenSim.Framework.Monitoring;
+using pCampBot.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using OpenMetaverse;
-using log4net;
-using log4net.Appender;
-using log4net.Core;
-using log4net.Repository;
-using Nini.Config;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Framework.Monitoring;
-using pCampBot.Interfaces;
 
 namespace pCampBot
 {
@@ -165,11 +164,11 @@ namespace pCampBot
             // to multiple regions.
             Settings.MAX_HTTP_CONNECTIONS = int.MaxValue;
 
-//            System.Threading.ThreadPool.SetMaxThreads(600, 240);
-//
-//            int workerThreads, iocpThreads;
-//            System.Threading.ThreadPool.GetMaxThreads(out workerThreads, out iocpThreads);
-//            Console.WriteLine("ThreadPool.GetMaxThreads {0} {1}", workerThreads, iocpThreads);
+            //            System.Threading.ThreadPool.SetMaxThreads(600, 240);
+            //
+            //            int workerThreads, iocpThreads;
+            //            System.Threading.ThreadPool.GetMaxThreads(out workerThreads, out iocpThreads);
+            //            Console.WriteLine("ThreadPool.GetMaxThreads {0} {1}", workerThreads, iocpThreads);
 
             InitBotSendAgentUpdates = true;
             InitBotRequestObjectTextures = true;
@@ -512,16 +511,16 @@ namespace pCampBot
             switch (eventt)
             {
                 case EventType.CONNECTED:
-                {
-                    m_log.Info("[" + callbot.FirstName + " " + callbot.LastName + "]: Connected");
-                    break;
-                }
+                    {
+                        m_log.Info("[" + callbot.FirstName + " " + callbot.LastName + "]: Connected");
+                        break;
+                    }
 
                 case EventType.DISCONNECTED:
-                {
-                    m_log.Info("[" + callbot.FirstName + " " + callbot.LastName + "]: Disconnected");
-                    break;
-                }
+                    {
+                        m_log.Info("[" + callbot.FirstName + " " + callbot.LastName + "]: Disconnected");
+                        break;
+                    }
             }
         }
 

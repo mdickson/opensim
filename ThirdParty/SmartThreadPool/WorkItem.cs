@@ -1,6 +1,6 @@
 using System;
-using System.Threading;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Amib.Threading.Internal
 {

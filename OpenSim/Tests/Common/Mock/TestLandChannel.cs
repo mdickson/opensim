@@ -25,12 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
 using OpenMetaverse;
 using OpenSim.Framework;
+using OpenSim.Region.CoreModules.World.Land;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.CoreModules.World.Land;
+using System.Collections.Generic;
 
 namespace OpenSim.Tests.Common
 {
@@ -110,15 +110,15 @@ namespace OpenSim.Tests.Common
 
         public bool IsLandPrimCountTainted() { return false; }
         public bool IsForcefulBansAllowed() { return false; }
-        public void UpdateLandObject(int localID, LandData data) {}
-        public void SendParcelsOverlay(IClientAPI client) {}
-        public void ReturnObjectsInParcel(int localID, uint returnType, UUID[] agentIDs, UUID[] taskIDs, IClientAPI remoteClient) {}
-        public void setParcelObjectMaxOverride(overrideParcelMaxPrimCountDelegate overrideDel) {}
-        public void setSimulatorObjectMaxOverride(overrideSimulatorMaxPrimCountDelegate overrideDel) {}
-        public void SetParcelOtherCleanTime(IClientAPI remoteClient, int localID, int otherCleanTime) {}
+        public void UpdateLandObject(int localID, LandData data) { }
+        public void SendParcelsOverlay(IClientAPI client) { }
+        public void ReturnObjectsInParcel(int localID, uint returnType, UUID[] agentIDs, UUID[] taskIDs, IClientAPI remoteClient) { }
+        public void setParcelObjectMaxOverride(overrideParcelMaxPrimCountDelegate overrideDel) { }
+        public void setSimulatorObjectMaxOverride(overrideSimulatorMaxPrimCountDelegate overrideDel) { }
+        public void SetParcelOtherCleanTime(IClientAPI remoteClient, int localID, int otherCleanTime) { }
 
-        public void Join(int start_x, int start_y, int end_x, int end_y, UUID attempting_user_id) {}
-        public void Subdivide(int start_x, int start_y, int end_x, int end_y, UUID attempting_user_id) {}
+        public void Join(int start_x, int start_y, int end_x, int end_y, UUID attempting_user_id) { }
+        public void Subdivide(int start_x, int start_y, int end_x, int end_y, UUID attempting_user_id) { }
         public void sendClientInitialLandInfo(IClientAPI remoteClient, bool overlay) { }
     }
 }

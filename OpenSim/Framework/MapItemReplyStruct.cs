@@ -63,8 +63,8 @@ namespace OpenSim.Framework
 
         public void FromOSD(OSDMap map)
         {
-            x = (uint) map["X"].AsInteger();
-            y = (uint) map["Y"].AsInteger();
+            x = (uint)map["X"].AsInteger();
+            y = (uint)map["Y"].AsInteger();
             id = map["ID"].AsUUID();
             Extra = map["Extra"].AsInteger();
             Extra2 = map["Extra2"].AsInteger();

@@ -25,13 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
 using log4net;
-using Nini.Config;
-using OpenSim.Framework;
 using OpenMetaverse;
+using OpenSim.Framework;
 using OpenSim.Region.PhysicsModules.SharedBase;
+using System;
 
 namespace OpenSim.Region.Framework.Scenes
 {
@@ -102,12 +100,12 @@ namespace OpenSim.Region.Framework.Scenes
                     if (sog.IsAttachment)
                         return 2;
 
-                    if(presence.ParentPart != null)
+                    if (presence.ParentPart != null)
                     {
-                        if(presence.ParentPart.ParentGroup == sog)
+                        if (presence.ParentPart.ParentGroup == sog)
                             return 2;
                     }
-                    
+
                     pqueue = ComputeDistancePriority(client, entity, false);
 
                     // Non physical prims are lower priority than physical prims
@@ -177,7 +175,7 @@ namespace OpenSim.Region.Framework.Scenes
 
             // If this is a root agent, then determine front & back
             // Bump up the priority queue (drop the priority) for any objects behind the avatar
-            if (useFrontBack && ! presence.IsChildAgent)
+            if (useFrontBack && !presence.IsChildAgent)
             {
                 // Root agent, decrease priority for objects behind us
                 Vector3 camPosition = presence.CameraPosition;
@@ -209,7 +207,7 @@ namespace OpenSim.Region.Framework.Scenes
             float distance;
 
             Vector3 presencePos = presence.AbsolutePosition;
-            if(entity is ScenePresence)
+            if (entity is ScenePresence)
             {
                 ScenePresence sp = entity as ScenePresence;
                 distance = Vector3.DistanceSquared(presencePos, sp.AbsolutePosition);
@@ -223,15 +221,15 @@ namespace OpenSim.Region.Framework.Scenes
 
             SceneObjectPart sop = entity as SceneObjectPart;
             SceneObjectGroup group = sop.ParentGroup;
-            if(presence.ParentPart != null)
+            if (presence.ParentPart != null)
             {
-                if(presence.ParentPart.ParentGroup == group)
+                if (presence.ParentPart.ParentGroup == group)
                     return pqueue;
             }
 
             if (group.IsAttachment)
             {
-                if(group.RootPart.LocalId == presence.LocalId)
+                if (group.RootPart.LocalId == presence.LocalId)
                     return pqueue;
 
                 distance = Vector3.DistanceSquared(presencePos, group.AbsolutePosition);
@@ -248,11 +246,11 @@ namespace OpenSim.Region.Framework.Scenes
             distance = Vector3.Distance(presencePos, grppos);
             distance -= bradius;
             distance *= group.getAreaFactor();
-            if(group.IsAttachment)
+            if (group.IsAttachment)
                 distance *= 0.5f;
-            else if(group.UsesPhysics)
+            else if (group.UsesPhysics)
                 distance *= 0.6f;
-            else if(group.GetSittingAvatarsCount() > 0)
+            else if (group.GetSittingAvatarsCount() > 0)
                 distance *= 0.5f;
 
             if (distance > 10f)

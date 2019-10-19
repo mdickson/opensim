@@ -25,17 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
-using System.Reflection;
-using System.Xml;
-using log4net;
 using OpenMetaverse;
+using System.Collections.Generic;
+using System.Xml;
 
 namespace OpenSim.Region.Framework.Scenes.Animation
 {
     public class DefaultAvatarAnimations
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public static readonly string DefaultAnimationsPath = "data/avataranimations.xml";
 
@@ -54,34 +52,34 @@ namespace OpenSim.Region.Framework.Scenes.Animation
         /// <returns></returns>
         private static void LoadAnimations(string path)
         {
-//            Dictionary<string, UUID> animations = new Dictionary<string, UUID>();
+            //            Dictionary<string, UUID> animations = new Dictionary<string, UUID>();
 
             using (XmlTextReader reader = new XmlTextReader(path))
             {
                 XmlDocument doc = new XmlDocument();
                 doc.Load(reader);
-//                if (doc.DocumentElement != null)
-//                {
-                    foreach (XmlNode nod in doc.DocumentElement.ChildNodes)
+                //                if (doc.DocumentElement != null)
+                //                {
+                foreach (XmlNode nod in doc.DocumentElement.ChildNodes)
+                {
+                    if (nod.Attributes["name"] != null)
                     {
-                        if (nod.Attributes["name"] != null)
-                        {
-                            string name = nod.Attributes["name"].Value;
-                            UUID id = (UUID)nod.InnerText;
-                            string animState = (string)nod.Attributes["state"].Value;
+                        string name = nod.Attributes["name"].Value;
+                        UUID id = (UUID)nod.InnerText;
+                        string animState = (string)nod.Attributes["state"].Value;
 
-                            AnimsUUID.Add(name, id);
-                            AnimsNames.Add(id, name);
-                            if (animState != "")
-                                AnimStateNames.Add(id, animState);
+                        AnimsUUID.Add(name, id);
+                        AnimsNames.Add(id, name);
+                        if (animState != "")
+                            AnimStateNames.Add(id, animState);
 
-//                            m_log.DebugFormat("[AVATAR ANIMATIONS]: Loaded {0} {1} {2}", id, name, animState);
-                        }
+                        //                            m_log.DebugFormat("[AVATAR ANIMATIONS]: Loaded {0} {1} {2}", id, name, animState);
                     }
-//                }
+                }
+                //                }
             }
 
-//            return animations;
+            //            return animations;
         }
 
         /// <summary>
@@ -91,13 +89,13 @@ namespace OpenSim.Region.Framework.Scenes.Animation
         /// <returns></returns>
         public static UUID GetDefaultAnimation(string name)
         {
-//            m_log.DebugFormat(
-//                "[AVATAR ANIMATIONS]: Looking for default avatar animation with name {0}", name);
+            //            m_log.DebugFormat(
+            //                "[AVATAR ANIMATIONS]: Looking for default avatar animation with name {0}", name);
 
             if (AnimsUUID.ContainsKey(name))
             {
-//                m_log.DebugFormat(
-//                    "[AVATAR ANIMATIONS]: Found {0} {1} in GetDefaultAvatarAnimation()", AnimsUUID[name], name);
+                //                m_log.DebugFormat(
+                //                    "[AVATAR ANIMATIONS]: Found {0} {1} in GetDefaultAvatarAnimation()", AnimsUUID[name], name);
 
                 return AnimsUUID[name];
             }

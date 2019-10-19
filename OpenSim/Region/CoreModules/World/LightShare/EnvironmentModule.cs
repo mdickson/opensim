@@ -25,19 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
-using System.Text;
+using log4net;
+using Mono.Addins;
+using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Capabilities;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using log4net;
-using Nini.Config;
-using Mono.Addins;
-
+using System;
+using System.Reflection;
+using System.Text;
 using Caps = OpenSim.Framework.Capabilities.Caps;
 
 
@@ -176,11 +174,11 @@ namespace OpenSim.Region.CoreModules.World.LightShare
             if (String.IsNullOrEmpty(env))
             {
                 StringBuilder sb = LLSDxmlEncode.Start();
-                    LLSDxmlEncode.AddArray(sb);
-                        LLSDxmlEncode.AddMap(sb);
-                            LLSDxmlEncode.AddElem("messageID", UUID.Zero, sb);
-                            LLSDxmlEncode.AddElem("regionID", regionID, sb);
-                        LLSDxmlEncode.AddEndMap(sb);
+                LLSDxmlEncode.AddArray(sb);
+                LLSDxmlEncode.AddMap(sb);
+                LLSDxmlEncode.AddElem("messageID", UUID.Zero, sb);
+                LLSDxmlEncode.AddElem("regionID", regionID, sb);
+                LLSDxmlEncode.AddEndMap(sb);
                 LLSDxmlEncode.AddEndArray(sb);
                 env = LLSDxmlEncode.End(sb);
             }
@@ -223,13 +221,13 @@ namespace OpenSim.Region.CoreModules.World.LightShare
             }
 
             StringBuilder sb = LLSDxmlEncode.Start();
-                LLSDxmlEncode.AddMap(sb);
-                    LLSDxmlEncode.AddElem("messageID", UUID.Zero, sb);
-                    LLSDxmlEncode.AddElem("regionID", regionID, sb);
-                    LLSDxmlEncode.AddElem("success", success, sb);
-                    if(!success)
-                        LLSDxmlEncode.AddElem("fail_reason", fail_reason, sb);
-                LLSDxmlEncode.AddEndMap(sb);
+            LLSDxmlEncode.AddMap(sb);
+            LLSDxmlEncode.AddElem("messageID", UUID.Zero, sb);
+            LLSDxmlEncode.AddElem("regionID", regionID, sb);
+            LLSDxmlEncode.AddElem("success", success, sb);
+            if (!success)
+                LLSDxmlEncode.AddElem("fail_reason", fail_reason, sb);
+            LLSDxmlEncode.AddEndMap(sb);
             return LLSDxmlEncode.End(sb);
         }
     }

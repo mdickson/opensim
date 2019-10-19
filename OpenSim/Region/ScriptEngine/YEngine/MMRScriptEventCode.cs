@@ -39,7 +39,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
      *        in range 0..63 that begin with a lower-case letter for scripts to
      *        reference.
      */
-    public enum ScriptEventCode: int
+    public enum ScriptEventCode : int
     {
 
         // used by XMRInstance to indicate no event being processed

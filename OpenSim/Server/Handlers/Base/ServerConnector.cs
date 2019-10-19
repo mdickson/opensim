@@ -25,11 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using Nini.Config;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
 using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Server.Base;
+using System;
 
 namespace OpenSim.Server.Handlers.Base
 {
@@ -77,14 +76,14 @@ namespace OpenSim.Server.Handlers.Base
             config = ServerUtils.GetConfig(ConfigFile, ConfigName);
 
             // Our file is not here? We can get one to bootstrap our plugin module
-            if ( config == null )
+            if (config == null)
             {
                 IConfigSource remotesource = GetConfigSource();
 
                 if (remotesource != null)
                 {
                     IniConfigSource initialconfig = new IniConfigSource();
-                    initialconfig.Merge (remotesource);
+                    initialconfig.Merge(remotesource);
                     initialconfig.Save(ConfigFile);
                 }
 
@@ -105,7 +104,7 @@ namespace OpenSim.Server.Handlers.Base
             source = ServerUtils.LoadInitialConfig(ConfigURL);
 
             if (source == null)
-                System.Console.WriteLine(String.Format ("Config Url: {0} Not found!", ConfigURL));
+                System.Console.WriteLine(String.Format("Config Url: {0} Not found!", ConfigURL));
 
             return source;
         }

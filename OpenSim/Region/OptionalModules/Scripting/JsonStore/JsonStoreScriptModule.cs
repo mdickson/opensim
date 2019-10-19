@@ -24,23 +24,17 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using Mono.Addins;
-
-using System;
-using System.Reflection;
-using System.Threading;
-using System.Text;
-using System.Net;
-using System.Net.Sockets;
 using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.Framework.Scenes.Scripting;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using PermissionMask = OpenSim.Framework.PermissionMask;
 
@@ -48,7 +42,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
 {
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "JsonStoreScriptModule")]
 
-    public class JsonStoreScriptModule  : INonSharedRegionModule
+    public class JsonStoreScriptModule : INonSharedRegionModule
     {
         private static readonly ILog m_log =
             LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -60,9 +54,9 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         private IScriptModuleComms m_comms;
         private IJsonStoreModule m_store;
 
-        private Dictionary<UUID,HashSet<UUID>> m_scriptStores = new Dictionary<UUID,HashSet<UUID>>();
+        private Dictionary<UUID, HashSet<UUID>> m_scriptStores = new Dictionary<UUID, HashSet<UUID>>();
 
-#region Region Module interface
+        #region Region Module interface
 
         // -----------------------------------------------------------------
         /// <summary>
@@ -155,7 +149,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
 
             lock (m_scriptStores)
             {
-                if (! m_scriptStores.TryGetValue(itemID, out stores))
+                if (!m_scriptStores.TryGetValue(itemID, out stores))
                     return;
                 m_scriptStores.Remove(itemID);
             }
@@ -214,9 +208,9 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
             get { return null; }
         }
 
-#endregion
+        #endregion
 
-#region ScriptConstantsInterface
+        #region ScriptConstantsInterface
 
         [ScriptConstant]
         public static readonly int JSON_NODETYPE_UNDEF = (int)JsonStoreNodeType.Undefined;
@@ -246,9 +240,9 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         public static readonly int JSON_VALUETYPE_STRING = (int)JsonStoreValueType.String;
 
 
-#endregion
+        #endregion
 
-#region ScriptInvocationInteface
+        #region ScriptInvocationInteface
         // -----------------------------------------------------------------
         /// <summary>
         ///
@@ -258,7 +252,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         public UUID JsonAttachObjectStore(UUID hostID, UUID scriptID)
         {
             UUID uuid = UUID.Zero;
-            if (! m_store.AttachObjectStore(hostID))
+            if (!m_store.AttachObjectStore(hostID))
                 GenerateRuntimeError("Failed to create Json store");
 
             return hostID;
@@ -273,12 +267,12 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         public UUID JsonCreateStore(UUID hostID, UUID scriptID, string value)
         {
             UUID uuid = UUID.Zero;
-            if (! m_store.CreateStore(value, ref uuid))
+            if (!m_store.CreateStore(value, ref uuid))
                 GenerateRuntimeError("Failed to create Json store");
 
             lock (m_scriptStores)
             {
-                if (! m_scriptStores.ContainsKey(scriptID))
+                if (!m_scriptStores.ContainsKey(scriptID))
                     m_scriptStores[scriptID] = new HashSet<UUID>();
 
                 m_scriptStores[scriptID].Add(uuid);
@@ -294,7 +288,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         [ScriptInvocation]
         public int JsonDestroyStore(UUID hostID, UUID scriptID, UUID storeID)
         {
-            lock(m_scriptStores)
+            lock (m_scriptStores)
             {
                 if (m_scriptStores.ContainsKey(scriptID))
                     m_scriptStores[scriptID].Remove(storeID);
@@ -352,7 +346,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         {
             UUID reqID = UUID.Random();
             Util.FireAndForget(
-                o => DoJsonWriteNotecard(reqID,hostID,scriptID,storeID,path,name), null, "JsonStoreScriptModule.DoJsonWriteNotecard");
+                o => DoJsonWriteNotecard(reqID, hostID, scriptID, storeID, path, name), null, "JsonStoreScriptModule.DoJsonWriteNotecard");
             return reqID;
         }
 
@@ -367,7 +361,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
             string ipath = ConvertList2Path(pathlist);
             string opath;
 
-            if (JsonStore.CanonicalPathExpression(ipath,out opath))
+            if (JsonStore.CanonicalPathExpression(ipath, out opath))
                 return opath;
 
             // This won't parse if passed to the other routines as opposed to
@@ -384,7 +378,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         [ScriptInvocation]
         public int JsonGetNodeType(UUID hostID, UUID scriptID, UUID storeID, string path)
         {
-            return (int)m_store.GetNodeType(storeID,path);
+            return (int)m_store.GetNodeType(storeID, path);
         }
 
         // -----------------------------------------------------------------
@@ -395,7 +389,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         [ScriptInvocation]
         public int JsonGetValueType(UUID hostID, UUID scriptID, UUID storeID, string path)
         {
-            return (int)m_store.GetValueType(storeID,path);
+            return (int)m_store.GetValueType(storeID, path);
         }
 
         // -----------------------------------------------------------------
@@ -406,13 +400,13 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         [ScriptInvocation]
         public int JsonSetValue(UUID hostID, UUID scriptID, UUID storeID, string path, string value)
         {
-            return m_store.SetValue(storeID,path,value,false) ? 1 : 0;
+            return m_store.SetValue(storeID, path, value, false) ? 1 : 0;
         }
 
         [ScriptInvocation]
         public int JsonSetJson(UUID hostID, UUID scriptID, UUID storeID, string path, string value)
         {
-            return m_store.SetValue(storeID,path,value,true) ? 1 : 0;
+            return m_store.SetValue(storeID, path, value, true) ? 1 : 0;
         }
 
         // -----------------------------------------------------------------
@@ -423,7 +417,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         [ScriptInvocation]
         public int JsonRemoveValue(UUID hostID, UUID scriptID, UUID storeID, string path)
         {
-            return m_store.RemoveValue(storeID,path) ? 1 : 0;
+            return m_store.RemoveValue(storeID, path) ? 1 : 0;
         }
 
         // -----------------------------------------------------------------
@@ -434,7 +428,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         [ScriptInvocation]
         public int JsonGetArrayLength(UUID hostID, UUID scriptID, UUID storeID, string path)
         {
-            return m_store.GetArrayLength(storeID,path);
+            return m_store.GetArrayLength(storeID, path);
         }
 
         // -----------------------------------------------------------------
@@ -446,7 +440,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         public string JsonGetValue(UUID hostID, UUID scriptID, UUID storeID, string path)
         {
             string value = String.Empty;
-            m_store.GetValue(storeID,path,false,out value);
+            m_store.GetValue(storeID, path, false, out value);
             return value;
         }
 
@@ -454,7 +448,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         public string JsonGetJson(UUID hostID, UUID scriptID, UUID storeID, string path)
         {
             string value = String.Empty;
-            m_store.GetValue(storeID,path,true, out value);
+            m_store.GetValue(storeID, path, true, out value);
             return value;
         }
 
@@ -468,7 +462,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         {
             UUID reqID = UUID.Random();
             Util.FireAndForget(
-                o => DoJsonTakeValue(scriptID,reqID,storeID,path,false), null, "JsonStoreScriptModule.DoJsonTakeValue");
+                o => DoJsonTakeValue(scriptID, reqID, storeID, path, false), null, "JsonStoreScriptModule.DoJsonTakeValue");
             return reqID;
         }
 
@@ -477,7 +471,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         {
             UUID reqID = UUID.Random();
             Util.FireAndForget(
-                o => DoJsonTakeValue(scriptID,reqID,storeID,path,true), null, "JsonStoreScriptModule.DoJsonTakeValueJson");
+                o => DoJsonTakeValue(scriptID, reqID, storeID, path, true), null, "JsonStoreScriptModule.DoJsonTakeValueJson");
             return reqID;
         }
 
@@ -491,7 +485,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         {
             UUID reqID = UUID.Random();
             Util.FireAndForget(
-                o => DoJsonReadValue(scriptID,reqID,storeID,path,false), null, "JsonStoreScriptModule.DoJsonReadValue");
+                o => DoJsonReadValue(scriptID, reqID, storeID, path, false), null, "JsonStoreScriptModule.DoJsonReadValue");
             return reqID;
         }
 
@@ -500,11 +494,11 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         {
             UUID reqID = UUID.Random();
             Util.FireAndForget(
-                o => DoJsonReadValue(scriptID,reqID,storeID,path,true), null, "JsonStoreScriptModule.DoJsonReadValueJson");
+                o => DoJsonReadValue(scriptID, reqID, storeID, path, true), null, "JsonStoreScriptModule.DoJsonReadValueJson");
             return reqID;
         }
 
-#endregion
+        #endregion
 
         // -----------------------------------------------------------------
         /// <summary>
@@ -513,7 +507,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         // -----------------------------------------------------------------
         protected void GenerateRuntimeError(string msg)
         {
-            m_log.InfoFormat("[JsonStore] runtime error: {0}",msg);
+            m_log.InfoFormat("[JsonStore] runtime error: {0}", msg);
             throw new Exception("JsonStore Runtime Error: " + msg);
         }
 
@@ -524,7 +518,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         // -----------------------------------------------------------------
         protected void DispatchValue(UUID scriptID, UUID reqID, string value)
         {
-            m_comms.DispatchReply(scriptID,1,value,reqID.ToString());
+            m_comms.DispatchReply(scriptID, 1, value, reqID.ToString());
         }
 
         // -----------------------------------------------------------------
@@ -536,15 +530,15 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         {
             try
             {
-                m_store.TakeValue(storeID,path,useJson,delegate(string value) { DispatchValue(scriptID,reqID,value); });
+                m_store.TakeValue(storeID, path, useJson, delegate (string value) { DispatchValue(scriptID, reqID, value); });
                 return;
             }
             catch (Exception e)
             {
-                m_log.InfoFormat("[JsonStoreScripts]: unable to retrieve value; {0}",e.ToString());
+                m_log.InfoFormat("[JsonStoreScripts]: unable to retrieve value; {0}", e.ToString());
             }
 
-            DispatchValue(scriptID,reqID,String.Empty);
+            DispatchValue(scriptID, reqID, String.Empty);
         }
 
 
@@ -557,15 +551,15 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         {
             try
             {
-                m_store.ReadValue(storeID,path,useJson,delegate(string value) { DispatchValue(scriptID,reqID,value); });
+                m_store.ReadValue(storeID, path, useJson, delegate (string value) { DispatchValue(scriptID, reqID, value); });
                 return;
             }
             catch (Exception e)
             {
-                m_log.InfoFormat("[JsonStoreScripts]: unable to retrieve value; {0}",e.ToString());
+                m_log.InfoFormat("[JsonStoreScripts]: unable to retrieve value; {0}", e.ToString());
             }
 
-            DispatchValue(scriptID,reqID,String.Empty);
+            DispatchValue(scriptID, reqID, String.Empty);
         }
 
         // -----------------------------------------------------------------
@@ -591,16 +585,16 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
             if (a.Type != (sbyte)AssetType.Notecard)
                 GenerateRuntimeError(String.Format("Invalid notecard asset {0}", assetID));
 
-            m_log.DebugFormat("[JsonStoreScripts]: read notecard in context {0}",storeID);
+            m_log.DebugFormat("[JsonStoreScripts]: read notecard in context {0}", storeID);
 
             try
             {
                 string jsondata = SLUtil.ParseNotecardToString(a.Data);
-                int result = m_store.SetValue(storeID, path, jsondata,true) ? 1 : 0;
+                int result = m_store.SetValue(storeID, path, jsondata, true) ? 1 : 0;
                 m_comms.DispatchReply(scriptID, result, "", reqID.ToString());
                 return;
             }
-            catch(SLUtil.NotANotecardFormatException e)
+            catch (SLUtil.NotANotecardFormatException e)
             {
                 m_log.WarnFormat("[JsonStoreScripts]: Notecard parsing failed; assetId {0} at line number {1}", assetID.ToString(), e.lineNumber);
             }
@@ -621,9 +615,9 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
         private void DoJsonWriteNotecard(UUID reqID, UUID hostID, UUID scriptID, UUID storeID, string path, string name)
         {
             string data;
-            if (! m_store.GetValue(storeID,path,true, out data))
+            if (!m_store.GetValue(storeID, path, true, out data))
             {
-                m_comms.DispatchReply(scriptID,0,UUID.Zero.ToString(),reqID.ToString());
+                m_comms.DispatchReply(scriptID, 0, UUID.Zero.ToString(), reqID.ToString());
                 return;
             }
 
@@ -666,7 +660,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
 
             host.Inventory.AddInventoryItem(taskItem, false);
             host.ParentGroup.InvalidateEffectivePerms();
-            m_comms.DispatchReply(scriptID,1,assetID.ToString(),reqID.ToString());
+            m_comms.DispatchReply(scriptID, 1, assetID.ToString(), reqID.ToString());
         }
 
         // -----------------------------------------------------------------
@@ -722,7 +716,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
             SceneObjectGroup host = m_scene.GetSceneObjectGroup(hostID);
             if (host == null)
             {
-                GenerateRuntimeError(String.Format("Unable to find rezzing host '{0}'",hostID));
+                GenerateRuntimeError(String.Format("Unable to find rezzing host '{0}'", hostID));
                 return;
             }
 
@@ -734,7 +728,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
             TaskInventoryItem item = host.RootPart.Inventory.GetInventoryItem(name);
             if (item == null)
             {
-                GenerateRuntimeError(String.Format("Unable to find object to rez '{0}'",name));
+                GenerateRuntimeError(String.Format("Unable to find object to rez '{0}'", name));
                 return;
             }
 
@@ -750,7 +744,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
             Vector3 bbox = new Vector3();
             float offsetHeight;
             bool success = host.RootPart.Inventory.GetRezReadySceneObjects(item, out objlist, out veclist, out bbox, out offsetHeight);
-            if (! success)
+            if (!success)
             {
                 GenerateRuntimeError("Failed to create object");
                 return;
@@ -760,13 +754,13 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
             foreach (SceneObjectGroup group in objlist)
                 totalPrims += group.PrimCount;
 
-            if (! m_scene.Permissions.CanRezObject(totalPrims, item.OwnerID, pos))
+            if (!m_scene.Permissions.CanRezObject(totalPrims, item.OwnerID, pos))
             {
                 GenerateRuntimeError("Not allowed to create the object");
                 return;
             }
 
-            if (! m_scene.Permissions.BypassPermissions())
+            if (!m_scene.Permissions.BypassPermissions())
             {
                 if ((item.CurrentPermissions & (uint)PermissionMask.Copy) == 0)
                     host.RootPart.Inventory.RemoveInventoryItem(item.ItemID);
@@ -787,7 +781,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
                 m_scene.AddNewSceneObject(group, true, curpos, rot, vel);
 
                 UUID storeID = group.UUID;
-                if (! m_store.CreateStore(param, ref storeID))
+                if (!m_store.CreateStore(param, ref storeID))
                 {
                     GenerateRuntimeError("Unable to create jsonstore for new object");
                     continue;
@@ -803,7 +797,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.JsonStore
 
                 // send the reply back to the host object, use the integer param to indicate the number
                 // of remaining objects
-                m_comms.DispatchReply(scriptID, objlist.Count-i-1, group.RootPart.UUID.ToString(), reqID.ToString());
+                m_comms.DispatchReply(scriptID, objlist.Count - i - 1, group.RootPart.UUID.ToString(), reqID.ToString());
             }
         }
     }

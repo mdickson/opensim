@@ -51,7 +51,7 @@ namespace OpenSim.Framework.Tests
         [Test]
         public void locationXYRegionHandle()
         {
-            Location TestLocation1 = new Location(255000,256000);
+            Location TestLocation1 = new Location(255000, 256000);
             Location TestLocation2 = new Location(1095216660736000);
             Assert.That(TestLocation1 == TestLocation2);
 
@@ -78,7 +78,7 @@ namespace OpenSim.Framework.Tests
 
             Location TestLocation3;
             object cln = TestLocation2.Clone();
-            TestLocation3 = (Location) cln;
+            TestLocation3 = (Location)cln;
             Assert.That(TestLocation3.X == TestLocation2.X && TestLocation3.Y == TestLocation2.Y,
                         "Cloned Location values do not match");
 

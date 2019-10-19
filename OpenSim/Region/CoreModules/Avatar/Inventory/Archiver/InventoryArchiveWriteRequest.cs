@@ -25,25 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Reflection;
-using System.Xml;
 using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Monitoring;
 using OpenSim.Framework.Serialization;
 using OpenSim.Framework.Serialization.External;
 using OpenSim.Region.CoreModules.World.Archiver;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-using Ionic.Zlib;
-using GZipStream = Ionic.Zlib.GZipStream;
-using CompressionMode = Ionic.Zlib.CompressionMode;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Xml;
 using CompressionLevel = Ionic.Zlib.CompressionLevel;
+using CompressionMode = Ionic.Zlib.CompressionMode;
+using GZipStream = Ionic.Zlib.GZipStream;
 using PermissionMask = OpenSim.Framework.PermissionMask;
 
 namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
@@ -218,7 +215,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
 
             // Count inventory items (different to asset count)
             CountItems++;
-            
+
             // Don't chase down link asset items as they actually point to their target item IDs rather than an asset
             if (SaveAssets && itemAssetType != AssetType.Link && itemAssetType != AssetType.LinkFolder)
             {
@@ -226,26 +223,26 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
                 int possible = m_assetGatherer.possibleNotAssetCount;
                 m_assetGatherer.AddForInspection(inventoryItem.AssetID);
                 m_assetGatherer.GatherAll();
-                curErrorCntr =  m_assetGatherer.ErrorCount - curErrorCntr;
+                curErrorCntr = m_assetGatherer.ErrorCount - curErrorCntr;
                 possible = m_assetGatherer.possibleNotAssetCount - possible;
 
-                if(curErrorCntr > 0 || possible > 0)
+                if (curErrorCntr > 0 || possible > 0)
                 {
                     string spath;
                     int indx = path.IndexOf("__");
-                    if(indx > 0)
-                         spath = path.Substring(0,indx);
+                    if (indx > 0)
+                        spath = path.Substring(0, indx);
                     else
                         spath = path;
 
-                    if(curErrorCntr > 0)
+                    if (curErrorCntr > 0)
                     {
                         m_log.ErrorFormat("[INVENTORY ARCHIVER Warning]: item {0} '{1}', type {2}, in '{3}', contains {4} references to  missing or damaged assets",
                             inventoryItem.ID, inventoryItem.Name, itemAssetType.ToString(), spath, curErrorCntr);
-                        if(possible > 0)
+                        if (possible > 0)
                             m_log.WarnFormat("[INVENTORY ARCHIVER Warning]: item also contains {0} references that may be to missing or damaged assets or not a problem", possible);
                     }
-                    else if(possible > 0)
+                    else if (possible > 0)
                     {
                         m_log.WarnFormat("[INVENTORY ARCHIVER Warning]: item {0} '{1}', type {2}, in '{3}', contains {4} references that may be to missing or damaged assets or not a problem", inventoryItem.ID, inventoryItem.Name, itemAssetType.ToString(), spath, possible);
                     }
@@ -410,8 +407,8 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
                     string errorMessage = string.Format("Aborted save.  Could not find inventory path {0}", m_invPath);
                     Exception e = new InventoryArchiverException(errorMessage);
                     m_module.TriggerInventoryArchiveSaved(m_id, false, m_userInfo, m_invPath, m_saveStream, e, 0, 0);
-                    if(m_saveStream != null && m_saveStream.CanWrite)
-                       m_saveStream.Close(); 
+                    if (m_saveStream != null && m_saveStream.CanWrite)
+                        m_saveStream.Close();
                     throw e;
                 }
 
@@ -455,7 +452,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
 
                     m_log.DebugFormat(
                         "[INVENTORY ARCHIVER]: The items to save reference {0} possible assets", m_assetGatherer.GatheredUuids.Count + errors);
-                    if(errors > 0)
+                    if (errors > 0)
                         m_log.DebugFormat("[INVENTORY ARCHIVER]: {0} of these have problems or are not assets and will be ignored", errors);
 
                     AssetsRequest ar = new AssetsRequest(
@@ -464,7 +461,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver
                             m_scene.AssetService,
                             m_scene.UserAccountService, m_scene.RegionInfo.ScopeID,
                             options, ReceivedAllAssets);
-                   ar.Execute();
+                    ar.Execute();
                 }
                 else
                 {

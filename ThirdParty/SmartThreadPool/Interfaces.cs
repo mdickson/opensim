@@ -271,19 +271,19 @@ namespace Amib.Threading
         /// Queue a work item.
         /// </summary>
         /// <returns>Returns a IWorkItemResult object, but its GetResult() will always return null</returns>
-        IWorkItemResult QueueWorkItem (Action action, WorkItemPriority priority);
+        IWorkItemResult QueueWorkItem(Action action, WorkItemPriority priority);
 
         /// <summary>
         /// Queue a work item.
         /// </summary>
         /// <returns>Returns a IWorkItemResult object, but its GetResult() will always return null</returns>
-        IWorkItemResult QueueWorkItem<T> (Action<T> action, T arg, WorkItemPriority priority);
+        IWorkItemResult QueueWorkItem<T>(Action<T> action, T arg, WorkItemPriority priority);
 
         /// <summary>
         /// Queue a work item.
         /// </summary>
         /// <returns>Returns a IWorkItemResult object, but its GetResult() will always return null</returns>
-        IWorkItemResult QueueWorkItem<T> (Action<T> action, T arg);
+        IWorkItemResult QueueWorkItem<T>(Action<T> action, T arg);
 
         /// <summary>
         /// Queue a work item.
@@ -295,7 +295,7 @@ namespace Amib.Threading
         /// Queue a work item.
         /// </summary>
         /// <returns>Returns a IWorkItemResult object, but its GetResult() will always return null</returns>
-        IWorkItemResult QueueWorkItem<T1, T2> (Action<T1, T2> action, T1 arg1, T2 arg2, WorkItemPriority priority);
+        IWorkItemResult QueueWorkItem<T1, T2>(Action<T1, T2> action, T1 arg1, T2 arg2, WorkItemPriority priority);
 
         /// <summary>
         /// Queue a work item.
@@ -307,7 +307,7 @@ namespace Amib.Threading
         /// Queue a work item.
         /// </summary>
         /// <returns>Returns a IWorkItemResult object, but its GetResult() will always return null</returns>
-        IWorkItemResult QueueWorkItem<T1, T2, T3> (Action<T1, T2, T3> action, T1 arg1, T2 arg2, T3 arg3, WorkItemPriority priority);
+        IWorkItemResult QueueWorkItem<T1, T2, T3>(Action<T1, T2, T3> action, T1 arg1, T2 arg2, T3 arg3, WorkItemPriority priority);
 
         /// <summary>
         /// Queue a work item.
@@ -319,7 +319,7 @@ namespace Amib.Threading
         /// Queue a work item.
         /// </summary>
         /// <returns>Returns a IWorkItemResult object, but its GetResult() will always return null</returns>
-        IWorkItemResult QueueWorkItem<T1, T2, T3, T4> (Action<T1, T2, T3, T4> action, T1 arg1, T2 arg2, T3 arg3, T4 arg4, WorkItemPriority priority);
+        IWorkItemResult QueueWorkItem<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action, T1 arg1, T2 arg2, T3 arg3, T4 arg4, WorkItemPriority priority);
 
         #endregion
 
@@ -373,22 +373,22 @@ namespace Amib.Threading
         /// <summary>
         /// Never call to the PostExecute call back
         /// </summary>
-        Never                    = 0x00,
+        Never = 0x00,
 
         /// <summary>
         /// Call to the PostExecute only when the work item is cancelled
         /// </summary>
-        WhenWorkItemCanceled     = 0x01,
+        WhenWorkItemCanceled = 0x01,
 
         /// <summary>
         /// Call to the PostExecute only when the work item is not cancelled
         /// </summary>
-        WhenWorkItemNotCanceled  = 0x02,
+        WhenWorkItemNotCanceled = 0x02,
 
         /// <summary>
         /// Always call to the PostExecute
         /// </summary>
-        Always                   = WhenWorkItemCanceled | WhenWorkItemNotCanceled,
+        Always = WhenWorkItemCanceled | WhenWorkItemNotCanceled,
     }
 
     #endregion

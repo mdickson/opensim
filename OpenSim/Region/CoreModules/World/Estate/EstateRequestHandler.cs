@@ -25,20 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Server.Base;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Xml;
-
-using OpenSim.Framework;
-using OpenSim.Server.Base;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Interfaces;
-
-using OpenMetaverse;
-using log4net;
 
 namespace OpenSim.Region.CoreModules.World.Estate
 {
@@ -61,7 +59,7 @@ namespace OpenSim.Region.CoreModules.World.Estate
                 IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
             string body;
-            using(StreamReader sr = new StreamReader(requestData))
+            using (StreamReader sr = new StreamReader(requestData))
                 body = sr.ReadToEnd();
 
             body = body.Trim();
@@ -84,7 +82,7 @@ namespace OpenSim.Region.CoreModules.World.Estate
                     string reqToken = request["TOKEN"].ToString();
                     request.Remove("TOKEN");
 
-                    if(token != reqToken)
+                    if (token != reqToken)
                         return FailureResult();
 
                     string method = request["METHOD"].ToString();
@@ -137,7 +135,8 @@ namespace OpenSim.Region.CoreModules.World.Estate
             {
                 if (s.RegionInfo.EstateSettings.EstateID == EstateID)
                 {
-                    s.ForEachScenePresence(delegate(ScenePresence p) {
+                    s.ForEachScenePresence(delegate (ScenePresence p)
+                    {
                         if (p != null && !p.IsChildAgent)
                         {
                             p.ControllingClient.SendTeleportStart(16);

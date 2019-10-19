@@ -25,13 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse.StructuredData;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Text;
-using log4net;
-using OpenMetaverse.StructuredData;
 
 namespace OpenSim.Framework.Monitoring
 {
@@ -40,7 +37,7 @@ namespace OpenSim.Framework.Monitoring
     /// </summary>
     public class Stat : IDisposable
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public static readonly char[] DisallowedShortNameCharacters = { '.' };
 
@@ -172,7 +169,7 @@ namespace OpenSim.Framework.Monitoring
             {
                 if (shortName.IndexOf(c) != -1)
                     shortName = shortName.Replace(c, '#');
-//                    throw new Exception(string.Format("Stat name {0} cannot contain character {1}", shortName, c));
+                //                    throw new Exception(string.Format("Stat name {0} cannot contain character {1}", shortName, c));
             }
 
             ShortName = shortName;
@@ -217,7 +214,7 @@ namespace OpenSim.Framework.Monitoring
                 if (m_samples.Count >= m_maxSamples)
                     m_samples.Dequeue();
 
-//                m_log.DebugFormat("[STAT]: Recording value {0} for {1}", newValue, Name);
+                //                m_log.DebugFormat("[STAT]: Recording value {0} for {1}", newValue, Name);
 
                 m_samples.Enqueue(newValue);
             }

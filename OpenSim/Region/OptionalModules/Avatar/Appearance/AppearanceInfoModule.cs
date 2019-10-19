@@ -25,21 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using log4net;
 using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Console;
-using OpenSim.Framework.Monitoring;
-using OpenSim.Region.ClientStack.LindenUDP;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace OpenSim.Region.OptionalModules.Avatar.Appearance
 {
@@ -49,11 +45,11 @@ namespace OpenSim.Region.OptionalModules.Avatar.Appearance
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "AppearanceInfoModule")]
     public class AppearanceInfoModule : ISharedRegionModule
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private List<Scene> m_scenes = new List<Scene>();
 
-//        private IAvatarFactoryModule m_avatarFactory;
+        //        private IAvatarFactoryModule m_avatarFactory;
 
         public string Name { get { return "Appearance Information Module"; } }
 
@@ -61,27 +57,27 @@ namespace OpenSim.Region.OptionalModules.Avatar.Appearance
 
         public void Initialise(IConfigSource source)
         {
-//            m_log.DebugFormat("[APPEARANCE INFO MODULE]: INITIALIZED MODULE");
+            //            m_log.DebugFormat("[APPEARANCE INFO MODULE]: INITIALIZED MODULE");
         }
 
         public void PostInitialise()
         {
-//            m_log.DebugFormat("[APPEARANCE INFO MODULE]: POST INITIALIZED MODULE");
+            //            m_log.DebugFormat("[APPEARANCE INFO MODULE]: POST INITIALIZED MODULE");
         }
 
         public void Close()
         {
-//            m_log.DebugFormat("[APPEARANCE INFO MODULE]: CLOSED MODULE");
+            //            m_log.DebugFormat("[APPEARANCE INFO MODULE]: CLOSED MODULE");
         }
 
         public void AddRegion(Scene scene)
         {
-//            m_log.DebugFormat("[APPEARANCE INFO MODULE]: REGION {0} ADDED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[APPEARANCE INFO MODULE]: REGION {0} ADDED", scene.RegionInfo.RegionName);
         }
 
         public void RemoveRegion(Scene scene)
         {
-//            m_log.DebugFormat("[APPEARANCE INFO MODULE]: REGION {0} REMOVED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[APPEARANCE INFO MODULE]: REGION {0} REMOVED", scene.RegionInfo.RegionName);
 
             lock (m_scenes)
                 m_scenes.Remove(scene);
@@ -89,7 +85,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.Appearance
 
         public void RegionLoaded(Scene scene)
         {
-//            m_log.DebugFormat("[APPEARANCE INFO MODULE]: REGION {0} LOADED", scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[APPEARANCE INFO MODULE]: REGION {0} LOADED", scene.RegionInfo.RegionName);
 
             lock (m_scenes)
                 m_scenes.Add(scene);
@@ -413,13 +409,13 @@ namespace OpenSim.Region.OptionalModules.Avatar.Appearance
                         sb.AppendFormat("Wearables checks for {0}\n\n", sp.Name);
 
                         AvatarWearable[] wearables = sp.Appearance.Wearables;
-                        if(wearables.Count() == 0)
+                        if(wearables.Length == 0)
                         {
                             MainConsole.Instance.Output("avatar has no wearables");
                             return;
                         }
-                        
-                        for (int i = 0; i < wearables.Count(); i++)
+
+                        for (int i = 0; i < wearables.Length; i++)
                         {
                             AvatarWearable aw = wearables[i];
 
@@ -477,8 +473,9 @@ namespace OpenSim.Region.OptionalModules.Avatar.Appearance
             cdt.AddColumn("Type", 10);
             cdt.AddColumn("Item UUID", ConsoleDisplayUtil.UuidSize);
             cdt.AddColumn("Asset UUID", ConsoleDisplayUtil.UuidSize);
+            AvatarWearable[] wearables = sp.Appearance.Wearables;
 
-            for (int i = (int)WearableType.Shape; i < (int)WearableType.Physics; i++)
+            for (int i = 0; i < wearables.Length; i++)
             {
                 AvatarWearable aw = sp.Appearance.Wearables[i];
 

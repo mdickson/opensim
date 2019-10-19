@@ -25,9 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using NUnit.Framework;
-using OpenSim.Framework;
 using OpenSim.Framework.Servers;
 
 namespace OpenSim.Tests.Common
@@ -48,7 +46,7 @@ namespace OpenSim.Tests.Common
             if (MainServer.Instance != null)
             {
                 MainServer.RemoveHttpServer(MainServer.Instance.Port);
-//                MainServer.Instance = null;
+                //                MainServer.Instance = null;
             }
         }
     }

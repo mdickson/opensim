@@ -25,16 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Mono.Addins;
+using OpenMetaverse;
+using OpenSim.Region.Framework.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-
-using log4net;
-using OpenMetaverse;
-using Mono.Addins;
-
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.CoreModules.World.Wind;
 
 namespace OpenSim.Region.CoreModules.World.Wind.Plugins
 {
@@ -95,9 +92,9 @@ namespace OpenSim.Region.CoreModules.World.Wind.Plugins
                 m_avgStrength = windConfig.GetFloat("avg_strength", 5.0F);
 
                 m_avgDirection = windConfig.GetFloat("avg_direction", 0.0F);
-                m_varStrength  = windConfig.GetFloat("var_strength", 5.0F);
+                m_varStrength = windConfig.GetFloat("var_strength", 5.0F);
                 m_varDirection = windConfig.GetFloat("var_direction", 30.0F);
-                m_rateChange   = windConfig.GetFloat("rate_change", 1.0F);
+                m_rateChange = windConfig.GetFloat("rate_change", 1.0F);
 
                 LogSettings();
             }
@@ -105,8 +102,8 @@ namespace OpenSim.Region.CoreModules.World.Wind.Plugins
 
         public bool WindUpdate(uint frame)
         {
-            double avgAng = m_avgDirection * (Math.PI/180.0f);
-            double varDir = m_varDirection * (Math.PI/180.0f);
+            double avgAng = m_avgDirection * (Math.PI / 180.0f);
+            double varDir = m_varDirection * (Math.PI / 180.0f);
 
             // Prevailing wind algorithm
             // Inspired by Kanker Greenacre
@@ -118,11 +115,11 @@ namespace OpenSim.Region.CoreModules.World.Wind.Plugins
 
             double theta = time * (2 * Math.PI) * m_rateChange;
 
-            double offset = Math.Sin(theta) * Math.Sin(theta*2) * Math.Sin(theta*9) * Math.Cos(theta*4);
+            double offset = Math.Sin(theta) * Math.Sin(theta * 2) * Math.Sin(theta * 9) * Math.Cos(theta * 4);
 
             double windDir = avgAng + (varDir * offset);
 
-            offset = Math.Sin(theta) * Math.Sin(theta*4) + (Math.Sin(theta*13) / 3);
+            offset = Math.Sin(theta) * Math.Sin(theta * 4) + (Math.Sin(theta * 13) / 3);
             double windSpeed = m_avgStrength + (m_varStrength * offset);
 
             if (windSpeed < 0)
@@ -181,20 +178,20 @@ namespace OpenSim.Region.CoreModules.World.Wind.Plugins
             switch (param)
             {
                 case "avgStrength":
-                     m_avgStrength = value;
-                     break;
+                    m_avgStrength = value;
+                    break;
                 case "avgDirection":
-                     m_avgDirection = value;
-                     break;
-                 case "varStrength":
-                     m_varStrength = value;
-                     break;
-                 case "varDirection":
-                     m_varDirection = value;
-                     break;
-                 case "rateChange":
-                     m_rateChange = value;
-                     break;
+                    m_avgDirection = value;
+                    break;
+                case "varStrength":
+                    m_varStrength = value;
+                    break;
+                case "varDirection":
+                    m_varDirection = value;
+                    break;
+                case "rateChange":
+                    m_rateChange = value;
+                    break;
             }
         }
 

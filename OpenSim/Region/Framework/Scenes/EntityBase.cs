@@ -25,19 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Security.Permissions;
-using log4net;
-using OpenSim.Framework;
 using OpenMetaverse;
+using OpenSim.Framework;
 
 namespace OpenSim.Region.Framework.Scenes
 {
     public abstract class EntityBase : ISceneEntity
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// The scene to which this entity belongs
@@ -106,7 +101,7 @@ namespace OpenSim.Region.Framework.Scenes
             set
             {
                 m_localId = value;
-//                m_log.DebugFormat("[ENTITY BASE]: Set part {0} to local id {1}", Name, m_localId);
+                //                m_log.DebugFormat("[ENTITY BASE]: Set part {0} to local id {1}", Name, m_localId);
             }
         }
 
@@ -130,7 +125,7 @@ namespace OpenSim.Region.Framework.Scenes
         /// <returns></returns>
         public virtual EntityBase Copy()
         {
-            return (EntityBase) MemberwiseClone();
+            return (EntityBase)MemberwiseClone();
         }
     }
 

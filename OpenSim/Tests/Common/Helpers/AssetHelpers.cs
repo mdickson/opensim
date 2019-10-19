@@ -25,13 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Text;
 using OpenMetaverse;
 using OpenMetaverse.Assets;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.Framework.Scenes.Serialization;
 using OpenSim.Services.Interfaces;
+using System.Text;
 
 namespace OpenSim.Tests.Common
 {
@@ -67,17 +67,17 @@ namespace OpenSim.Tests.Common
             return CreateAsset(assetId, AssetType.Notecard, text, UUID.Random());
         }
 
-//        /// <summary>
-//        /// Create and store a notecard asset with a random uuid and dummy text.
-//        /// </summary>
-//        /// <param name="creatorId">/param>
-//        /// <returns></returns>
-//        public static AssetBase CreateNotecardAsset(Scene scene, UUID creatorId)
-//        {
-//            AssetBase asset = CreateAsset(UUID.Random(), AssetType.Notecard, "hello", creatorId);
-//            scene.AssetService.Store(asset);
-//            return asset;
-//        }
+        //        /// <summary>
+        //        /// Create and store a notecard asset with a random uuid and dummy text.
+        //        /// </summary>
+        //        /// <param name="creatorId">/param>
+        //        /// <returns></returns>
+        //        public static AssetBase CreateNotecardAsset(Scene scene, UUID creatorId)
+        //        {
+        //            AssetBase asset = CreateAsset(UUID.Random(), AssetType.Notecard, "hello", creatorId);
+        //            scene.AssetService.Store(asset);
+        //            return asset;
+        //        }
 
         /// <summary>
         /// Create an asset from the given object.

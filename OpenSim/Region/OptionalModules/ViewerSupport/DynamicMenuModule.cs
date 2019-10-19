@@ -25,25 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using OpenSim.Framework;
+//using OpenSim.Framework.Capabilities;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using System.Collections.Generic;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using OpenSim;
-using OpenSim.Region;
-using OpenSim.Region.Framework;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Framework;
-//using OpenSim.Framework.Capabilities;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Servers.HttpServer;
-using Nini.Config;
-using log4net;
-using Mono.Addins;
 using Caps = OpenSim.Framework.Capabilities.Caps;
 using OSDMap = OpenMetaverse.StructuredData.OSDMap;
 
@@ -140,21 +136,21 @@ namespace OpenSim.Region.OptionalModules.ViewerSupport
                     OSDMap loc = null;
                     switch (d.Location)
                     {
-                    case InsertLocation.Agent:
-                        loc = agent;
-                        break;
-                    case InsertLocation.World:
-                        loc = world;
-                        break;
-                    case InsertLocation.Tools:
-                        loc = tools;
-                        break;
-                    case InsertLocation.Advanced:
-                        loc = advanced;
-                        break;
-                    case InsertLocation.Admin:
-                        loc = admin;
-                        break;
+                        case InsertLocation.Agent:
+                            loc = agent;
+                            break;
+                        case InsertLocation.World:
+                            loc = world;
+                            break;
+                        case InsertLocation.Tools:
+                            loc = tools;
+                            break;
+                        case InsertLocation.Advanced:
+                            loc = advanced;
+                            break;
+                        case InsertLocation.Admin:
+                            loc = admin;
+                            break;
                     }
 
                     if (loc == null)
@@ -174,21 +170,21 @@ namespace OpenSim.Region.OptionalModules.ViewerSupport
                     OSDMap loc = null;
                     switch (d.Location)
                     {
-                    case InsertLocation.Agent:
-                        loc = agent;
-                        break;
-                    case InsertLocation.World:
-                        loc = world;
-                        break;
-                    case InsertLocation.Tools:
-                        loc = tools;
-                        break;
-                    case InsertLocation.Advanced:
-                        loc = advanced;
-                        break;
-                    case InsertLocation.Admin:
-                        loc = admin;
-                        break;
+                        case InsertLocation.Agent:
+                            loc = agent;
+                            break;
+                        case InsertLocation.World:
+                            loc = world;
+                            break;
+                        case InsertLocation.Tools:
+                            loc = tools;
+                            break;
+                        case InsertLocation.Advanced:
+                            loc = advanced;
+                            break;
+                        case InsertLocation.Admin:
+                            loc = admin;
+                            break;
                     }
 
                     if (loc == null)
@@ -252,7 +248,7 @@ namespace OpenSim.Region.OptionalModules.ViewerSupport
 
         public void RemoveMenuItem(string action)
         {
-            foreach (KeyValuePair<UUID,List< MenuItemData>> kvp in m_menuItems)
+            foreach (KeyValuePair<UUID, List<MenuItemData>> kvp in m_menuItems)
             {
                 List<MenuItemData> pendingDeletes = new List<MenuItemData>();
                 foreach (MenuItemData d in kvp.Value)
@@ -277,7 +273,7 @@ namespace OpenSim.Region.OptionalModules.ViewerSupport
         private DynamicMenuModule m_module;
 
         public MenuActionHandler(string path, string name, UUID agentID, DynamicMenuModule module, Scene scene)
-                :base("POST", path, name, agentID.ToString())
+                : base("POST", path, name, agentID.ToString())
         {
             m_agentID = agentID;
             m_scene = scene;
@@ -294,7 +290,7 @@ namespace OpenSim.Region.OptionalModules.ViewerSupport
             string action = ((OSDMap)osd)["action"].AsString();
             OSDArray selection = (OSDArray)((OSDMap)osd)["selection"];
             List<uint> sel = new List<uint>();
-            for (int i = 0 ; i < selection.Count ; i++)
+            for (int i = 0; i < selection.Count; i++)
                 sel.Add(selection[i].AsUInteger());
 
             Util.FireAndForget(

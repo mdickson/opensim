@@ -25,9 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -35,6 +32,9 @@ using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.Avatar.Lure
 {
@@ -89,7 +89,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Lure
 
                 if (m_TransferModule == null)
                 {
-                    m_log.Error("[INSTANT MESSAGE]: No message transfer module, "+
+                    m_log.Error("[INSTANT MESSAGE]: No message transfer module, " +
                     "lures will not work!");
 
                     m_Enabled = false;
@@ -172,7 +172,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Lure
             if (scene.Permissions.IsAdministrator(client.AgentId) && presence.IsViewerUIGod && (!scene.Permissions.IsAdministrator(targetid)))
             {
                 m = new GridInstantMessage(scene, client.AgentId,
-                        client.FirstName+" "+client.LastName, targetid,
+                        client.FirstName + " " + client.LastName, targetid,
                         (byte)InstantMessageDialog.GodLikeRequestTeleport, false,
                         message, dest, false, presence.AbsolutePosition,
                         new Byte[0], true);
@@ -180,7 +180,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Lure
             else
             {
                 m = new GridInstantMessage(scene, client.AgentId,
-                        client.FirstName+" "+client.LastName, targetid,
+                        client.FirstName + " " + client.LastName, targetid,
                         (byte)InstantMessageDialog.RequestTeleport, false,
                         message, dest, false, presence.AbsolutePosition,
                         new Byte[0], true);
@@ -189,7 +189,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Lure
             if (m_TransferModule != null)
             {
                 m_TransferModule.SendInstantMessage(m,
-                    delegate(bool success) { });
+                    delegate (bool success) { });
             }
         }
 
@@ -227,7 +227,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Lure
             if (m_TransferModule != null)
             {
                 m_TransferModule.SendInstantMessage(msg,
-                    delegate(bool success) { });
+                    delegate (bool success) { });
             }
         }
     }

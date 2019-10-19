@@ -31,11 +31,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Text;
 
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
 using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
-using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
 using LSL_Rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
 using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
@@ -48,7 +46,7 @@ using LSL_Vector = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Vector3;
  */
 namespace OpenSim.Region.ScriptEngine.Yengine
 {
-    public enum ScriptObjWriterCode: byte
+    public enum ScriptObjWriterCode : byte
     {
         BegMethod, EndMethod, TheEnd,
         DclLabel, DclLocal, DclMethod, MarkLabel,
@@ -58,7 +56,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         BegExcBlk, BegCatBlk, BegFinBlk, EndExcBlk
     }
 
-    public class ScriptObjWriter: ScriptMyILGen
+    public class ScriptObjWriter : ScriptMyILGen
     {
         private static Dictionary<short, OpCode> opCodes = PopulateOpCodes();
         private static Dictionary<string, Type> string2Type = PopulateS2T();
@@ -122,10 +120,10 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             this.objFileWriter = objFileWriter;
 
             // Build list that translates system-defined types to script defined types.
-            foreach(TokenDeclSDType sdt in tokenScript.sdSrcTypesValues)
+            foreach (TokenDeclSDType sdt in tokenScript.sdSrcTypesValues)
             {
                 Type sys = sdt.GetSysType();
-                if(sys != null)
+                if (sys != null)
                     sdTypesRev[sys] = sdt.longName.val;
             }
 
@@ -138,7 +136,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
             int nArgs = argTypes.Length;
             objFileWriter.Write(nArgs);
-            for(int i = 0; i < nArgs; i++)
+            for (int i = 0; i < nArgs; i++)
             {
                 objFileWriter.Write(GetStrFromType(argTypes[i]));
                 objFileWriter.Write(argNames[i]);
@@ -273,7 +271,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             WriteOpCode(errorAt, opcode);
             int nLabels = myLabels.Length;
             objFileWriter.Write(nLabels);
-            for(int i = 0; i < nLabels; i++)
+            for (int i = 0; i < nLabels; i++)
             {
                 objFileWriter.Write(myLabels[i].number);
             }
@@ -281,7 +279,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public void Emit(Token errorAt, OpCode opcode, ScriptObjWriter method)
         {
-            if(method == null)
+            if (method == null)
                 throw new ArgumentNullException("method");
             objFileWriter.Write((byte)ScriptObjWriterCode.EmitMethodInt);
             WriteOpCode(errorAt, opcode);
@@ -297,7 +295,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             ParameterInfo[] parms = method.GetParameters();
             int nArgs = parms.Length;
             objFileWriter.Write(nArgs);
-            for(int i = 0; i < nArgs; i++)
+            for (int i = 0; i < nArgs; i++)
             {
                 objFileWriter.Write(GetStrFromType(parms[i].ParameterType));
             }
@@ -311,7 +309,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             ParameterInfo[] parms = ctor.GetParameters();
             int nArgs = parms.Length;
             objFileWriter.Write(nArgs);
-            for(int i = 0; i < nArgs; i++)
+            for (int i = 0; i < nArgs; i++)
             {
                 objFileWriter.Write(GetStrFromType(parms[i].ParameterType));
             }
@@ -319,7 +317,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public void Emit(Token errorAt, OpCode opcode, double value)
         {
-            if(opcode != OpCodes.Ldc_R8)
+            if (opcode != OpCodes.Ldc_R8)
             {
                 throw new Exception("bad opcode " + opcode.ToString());
             }
@@ -330,7 +328,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public void Emit(Token errorAt, OpCode opcode, float value)
         {
-            if(opcode != OpCodes.Ldc_R4)
+            if (opcode != OpCodes.Ldc_R4)
             {
                 throw new Exception("bad opcode " + opcode.ToString());
             }
@@ -394,18 +392,18 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             int srcLine = 0;
             int srcPosn = 0;
 
-            while(true)
+            while (true)
             {
                 // Get IL instruction offset at beginning of instruction.
                 offset = 0;
-                if((ilGen != null) && (monoGetCurrentOffset != null))
+                if ((ilGen != null) && (monoGetCurrentOffset != null))
                 {
                     offset = (int)monoGetCurrentOffset.Invoke(null, ilGenArg);
                 }
 
                 // Read and decode next internal format code from input file (.xmrobj file).
                 ScriptObjWriterCode code = (ScriptObjWriterCode)objReader.ReadByte();
-                switch(code)
+                switch (code)
                 {
                     // Reached end-of-file so we are all done.
                     case ScriptObjWriterCode.TheEnd:
@@ -415,366 +413,366 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     // Method must have already been declared via DclMethod
                     // so all we need is its name to retrieve from methods[].
                     case ScriptObjWriterCode.BegMethod:
-                    {
-                        string methName = objReader.ReadString();
+                        {
+                            string methName = objReader.ReadString();
 
-                        method = methods[methName];
-                        ilGen = method.GetILGenerator();
-                        ilGenArg[0] = ilGen;
+                            method = methods[methName];
+                            ilGen = method.GetILGenerator();
+                            ilGenArg[0] = ilGen;
 
-                        labels.Clear();
-                        locals.Clear();
-                        labelNames.Clear();
-                        localNames.Clear();
+                            labels.Clear();
+                            locals.Clear();
+                            labelNames.Clear();
+                            localNames.Clear();
 
-                        srcLocs = new Dictionary<int, ScriptSrcLoc>();
-                        if(objectTokens != null)
-                            objectTokens.BegMethod(method);
-                        break;
-                    }
+                            srcLocs = new Dictionary<int, ScriptSrcLoc>();
+                            if (objectTokens != null)
+                                objectTokens.BegMethod(method);
+                            break;
+                        }
 
                     // End of method's contents (ie, an OpCodes.Ret was probably just output).
                     // Call the callback to tell it the method is complete, and it can do whatever
                     // it wants with the method.
                     case ScriptObjWriterCode.EndMethod:
-                    {
-                        ilGen = null;
-                        ilGenArg[0] = null;
-                        scriptObjCode.EndMethod(method, srcLocs);
-                        srcLocs = null;
-                        if(objectTokens != null)
-                            objectTokens.EndMethod();
-                        break;
-                    }
-
-                     // Declare a label for branching to.
-                    case ScriptObjWriterCode.DclLabel:
-                    {
-                        int number = objReader.ReadInt32();
-                        string name = objReader.ReadString();
-
-                        labels.Add(number, ilGen.DefineLabel());
-                        labelNames.Add(number, name + "_" + number.ToString());
-                        if(objectTokens != null)
-                            objectTokens.DefineLabel(number, name);
-                        break;
-                    }
-
-                     // Declare a local variable to store into.
-                    case ScriptObjWriterCode.DclLocal:
-                    {
-                        int number = objReader.ReadInt32();
-                        string name = objReader.ReadString();
-                        string type = objReader.ReadString();
-                        Type syType = GetTypeFromStr(sdTypes, type);
-
-                        locals.Add(number, ilGen.DeclareLocal(syType));
-                        localNames.Add(number, name + "_" + number.ToString());
-                        if(objectTokens != null)
-                            objectTokens.DefineLocal(number, name, type, syType);
-                        break;
-                    }
-
-                     // Declare a method that will subsequently be defined.
-                     // We create the DynamicMethod object at this point in case there
-                     // are forward references from other method bodies.
-                    case ScriptObjWriterCode.DclMethod:
-                    {
-                        string methName = objReader.ReadString();
-                        Type retType = GetTypeFromStr(sdTypes, objReader.ReadString());
-                        int nArgs = objReader.ReadInt32();
-
-                        Type[] argTypes = new Type[nArgs];
-                        string[] argNames = new string[nArgs];
-                        for(int i = 0; i < nArgs; i++)
                         {
-                            argTypes[i] = GetTypeFromStr(sdTypes, objReader.ReadString());
-                            argNames[i] = objReader.ReadString();
+                            ilGen = null;
+                            ilGenArg[0] = null;
+                            scriptObjCode.EndMethod(method, srcLocs);
+                            srcLocs = null;
+                            if (objectTokens != null)
+                                objectTokens.EndMethod();
+                            break;
                         }
-                        methods.Add(methName, new DynamicMethod(methName, retType, argTypes));
-                        if(objectTokens != null)
-                            objectTokens.DefineMethod(methName, retType, argTypes, argNames);
-                        break;
-                    }
 
-                     // Mark a previously declared label at this spot.
+                    // Declare a label for branching to.
+                    case ScriptObjWriterCode.DclLabel:
+                        {
+                            int number = objReader.ReadInt32();
+                            string name = objReader.ReadString();
+
+                            labels.Add(number, ilGen.DefineLabel());
+                            labelNames.Add(number, name + "_" + number.ToString());
+                            if (objectTokens != null)
+                                objectTokens.DefineLabel(number, name);
+                            break;
+                        }
+
+                    // Declare a local variable to store into.
+                    case ScriptObjWriterCode.DclLocal:
+                        {
+                            int number = objReader.ReadInt32();
+                            string name = objReader.ReadString();
+                            string type = objReader.ReadString();
+                            Type syType = GetTypeFromStr(sdTypes, type);
+
+                            locals.Add(number, ilGen.DeclareLocal(syType));
+                            localNames.Add(number, name + "_" + number.ToString());
+                            if (objectTokens != null)
+                                objectTokens.DefineLocal(number, name, type, syType);
+                            break;
+                        }
+
+                    // Declare a method that will subsequently be defined.
+                    // We create the DynamicMethod object at this point in case there
+                    // are forward references from other method bodies.
+                    case ScriptObjWriterCode.DclMethod:
+                        {
+                            string methName = objReader.ReadString();
+                            Type retType = GetTypeFromStr(sdTypes, objReader.ReadString());
+                            int nArgs = objReader.ReadInt32();
+
+                            Type[] argTypes = new Type[nArgs];
+                            string[] argNames = new string[nArgs];
+                            for (int i = 0; i < nArgs; i++)
+                            {
+                                argTypes[i] = GetTypeFromStr(sdTypes, objReader.ReadString());
+                                argNames[i] = objReader.ReadString();
+                            }
+                            methods.Add(methName, new DynamicMethod(methName, retType, argTypes));
+                            if (objectTokens != null)
+                                objectTokens.DefineMethod(methName, retType, argTypes, argNames);
+                            break;
+                        }
+
+                    // Mark a previously declared label at this spot.
                     case ScriptObjWriterCode.MarkLabel:
-                    {
-                        int number = objReader.ReadInt32();
+                        {
+                            int number = objReader.ReadInt32();
 
-                        ilGen.MarkLabel(labels[number]);
+                            ilGen.MarkLabel(labels[number]);
 
-                        if(objectTokens != null)
-                            objectTokens.MarkLabel(offset, number);
-                        break;
-                    }
+                            if (objectTokens != null)
+                                objectTokens.MarkLabel(offset, number);
+                            break;
+                        }
 
-                     // Try/Catch blocks.
+                    // Try/Catch blocks.
                     case ScriptObjWriterCode.BegExcBlk:
-                    {
-                        ilGen.BeginExceptionBlock();
-                        if(objectTokens != null)
-                            objectTokens.BegExcBlk(offset);
-                        break;
-                    }
+                        {
+                            ilGen.BeginExceptionBlock();
+                            if (objectTokens != null)
+                                objectTokens.BegExcBlk(offset);
+                            break;
+                        }
 
                     case ScriptObjWriterCode.BegCatBlk:
-                    {
-                        Type excType = GetTypeFromStr(sdTypes, objReader.ReadString());
-                        ilGen.BeginCatchBlock(excType);
-                        if(objectTokens != null)
-                            objectTokens.BegCatBlk(offset, excType);
-                        break;
-                    }
+                        {
+                            Type excType = GetTypeFromStr(sdTypes, objReader.ReadString());
+                            ilGen.BeginCatchBlock(excType);
+                            if (objectTokens != null)
+                                objectTokens.BegCatBlk(offset, excType);
+                            break;
+                        }
 
                     case ScriptObjWriterCode.BegFinBlk:
-                    {
-                        ilGen.BeginFinallyBlock();
-                        if(objectTokens != null)
-                            objectTokens.BegFinBlk(offset);
-                        break;
-                    }
+                        {
+                            ilGen.BeginFinallyBlock();
+                            if (objectTokens != null)
+                                objectTokens.BegFinBlk(offset);
+                            break;
+                        }
 
                     case ScriptObjWriterCode.EndExcBlk:
-                    {
-                        ilGen.EndExceptionBlock();
-                        if(objectTokens != null)
-                            objectTokens.EndExcBlk(offset);
-                        break;
-                    }
+                        {
+                            ilGen.EndExceptionBlock();
+                            if (objectTokens != null)
+                                objectTokens.EndExcBlk(offset);
+                            break;
+                        }
 
-                     // Emit an opcode with no operand.
+                    // Emit an opcode with no operand.
                     case ScriptObjWriterCode.EmitNull:
-                    {
-                        OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
+                        {
+                            OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
 
-                        SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
-                        ilGen.Emit(opCode);
+                            SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
+                            ilGen.Emit(opCode);
 
-                        if(objectTokens != null)
-                            objectTokens.EmitNull(offset, opCode);
-                        break;
-                    }
+                            if (objectTokens != null)
+                                objectTokens.EmitNull(offset, opCode);
+                            break;
+                        }
 
-                     // Emit an opcode with a FieldInfo operand.
+                    // Emit an opcode with a FieldInfo operand.
                     case ScriptObjWriterCode.EmitField:
-                    {
-                        OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
-                        Type reflectedType = GetTypeFromStr(sdTypes, objReader.ReadString());
-                        string fieldName = objReader.ReadString();
+                        {
+                            OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
+                            Type reflectedType = GetTypeFromStr(sdTypes, objReader.ReadString());
+                            string fieldName = objReader.ReadString();
 
-                        FieldInfo field = reflectedType.GetField(fieldName);
-                        SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
-                        ilGen.Emit(opCode, field);
+                            FieldInfo field = reflectedType.GetField(fieldName);
+                            SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
+                            ilGen.Emit(opCode, field);
 
-                        if(objectTokens != null)
-                            objectTokens.EmitField(offset, opCode, field);
-                        break;
-                    }
+                            if (objectTokens != null)
+                                objectTokens.EmitField(offset, opCode, field);
+                            break;
+                        }
 
-                     // Emit an opcode with a LocalBuilder operand.
+                    // Emit an opcode with a LocalBuilder operand.
                     case ScriptObjWriterCode.EmitLocal:
-                    {
-                        OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
-                        int number = objReader.ReadInt32();
-                        SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
-                        ilGen.Emit(opCode, locals[number]);
+                        {
+                            OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
+                            int number = objReader.ReadInt32();
+                            SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
+                            ilGen.Emit(opCode, locals[number]);
 
-                        if(objectTokens != null)
-                            objectTokens.EmitLocal(offset, opCode, number);
-                        break;
-                    }
+                            if (objectTokens != null)
+                                objectTokens.EmitLocal(offset, opCode, number);
+                            break;
+                        }
 
-                     // Emit an opcode with a Type operand.
+                    // Emit an opcode with a Type operand.
                     case ScriptObjWriterCode.EmitType:
-                    {
-                        OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
-                        string name = objReader.ReadString();
-                        Type type = GetTypeFromStr(sdTypes, name);
+                        {
+                            OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
+                            string name = objReader.ReadString();
+                            Type type = GetTypeFromStr(sdTypes, name);
 
-                        SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
-                        ilGen.Emit(opCode, type);
+                            SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
+                            ilGen.Emit(opCode, type);
 
-                        if(objectTokens != null)
-                            objectTokens.EmitType(offset, opCode, type);
-                        break;
-                    }
+                            if (objectTokens != null)
+                                objectTokens.EmitType(offset, opCode, type);
+                            break;
+                        }
 
-                     // Emit an opcode with a Label operand.
+                    // Emit an opcode with a Label operand.
                     case ScriptObjWriterCode.EmitLabel:
-                    {
-                        OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
-                        int number = objReader.ReadInt32();
+                        {
+                            OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
+                            int number = objReader.ReadInt32();
 
-                        SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
-                        ilGen.Emit(opCode, labels[number]);
+                            SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
+                            ilGen.Emit(opCode, labels[number]);
 
-                        if(objectTokens != null)
-                            objectTokens.EmitLabel(offset, opCode, number);
-                        break;
-                    }
+                            if (objectTokens != null)
+                                objectTokens.EmitLabel(offset, opCode, number);
+                            break;
+                        }
 
-                     // Emit an opcode with a Label array operand.
+                    // Emit an opcode with a Label array operand.
                     case ScriptObjWriterCode.EmitLabels:
-                    {
-                        OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
-                        int nLabels = objReader.ReadInt32();
-                        Label[] lbls = new Label[nLabels];
-                        int[] nums = new int[nLabels];
-                        for(int i = 0; i < nLabels; i++)
                         {
-                            nums[i] = objReader.ReadInt32();
-                            lbls[i] = labels[nums[i]];
+                            OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
+                            int nLabels = objReader.ReadInt32();
+                            Label[] lbls = new Label[nLabels];
+                            int[] nums = new int[nLabels];
+                            for (int i = 0; i < nLabels; i++)
+                            {
+                                nums[i] = objReader.ReadInt32();
+                                lbls[i] = labels[nums[i]];
+                            }
+
+                            SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
+                            ilGen.Emit(opCode, lbls);
+
+                            if (objectTokens != null)
+                                objectTokens.EmitLabels(offset, opCode, nums);
+                            break;
                         }
 
-                        SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
-                        ilGen.Emit(opCode, lbls);
-
-                        if(objectTokens != null)
-                            objectTokens.EmitLabels(offset, opCode, nums);
-                        break;
-                    }
-
-                     // Emit an opcode with a MethodInfo operand (such as a call) of an external function.
+                    // Emit an opcode with a MethodInfo operand (such as a call) of an external function.
                     case ScriptObjWriterCode.EmitMethodExt:
-                    {
-                        OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
-                        string methName = objReader.ReadString();
-                        Type methType = GetTypeFromStr(sdTypes, objReader.ReadString());
-                        int nArgs = objReader.ReadInt32();
-
-                        Type[] argTypes = new Type[nArgs];
-                        for(int i = 0; i < nArgs; i++)
                         {
-                            argTypes[i] = GetTypeFromStr(sdTypes, objReader.ReadString());
+                            OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
+                            string methName = objReader.ReadString();
+                            Type methType = GetTypeFromStr(sdTypes, objReader.ReadString());
+                            int nArgs = objReader.ReadInt32();
+
+                            Type[] argTypes = new Type[nArgs];
+                            for (int i = 0; i < nArgs; i++)
+                            {
+                                argTypes[i] = GetTypeFromStr(sdTypes, objReader.ReadString());
+                            }
+                            MethodInfo methInfo = methType.GetMethod(methName, argTypes);
+                            SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
+                            ilGen.Emit(opCode, methInfo);
+
+                            if (objectTokens != null)
+                                objectTokens.EmitMethod(offset, opCode, methInfo);
+                            break;
                         }
-                        MethodInfo methInfo = methType.GetMethod(methName, argTypes);
-                        SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
-                        ilGen.Emit(opCode, methInfo);
 
-                        if(objectTokens != null)
-                            objectTokens.EmitMethod(offset, opCode, methInfo);
-                        break;
-                    }
-
-                     // Emit an opcode with a MethodInfo operand of an internal function
-                     // (previously declared via DclMethod).
+                    // Emit an opcode with a MethodInfo operand of an internal function
+                    // (previously declared via DclMethod).
                     case ScriptObjWriterCode.EmitMethodInt:
-                    {
-                        OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
-                        string methName = objReader.ReadString();
+                        {
+                            OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
+                            string methName = objReader.ReadString();
 
-                        MethodInfo methInfo = methods[methName];
-                        SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
-                        ilGen.Emit(opCode, methInfo);
+                            MethodInfo methInfo = methods[methName];
+                            SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
+                            ilGen.Emit(opCode, methInfo);
 
-                        if(objectTokens != null)
-                            objectTokens.EmitMethod(offset, opCode, methInfo);
-                        break;
-                    }
+                            if (objectTokens != null)
+                                objectTokens.EmitMethod(offset, opCode, methInfo);
+                            break;
+                        }
 
-                     // Emit an opcode with a ConstructorInfo operand.
+                    // Emit an opcode with a ConstructorInfo operand.
                     case ScriptObjWriterCode.EmitCtor:
-                    {
-                        OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
-                        Type ctorType = GetTypeFromStr(sdTypes, objReader.ReadString());
-                        int nArgs = objReader.ReadInt32();
-                        Type[] argTypes = new Type[nArgs];
-                        for(int i = 0; i < nArgs; i++)
                         {
-                            argTypes[i] = GetTypeFromStr(sdTypes, objReader.ReadString());
+                            OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
+                            Type ctorType = GetTypeFromStr(sdTypes, objReader.ReadString());
+                            int nArgs = objReader.ReadInt32();
+                            Type[] argTypes = new Type[nArgs];
+                            for (int i = 0; i < nArgs; i++)
+                            {
+                                argTypes[i] = GetTypeFromStr(sdTypes, objReader.ReadString());
+                            }
+
+                            ConstructorInfo ctorInfo = ctorType.GetConstructor(argTypes);
+                            SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
+                            ilGen.Emit(opCode, ctorInfo);
+
+                            if (objectTokens != null)
+                                objectTokens.EmitCtor(offset, opCode, ctorInfo);
+                            break;
                         }
 
-                        ConstructorInfo ctorInfo = ctorType.GetConstructor(argTypes);
-                        SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
-                        ilGen.Emit(opCode, ctorInfo);
-
-                        if(objectTokens != null)
-                            objectTokens.EmitCtor(offset, opCode, ctorInfo);
-                        break;
-                    }
-
-                     // Emit an opcode with a constant operand of various types.
+                    // Emit an opcode with a constant operand of various types.
                     case ScriptObjWriterCode.EmitDouble:
-                    {
-                        OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
-                        double value = objReader.ReadDouble();
-
-                        if(opCode != OpCodes.Ldc_R8)
                         {
-                            throw new Exception("bad opcode " + opCode.ToString());
-                        }
-                        SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
-                        ilGen.Emit(opCode, value);
+                            OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
+                            double value = objReader.ReadDouble();
 
-                        if(objectTokens != null)
-                            objectTokens.EmitDouble(offset, opCode, value);
-                        break;
-                    }
+                            if (opCode != OpCodes.Ldc_R8)
+                            {
+                                throw new Exception("bad opcode " + opCode.ToString());
+                            }
+                            SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
+                            ilGen.Emit(opCode, value);
+
+                            if (objectTokens != null)
+                                objectTokens.EmitDouble(offset, opCode, value);
+                            break;
+                        }
 
                     case ScriptObjWriterCode.EmitFloat:
-                    {
-                        OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
-                        float value = objReader.ReadSingle();
-
-                        if(opCode != OpCodes.Ldc_R4)
                         {
-                            throw new Exception("bad opcode " + opCode.ToString());
-                        }
-                        SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
-                        ilGen.Emit(opCode, value);
+                            OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
+                            float value = objReader.ReadSingle();
 
-                        if(objectTokens != null)
-                            objectTokens.EmitFloat(offset, opCode, value);
-                        break;
-                    }
+                            if (opCode != OpCodes.Ldc_R4)
+                            {
+                                throw new Exception("bad opcode " + opCode.ToString());
+                            }
+                            SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
+                            ilGen.Emit(opCode, value);
+
+                            if (objectTokens != null)
+                                objectTokens.EmitFloat(offset, opCode, value);
+                            break;
+                        }
 
                     case ScriptObjWriterCode.EmitInteger:
-                    {
-                        OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
-                        int value = objReader.ReadInt32();
-
-                        SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
-
-                        if(opCode == OpCodes.Ldc_I4)
                         {
-                            if((value >= -1) && (value <= 8))
+                            OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
+                            int value = objReader.ReadInt32();
+
+                            SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
+
+                            if (opCode == OpCodes.Ldc_I4)
                             {
-                                opCode = opCodesLdcI4M1P8[value + 1];
-                                ilGen.Emit(opCode);
-                                if(objectTokens != null)
-                                    objectTokens.EmitNull(offset, opCode);
-                                break;
+                                if ((value >= -1) && (value <= 8))
+                                {
+                                    opCode = opCodesLdcI4M1P8[value + 1];
+                                    ilGen.Emit(opCode);
+                                    if (objectTokens != null)
+                                        objectTokens.EmitNull(offset, opCode);
+                                    break;
+                                }
+                                if ((value >= 0) && (value <= 127))
+                                {
+                                    opCode = OpCodes.Ldc_I4_S;
+                                    ilGen.Emit(OpCodes.Ldc_I4_S, (sbyte)value);
+                                    goto pemitint;
+                                }
                             }
-                            if((value >= 0) && (value <= 127))
-                            {
-                                opCode = OpCodes.Ldc_I4_S;
-                                ilGen.Emit(OpCodes.Ldc_I4_S, (sbyte)value);
-                                goto pemitint;
-                            }
+
+                            ilGen.Emit(opCode, value);
+                        pemitint:
+                            if (objectTokens != null)
+                                objectTokens.EmitInteger(offset, opCode, value);
+                            break;
                         }
 
-                        ilGen.Emit(opCode, value);
-                        pemitint:
-                        if(objectTokens != null)
-                            objectTokens.EmitInteger(offset, opCode, value);
-                        break;
-                    }
-
                     case ScriptObjWriterCode.EmitString:
-                    {
-                        OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
-                        string value = objReader.ReadString();
+                        {
+                            OpCode opCode = ReadOpCode(objReader, ref srcFile, ref srcLine, ref srcPosn);
+                            string value = objReader.ReadString();
 
-                        SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
-                        ilGen.Emit(opCode, value);
+                            SaveSrcLoc(srcLocs, offset, srcFile, srcLine, srcPosn);
+                            ilGen.Emit(opCode, value);
 
-                        if(objectTokens != null)
-                            objectTokens.EmitString(offset, opCode, value);
-                        break;
-                    }
+                            if (objectTokens != null)
+                                objectTokens.EmitString(offset, opCode, value);
+                            break;
+                        }
 
-                     // Who knows what?
+                    // Who knows what?
                     default:
                         throw new Exception("bad ScriptObjWriterCode " + ((byte)code).ToString());
                 }
@@ -788,7 +786,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             Dictionary<short, OpCode> opCodeDict = new Dictionary<short, OpCode>();
             FieldInfo[] fields = typeof(OpCodes).GetFields();
-            for(int i = 0; i < fields.Length; i++)
+            for (int i = 0; i < fields.Length; i++)
             {
                 OpCode opcode = (OpCode)fields[i].GetValue(null);
                 opCodeDict.Add(opcode.Value, opcode);
@@ -801,7 +799,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         private void WriteOpCode(Token errorAt, OpCode opcode)
         {
-            if(errorAt == null)
+            if (errorAt == null)
             {
                 objFileWriter.Write("");
                 objFileWriter.Write(lastErrorAtLine);
@@ -809,7 +807,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
             else
             {
-                if(errorAt.file != lastErrorAtFile)
+                if (errorAt.file != lastErrorAtFile)
                 {
                     objFileWriter.Write(errorAt.file);
                     lastErrorAtFile = errorAt.file;
@@ -832,7 +830,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         private static OpCode ReadOpCode(BinaryReader objReader, ref string srcFile, ref int srcLine, ref int srcPosn)
         {
             string f = objReader.ReadString();
-            if(f != "")
+            if (f != "")
                 srcFile = f;
             srcLine = objReader.ReadInt32();
             srcPosn = objReader.ReadInt32();
@@ -910,7 +908,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             Dictionary<string, Type> s2t = PopulateS2T();
             Dictionary<Type, string> t2s = new Dictionary<Type, string>();
-            foreach(KeyValuePair<string, Type> kvp in s2t)
+            foreach (KeyValuePair<string, Type> kvp in s2t)
             {
                 t2s.Add(kvp.Value, kvp.Key);
             }
@@ -922,7 +920,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public static void DefineInternalType(string name, Type type)
         {
-            if(!string2Type.ContainsKey(name))
+            if (!string2Type.ContainsKey(name))
             {
                 string2Type.Add(name, type);
                 type2String.Add(type, name);
@@ -939,16 +937,16 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             string s;
 
             // internal fixed types like int and xmrarray etc
-            if(type2String.TryGetValue(t, out s))
+            if (type2String.TryGetValue(t, out s))
                 return s;
 
             // script-defined types
-            if(sdTypesRev.TryGetValue(t, out s))
+            if (sdTypesRev.TryGetValue(t, out s))
                 return "sdt$" + s;
 
             // inline function types
             s = TokenDeclSDTypeDelegate.TryGetInlineName(t);
-            if(s != null)
+            if (s != null)
                 return s;
 
             // last resort
@@ -960,16 +958,16 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             Type t;
 
             // internal fixed types like int and xmrarray etc
-            if(string2Type.TryGetValue(s, out t))
+            if (string2Type.TryGetValue(s, out t))
                 return t;
 
             // script-defined types
-            if(s.StartsWith("sdt$"))
+            if (s.StartsWith("sdt$"))
                 return sdTypes[s.Substring(4)].GetSysType();
 
             // inline function types
             t = TokenDeclSDTypeDelegate.TryGetInlineSysType(s);
-            if(t != null)
+            if (t != null)
                 return t;
 
             // last resort

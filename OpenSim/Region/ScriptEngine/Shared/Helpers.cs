@@ -25,18 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.IO;
-using System.Threading;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Region.CoreModules;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
-using OpenSim.Region.Framework.Interfaces;
+using System;
+using System.Runtime.Serialization;
 
 namespace OpenSim.Region.ScriptEngine.Shared
 {
@@ -252,14 +245,14 @@ namespace OpenSim.Region.ScriptEngine.Shared
 
         public void Populate(Scene scene, DetectedObject obj)
         {
-            if(obj.keyUUID == UUID.Zero) // land
+            if (obj.keyUUID == UUID.Zero) // land
             {
                 Position = new LSL_Types.Vector3(obj.posVector);
                 Rotation.s = 1.0;
                 return;
             }
 
-            if((obj.colliderType & 0x21) != 0) // avatar or npc
+            if ((obj.colliderType & 0x21) != 0) // avatar or npc
             {
                 ScenePresence presence = scene.GetScenePresence(obj.keyUUID);
                 if (presence == null)
@@ -278,7 +271,7 @@ namespace OpenSim.Region.ScriptEngine.Shared
             }
 
             SceneObjectPart part = scene.GetSceneObjectPart(obj.keyUUID);
-            if(part == null)
+            if (part == null)
                 return;
 
             Name = obj.nameStr;
@@ -289,7 +282,7 @@ namespace OpenSim.Region.ScriptEngine.Shared
             Rotation = new LSL_Types.Quaternion(obj.rotQuat);
             Velocity = new LSL_Types.Vector3(obj.velVector);
             LinkNum = obj.linkNumber;
-            if(obj.velVector == Vector3.Zero)
+            if (obj.velVector == Vector3.Zero)
                 Type = 4;
             else
                 Type = 2;
@@ -301,10 +294,10 @@ namespace OpenSim.Region.ScriptEngine.Shared
                 {
                     // at sl a physical prim is active also if has active scripts
                     // assuming all scripts are in run state to save time
-                    if((part.Flags & PrimFlags.Physics) != 0 )
+                    if ((part.Flags & PrimFlags.Physics) != 0)
                         Type = 10; // script + active
                     else
-                       Type |= SCRIPTED; // Scripted
+                        Type |= SCRIPTED; // Scripted
                     break;
                 }
             }

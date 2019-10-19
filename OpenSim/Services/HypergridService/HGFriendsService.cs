@@ -25,22 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Reflection;
-
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Framework;
+using OpenSim.Server.Base;
 using OpenSim.Services.Connectors.Friends;
 using OpenSim.Services.Connectors.Hypergrid;
 using OpenSim.Services.Interfaces;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using OpenSim.Server.Base;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using FriendInfo = OpenSim.Services.Interfaces.FriendInfo;
-
-using OpenMetaverse;
-using log4net;
-using Nini.Config;
+using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Services.HypergridService
 {
@@ -277,19 +274,19 @@ namespace OpenSim.Services.HypergridService
                 }
             }
 
-//            // Lastly, let's notify the rest who may be online somewhere else
-//            foreach (string user in usersToBeNotified)
-//            {
-//                UUID id = new UUID(user);
-//                //m_UserAgentService.LocateUser(id);
-//                //etc...
-//                //if (m_TravelingAgents.ContainsKey(id) && m_TravelingAgents[id].GridExternalName != m_GridName)
-//                //{
-//                //    string url = m_TravelingAgents[id].GridExternalName;
-//                //    // forward
-//                //}
-//                //m_log.WarnFormat("[HGFRIENDS SERVICE]: User {0} is visiting another grid. HG Status notifications still not implemented.", user);
-//            }
+            //            // Lastly, let's notify the rest who may be online somewhere else
+            //            foreach (string user in usersToBeNotified)
+            //            {
+            //                UUID id = new UUID(user);
+            //                //m_UserAgentService.LocateUser(id);
+            //                //etc...
+            //                //if (m_TravelingAgents.ContainsKey(id) && m_TravelingAgents[id].GridExternalName != m_GridName)
+            //                //{
+            //                //    string url = m_TravelingAgents[id].GridExternalName;
+            //                //    // forward
+            //                //}
+            //                //m_log.WarnFormat("[HGFRIENDS SERVICE]: User {0} is visiting another grid. HG Status notifications still not implemented.", user);
+            //            }
 
             // and finally, let's send the online friends
             if (online)
@@ -313,7 +310,7 @@ namespace OpenSim.Services.HypergridService
             if (!fromName.Contains("@"))
                 return;
 
-            string[] parts = fromName.Split(new char[] {'@'});
+            string[] parts = fromName.Split(new char[] { '@' });
             if (parts.Length != 2)
                 return;
 

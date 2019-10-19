@@ -24,21 +24,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Services.Connectors;
-using PresenceInfo = OpenSim.Services.Interfaces.PresenceInfo;
-
-using OpenMetaverse;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Services.Connectors;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Presence
 {

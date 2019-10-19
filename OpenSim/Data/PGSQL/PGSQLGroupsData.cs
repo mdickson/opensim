@@ -25,14 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using OpenSim.Framework;
-using OpenMetaverse;
-using log4net;
 using Npgsql;
+using OpenMetaverse;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Data.PGSQL
 {
@@ -86,13 +82,13 @@ namespace OpenSim.Data.PGSQL
 
             if (string.IsNullOrEmpty(pattern)) // True for where clause
             {
-                pattern = " 1 ORDER BY lower(\"Name\") LIMIT 100";
+                pattern = "1";
 
                 return m_Groups.Get(pattern);
             }
             else
             {
-                pattern = " \"ShowInList\" = 1 AND lower(\"Name\") LIKE lower('%" + pattern + "%') ORDER BY lower(\"Name\") LIMIT 100";
+                pattern = " \"ShowInList\" = 1 AND lower(\"Name\") LIKE lower('%" + pattern + "%')";
 
                 return m_Groups.Get(pattern, new NpgsqlParameter("pattern", pattern));
             }
@@ -233,7 +229,7 @@ namespace OpenSim.Data.PGSQL
 
         public bool DeleteRoleMember(RoleMembershipData data)
         {
-            return m_RoleMembership.Delete(new string[] { "GroupID", "RoleID", "PrincipalID"},
+            return m_RoleMembership.Delete(new string[] { "GroupID", "RoleID", "PrincipalID" },
                                            new string[] { data.GroupID.ToString(), data.RoleID.ToString(), data.PrincipalID });
         }
 

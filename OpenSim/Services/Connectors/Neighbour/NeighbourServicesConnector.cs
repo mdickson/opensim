@@ -26,20 +26,13 @@
  */
 
 using log4net;
+using OpenMetaverse.StructuredData;
+using OpenSim.Framework;
+using OpenSim.Services.Interfaces;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Reflection;
-using System.Text;
-using Nini.Config;
-using OpenSim.Framework;
-
-using OpenSim.Services.Interfaces;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Services.Connectors
@@ -87,7 +80,7 @@ namespace OpenSim.Services.Connectors
         public bool DoHelloNeighbourCall(GridRegion region, RegionInfo thisRegion)
         {
             string uri = region.ServerURI + "region/" + thisRegion.RegionID + "/";
-//            m_log.Debug("   >>> DoHelloNeighbourCall <<< " + uri);
+            //            m_log.Debug("   >>> DoHelloNeighbourCall <<< " + uri);
 
             WebRequest helloNeighbourRequest;
 
@@ -151,12 +144,12 @@ namespace OpenSim.Services.Connectors
                 os.Write(buffer, 0, strBuffer.Length);         //Send it
                 //m_log.InfoFormat("[REST COMMS]: Posted HelloNeighbour request to remote sim {0}", uri);
             }
-//            catch (Exception e)
+            //            catch (Exception e)
             catch
             {
-//                m_log.WarnFormat(
-//                    "[NEIGHBOUR SERVICE CONNCTOR]: Unable to send HelloNeighbour from {0} to {1}.  Exception {2}{3}",
-//                    thisRegion.RegionName, region.RegionName, e.Message, e.StackTrace);
+                //                m_log.WarnFormat(
+                //                    "[NEIGHBOUR SERVICE CONNCTOR]: Unable to send HelloNeighbour from {0} to {1}.  Exception {2}{3}",
+                //                    thisRegion.RegionName, region.RegionName, e.Message, e.StackTrace);
 
                 return false;
             }

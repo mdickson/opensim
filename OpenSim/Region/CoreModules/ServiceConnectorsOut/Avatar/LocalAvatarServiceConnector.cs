@@ -25,19 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Server.Base;
 using OpenSim.Services.Interfaces;
-
-using OpenMetaverse;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Avatar
 {
@@ -147,7 +145,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Avatar
 
         public bool SetAppearance(UUID userID, AvatarAppearance appearance)
         {
-            return m_AvatarService.SetAppearance(userID,appearance);
+            return m_AvatarService.SetAppearance(userID, appearance);
         }
 
         public AvatarData GetAvatar(UUID userID)

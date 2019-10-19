@@ -25,11 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using OpenMetaverse;
-using OpenSim.Region.ScriptEngine.Shared.Api;
+using System;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
 {
@@ -74,7 +72,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
             return localID.ToString() + itemID.ToString();
         }
 
-        private Dictionary<string,TimerInfo> Timers = new Dictionary<string,TimerInfo>();
+        private Dictionary<string, TimerInfo> Timers = new Dictionary<string, TimerInfo>();
         private object TimerListLock = new object();
 
         public void SetTimerEvent(uint m_localID, UUID m_itemID, double sec)
@@ -160,7 +158,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
                     if (ts.itemID == itemID)
                     {
                         data.Add(ts.interval);
-                        data.Add(ts.next-DateTime.Now.Ticks);
+                        data.Add(ts.next - DateTime.Now.Ticks);
                     }
                 }
             }
@@ -179,7 +177,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
                 ts.localID = localID;
                 ts.itemID = itemID;
                 ts.interval = (long)data[idx];
-                ts.next = DateTime.Now.Ticks + (long)data[idx+1];
+                ts.next = DateTime.Now.Ticks + (long)data[idx + 1];
                 idx += 2;
 
                 lock (TimerListLock)

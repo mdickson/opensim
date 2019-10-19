@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using NUnit.Framework;
 using OpenSim.Framework;
 using OpenSim.Region.CoreModules.World.Terrain.PaintBrushes;
@@ -50,7 +49,7 @@ namespace OpenSim.Region.CoreModules.World.Terrain.Tests
             {
                 for (y = 0; y < (int)Constants.RegionSize; y++)
                 {
-                    allowMask[x,y] = true;
+                    allowMask[x, y] = true;
                 }
             }
 
@@ -61,33 +60,33 @@ namespace OpenSim.Region.CoreModules.World.Terrain.Tests
             ITerrainPaintableEffect effect = new RaiseSphere();
 
             effect.PaintEffect(map, allowMask, midRegion, midRegion, -1.0, 2, 6.0,
-                0, midRegion - 1,0, (int)Constants.RegionSize -1);
+                0, midRegion - 1, 0, (int)Constants.RegionSize - 1);
             Assert.That(map[127, midRegion] > 0.0, "Raise brush should raising value at this point (127,128).");
             Assert.That(map[125, midRegion] > 0.0, "Raise brush should raising value at this point (124,128).");
             Assert.That(map[120, midRegion] == 0.0, "Raise brush should not change value at this point (120,128).");
             Assert.That(map[128, midRegion] == 0.0, "Raise brush should not change value at this point (128,128).");
-//            Assert.That(map[0, midRegion] == 0.0, "Raise brush should not change value at this point (0,128).");
+            //            Assert.That(map[0, midRegion] == 0.0, "Raise brush should not change value at this point (0,128).");
             //
             // Test LowerSphere
             //
             map = new TerrainChannel((int)Constants.RegionSize, (int)Constants.RegionSize);
-            for (x=0; x<map.Width; x++)
+            for (x = 0; x < map.Width; x++)
             {
-                for (y=0; y<map.Height; y++)
+                for (y = 0; y < map.Height; y++)
                 {
-                    map[x,y] = 1.0;
+                    map[x, y] = 1.0;
                 }
             }
             effect = new LowerSphere();
 
             effect.PaintEffect(map, allowMask, midRegion, midRegion, -1.0, 2, 6.0,
-                0, (int)Constants.RegionSize -1,0, (int)Constants.RegionSize -1);
+                0, (int)Constants.RegionSize - 1, 0, (int)Constants.RegionSize - 1);
             Assert.That(map[127, midRegion] >= 0.0, "Lower should not lowering value below 0.0 at this point (127,128).");
             Assert.That(map[127, midRegion] == 0.0, "Lower brush should lowering value to 0.0 at this point (127,128).");
             Assert.That(map[125, midRegion] < 1.0, "Lower brush should lowering value at this point (124,128).");
             Assert.That(map[120, midRegion] == 1.0, "Lower brush should not change value at this point (120,128).");
             Assert.That(map[128, midRegion] == 1.0, "Lower brush should not change value at this point (128,128).");
-//            Assert.That(map[0, midRegion] == 1.0, "Lower brush should not change value at this point (0,128).");
+            //            Assert.That(map[0, midRegion] == 1.0, "Lower brush should not change value at this point (0,128).");
         }
 
         [Test]

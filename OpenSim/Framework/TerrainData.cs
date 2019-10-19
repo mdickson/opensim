@@ -25,15 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
-
-using OpenMetaverse;
-
-using log4net;
 
 namespace OpenSim.Framework
 {
@@ -255,7 +251,7 @@ namespace OpenSim.Framework
             int startX = px * 16 * stride;
             int endX = (px + 1) * 16 * stride;
             int startY = py * 16;
-            fixed(float* block = _block, map = m_heightmap)
+            fixed (float* block = _block, map = m_heightmap)
             {
                 for (int y = startY; y < startY + 16; y++)
                 {
@@ -267,31 +263,31 @@ namespace OpenSim.Framework
             }
         }
 
-/*
- //    that is coded as the float height times the compression factor (usually '100'
-        //    to make for two decimal points).
-        public short ToCompressedHeightshort(float pHeight)
-        {
-            // clamp into valid range
-            pHeight *= CompressionFactor;
-            if (pHeight < short.MinValue)
-                return short.MinValue;
-            else if (pHeight > short.MaxValue)
-                return short.MaxValue;
-            return (short)pHeight;
-        }
+        /*
+         //    that is coded as the float height times the compression factor (usually '100'
+                //    to make for two decimal points).
+                public short ToCompressedHeightshort(float pHeight)
+                {
+                    // clamp into valid range
+                    pHeight *= CompressionFactor;
+                    if (pHeight < short.MinValue)
+                        return short.MinValue;
+                    else if (pHeight > short.MaxValue)
+                        return short.MaxValue;
+                    return (short)pHeight;
+                }
 
-        public ushort ToCompressedHeightushort(float pHeight)
-        {
-            // clamp into valid range
-            pHeight *= CompressionFactor;
-            if (pHeight < ushort.MinValue)
-                return ushort.MinValue;
-            else if (pHeight > ushort.MaxValue)
-                return ushort.MaxValue;
-            return (ushort)pHeight;
-        }
-*/
+                public ushort ToCompressedHeightushort(float pHeight)
+                {
+                    // clamp into valid range
+                    pHeight *= CompressionFactor;
+                    if (pHeight < ushort.MinValue)
+                        return ushort.MinValue;
+                    else if (pHeight > ushort.MaxValue)
+                        return ushort.MaxValue;
+                    return (ushort)pHeight;
+                }
+        */
 
         public float FromCompressedHeight(short pHeight)
         {
@@ -456,14 +452,14 @@ namespace OpenSim.Framework
                             for (int xx = 0; xx < SizeX; xx++)
                             {
                                 // reduce to 1cm resolution
-                                float val = (float)Math.Round(m_heightmap[xx, yy],2,MidpointRounding.ToEven);
+                                float val = (float)Math.Round(m_heightmap[xx, yy], 2, MidpointRounding.ToEven);
                                 bw.Write(val);
                             }
                     }
                     ret = str.ToArray();
                 }
             }
-            catch {}
+            catch { }
 
             m_log.DebugFormat("{0} V2D {1} bytes", LogHeader, ret.Length);
 
@@ -503,7 +499,7 @@ namespace OpenSim.Framework
                     }
                 }
             }
-            catch {}
+            catch { }
 
             m_log.DebugFormat("{0} V2DGzip {1} bytes", LogHeader, ret.Length);
             return ret;
@@ -639,7 +635,7 @@ namespace OpenSim.Framework
                     }
                 }
             }
-            catch( Exception e)
+            catch (Exception e)
             {
                 ClearTaint();
                 m_log.ErrorFormat("{0} V2DGzip error: {1} - terrain may be damaged",

@@ -25,23 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using NUnit.Framework;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Serialization;
+using OpenSim.Region.CoreModules.World.Serialiser;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Tests.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using System.Threading;
-using NUnit.Framework;
-using OpenMetaverse;
-using OpenSim.Data;
-using OpenSim.Framework;
-using OpenSim.Framework.Serialization;
-using OpenSim.Framework.Serialization.External;
-using OpenSim.Region.CoreModules.Avatar.Inventory.Archiver;
-using OpenSim.Region.CoreModules.World.Serialiser;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Scenes.Serialization;
-using OpenSim.Services.Interfaces;
-using OpenSim.Tests.Common;
 
 namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
 {
@@ -73,7 +66,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
         public void TestOrder()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             MemoryStream archiveReadStream = new MemoryStream(m_iarStreamBytes);
             TarArchiveReader tar = new TarArchiveReader(archiveReadStream);
@@ -94,7 +87,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
         public void TestSaveRootFolderToIar()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string userFirstName = "Jock";
             string userLastName = "Stirrup";
@@ -116,7 +109,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
             MemoryStream archiveReadStream = new MemoryStream(archive);
             TarArchiveReader tar = new TarArchiveReader(archiveReadStream);
 
-//            InventoryArchiveUtils.
+            //            InventoryArchiveUtils.
             bool gotObjectsFolder = false;
 
             string objectsFolderName
@@ -131,7 +124,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
 
             while (tar.ReadEntry(out filePath, out tarEntryType) != null)
             {
-//                Console.WriteLine("Got {0}", filePath);
+                //                Console.WriteLine("Got {0}", filePath);
 
                 // Lazily, we only bother to look for the system objects folder created when we call CreateUserWithInventory()
                 // XXX: But really we need to stop all that stuff being created in tests or check for such folders
@@ -147,7 +140,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
         public void TestSaveNonRootFolderToIar()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             string userFirstName = "Jock";
             string userLastName = "Stirrup";
@@ -185,7 +178,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
             MemoryStream archiveReadStream = new MemoryStream(archive);
             TarArchiveReader tar = new TarArchiveReader(archiveReadStream);
 
-//            InventoryArchiveUtils.
+            //            InventoryArchiveUtils.
             bool gotf1 = false, gotf1_1 = false, gotso1 = false, gotso2 = false;
 
             string f1FileName
@@ -202,7 +195,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
 
             while (tar.ReadEntry(out filePath, out tarEntryType) != null)
             {
-//                Console.WriteLine("Got {0}", filePath);
+                //                Console.WriteLine("Got {0}", filePath);
 
                 if (filePath == f1FileName)
                     gotf1 = true;
@@ -214,7 +207,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
                     gotso2 = true;
             }
 
-//            Assert.That(gotControlFile, Is.True, "No control file in archive");
+            //            Assert.That(gotControlFile, Is.True, "No control file in archive");
             Assert.That(gotf1, Is.True);
             Assert.That(gotf1_1, Is.True);
             Assert.That(gotso1, Is.True);
@@ -231,7 +224,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
         public void TestSaveItemToIar()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             // Create user
             string userFirstName = "Jock";
@@ -284,37 +277,37 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
             string filePath;
             TarArchiveReader.TarEntryType tarEntryType;
 
-//            Console.WriteLine("Reading archive");
+            //            Console.WriteLine("Reading archive");
 
             while (tar.ReadEntry(out filePath, out tarEntryType) != null)
             {
                 Console.WriteLine("Got {0}", filePath);
 
-//                if (ArchiveConstants.CONTROL_FILE_PATH == filePath)
-//                {
-//                    gotControlFile = true;
-//                }
+                //                if (ArchiveConstants.CONTROL_FILE_PATH == filePath)
+                //                {
+                //                    gotControlFile = true;
+                //                }
 
                 if (filePath.StartsWith(ArchiveConstants.INVENTORY_PATH) && filePath.EndsWith(".xml"))
                 {
-//                    string fileName = filePath.Remove(0, "Objects/".Length);
-//
-//                    if (fileName.StartsWith(part1.Name))
-//                    {
-                        Assert.That(expectedObject1FilePath, Is.EqualTo(filePath));
-                        gotObject1File = true;
-//                    }
-//                    else if (fileName.StartsWith(part2.Name))
-//                    {
-//                        Assert.That(fileName, Is.EqualTo(expectedObject2FileName));
-//                        gotObject2File = true;
-//                    }
+                    //                    string fileName = filePath.Remove(0, "Objects/".Length);
+                    //
+                    //                    if (fileName.StartsWith(part1.Name))
+                    //                    {
+                    Assert.That(expectedObject1FilePath, Is.EqualTo(filePath));
+                    gotObject1File = true;
+                    //                    }
+                    //                    else if (fileName.StartsWith(part2.Name))
+                    //                    {
+                    //                        Assert.That(fileName, Is.EqualTo(expectedObject2FileName));
+                    //                        gotObject2File = true;
+                    //                    }
                 }
             }
 
-//            Assert.That(gotControlFile, Is.True, "No control file in archive");
+            //            Assert.That(gotControlFile, Is.True, "No control file in archive");
             Assert.That(gotObject1File, Is.True, "No item1 file in archive");
-//            Assert.That(gotObject2File, Is.True, "No object2 file in archive");
+            //            Assert.That(gotObject2File, Is.True, "No object2 file in archive");
 
             // TODO: Test presence of more files and contents of files.
         }
@@ -326,7 +319,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
         public void TestSaveItemToIarNoAssets()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             // Create user
             string userFirstName = "Jock";
@@ -380,31 +373,31 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
             string filePath;
             TarArchiveReader.TarEntryType tarEntryType;
 
-//            Console.WriteLine("Reading archive");
+            //            Console.WriteLine("Reading archive");
 
             while (tar.ReadEntry(out filePath, out tarEntryType) != null)
             {
                 Console.WriteLine("Got {0}", filePath);
 
-//                if (ArchiveConstants.CONTROL_FILE_PATH == filePath)
-//                {
-//                    gotControlFile = true;
-//                }
+                //                if (ArchiveConstants.CONTROL_FILE_PATH == filePath)
+                //                {
+                //                    gotControlFile = true;
+                //                }
 
                 if (filePath.StartsWith(ArchiveConstants.INVENTORY_PATH) && filePath.EndsWith(".xml"))
                 {
-//                    string fileName = filePath.Remove(0, "Objects/".Length);
-//
-//                    if (fileName.StartsWith(part1.Name))
-//                    {
-                        Assert.That(expectedObject1FilePath, Is.EqualTo(filePath));
-                        gotObject1File = true;
-//                    }
-//                    else if (fileName.StartsWith(part2.Name))
-//                    {
-//                        Assert.That(fileName, Is.EqualTo(expectedObject2FileName));
-//                        gotObject2File = true;
-//                    }
+                    //                    string fileName = filePath.Remove(0, "Objects/".Length);
+                    //
+                    //                    if (fileName.StartsWith(part1.Name))
+                    //                    {
+                    Assert.That(expectedObject1FilePath, Is.EqualTo(filePath));
+                    gotObject1File = true;
+                    //                    }
+                    //                    else if (fileName.StartsWith(part2.Name))
+                    //                    {
+                    //                        Assert.That(fileName, Is.EqualTo(expectedObject2FileName));
+                    //                        gotObject2File = true;
+                    //                    }
                 }
                 else if (filePath.StartsWith(ArchiveConstants.ASSETS_PATH))
                 {
@@ -412,9 +405,9 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
                 }
             }
 
-//            Assert.That(gotControlFile, Is.True, "No control file in archive");
+            //            Assert.That(gotControlFile, Is.True, "No control file in archive");
             Assert.That(gotObject1File, Is.True, "No item1 file in archive");
-//            Assert.That(gotObject2File, Is.True, "No object2 file in archive");
+            //            Assert.That(gotObject2File, Is.True, "No object2 file in archive");
 
             // TODO: Test presence of more files and contents of files.
         }

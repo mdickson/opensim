@@ -29,10 +29,10 @@ namespace OpenSim.Framework
 {
     public class ConfigSettings
     {
-        public string PhysicsEngine                 { get; set; }
-        public string MeshEngineName                { get; set; }
-        public string ClientstackDll                { get; set; }
-        public string LibrariesXMLFile              { get; set; }
+        public string PhysicsEngine { get; set; }
+        public string MeshEngineName { get; set; }
+        public string ClientstackDll { get; set; }
+        public string LibrariesXMLFile { get; set; }
 
         public const uint DefaultRegionHttpPort = 9000;
     }

@@ -25,26 +25,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.Reflection;
-using System.Threading;
 using log4net;
-using Nini.Config;
 using Mono.Addins;
+using Nini.Config;
 using OpenMetaverse;
+using OpenSim.Capabilities.Handlers;
+using OpenSim.Framework.Monitoring;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Framework.Capabilities;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading;
 using Caps = OpenSim.Framework.Capabilities.Caps;
-using OpenSim.Capabilities.Handlers;
-using OpenSim.Framework.Monitoring;
-
-using OpenMetaverse.StructuredData;
 
 namespace OpenSim.Region.ClientStack.Linden
 {
@@ -90,7 +87,7 @@ namespace OpenSim.Region.ClientStack.Linden
         private bool m_Enabled;
 
         private string m_fetchInventoryDescendents2Url;
-//        private string m_webFetchInventoryDescendentsUrl;
+        //        private string m_webFetchInventoryDescendentsUrl;
 
         private static FetchInvDescHandler m_webFetchHandler;
 
@@ -102,7 +99,7 @@ namespace OpenSim.Region.ClientStack.Linden
 
         #region ISharedRegionModule Members
 
-        public WebFetchInvDescModule() : this(true) {}
+        public WebFetchInvDescModule() : this(true) { }
 
         public WebFetchInvDescModule(bool processQueuedResultsAsync)
         {
@@ -116,9 +113,9 @@ namespace OpenSim.Region.ClientStack.Linden
                 return;
 
             m_fetchInventoryDescendents2Url = config.GetString("Cap_FetchInventoryDescendents2", string.Empty);
-//            m_webFetchInventoryDescendentsUrl = config.GetString("Cap_WebFetchInventoryDescendents", string.Empty);
+            //            m_webFetchInventoryDescendentsUrl = config.GetString("Cap_WebFetchInventoryDescendents", string.Empty);
 
-//            if (m_fetchInventoryDescendents2Url != string.Empty || m_webFetchInventoryDescendentsUrl != string.Empty)
+            //            if (m_fetchInventoryDescendents2Url != string.Empty || m_webFetchInventoryDescendentsUrl != string.Empty)
             if (m_fetchInventoryDescendents2Url != string.Empty)
             {
                 m_Enabled = true;
@@ -231,7 +228,7 @@ namespace OpenSim.Region.ClientStack.Linden
                     m_workerThreads = null;
                 }
             }
-//            m_queue.Dispose();
+            //            m_queue.Dispose();
         }
 
         public string Name { get { return "WebFetchInvDescModule"; } }
@@ -264,7 +261,7 @@ namespace OpenSim.Region.ClientStack.Linden
                     lock (responses)
                     {
                         responses.Remove(x);
-                        lock(dropedResponses)
+                        lock (dropedResponses)
                             dropedResponses.Add(x);
                     }
                 };
@@ -307,16 +304,16 @@ namespace OpenSim.Region.ClientStack.Linden
 
             public void Process(APollRequest requestinfo)
             {
-                if(m_module == null || m_module.Scene == null || m_module.Scene.ShuttingDown)
+                if (m_module == null || m_module.Scene == null || m_module.Scene.ShuttingDown)
                     return;
 
                 UUID requestID = requestinfo.reqID;
 
-                lock(responses)
+                lock (responses)
                 {
-                    lock(dropedResponses)
+                    lock (dropedResponses)
                     {
-                        if(dropedResponses.Contains(requestID))
+                        if (dropedResponses.Contains(requestID))
                         {
                             dropedResponses.Remove(requestID);
                             return;
@@ -336,9 +333,9 @@ namespace OpenSim.Region.ClientStack.Linden
                         );
                 lock (responses)
                 {
-                    lock(dropedResponses)
+                    lock (dropedResponses)
                     {
-                        if(dropedResponses.Contains(requestID))
+                        if (dropedResponses.Contains(requestID))
                         {
                             dropedResponses.Remove(requestID);
                             requestinfo.request.Clear();
@@ -387,7 +384,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 capUrl = url;
                 IExternalCapsModule handler = Scene.RequestModuleInterface<IExternalCapsModule>();
                 if (handler != null)
-                    handler.RegisterExternalUserCapsHandler(agentID,caps,capName,capUrl);
+                    handler.RegisterExternalUserCapsHandler(agentID, caps, capName, capUrl);
                 else
                     caps.RegisterHandler(capName, capUrl);
             }

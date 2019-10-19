@@ -28,11 +28,7 @@
 using System;
 using System.IO;
 using System.Net;
-using System.Reflection;
 using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
-using log4net;
 
 namespace OpenSim.ConsoleClient
 {
@@ -50,16 +46,16 @@ namespace OpenSim.ConsoleClient
             request.ContentType = "application/x-www-form-urlencoded";
 
             byte[] buffer = Encoding.ASCII.GetBytes(data);
-            int length = (int) buffer.Length;
+            int length = (int)buffer.Length;
             request.ContentLength = length;
 
-            request.BeginGetRequestStream(delegate(IAsyncResult res)
+            request.BeginGetRequestStream(delegate (IAsyncResult res)
             {
                 Stream requestStream = request.EndGetRequestStream(res);
 
                 requestStream.Write(buffer, 0, length);
 
-                request.BeginGetResponse(delegate(IAsyncResult ar)
+                request.BeginGetResponse(delegate (IAsyncResult ar)
                 {
                     string reply = String.Empty;
 
@@ -68,8 +64,8 @@ namespace OpenSim.ConsoleClient
                         try
                         {
                             using (Stream s = response.GetResponseStream())
-                                using (StreamReader r = new StreamReader(s))
-                                    reply = r.ReadToEnd();
+                            using (StreamReader r = new StreamReader(s))
+                                reply = r.ReadToEnd();
 
                         }
                         catch (System.InvalidOperationException)

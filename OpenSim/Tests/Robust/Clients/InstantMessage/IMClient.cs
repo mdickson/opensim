@@ -25,16 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-using OpenMetaverse;
 using NUnit.Framework;
-
 using OpenSim.Framework;
-using OpenSim.Services.Interfaces;
 using OpenSim.Services.Connectors.InstantMessage;
+using System;
 
 namespace Robust.Tests
 {
@@ -50,7 +44,7 @@ namespace Robust.Tests
             im.message = "Hello";
             im.imSessionID = new Guid();
 
-            bool success = InstantMessageServiceConnector.SendInstantMessage(DemonServer.Address, im);
+            bool success = InstantMessageServiceConnector.SendInstantMessage(DemonServer.Address, im, String.Empty);
             Assert.IsFalse(success, "Sending of IM succeeded, but it should have failed");
         }
 

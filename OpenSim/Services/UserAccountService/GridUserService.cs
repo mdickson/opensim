@@ -25,18 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Data;
+using OpenSim.Framework;
+using OpenSim.Framework.Console;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Nini.Config;
-using OpenSim.Data;
-using OpenSim.Services.Interfaces;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-
-using OpenMetaverse;
-using log4net;
 
 namespace OpenSim.Services.UserAccountService
 {
@@ -88,7 +86,7 @@ namespace OpenSim.Services.UserAccountService
 
                 cdl.AddRow("User ID", gu.UserID);
 
-                foreach (KeyValuePair<string,string> kvp in gu.Data)
+                foreach (KeyValuePair<string, string> kvp in gu.Data)
                     cdl.AddRow(kvp.Key, kvp.Value);
 
                 MainConsole.Instance.Output(cdl.ToString());
@@ -99,13 +97,13 @@ namespace OpenSim.Services.UserAccountService
 
         protected void HandleShowGridUsersOnline(string module, string[] cmdparams)
         {
-//            if (cmdparams.Length != 4)
-//            {
-//                MainConsole.Instance.Output("Usage: show grid users online");
-//                return;
-//            }
+            //            if (cmdparams.Length != 4)
+            //            {
+            //                MainConsole.Instance.Output("Usage: show grid users online");
+            //                return;
+            //            }
 
-//            int onlineCount;
+            //            int onlineCount;
             int onlineRecentlyCount = 0;
 
             DateTime now = DateTime.UtcNow;
@@ -114,7 +112,7 @@ namespace OpenSim.Services.UserAccountService
             {
                 if (bool.Parse(gu.Data["Online"]))
                 {
-//                    onlineCount++;
+                    //                    onlineCount++;
 
                     int unixLoginTime = int.Parse(gu.Data["Login"]);
 
@@ -245,7 +243,7 @@ namespace OpenSim.Services.UserAccountService
 
         public bool SetLastPosition(string userID, UUID sessionID, UUID regionID, Vector3 lastPosition, Vector3 lastLookAt)
         {
-//            m_log.DebugFormat("[GRID USER SERVICE]: SetLastPosition for {0}", userID);
+            //            m_log.DebugFormat("[GRID USER SERVICE]: SetLastPosition for {0}", userID);
 
             GridUserData d = GetGridUserData(userID);
 

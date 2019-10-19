@@ -25,11 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse.StructuredData;
 using System;
 using System.Diagnostics;
 using System.Text;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 
 namespace OpenSim.Framework.Monitoring
 {
@@ -53,7 +52,7 @@ namespace OpenSim.Framework.Monitoring
                 Math.Round((MemoryWatchdog.AverageHeapAllocationRate * 1000) / 1048576.0, 3));
 
             Process myprocess = Process.GetCurrentProcess();
-//            if (!myprocess.HasExited)
+            //            if (!myprocess.HasExited)
             try
             {
                 myprocess.Refresh();
@@ -70,15 +69,15 @@ namespace OpenSim.Framework.Monitoring
             }
             catch
             { }
-//            else
-//                sb.Append("Process reported as Exited \n");
+            //            else
+            //                sb.Append("Process reported as Exited \n");
 
             return sb.ToString();
         }
 
         public virtual string XReport(string uptime, string version)
         {
-            return (string) Math.Round(GC.GetTotalMemory(false) / 1024.0 / 1024.0).ToString() ;
+            return (string)Math.Round(GC.GetTotalMemory(false) / 1024.0 / 1024.0).ToString();
         }
 
         public virtual OSDMap OReport(string uptime, string version)

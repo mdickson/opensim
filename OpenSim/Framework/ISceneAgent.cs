@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using OpenMetaverse;
 
 namespace OpenSim.Framework
@@ -56,7 +55,7 @@ namespace OpenSim.Framework
         bool IsChildAgent { get; }
 
         bool IsInTransit { get; }
-        bool IsNPC { get;}
+        bool IsNPC { get; }
 
         bool Invulnerable { get; set; }
         /// <summary>

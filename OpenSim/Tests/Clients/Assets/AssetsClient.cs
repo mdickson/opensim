@@ -25,21 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using System.Reflection;
-using System.Threading;
-
-using OpenMetaverse;
 using log4net;
 using log4net.Appender;
 using log4net.Layout;
-
+using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Services.Interfaces;
 using OpenSim.Services.Connectors;
+using System;
+using System.Net;
+using System.Reflection;
+using System.Threading;
 
 namespace OpenSim.Tests.Clients.AssetsClient
 {

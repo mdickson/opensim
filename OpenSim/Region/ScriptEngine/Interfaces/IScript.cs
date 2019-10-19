@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenSim.Region.ScriptEngine.Interfaces;
 using System;
 using System.Collections.Generic;
-using OpenSim.Region.ScriptEngine.Interfaces;
 
 namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 {
@@ -38,8 +38,8 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 
         int GetStateEventFlags(string state);
         void ExecuteEvent(string state, string FunctionName, object[] args);
-        Dictionary<string,Object> GetVars();
-        void SetVars(Dictionary<string,Object> vars);
+        Dictionary<string, Object> GetVars();
+        void SetVars(Dictionary<string, Object> vars);
         void ResetVars();
 
         void Close();

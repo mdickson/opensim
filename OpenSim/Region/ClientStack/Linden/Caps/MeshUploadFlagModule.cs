@@ -25,19 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Reflection;
-using log4net;
-using Nini.Config;
 using Mono.Addins;
+using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using OpenSim.Framework;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
+using System;
+using System.Collections;
 using Caps = OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Region.ClientStack.Linden
@@ -48,8 +44,8 @@ namespace OpenSim.Region.ClientStack.Linden
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "MeshUploadFlagModule")]
     public class MeshUploadFlagModule : INonSharedRegionModule
     {
-//        private static readonly ILog m_log =
-//            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log =
+        //            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Is this module enabled?
@@ -126,18 +122,18 @@ namespace OpenSim.Region.ClientStack.Linden
 
         private Hashtable MeshUploadFlag(Hashtable mDhttpMethod, UUID agentID)
         {
-//            m_log.DebugFormat("[MESH UPLOAD FLAG MODULE]: MeshUploadFlag request");
+            //            m_log.DebugFormat("[MESH UPLOAD FLAG MODULE]: MeshUploadFlag request");
 
             OSDMap data = new OSDMap();
-//    	    ScenePresence sp = m_scene.GetScenePresence(m_agentID);
-//    	    data["username"] = sp.Firstname + "." + sp.Lastname;
-//    	    data["display_name_next_update"] = new OSDDate(DateTime.Now);
-//    	    data["legacy_first_name"] = sp.Firstname;
+            //    	    ScenePresence sp = m_scene.GetScenePresence(m_agentID);
+            //    	    data["username"] = sp.Firstname + "." + sp.Lastname;
+            //    	    data["display_name_next_update"] = new OSDDate(DateTime.Now);
+            //    	    data["legacy_first_name"] = sp.Firstname;
             data["mesh_upload_status"] = "valid";
-//    	    data["display_name"] = sp.Firstname + " " + sp.Lastname;
-//    	    data["legacy_last_name"] = sp.Lastname;
-//    	    data["id"] = m_agentID;
-//    	    data["is_display_name_default"] = true;
+            //    	    data["display_name"] = sp.Firstname + " " + sp.Lastname;
+            //    	    data["legacy_last_name"] = sp.Lastname;
+            //    	    data["id"] = m_agentID;
+            //    	    data["is_display_name_default"] = true;
 
             //Send back data
             Hashtable responsedata = new Hashtable();

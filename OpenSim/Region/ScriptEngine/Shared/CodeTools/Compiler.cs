@@ -25,21 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+//using Microsoft.JScript;
+using log4net;
+using OpenMetaverse;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.ScriptEngine.Interfaces;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Reflection;
 using System.IO;
+using System.Reflection;
 using System.Text;
-using Microsoft.CSharp;
-//using Microsoft.JScript;
-using Microsoft.VisualBasic;
-using log4net;
-
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.ScriptEngine.Interfaces;
-using OpenMetaverse;
 
 namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
 {
@@ -268,7 +265,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
             string source, string asset, UUID ownerUUID, bool alwaysRecompile,
             out string assembly, out Dictionary<KeyValuePair<int, int>, KeyValuePair<int, int>> linemap)
         {
-//            m_log.DebugFormat("[Compiler]: Checking script for asset {0} in {1}\n{2}", asset, m_scriptEngine.World.Name, source);
+            //            m_log.DebugFormat("[Compiler]: Checking script for asset {0} in {1}\n{2}", asset, m_scriptEngine.World.Name, source);
 
             IScriptModuleComms comms = m_scriptEngine.World.RequestModuleInterface<IScriptModuleComms>();
 
@@ -277,7 +274,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
 
             assembly = GetCompilerOutput(asset);
 
-//            m_log.DebugFormat("[Compiler]: Retrieved assembly {0} for asset {1} in {2}", assembly, asset, m_scriptEngine.World.Name);
+            //            m_log.DebugFormat("[Compiler]: Retrieved assembly {0} for asset {1} in {2}", assembly, asset, m_scriptEngine.World.Name);
 
             CheckOrCreateScriptsDirectory();
 
@@ -285,7 +282,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
             // Performing 3 file exists tests for every script can still be slow
             if (!alwaysRecompile && File.Exists(assembly) && File.Exists(assembly + ".text") && File.Exists(assembly + ".map"))
             {
-//                m_log.DebugFormat("[Compiler]: Found existing assembly {0} for asset {1} in {2}", assembly, asset, m_scriptEngine.World.Name);
+                //                m_log.DebugFormat("[Compiler]: Found existing assembly {0} for asset {1} in {2}", assembly, asset, m_scriptEngine.World.Name);
 
                 // If we have already read this linemap file, then it will be in our dictionary.
                 // Don't build another copy of the dictionary (saves memory) and certainly
@@ -296,7 +293,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
                 return;
             }
 
-//            m_log.DebugFormat("[Compiler]: Compiling assembly {0} for asset {1} in {2}", assembly, asset, m_scriptEngine.World.Name);
+            //            m_log.DebugFormat("[Compiler]: Compiling assembly {0} for asset {1} in {2}", assembly, asset, m_scriptEngine.World.Name);
 
             if (source == String.Empty)
                 throw new Exception("Cannot find script assembly and no script text present");
@@ -315,7 +312,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
             if (source.StartsWith("//lsl", true, CultureInfo.InvariantCulture))
                 language = enumCompileType.lsl;
 
-//            m_log.DebugFormat("[Compiler]: Compile language is {0}", language);
+            //            m_log.DebugFormat("[Compiler]: Compile language is {0}", language);
 
             if (!AllowedCompilers.ContainsKey(language.ToString()))
             {
@@ -348,7 +345,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
                         m_scriptEngine.ScriptBaseClassParameters,
                         sb);
 
-                LSL_Converter.Convert(source,sb);
+                LSL_Converter.Convert(source, sb);
                 AddCSScriptTail(sb);
                 compileScript = sb.ToString();
                 // copy converter warnings into our warnings.
@@ -397,16 +394,16 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
             }
         }
 
-//        private static string CreateJSCompilerScript(string compileScript)
-//        {
-//            compileScript = String.Empty +
-//                "import OpenSim.Region.ScriptEngine.Shared; import System.Collections.Generic;\r\n" +
-//                "package SecondLife {\r\n" +
-//                "class Script extends OpenSim.Region.ScriptEngine.Shared.ScriptBase.ScriptBaseClass { \r\n" +
-//                compileScript +
-//                "} }\r\n";
-//            return compileScript;
-//        }
+        //        private static string CreateJSCompilerScript(string compileScript)
+        //        {
+        //            compileScript = String.Empty +
+        //                "import OpenSim.Region.ScriptEngine.Shared; import System.Collections.Generic;\r\n" +
+        //                "package SecondLife {\r\n" +
+        //                "class Script extends OpenSim.Region.ScriptEngine.Shared.ScriptBase.ScriptBaseClass { \r\n" +
+        //                compileScript +
+        //                "} }\r\n";
+        //            return compileScript;
+        //        }
 
         public static void AddCSScriptHeader(string className, string baseClassName, ParameterInfo[] constructorParameters, StringBuilder sb)
         {
@@ -484,7 +481,7 @@ namespace SecondLife
         /// <returns>Filename to .dll assembly</returns>
         internal string CompileFromDotNetText(string Script, enumCompileType lang, string asset, string assembly)
         {
-//            m_log.DebugFormat("[Compiler]: Compiling to assembly\n{0}", Script);
+            //            m_log.DebugFormat("[Compiler]: Compiling to assembly\n{0}", Script);
 
             string ext = "." + lang.ToString();
 
@@ -549,8 +546,8 @@ namespace SecondLife
             parameters.TreatWarningsAsErrors = false;
             parameters.GenerateInMemory = false;
 
-//            parameters.TempFiles = new TempFileCollection(Path.Combine(ScriptEnginesPath,
-//                        m_scriptEngine.World.RegionInfo.RegionID.ToString()), CompileWithDebugInformation);
+            //            parameters.TempFiles = new TempFileCollection(Path.Combine(ScriptEnginesPath,
+            //                        m_scriptEngine.World.RegionInfo.RegionID.ToString()), CompileWithDebugInformation);
 
             CompilerResults results;
 
@@ -569,8 +566,8 @@ namespace SecondLife
                                         "language type \"" + lang.ToString() + "\"");
             }
 
-            if(provider == null)
-                    throw new Exception("Compiler failed to load ");
+            if (provider == null)
+                throw new Exception("Compiler failed to load ");
 
             bool complete = false;
             bool retried = false;
@@ -750,26 +747,26 @@ namespace SecondLife
                 // Keep going until we find the first point passed line,col.
                 if (posmap.Key.Key > line)
                 {
-                  //m_log.DebugFormat("[Compiler]: Line is larger than requested {0},{1}, returning {2},{3}", line, col, l, c);
-                  if (pl < line)
-                  {
-                    //m_log.DebugFormat("[Compiler]: Previous line ({0}) is less than requested line ({1}), setting column to 1.", pl, line);
-                    c = 1;
-                  }
-                  break;
+                    //m_log.DebugFormat("[Compiler]: Line is larger than requested {0},{1}, returning {2},{3}", line, col, l, c);
+                    if (pl < line)
+                    {
+                        //m_log.DebugFormat("[Compiler]: Previous line ({0}) is less than requested line ({1}), setting column to 1.", pl, line);
+                        c = 1;
+                    }
+                    break;
                 }
                 if (posmap.Key.Key == line && posmap.Key.Value > col)
                 {
-                  // Never move l,c backwards.
-                  if (nl > l || (nl == l && nc > c))
-                  {
-                    //m_log.DebugFormat("[Compiler]: Using offset relative to this: {0} + {1} - {2}, {3} + {4} - {5} = {6}, {7}",
-                    //    posmap.Value.Key, line, posmap.Key.Key, posmap.Value.Value, col, posmap.Key.Value, nl, nc);
-                    l = nl;
-                    c = nc;
-                  }
-                  //m_log.DebugFormat("[Compiler]: Column is larger than requested {0},{1}, returning {2},{3}", line, col, l, c);
-                  break;
+                    // Never move l,c backwards.
+                    if (nl > l || (nl == l && nc > c))
+                    {
+                        //m_log.DebugFormat("[Compiler]: Using offset relative to this: {0} + {1} - {2}, {3} + {4} - {5} = {6}, {7}",
+                        //    posmap.Value.Key, line, posmap.Key.Key, posmap.Value.Value, col, posmap.Key.Value, nl, nc);
+                        l = nl;
+                        c = nc;
+                    }
+                    //m_log.DebugFormat("[Compiler]: Column is larger than requested {0},{1}, returning {2},{3}", line, col, l, c);
+                    break;
                 }
                 pl = posmap.Key.Key;
                 l = posmap.Value.Key;

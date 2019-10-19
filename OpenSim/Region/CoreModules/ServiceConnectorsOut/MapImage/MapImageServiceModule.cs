@@ -25,25 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Net;
-using System.IO;
-using System.Timers;
-using System.Drawing;
-using System.Drawing.Imaging;
-
 using log4net;
 using Mono.Addins;
 using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
 using OpenSim.Server.Base;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Reflection;
+using System.Timers;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.MapImage
 {
@@ -117,7 +114,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.MapImage
             }
 
             // we don't want the timer if the interval is zero, but we still want this module enables
-            if(refreshminutes > 0)
+            if (refreshminutes > 0)
             {
                 m_refreshtime = refreshminutes * 60 * 1000; // convert from minutes to ms
 
@@ -163,7 +160,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.MapImage
         ///</summary>
         public void RemoveRegion(Scene scene)
         {
-            if (! m_enabled)
+            if (!m_enabled)
                 return;
 
             lock (m_scenes)
@@ -224,9 +221,9 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.MapImage
             }
             else
             {
-            m_log.DebugFormat("{0} Upload {1} maptiles for {2}", LogHeader,
-                    (mapTile.Width * mapTile.Height) / (Constants.RegionSize * Constants.RegionSize),
-                    scene.Name);
+                m_log.DebugFormat("{0} Upload {1} maptiles for {2}", LogHeader,
+                        (mapTile.Width * mapTile.Height) / (Constants.RegionSize * Constants.RegionSize),
+                        scene.Name);
 
                 // For larger regions (varregion) we must cut the region image into legacy sized
                 //    pieces since that is how the maptile system works.
@@ -244,7 +241,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.MapImage
                             (int)Constants.RegionSize, (int)Constants.RegionSize);
                         using (Bitmap subMapTile = mapTile.Clone(rect, mapTile.PixelFormat))
                         {
-                            if(!ConvertAndUploadMaptile(scene, subMapTile,
+                            if (!ConvertAndUploadMaptile(scene, subMapTile,
                                                     scene.RegionInfo.RegionLocX + (xx / Constants.RegionSize),
                                                     scene.RegionInfo.RegionLocY + (yy / Constants.RegionSize),
                                                     scene.Name))
@@ -252,7 +249,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.MapImage
                                 m_log.DebugFormat("{0} Upload maptileS for {1} aborted!", LogHeader, scene.Name);
                                 return; // abort rest;
                             }
-                        }            
+                        }
                     }
                 }
             }

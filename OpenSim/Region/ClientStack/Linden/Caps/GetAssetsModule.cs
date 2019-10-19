@@ -25,24 +25,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.Reflection;
-using System.Threading;
-using Mono.Addins;
-using OpenSim.Framework.Monitoring;
 using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Capabilities.Handlers;
-using OpenSim.Framework;
+using OpenSim.Framework.Monitoring;
 using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading;
 using Caps = OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Region.ClientStack.Linden
@@ -50,8 +49,8 @@ namespace OpenSim.Region.ClientStack.Linden
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "GetAssetsModule")]
     public class GetAssetsModule : INonSharedRegionModule
     {
-//        private static readonly ILog m_log =
-//            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log =
+        //            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private Scene m_scene;
         private bool m_Enabled;
@@ -117,7 +116,6 @@ namespace OpenSim.Region.ClientStack.Linden
             m_GetAssetURL = config.GetString("Cap_GetAsset", string.Empty);
             if (m_GetAssetURL != string.Empty)
                 m_Enabled = true;
-
         }
 
         public void AddRegion(Scene pScene)
@@ -144,7 +142,7 @@ namespace OpenSim.Region.ClientStack.Linden
             if (!m_Enabled)
                 return;
 
-            lock(m_loadLock)
+            lock (m_loadLock)
             {
                 if (m_assetService == null && m_NumberScenes == 0)
                 {
@@ -183,7 +181,7 @@ namespace OpenSim.Region.ClientStack.Linden
 
         public void Close()
         {
-            if(m_NumberScenes <= 0 && m_workerThreads != null)
+            if (m_NumberScenes <= 0 && m_workerThreads != null)
             {
                 m_log.DebugFormat("[GetAssetsModule] Closing");
                 foreach (Thread t in m_workerThreads)
@@ -194,7 +192,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 {
                     m_queue.Dispose();
                 }
-                catch {}
+                catch { }
             }
         }
 
@@ -230,7 +228,7 @@ namespace OpenSim.Region.ClientStack.Linden
         private class PollServiceAssetEventArgs : PollServiceEventArgs
         {
             private List<Hashtable> requests = new List<Hashtable>();
-            private Dictionary<UUID, APollResponse> responses =new Dictionary<UUID, APollResponse>();
+            private Dictionary<UUID, APollResponse> responses = new Dictionary<UUID, APollResponse>();
             private HashSet<UUID> dropedResponses = new HashSet<UUID>();
 
             private Scene m_scene;
@@ -253,7 +251,7 @@ namespace OpenSim.Region.ClientStack.Linden
 
                             if (m_presence == null || m_presence.IsDeleted)
                                 return true;
-                            if(response.throttle)
+                            if (response.throttle)
                                 return m_presence.CapCanSendAsset(1, response.bytes);
                             return m_presence.CapCanSendAsset(2, response.bytes);
                         }
@@ -266,7 +264,7 @@ namespace OpenSim.Region.ClientStack.Linden
                     lock (responses)
                     {
                         responses.Remove(x);
-                        lock(dropedResponses)
+                        lock (dropedResponses)
                             dropedResponses.Add(x);
                     }
                 };
@@ -322,53 +320,53 @@ namespace OpenSim.Region.ClientStack.Linden
 
                 UUID requestID = requestinfo.reqID;
 
-                if(m_scene.ShuttingDown)
+                if (m_scene.ShuttingDown)
                     return;
 
-                lock(responses)
+                lock (responses)
                 {
-                    lock(dropedResponses)
+                    lock (dropedResponses)
                     {
-                        if(dropedResponses.Contains(requestID))
+                        if (dropedResponses.Contains(requestID))
                         {
                             dropedResponses.Remove(requestID);
                             return;
                         }
                     }
-/* can't do this with current viewers; HG problem
-                    // If the avatar is gone, don't bother to get the texture
-                    if(m_scene.GetScenePresence(Id) == null)
-                    {
-                        curresponse = new Hashtable();
-                        curresponse["int_response_code"] = 500;
-                        curresponse["str_response_string"] = "timeout";
-                        curresponse["content_type"] = "text/plain";
-                        curresponse["keepalive"] = false;
-                        responses[requestID] = new APollResponse() { bytes = 0, response = curresponse };
-                        return;
-                    }
-*/
+                    /* can't do this with current viewers; HG problem
+                                        // If the avatar is gone, don't bother to get the texture
+                                        if(m_scene.GetScenePresence(Id) == null)
+                                        {
+                                            curresponse = new Hashtable();
+                                            curresponse["int_response_code"] = 500;
+                                            curresponse["str_response_string"] = "timeout";
+                                            curresponse["content_type"] = "text/plain";
+                                            curresponse["keepalive"] = false;
+                                            responses[requestID] = new APollResponse() { bytes = 0, response = curresponse };
+                                            return;
+                                        }
+                    */
                 }
 
                 curresponse = m_getAssetHandler.Handle(requestinfo.request);
 
-                lock(responses)
+                lock (responses)
                 {
-                    lock(dropedResponses)
+                    lock (dropedResponses)
                     {
-                        if(dropedResponses.Contains(requestID))
+                        if (dropedResponses.Contains(requestID))
                         {
                             dropedResponses.Remove(requestID);
                             return;
                         }
                     }
 
-                    APollResponse preq= new APollResponse()
+                    APollResponse preq = new APollResponse()
                     {
                         bytes = (int)curresponse["int_bytes"],
                         response = curresponse
                     };
-                    if(curresponse.Contains("throttle"))
+                    if (curresponse.Contains("throttle"))
                         preq.throttle = true;
                     responses[requestID] = preq;
                 }
@@ -387,6 +385,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 protocol = "https";
             }
 
+            IExternalCapsModule handler = m_scene.RequestModuleInterface<IExternalCapsModule>();
             string baseURL = String.Format("{0}://{1}:{2}", protocol, hostName, port);
 
             if (m_GetTextureURL == "localhost")
@@ -399,7 +398,6 @@ namespace OpenSim.Region.ClientStack.Linden
                 args.Type = PollServiceEventArgs.EventType.Texture;
                 MainServer.Instance.AddPollServiceHTTPHandler(capUrl, args);
 
-                IExternalCapsModule handler = m_scene.RequestModuleInterface<IExternalCapsModule>();
                 if (handler != null)
                     handler.RegisterExternalUserCapsHandler(agentID, caps, "GetTexture", capUrl);
                 else
@@ -420,7 +418,6 @@ namespace OpenSim.Region.ClientStack.Linden
                 args.Type = PollServiceEventArgs.EventType.Mesh;
                 MainServer.Instance.AddPollServiceHTTPHandler(capUrl, args);
 
-                IExternalCapsModule handler = m_scene.RequestModuleInterface<IExternalCapsModule>();
                 if (handler != null)
                     handler.RegisterExternalUserCapsHandler(agentID, caps, "GetMesh", capUrl);
                 else
@@ -438,7 +435,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 PollServiceAssetEventArgs args = new PollServiceAssetEventArgs(capUrl, agentID, m_scene);
                 args.Type = PollServiceEventArgs.EventType.Mesh2;
                 MainServer.Instance.AddPollServiceHTTPHandler(capUrl, args);
-                IExternalCapsModule handler = m_scene.RequestModuleInterface<IExternalCapsModule>();
+
                 if (handler != null)
                     handler.RegisterExternalUserCapsHandler(agentID, caps, "GetMesh2", capUrl);
                 else
@@ -448,6 +445,7 @@ namespace OpenSim.Region.ClientStack.Linden
             else if (m_GetMesh2URL != string.Empty)
                 caps.RegisterHandler("GetMesh2", m_GetMesh2URL);
 
+
             //ViewerAsset
             if (m_GetAssetURL == "localhost")
             {
@@ -456,7 +454,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 PollServiceAssetEventArgs args = new PollServiceAssetEventArgs(capUrl, agentID, m_scene);
                 args.Type = PollServiceEventArgs.EventType.Asset;
                 MainServer.Instance.AddPollServiceHTTPHandler(capUrl, args);
-                IExternalCapsModule handler = m_scene.RequestModuleInterface<IExternalCapsModule>();
+
                 if (handler != null)
                     handler.RegisterExternalUserCapsHandler(agentID, caps, "ViewerAsset", capUrl);
                 else
@@ -464,8 +462,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 m_capsDictGetAsset[agentID] = capUrl;
             }
             else if (m_GetAssetURL != string.Empty)
-                caps.RegisterHandler("ViewerAsset", m_GetMesh2URL);
-
+                caps.RegisterHandler("ViewerAsset", m_GetAssetURL);
         }
 
         private void DeregisterCaps(UUID agentID, Caps caps)

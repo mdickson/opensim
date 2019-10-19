@@ -25,18 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
-using System.Collections.Generic;
-using Nini.Config;
 using log4net;
-using OpenSim.Framework;
+using Mono.Addins;
+using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using Mono.Addins;
-using OpenMetaverse;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.Scripting.ScriptModuleComms
 {
@@ -47,9 +46,9 @@ namespace OpenSim.Region.CoreModules.Scripting.ScriptModuleComms
             LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static string LogHeader = "[MODULE COMMS]";
 
-        private Dictionary<string,object> m_constants = new Dictionary<string,object>();
+        private Dictionary<string, object> m_constants = new Dictionary<string, object>();
 
-#region ScriptInvocation
+        #region ScriptInvocation
         protected class ScriptInvocationData
         {
             public Delegate ScriptInvocationDelegate { get; private set; }
@@ -66,13 +65,13 @@ namespace OpenSim.Region.CoreModules.Scripting.ScriptModuleComms
             }
         }
 
-        private Dictionary<string,ScriptInvocationData> m_scriptInvocation = new Dictionary<string,ScriptInvocationData>();
-#endregion
+        private Dictionary<string, ScriptInvocationData> m_scriptInvocation = new Dictionary<string, ScriptInvocationData>();
+        #endregion
 
         private IScriptModule m_scriptModule = null;
         public event ScriptCommand OnScriptCommand;
 
-#region RegionModuleInterface
+        #region RegionModuleInterface
         public void Initialise(IConfigSource config)
         {
         }
@@ -107,9 +106,9 @@ namespace OpenSim.Region.CoreModules.Scripting.ScriptModuleComms
         public void Close()
         {
         }
-#endregion
+        #endregion
 
-#region ScriptModuleComms
+        #region ScriptModuleComms
 
         public void RaiseEvent(UUID script, string id, string module, string command, string k)
         {
@@ -126,7 +125,7 @@ namespace OpenSim.Region.CoreModules.Scripting.ScriptModuleComms
             if (m_scriptModule == null)
                 return;
 
-            Object[] args = new Object[] {-1, code, text, k};
+            Object[] args = new Object[] { -1, code, text, k };
 
             m_scriptModule.PostScriptEvent(script, "link_message", args);
         }
@@ -164,7 +163,7 @@ namespace OpenSim.Region.CoreModules.Scripting.ScriptModuleComms
 
         public void RegisterScriptInvocation(object target, MethodInfo mi)
         {
-//            m_log.DebugFormat("[MODULE COMMANDS] Register method {0} from type {1}", mi.Name, (target is Type) ? ((Type)target).Name : target.GetType().Name);
+            //            m_log.DebugFormat("[MODULE COMMANDS] Register method {0} from type {1}", mi.Name, (target is Type) ? ((Type)target).Name : target.GetType().Name);
 
             Type delegateType = typeof(void);
             List<Type> typeArgs = mi.GetParameters()
@@ -223,14 +222,14 @@ namespace OpenSim.Region.CoreModules.Scripting.ScriptModuleComms
 
         public void RegisterScriptInvocations(IRegionModuleBase target)
         {
-            foreach(MethodInfo method in target.GetType().GetMethods(
+            foreach (MethodInfo method in target.GetType().GetMethods(
                     BindingFlags.Public | BindingFlags.Instance |
                     BindingFlags.Static))
             {
-                if(method.GetCustomAttributes(
+                if (method.GetCustomAttributes(
                         typeof(ScriptInvocationAttribute), true).Any())
                 {
-                    if(method.IsStatic)
+                    if (method.IsStatic)
                         RegisterScriptInvocation(target.GetType(), method);
                     else
                         RegisterScriptInvocation(target, method);
@@ -255,7 +254,7 @@ namespace OpenSim.Region.CoreModules.Scripting.ScriptModuleComms
             lock (m_scriptInvocation)
             {
                 ScriptInvocationData sid;
-                if (m_scriptInvocation.TryGetValue(fname,out sid))
+                if (m_scriptInvocation.TryGetValue(fname, out sid))
                 {
                     if (sid.ReturnType == typeof(string))
                         return "modInvokeS";
@@ -274,7 +273,7 @@ namespace OpenSim.Region.CoreModules.Scripting.ScriptModuleComms
                     else if (sid.ReturnType == typeof(void))
                         return "modInvokeN";
 
-                    m_log.WarnFormat("[MODULE COMMANDS] failed to find match for {0} with return type {1}",fname,sid.ReturnType.Name);
+                    m_log.WarnFormat("[MODULE COMMANDS] failed to find match for {0} with return type {1}", fname, sid.ReturnType.Name);
                 }
             }
 
@@ -286,7 +285,7 @@ namespace OpenSim.Region.CoreModules.Scripting.ScriptModuleComms
             lock (m_scriptInvocation)
             {
                 ScriptInvocationData sid;
-                if (m_scriptInvocation.TryGetValue(fname,out sid))
+                if (m_scriptInvocation.TryGetValue(fname, out sid))
                     return sid.ScriptInvocationDelegate;
             }
 
@@ -298,7 +297,7 @@ namespace OpenSim.Region.CoreModules.Scripting.ScriptModuleComms
             lock (m_scriptInvocation)
             {
                 ScriptInvocationData sid;
-                if (m_scriptInvocation.TryGetValue(fname,out sid))
+                if (m_scriptInvocation.TryGetValue(fname, out sid))
                     return sid.TypeSignature;
             }
 
@@ -310,7 +309,7 @@ namespace OpenSim.Region.CoreModules.Scripting.ScriptModuleComms
             lock (m_scriptInvocation)
             {
                 ScriptInvocationData sid;
-                if (m_scriptInvocation.TryGetValue(fname,out sid))
+                if (m_scriptInvocation.TryGetValue(fname, out sid))
                     return sid.ReturnType;
             }
 
@@ -334,10 +333,10 @@ namespace OpenSim.Region.CoreModules.Scripting.ScriptModuleComms
         /// </summary>
         public void RegisterConstant(string cname, object value)
         {
-//            m_log.DebugFormat("[MODULE COMMANDS] register constant <{0}> with value {1}",cname,value.ToString());
+            //            m_log.DebugFormat("[MODULE COMMANDS] register constant <{0}> with value {1}",cname,value.ToString());
             lock (m_constants)
             {
-                m_constants.Add(cname,value);
+                m_constants.Add(cname, value);
             }
         }
 
@@ -365,7 +364,7 @@ namespace OpenSim.Region.CoreModules.Scripting.ScriptModuleComms
             lock (m_constants)
             {
                 object value = null;
-                if (m_constants.TryGetValue(cname,out value))
+                if (m_constants.TryGetValue(cname, out value))
                     return value;
             }
 
@@ -388,7 +387,7 @@ namespace OpenSim.Region.CoreModules.Scripting.ScriptModuleComms
             return ret;
         }
 
-#endregion
+        #endregion
 
     }
 }

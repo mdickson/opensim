@@ -25,23 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using Mono.Addins;
 using Nini.Config;
-using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Threading;
 
 namespace OpenSim.Region.CoreModules.World
 {
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "CloudModule")]
     public class CloudModule : ICloudModule, INonSharedRegionModule
     {
-//        private static readonly log4net.ILog m_log
-//            = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly log4net.ILog m_log
+        //            = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private uint m_frame = 0;
         private int m_frameUpdateRate = 1000;
         private Random m_rndnums;
@@ -137,7 +135,7 @@ namespace OpenSim.Region.CoreModules.World
 
             if (cloudCover != null)
             {
-                lock(cloudlock)
+                lock (cloudlock)
                     cover = cloudCover[y * 16 + x];
             }
 
@@ -168,7 +166,7 @@ namespace OpenSim.Region.CoreModules.World
                     columnRight = x + 1;
                     columnLeft = x - 1;
                 }
-                for (int y = 0; y< 16; y++)
+                for (int y = 0; y < 16; y++)
                 {
                     if (y == 0)
                     {
@@ -204,21 +202,21 @@ namespace OpenSim.Region.CoreModules.World
 
         private void CloudUpdate()
         {
-            if ((!m_ready ||  m_busy || m_cloudDensity == 0 ||
+            if ((!m_ready || m_busy || m_cloudDensity == 0 ||
                     (m_frame++ % m_frameUpdateRate) != 0))
                 return;
 
-            if(Monitor.TryEnter(cloudlock))
+            if (Monitor.TryEnter(cloudlock))
             {
                 m_busy = true;
                 Util.FireAndForget(delegate
                     {
                         try
                         {
-                            lock(cloudlock)
+                            lock (cloudlock)
                             {
                                 UpdateCloudCover();
-                                m_scene.ForEachClient(delegate(IClientAPI client)
+                                m_scene.ForEachClient(delegate (IClientAPI client)
                                 {
                                     client.SendCloudData(m_dataVersion, cloudCover);
                                 });
@@ -238,8 +236,8 @@ namespace OpenSim.Region.CoreModules.World
         {
             if (m_ready)
             {
-                lock(cloudlock)
-                       client.SendCloudData(m_dataVersion, cloudCover);
+                lock (cloudlock)
+                    client.SendCloudData(m_dataVersion, cloudCover);
             }
         }
 

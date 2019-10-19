@@ -25,9 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -36,6 +33,9 @@ using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
 {
@@ -76,7 +76,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
 
             m_Scenelist.Add(scene);
 
-//            scene.RegisterModuleInterface<IInventoryTransferModule>(this);
+            //            scene.RegisterModuleInterface<IInventoryTransferModule>(this);
 
             scene.EventManager.OnNewClient += OnNewClient;
             scene.EventManager.OnIncomingInstantMessage += OnGridInstantMessage;
@@ -92,8 +92,8 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
                     m_log.Error("[INVENTORY TRANSFER]: No Message transfer module found, transfers will be local only");
                     m_Enabled = false;
 
-//                    m_Scenelist.Clear();
-//                    scene.EventManager.OnNewClient -= OnNewClient;
+                    //                    m_Scenelist.Clear();
+                    //                    scene.EventManager.OnNewClient -= OnNewClient;
                     scene.EventManager.OnIncomingInstantMessage -= OnGridInstantMessage;
                 }
             }
@@ -148,17 +148,17 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
 
         private void OnInstantMessage(IClientAPI client, GridInstantMessage im)
         {
-//            m_log.DebugFormat(
-//                "[INVENTORY TRANSFER]: {0} IM type received from client {1}. From={2} ({3}), To={4}",
-//                (InstantMessageDialog)im.dialog, client.Name,
-//                im.fromAgentID, im.fromAgentName, im.toAgentID);
+            //            m_log.DebugFormat(
+            //                "[INVENTORY TRANSFER]: {0} IM type received from client {1}. From={2} ({3}), To={4}",
+            //                (InstantMessageDialog)im.dialog, client.Name,
+            //                im.fromAgentID, im.fromAgentName, im.toAgentID);
 
             Scene scene = FindClientScene(client.AgentId);
 
             if (scene == null) // Something seriously wrong here.
                 return;
 
-            if (im.dialog == (byte) InstantMessageDialog.InventoryOffered)
+            if (im.dialog == (byte)InstantMessageDialog.InventoryOffered)
             {
                 //m_log.DebugFormat("Asset type {0}", ((AssetType)im.binaryBucket[0]));
 
@@ -213,7 +213,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
 
                     UUID itemID = new UUID(im.binaryBucket, 1);
 
-                    m_log.DebugFormat("[INVENTORY TRANSFER]: (giving) Inserting item {0} "+
+                    m_log.DebugFormat("[INVENTORY TRANSFER]: (giving) Inserting item {0} " +
                             "into agent {1}'s inventory",
                             itemID, new UUID(im.toAgentID));
 
@@ -253,22 +253,22 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
                 else
                 {
                     if (m_TransferModule != null)
-                        m_TransferModule.SendInstantMessage(im, delegate(bool success)
+                        m_TransferModule.SendInstantMessage(im, delegate (bool success)
                         {
                             if (!success)
                                 client.SendAlertMessage("User not online. Inventory has been saved");
                         });
                 }
             }
-            else if (im.dialog == (byte) InstantMessageDialog.InventoryAccepted ||
-                     im.dialog == (byte) InstantMessageDialog.TaskInventoryAccepted)
+            else if (im.dialog == (byte)InstantMessageDialog.InventoryAccepted ||
+                     im.dialog == (byte)InstantMessageDialog.TaskInventoryAccepted)
             {
                 UUID inventoryID = new UUID(im.imSessionID); // The inventory item/folder, back from it's trip
                 IInventoryService invService = scene.InventoryService;
 
                 // Special case: folder redirect.
                 // RLV uses this
-                if (im.dialog == (byte) InstantMessageDialog.TaskInventoryAccepted)
+                if (im.dialog == (byte)InstantMessageDialog.TaskInventoryAccepted)
                 {
                     InventoryFolderBase folder = invService.GetFolder(client.AgentId, inventoryID);
 
@@ -303,7 +303,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
                 else
                 {
                     if (m_TransferModule != null)
-                        m_TransferModule.SendInstantMessage(im, delegate(bool success) {});
+                        m_TransferModule.SendInstantMessage(im, delegate (bool success) { });
                 }
             }
 
@@ -312,7 +312,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
             // response from renaming the #RLV/~example folder to ~example.  For some reason this is not yet
             // happening, possibly because we are not sending the correct inventory update messages with the correct
             // transaction IDs
-            else if (im.dialog == (byte) InstantMessageDialog.TaskInventoryAccepted)
+            else if (im.dialog == (byte)InstantMessageDialog.TaskInventoryAccepted)
             {
                 UUID destinationFolderID = UUID.Zero;
 
@@ -416,7 +416,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
                     if (folder == null)
                         reason += " Folder not found.";
 
-                    client.SendAgentAlertMessage("Unable to delete "+
+                    client.SendAgentAlertMessage("Unable to delete " +
                             "received inventory" + reason, false);
                 }
                 // Tell client about updates to original parent and new parent (this should probably be factored with existing move item/folder code).
@@ -439,7 +439,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
                     else
                     {
                         if (m_TransferModule != null)
-                            m_TransferModule.SendInstantMessage(im, delegate(bool success) { });
+                            m_TransferModule.SendInstantMessage(im, delegate (bool success) { });
                     }
                 }
             }
@@ -467,7 +467,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
             // This requires a little bit of processing because we have to make the
             // new item visible in the recipient's inventory here
             //
-            if (im.dialog == (byte) InstantMessageDialog.InventoryOffered)
+            if (im.dialog == (byte)InstantMessageDialog.InventoryOffered)
             {
                 if (im.binaryBucket.Length < 17) // Invalid
                     return;
@@ -501,7 +501,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
                 }
                 user.ControllingClient.SendInstantMessage(im);
             }
-            if (im.dialog == (byte) InstantMessageDialog.TaskInventoryOffered)
+            if (im.dialog == (byte)InstantMessageDialog.TaskInventoryOffered)
             {
                 if (im.binaryBucket.Length < 1) // Invalid
                     return;
@@ -541,10 +541,10 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
 
                 user.ControllingClient.SendInstantMessage(im);
             }
-            else if (im.dialog == (byte) InstantMessageDialog.InventoryAccepted ||
-                     im.dialog == (byte) InstantMessageDialog.InventoryDeclined ||
-                     im.dialog == (byte) InstantMessageDialog.TaskInventoryDeclined ||
-                     im.dialog == (byte) InstantMessageDialog.TaskInventoryAccepted)
+            else if (im.dialog == (byte)InstantMessageDialog.InventoryAccepted ||
+                     im.dialog == (byte)InstantMessageDialog.InventoryDeclined ||
+                     im.dialog == (byte)InstantMessageDialog.TaskInventoryDeclined ||
+                     im.dialog == (byte)InstantMessageDialog.TaskInventoryAccepted)
             {
                 user.ControllingClient.SendInstantMessage(im);
             }

@@ -26,18 +26,15 @@
  */
 
 using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
-using Nini.Config;
-using OpenSim.Framework;
-
-using OpenSim.Framework.ServiceAuth;
-using OpenSim.Services.Interfaces;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using OpenSim.Server.Base;
-using OpenMetaverse;
 
 namespace OpenSim.Services.Connectors
 {
@@ -94,7 +91,7 @@ namespace OpenSim.Services.Connectors
         public string RegisterRegion(UUID scopeID, GridRegion regionInfo)
         {
             Dictionary<string, object> rinfo = regionInfo.ToKeyValuePairs();
-            Dictionary<string, object> sendData = new Dictionary<string,object>();
+            Dictionary<string, object> sendData = new Dictionary<string, object>();
             foreach (KeyValuePair<string, object> kvp in rinfo)
                 sendData[kvp.Key] = (string)kvp.Value;
 
@@ -113,11 +110,11 @@ namespace OpenSim.Services.Connectors
                 {
                     Dictionary<string, object> replyData = ServerUtils.ParseXmlResponse(reply);
 
-                    if (replyData.ContainsKey("Result")&& (replyData["Result"].ToString().ToLower() == "success"))
+                    if (replyData.ContainsKey("Result") && (replyData["Result"].ToString().ToLower() == "success"))
                     {
                         return String.Empty;
                     }
-                    else if (replyData.ContainsKey("Result")&& (replyData["Result"].ToString().ToLower() == "failure"))
+                    else if (replyData.ContainsKey("Result") && (replyData["Result"].ToString().ToLower() == "failure"))
                     {
                         m_log.ErrorFormat(
                             "[GRID CONNECTOR]: Registration failed: {0} when contacting {1}", replyData["Message"], uri);

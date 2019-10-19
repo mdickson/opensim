@@ -25,23 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.IO;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using OpenSim.Framework.Console;
-using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using Caps = OpenSim.Framework.Capabilities.Caps;
-using OpenSim.Capabilities.Handlers;
 
 namespace OpenSim.Region.ClientStack.LindenCaps
 {
@@ -73,18 +69,20 @@ namespace OpenSim.Region.ClientStack.LindenCaps
 
         public void RegionLoaded(Scene scene)
         {
-            scene.EventManager.OnRegisterCaps += delegate(UUID agentID, OpenSim.Framework.Capabilities.Caps caps)
+            scene.EventManager.OnRegisterCaps += delegate (UUID agentID, OpenSim.Framework.Capabilities.Caps caps)
             {
                 RegisterCaps(agentID, caps);
             };
+
             ISimulatorFeaturesModule simFeatures = scene.RequestModuleInterface<ISimulatorFeaturesModule>();
             if(simFeatures != null)
                 simFeatures.AddFeature("AvatarHoverHeightEnabled",OSD.FromBoolean(true));
+
         }
 
-        public void PostInitialise() {}
+        public void PostInitialise() { }
 
-        public void Close() {}
+        public void Close() { }
 
         public string Name { get { return "AgentPreferencesModule"; } }
 
@@ -98,21 +96,21 @@ namespace OpenSim.Region.ClientStack.LindenCaps
             UUID capId = UUID.Random();
             caps.RegisterHandler("AgentPreferences",
                 new RestStreamHandler("POST", "/CAPS/" + capId,
-                    delegate(string request, string path, string param,
+                    delegate (string request, string path, string param,
                         IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
                     {
                         return UpdateAgentPreferences(request, path, param, agent);
                     }));
             caps.RegisterHandler("UpdateAgentLanguage",
                 new RestStreamHandler("POST", "/CAPS/" + capId,
-                    delegate(string request, string path, string param,
+                    delegate (string request, string path, string param,
                         IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
                     {
                         return UpdateAgentPreferences(request, path, param, agent);
                     }));
             caps.RegisterHandler("UpdateAgentInformation",
                 new RestStreamHandler("POST", "/CAPS/" + capId,
-                    delegate(string request, string path, string param,
+                    delegate (string request, string path, string param,
                         IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
                     {
                         return UpdateAgentPreferences(request, path, param, agent);
@@ -122,7 +120,7 @@ namespace OpenSim.Region.ClientStack.LindenCaps
         public string UpdateAgentPreferences(string request, string path, string param, UUID agent)
         {
             OSDMap resp = new OSDMap();
-            // The viewer doesn't do much with the return value, so for now, if there is no preference service,
+            // if there is no preference service,
             // we'll return a null llsd block for debugging purposes. This may change if someone knows what the
             // correct server response would be here.
             if (m_scenes[0].AgentPreferencesService == null)
@@ -151,7 +149,7 @@ namespace OpenSim.Region.ClientStack.LindenCaps
             }
             if (req.ContainsKey("hover_height"))
             {
-                data.HoverHeight = req["hover_height"].AsReal();
+                data.HoverHeight = (float)req["hover_height"].AsReal();
             }
             if (req.ContainsKey("language"))
             {
@@ -174,6 +172,9 @@ namespace OpenSim.Region.ClientStack.LindenCaps
             resp["hover_height"] = data.HoverHeight;
             resp["language"] = data.Language;
             resp["language_is_public"] = data.LanguageIsPublic;
+
+            IAvatarFactoryModule afm = m_scenes[0].RequestModuleInterface<IAvatarFactoryModule>();
+            afm?.SetPreferencesHoverZ(agent, (float)data.HoverHeight);
 
             string response = OSDParser.SerializeLLSDXmlString(resp);
             return response;

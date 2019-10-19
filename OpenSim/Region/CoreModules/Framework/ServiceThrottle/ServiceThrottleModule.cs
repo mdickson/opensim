@@ -25,18 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Framework.Monitoring;
+using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Region.CoreModules.Framework
@@ -55,7 +54,7 @@ namespace OpenSim.Region.CoreModules.Framework
         public void Initialise(IConfigSource config)
         {
             m_processorJobEngine = new JobEngine(
-                "ServiceThrottle","ServiceThrottle");
+                "ServiceThrottle", "ServiceThrottle");
             m_processorJobEngine.RequestProcessTimeoutOnStop = 31000; // many webrequests have 30s expire
             m_processorJobEngine.Start();
         }
@@ -116,14 +115,14 @@ namespace OpenSim.Region.CoreModules.Framework
             //m_log.DebugFormat("[SERVICE THROTTLE]: RegionHandleRequest {0}", regionID);
             Action action = delegate
             {
-                if(!client.IsActive || m_scenes.Count == 0 || m_scenes[0] == null )
+                if (!client.IsActive || m_scenes.Count == 0 || m_scenes[0] == null)
                 {
                     client = null;
                     return;
                 }
 
                 Scene baseScene = m_scenes[0];
-                if(baseScene.ShuttingDown)
+                if (baseScene.ShuttingDown)
                 {
                     client = null;
                     return;
@@ -146,7 +145,7 @@ namespace OpenSim.Region.CoreModules.Framework
 
         public void Enqueue(string category, string itemid, Action continuation)
         {
-                m_processorJobEngine.QueueJob(category, continuation, itemid);
+            m_processorJobEngine.QueueJob(category, continuation, itemid);
         }
 
         #endregion IServiceThrottleModule

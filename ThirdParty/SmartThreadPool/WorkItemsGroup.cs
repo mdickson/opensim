@@ -1,7 +1,7 @@
 using System;
-using System.Threading;
-using System.Runtime.CompilerServices;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace Amib.Threading.Internal
 {
@@ -238,13 +238,13 @@ namespace Amib.Threading.Internal
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void FireOnIdleImpl(WorkItemsGroupIdleHandler onIdle)
         {
-            if(null == onIdle)
+            if (null == onIdle)
             {
                 return;
             }
 
             Delegate[] delegates = onIdle.GetInvocationList();
-            foreach(WorkItemsGroupIdleHandler eh in delegates)
+            foreach (WorkItemsGroupIdleHandler eh in delegates)
             {
                 try
                 {
@@ -256,7 +256,7 @@ namespace Amib.Threading.Internal
 
         private void OnWorkItemStartedCallback(WorkItem workItem)
         {
-            lock(_lock)
+            lock (_lock)
             {
                 ++_workItemsExecutingInStp;
             }
@@ -279,21 +279,21 @@ namespace Amib.Threading.Internal
 
         private void EnqueueToSTPNextWorkItem(WorkItem workItem, bool decrementWorkItemsInStpQueue)
         {
-            lock(_lock)
+            lock (_lock)
             {
                 // Got here from OnWorkItemCompletedCallback()
                 if (decrementWorkItemsInStpQueue)
                 {
                     --_workItemsInStpQueue;
 
-                    if(_workItemsInStpQueue < 0)
+                    if (_workItemsInStpQueue < 0)
                     {
                         _workItemsInStpQueue = 0;
                     }
 
                     --_workItemsExecutingInStp;
 
-                    if(_workItemsExecutingInStp < 0)
+                    if (_workItemsExecutingInStp < 0)
                     {
                         _workItemsExecutingInStp = 0;
                     }

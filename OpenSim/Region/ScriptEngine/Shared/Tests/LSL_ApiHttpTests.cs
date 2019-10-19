@@ -25,13 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Reflection;
-using System.Text;
-using log4net;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
@@ -40,11 +33,13 @@ using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.CoreModules.Scripting.LSLHttp;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.ScriptEngine.Shared;
 using OpenSim.Region.ScriptEngine.Shared.Api;
 using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
-using OpenSim.Services.Interfaces;
 using OpenSim.Tests.Common;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Tests
 {
@@ -155,12 +150,12 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
                 try
                 {
                     using (HttpWebResponse webResponse = (HttpWebResponse)webRequest.GetResponse())
-                    {}
+                    { }
                 }
                 catch (WebException)
                 {
-//                    using (HttpWebResponse response = (HttpWebResponse)e.Response)
-//                        gotExpectedException = response.StatusCode == HttpStatusCode.NotFound;
+                    //                    using (HttpWebResponse response = (HttpWebResponse)e.Response)
+                    //                        gotExpectedException = response.StatusCode == HttpStatusCode.NotFound;
                     gotExpectedException = true;
                 }
 
@@ -212,7 +207,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
                 m_engine.PostEventHook
                     += (itemId, evp) => m_lslApi.llHTTPResponse(evp.Params[0].ToString(), 200, testResponse);
 
-//                Console.WriteLine("Trying {0}", returnedUri);
+                //                Console.WriteLine("Trying {0}", returnedUri);
 
                 AssertHttpResponse(returnedUri, testResponse);
 

@@ -25,24 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Data;
+using OpenSim.Framework;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Mail;
 using System.Reflection;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Timers;
 using System.Xml;
 using System.Xml.Serialization;
-using log4net;
-using Nini.Config;
-
-using OpenMetaverse;
-using OpenSim.Data;
-using OpenSim.Framework;
-using OpenSim.Services.Interfaces;
 
 namespace OpenSim.OfflineIM
 {
@@ -165,7 +162,7 @@ namespace OpenSim.OfflineIM
 
                 Regex EMailreStrict = new Regex(EMailpatternStrict);
 
-                if (! EMailreStrict.IsMatch(emailRecipient))
+                if (!EMailreStrict.IsMatch(emailRecipient))
                 {
                     m_log.DebugFormat("[OFFLINE EMAIL]: REGEX Problem in EMail Address: {0}", emailRecipient);
 
@@ -217,9 +214,9 @@ namespace OpenSim.OfflineIM
                 }
 
                 m_log.DebugFormat(
-                    "[OFFLINE EMAIL]: EMail sent to: {0} from {1}@{2}", 
-                    emailRecipient, 
-                    fromUsername, 
+                    "[OFFLINE EMAIL]: EMail sent to: {0} from {1}@{2}",
+                    emailRecipient,
+                    fromUsername,
                     this.SmtpHostName);
 
                 reason = "Message Sent";

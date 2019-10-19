@@ -25,14 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using NUnit.Framework;
 using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Scenes;
 using OpenSim.Tests.Common;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.Framework.Scenes.Tests
 {
@@ -86,7 +82,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
 
             m_so1.ScriptSetPhantomStatus(true);
 
-//            Console.WriteLine("so.RootPart.Flags [{0}]", so.RootPart.Flags);
+            //            Console.WriteLine("so.RootPart.Flags [{0}]", so.RootPart.Flags);
             Assert.That(rootPart.Flags, Is.EqualTo(PrimFlags.Phantom));
 
             m_so1.ScriptSetPhantomStatus(false);
@@ -106,7 +102,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
 
             m_so1.ScriptSetVolumeDetect(true);
 
-//            Console.WriteLine("so.RootPart.Flags [{0}]", so.RootPart.Flags);
+            //            Console.WriteLine("so.RootPart.Flags [{0}]", so.RootPart.Flags);
             // PrimFlags.JointLP2P is incorrect it now means VolumeDetect (as defined by viewers)
             Assert.That(rootPart.Flags, Is.EqualTo(PrimFlags.Phantom | PrimFlags.JointLP2P));
 

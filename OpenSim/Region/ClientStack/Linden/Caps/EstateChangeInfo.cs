@@ -25,23 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-
 using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using Mono.Addins;
-
 using OpenSim.Framework;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using Caps=OpenSim.Framework.Capabilities.Caps;
+using System;
+using System.Collections;
+using System.Reflection;
+using Caps = OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Region.ClientStack.Linden
 {
@@ -101,7 +97,7 @@ namespace OpenSim.Region.ClientStack.Linden
             }
 
             m_EstateModule = scene.RequestModuleInterface<IEstateModule>();
-            if(m_EstateModule == null)
+            if (m_EstateModule == null)
             {
                 m_Enabled = false;
                 return;
@@ -153,7 +149,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 return responsedata;
             }
 
-            if (m_scene.RegionInfo == null 
+            if (m_scene.RegionInfo == null
                 || m_scene.RegionInfo.EstateSettings == null)
             {
                 responsedata["int_response_code"] = 501;
@@ -209,7 +205,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 ok = false;
             }
 
-            if(ok)
+            if (ok)
             {
                 responsedata["int_response_code"] = 200;
                 responsedata["content_type"] = "text/plain";

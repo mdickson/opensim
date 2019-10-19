@@ -25,24 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using OpenSim.Framework;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
 using System.Net;
 using System.Reflection;
-using log4net;
-using Mono.Addins;
-using Nini.Config;
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Services.Connectors.SimianGrid
@@ -58,7 +51,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
                 MethodBase.GetCurrentMethod().DeclaringType);
 
         private string m_ServerURI = String.Empty;
-//        private bool m_Enabled = false;
+        //        private bool m_Enabled = false;
 
         public SimianGridServiceConnector() { }
         public SimianGridServiceConnector(string serverURI)
@@ -95,7 +88,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
             if (!serviceUrl.EndsWith("/") && !serviceUrl.EndsWith("="))
                 serviceUrl = serviceUrl + '/';
             m_ServerURI = serviceUrl;
-//            m_Enabled = true;
+            //            m_Enabled = true;
         }
 
         #region IGridService
@@ -105,11 +98,11 @@ namespace OpenSim.Services.Connectors.SimianGrid
             IPEndPoint ext = regionInfo.ExternalEndPoint;
             if (ext == null) return "Region registration for " + regionInfo.RegionName + " failed: Could not resolve EndPoint";
             // Generate and upload our map tile in PNG format to the SimianGrid AddMapTile service
-//            Scene scene;
-//            if (m_scenes.TryGetValue(regionInfo.RegionID, out scene))
-//                UploadMapTile(scene);
-//            else
-//                m_log.Warn("Registering region " + regionInfo.RegionName + " (" + regionInfo.RegionID + ") that we are not tracking");
+            //            Scene scene;
+            //            if (m_scenes.TryGetValue(regionInfo.RegionID, out scene))
+            //                UploadMapTile(scene);
+            //            else
+            //                m_log.Warn("Registering region " + regionInfo.RegionName + " (" + regionInfo.RegionID + ") that we are not tracking");
 
             Vector3d minPosition = new Vector3d(regionInfo.RegionLocX, regionInfo.RegionLocY, 0.0);
             Vector3d maxPosition = minPosition + new Vector3d(regionInfo.RegionSizeX, regionInfo.RegionSizeY, Constants.RegionHeight);
@@ -186,7 +179,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
                     }
                 }
 
-//                m_log.Debug("[SIMIAN GRID CONNECTOR]: Found " + regions.Count + " neighbors for region " + regionID);
+                //                m_log.Debug("[SIMIAN GRID CONNECTOR]: Found " + regions.Count + " neighbors for region " + regionID);
                 return regions;
             }
 
@@ -395,7 +388,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
                 { "SceneID", regionID.ToString() }
             };
 
-            m_log.DebugFormat("[SIMIAN GRID CONNECTOR] request region flags for {0}",regionID.ToString());
+            m_log.DebugFormat("[SIMIAN GRID CONNECTOR] request region flags for {0}", regionID.ToString());
 
             OSDMap response = SimianGrid.PostToService(m_ServerURI, requestArgs);
             if (response["Success"].AsBoolean())
@@ -403,7 +396,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
                 OSDMap extraData = response["ExtraData"] as OSDMap;
                 int enabled = response["Enabled"].AsBoolean() ? (int)OpenSim.Framework.RegionFlags.RegionOnline : 0;
                 int hypergrid = extraData["HyperGrid"].AsBoolean() ? (int)OpenSim.Framework.RegionFlags.Hyperlink : 0;
-                int flags =  enabled | hypergrid;
+                int flags = enabled | hypergrid;
                 m_log.DebugFormat("[SGGC] enabled - {0} hg - {1} flags - {2}", enabled, hypergrid, flags);
                 return flags;
             }
@@ -468,7 +461,8 @@ namespace OpenSim.Services.Connectors.SimianGrid
             region.RegionSizeX = (int)maxPosition.X - (int)minPosition.X;
             region.RegionSizeY = (int)maxPosition.Y - (int)minPosition.Y;
 
-            if ( ! extraData["HyperGrid"] ) {
+            if (!extraData["HyperGrid"])
+            {
                 Uri httpAddress = response["Address"].AsUri();
                 region.ExternalHostName = httpAddress.Host;
                 region.HttpPort = (uint)httpAddress.Port;
@@ -485,7 +479,9 @@ namespace OpenSim.Services.Connectors.SimianGrid
                 region.EstateOwner = extraData["EstateOwner"].AsUUID();
                 region.Token = extraData["Token"].AsString();
                 region.ServerURI = extraData["ServerURI"].AsString();
-            } else {
+            }
+            else
+            {
                 region.ServerURI = response["Address"];
             }
 

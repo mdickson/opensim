@@ -26,11 +26,11 @@
  */
 
 using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
-using OpenSim.Region.ScriptEngine.Yengine;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Globalization;
 
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
 using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
@@ -177,9 +177,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public static bool IsAssignableFrom(TokenType dstType, TokenType srcType)
         {
-             // Do a 'dry run' of the casting operation, discarding any emits and not printing any errors.
-             // But if the casting tries to print error(s), return false.
-             // Otherwise assume the cast is allowed and return true.
+            // Do a 'dry run' of the casting operation, discarding any emits and not printing any errors.
+            // But if the casting tries to print error(s), return false.
+            // Otherwise assume the cast is allowed and return true.
             SCGIAF scg = new SCGIAF();
             scg.ok = true;
             scg._ilGen = migiaf;
@@ -187,7 +187,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return scg.ok;
         }
 
-        private struct SCGIAF: IScriptCodeGen
+        private struct SCGIAF : IScriptCodeGen
         {
             public bool ok;
             public ScriptMyILGen _ilGen;
@@ -213,7 +213,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
 
         private static readonly MIGIAF migiaf = new MIGIAF();
-        private struct MIGIAF: ScriptMyILGen
+        private struct MIGIAF : ScriptMyILGen
         {
             // ScriptMyILGen
             public string methName
@@ -303,8 +303,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             string oldString = oldType.ToString();
             string newString = newType.ToString();
 
-             // 'key' -> 'bool' is the only time we care about key being different than string.
-            if((oldString == "key") && (newString == "bool"))
+            // 'key' -> 'bool' is the only time we care about key being different than string.
+            if ((oldString == "key") && (newString == "bool"))
             {
                 LSLUnwrap(scg, errorAt, oldType);
                 scg.ilGen.Emit(errorAt, OpCodes.Call, keyToBoolMethodInfo);
@@ -312,17 +312,17 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 return;
             }
 
-             // Treat key and string as same type for all other type casts.
-            if(oldString == "key")
+            // Treat key and string as same type for all other type casts.
+            if (oldString == "key")
                 oldString = "string";
-            if(newString == "key")
+            if (newString == "key")
                 newString = "string";
 
-             // If the types are the same, there is no conceptual casting needed.
-             // However, there may be wraping/unwraping to/from the LSL wrappers.
-            if(oldString == newString)
+            // If the types are the same, there is no conceptual casting needed.
+            // However, there may be wraping/unwraping to/from the LSL wrappers.
+            if (oldString == newString)
             {
-                if(oldType.ToLSLWrapType() != newType.ToLSLWrapType())
+                if (oldType.ToLSLWrapType() != newType.ToLSLWrapType())
                 {
                     LSLUnwrap(scg, errorAt, oldType);
                     LSLWrap(scg, errorAt, newType);
@@ -330,23 +330,23 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 return;
             }
 
-             // Script-defined classes can be cast up and down the tree.
-            if((oldType is TokenTypeSDTypeClass) && (newType is TokenTypeSDTypeClass))
+            // Script-defined classes can be cast up and down the tree.
+            if ((oldType is TokenTypeSDTypeClass) && (newType is TokenTypeSDTypeClass))
             {
                 TokenDeclSDTypeClass oldSDTC = ((TokenTypeSDTypeClass)oldType).decl;
                 TokenDeclSDTypeClass newSDTC = ((TokenTypeSDTypeClass)newType).decl;
 
                 // implicit cast allowed from leaf toward root
-                for(TokenDeclSDTypeClass sdtc = oldSDTC; sdtc != null; sdtc = sdtc.extends)
+                for (TokenDeclSDTypeClass sdtc = oldSDTC; sdtc != null; sdtc = sdtc.extends)
                 {
-                    if(sdtc == newSDTC)
+                    if (sdtc == newSDTC)
                         return;
                 }
 
                 // explicit cast allowed from root toward leaf
-                for(TokenDeclSDTypeClass sdtc = newSDTC; sdtc != null; sdtc = sdtc.extends)
+                for (TokenDeclSDTypeClass sdtc = newSDTC; sdtc != null; sdtc = sdtc.extends)
                 {
-                    if(sdtc == oldSDTC)
+                    if (sdtc == oldSDTC)
                     {
                         ExplCheck(scg, errorAt, explicitAllowed, oldString, newString);
                         scg.ilGen.Emit(errorAt, OpCodes.Ldc_I4, newSDTC.sdTypeIndex);
@@ -359,28 +359,28 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 goto illcast;
             }
 
-             // One script-defined interface type cannot be cast to another script-defined interface type, 
-             // unless the old interface declares that it implements the new interface.  That proves that 
-             // the underlying object, no matter what type, implements the new interface.
-            if((oldType is TokenTypeSDTypeInterface) && (newType is TokenTypeSDTypeInterface))
+            // One script-defined interface type cannot be cast to another script-defined interface type, 
+            // unless the old interface declares that it implements the new interface.  That proves that 
+            // the underlying object, no matter what type, implements the new interface.
+            if ((oldType is TokenTypeSDTypeInterface) && (newType is TokenTypeSDTypeInterface))
             {
                 TokenDeclSDTypeInterface oldDecl = ((TokenTypeSDTypeInterface)oldType).decl;
                 TokenDeclSDTypeInterface newDecl = ((TokenTypeSDTypeInterface)newType).decl;
-                if(!oldDecl.Implements(newDecl))
+                if (!oldDecl.Implements(newDecl))
                     goto illcast;
                 scg.ilGen.Emit(errorAt, OpCodes.Ldstr, newType.ToString());
                 scg.ilGen.Emit(errorAt, OpCodes.Call, sdTypeClassCastObj2IFaceMethodInfo);
                 return;
             }
 
-             // A script-defined class type can be implicitly cast to a script-defined interface type that it 
-             // implements.  The result is an array of delegates that give the class's implementation of the 
-             // various methods defined by the interface.
-            if((oldType is TokenTypeSDTypeClass) && (newType is TokenTypeSDTypeInterface))
+            // A script-defined class type can be implicitly cast to a script-defined interface type that it 
+            // implements.  The result is an array of delegates that give the class's implementation of the 
+            // various methods defined by the interface.
+            if ((oldType is TokenTypeSDTypeClass) && (newType is TokenTypeSDTypeInterface))
             {
                 TokenDeclSDTypeClass oldSDTC = ((TokenTypeSDTypeClass)oldType).decl;
                 int intfIndex;
-                if(!oldSDTC.intfIndices.TryGetValue(newType.ToString(), out intfIndex))
+                if (!oldSDTC.intfIndices.TryGetValue(newType.ToString(), out intfIndex))
                     goto illcast;
                 scg.ilGen.Emit(errorAt, OpCodes.Ldfld, sdtcITableFieldInfo);
                 scg.ilGen.Emit(errorAt, OpCodes.Ldc_I4, intfIndex);
@@ -388,17 +388,17 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 return;
             }
 
-             // A script-defined interface type can be explicitly cast to a script-defined class type by 
-             // extracting the Target property from element 0 of the delegate array that is the interface
-             // object and making sure it casts to the correct script-defined class type.
-             //
-             // But then only if the class type implements the interface type.
-            if((oldType is TokenTypeSDTypeInterface) && (newType is TokenTypeSDTypeClass))
+            // A script-defined interface type can be explicitly cast to a script-defined class type by 
+            // extracting the Target property from element 0 of the delegate array that is the interface
+            // object and making sure it casts to the correct script-defined class type.
+            //
+            // But then only if the class type implements the interface type.
+            if ((oldType is TokenTypeSDTypeInterface) && (newType is TokenTypeSDTypeClass))
             {
                 TokenTypeSDTypeInterface oldSDTI = (TokenTypeSDTypeInterface)oldType;
                 TokenTypeSDTypeClass newSDTC = (TokenTypeSDTypeClass)newType;
 
-                if(!newSDTC.decl.CanCastToIntf(oldSDTI.decl))
+                if (!newSDTC.decl.CanCastToIntf(oldSDTI.decl))
                     goto illcast;
 
                 ExplCheck(scg, errorAt, explicitAllowed, oldString, newString);
@@ -407,14 +407,14 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 return;
             }
 
-             // A script-defined interface type can be implicitly cast to object.
-            if((oldType is TokenTypeSDTypeInterface) && (newType is TokenTypeObject))
+            // A script-defined interface type can be implicitly cast to object.
+            if ((oldType is TokenTypeSDTypeInterface) && (newType is TokenTypeObject))
             {
                 return;
             }
 
-             // An object can be explicitly cast to a script-defined interface.
-            if((oldType is TokenTypeObject) && (newType is TokenTypeSDTypeInterface))
+            // An object can be explicitly cast to a script-defined interface.
+            if ((oldType is TokenTypeObject) && (newType is TokenTypeSDTypeInterface))
             {
                 ExplCheck(scg, errorAt, explicitAllowed, oldString, newString);
                 scg.ilGen.Emit(errorAt, OpCodes.Ldstr, newString);
@@ -422,15 +422,15 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 return;
             }
 
-             // Cast to void is always allowed, such as discarding value from 'i++' or function return value.
-            if(newType is TokenTypeVoid)
+            // Cast to void is always allowed, such as discarding value from 'i++' or function return value.
+            if (newType is TokenTypeVoid)
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Pop);
                 return;
             }
 
-             // Cast from undef to object or script-defined type is always allowed.
-            if((oldType is TokenTypeUndef) &&
+            // Cast from undef to object or script-defined type is always allowed.
+            if ((oldType is TokenTypeUndef) &&
                 ((newType is TokenTypeObject) ||
                  (newType is TokenTypeSDTypeClass) ||
                  (newType is TokenTypeSDTypeInterface)))
@@ -438,16 +438,16 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 return;
             }
 
-             // Script-defined classes can be implicitly cast to objects.
-            if((oldType is TokenTypeSDTypeClass) && (newType is TokenTypeObject))
+            // Script-defined classes can be implicitly cast to objects.
+            if ((oldType is TokenTypeSDTypeClass) && (newType is TokenTypeObject))
             {
                 return;
             }
 
-             // Script-defined classes can be explicitly cast from objects and other script-defined classes.
-             // Note that we must manually check that it is the correct SDTypeClass however because as far as 
-             // mono is concerned, all SDTypeClass's are the same.
-            if((oldType is TokenTypeObject) && (newType is TokenTypeSDTypeClass))
+            // Script-defined classes can be explicitly cast from objects and other script-defined classes.
+            // Note that we must manually check that it is the correct SDTypeClass however because as far as 
+            // mono is concerned, all SDTypeClass's are the same.
+            if ((oldType is TokenTypeObject) && (newType is TokenTypeSDTypeClass))
             {
                 ExplCheck(scg, errorAt, explicitAllowed, oldString, newString);
                 scg.ilGen.Emit(errorAt, OpCodes.Ldc_I4, ((TokenTypeSDTypeClass)newType).decl.sdTypeIndex);
@@ -455,44 +455,44 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 return;
             }
 
-             // Delegates can be implicitly cast to/from objects.
-            if((oldType is TokenTypeSDTypeDelegate) && (newType is TokenTypeObject))
+            // Delegates can be implicitly cast to/from objects.
+            if ((oldType is TokenTypeSDTypeDelegate) && (newType is TokenTypeObject))
             {
                 return;
             }
-            if((oldType is TokenTypeObject) && (newType is TokenTypeSDTypeDelegate))
+            if ((oldType is TokenTypeObject) && (newType is TokenTypeSDTypeDelegate))
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Castclass, newType.ToSysType());
                 return;
             }
 
-             // Some actual conversion is needed, see if it is in table of legal casts.
+            // Some actual conversion is needed, see if it is in table of legal casts.
             string key = oldString + " " + newString;
-            if(!legalTypeCasts.TryGetValue(key, out castDelegate))
+            if (!legalTypeCasts.TryGetValue(key, out castDelegate))
             {
                 key = oldString + "*" + newString;
-                if(!legalTypeCasts.TryGetValue(key, out castDelegate))
+                if (!legalTypeCasts.TryGetValue(key, out castDelegate))
                     goto illcast;
                 ExplCheck(scg, errorAt, explicitAllowed, oldString, newString);
             }
 
-             // Ok, output cast.  But make sure it is in native form without any LSL wrapping
-             // before passing to our casting routine.  Then if caller is expecting an LSL-
-             // wrapped value on the stack upon return, wrap it up after our casting.
+            // Ok, output cast.  But make sure it is in native form without any LSL wrapping
+            // before passing to our casting routine.  Then if caller is expecting an LSL-
+            // wrapped value on the stack upon return, wrap it up after our casting.
             LSLUnwrap(scg, errorAt, oldType);
             castDelegate(scg, errorAt);
             LSLWrap(scg, errorAt, newType);
             return;
 
-            illcast:
+        illcast:
             scg.ErrorMsg(errorAt, "illegal to cast from " + oldString + " to " + newString);
-            if(!(oldType is TokenTypeVoid))
+            if (!(oldType is TokenTypeVoid))
                 scg.ilGen.Emit(errorAt, OpCodes.Pop);
             scg.PushDefaultValue(newType);
         }
         private static void ExplCheck(IScriptCodeGen scg, Token errorAt, bool explicitAllowed, string oldString, string newString)
         {
-            if(!explicitAllowed)
+            if (!explicitAllowed)
             {
                 scg.ErrorMsg(errorAt, "must explicitly cast from " + oldString + " to " + newString);
             }
@@ -503,15 +503,15 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public static void LSLUnwrap(IScriptCodeGen scg, Token errorAt, TokenType type)
         {
-            if(type.ToLSLWrapType() == typeof(LSL_Float))
+            if (type.ToLSLWrapType() == typeof(LSL_Float))
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Ldfld, lslFloatValueFieldInfo);
             }
-            if(type.ToLSLWrapType() == typeof(LSL_Integer))
+            if (type.ToLSLWrapType() == typeof(LSL_Integer))
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Ldfld, lslIntegerValueFieldInfo);
             }
-            if(type.ToLSLWrapType() == typeof(LSL_String))
+            if (type.ToLSLWrapType() == typeof(LSL_String))
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Ldfld, lslStringValueFieldInfo);
             }
@@ -522,15 +522,15 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         private static void LSLWrap(IScriptCodeGen scg, Token errorAt, TokenType type)
         {
-            if(type.ToLSLWrapType() == typeof(LSL_Float))
+            if (type.ToLSLWrapType() == typeof(LSL_Float))
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Newobj, lslFloatConstructorInfo);
             }
-            if(type.ToLSLWrapType() == typeof(LSL_Integer))
+            if (type.ToLSLWrapType() == typeof(LSL_Integer))
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Newobj, lslIntegerConstructorInfo);
             }
-            if(type.ToLSLWrapType() == typeof(LSL_String))
+            if (type.ToLSLWrapType() == typeof(LSL_String))
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Newobj, lslStringConstructorInfo);
             }
@@ -546,11 +546,11 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         private static void TypeCastBool2Float(IScriptCodeGen scg, Token errorAt)
         {
-            if(typeof(double) == typeof(float))
+            if (typeof(double) == typeof(float))
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Conv_R4);
             }
-            else if(typeof(double) == typeof(double))
+            else if (typeof(double) == typeof(double))
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Conv_R8);
             }
@@ -620,11 +620,11 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         private static void TypeCastInteger2Float(IScriptCodeGen scg, Token errorAt)
         {
-            if(typeof(double) == typeof(float))
+            if (typeof(double) == typeof(float))
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Conv_R4);
             }
-            else if(typeof(double) == typeof(double))
+            else if (typeof(double) == typeof(double))
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Conv_R8);
             }
@@ -643,7 +643,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         private static void TypeCastList2Object(IScriptCodeGen scg, Token errorAt)
         {
-            if(typeof(LSL_List).IsValueType)
+            if (typeof(LSL_List).IsValueType)
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Box, typeof(LSL_List));
             }
@@ -674,7 +674,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         private static void TypeCastObject2List(IScriptCodeGen scg, Token errorAt)
         {
-            if(typeof(LSL_List).IsValueType)
+            if (typeof(LSL_List).IsValueType)
             {
                 scg.ilGen.Emit(errorAt, OpCodes.Call, objectToListMethodInfo);
             }
@@ -810,7 +810,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         }
         public static string FloatToString(double x)
         {
-            return x.ToString("0.000000");
+            return x.ToString("0.000000",CultureInfo.InvariantCulture);
         }
         public static string IntegerToString(int x)
         {
@@ -875,26 +875,26 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public static double ObjectToFloat(object x)
         {
-            if(x is LSL_String)
+            if (x is LSL_String)
                 return double.Parse(((LSL_String)x).m_string);
-            if(x is string)
+            if (x is string)
                 return double.Parse((string)x);
-            if(x is LSL_Float)
+            if (x is LSL_Float)
                 return (double)(LSL_Float)x;
-            if(x is LSL_Integer)
+            if (x is LSL_Integer)
                 return (double)(int)(LSL_Integer)x;
-            if(x is int)
+            if (x is int)
                 return (double)(int)x;
             return (double)x;
         }
 
         public static int ObjectToInteger(object x)
         {
-            if(x is LSL_String)
+            if (x is LSL_String)
                 return int.Parse(((LSL_String)x).m_string);
-            if(x is string)
+            if (x is string)
                 return int.Parse((string)x);
-            if(x is LSL_Integer)
+            if (x is LSL_Integer)
                 return (int)(LSL_Integer)x;
             return (int)x;
         }
@@ -906,18 +906,18 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public static LSL_Rotation ObjectToRotation(object x)
         {
-            if(x is LSL_String)
+            if (x is LSL_String)
                 return new LSL_Rotation(((LSL_String)x).m_string);
-            if(x is string)
+            if (x is string)
                 return new LSL_Rotation((string)x);
             return (LSL_Rotation)x;
         }
 
         public static LSL_Vector ObjectToVector(object x)
         {
-            if(x is LSL_String)
+            if (x is LSL_String)
                 return new LSL_Vector(((LSL_String)x).m_string);
-            if(x is string)
+            if (x is string)
                 return new LSL_Vector((string)x);
             return (LSL_Vector)x;
         }
@@ -934,21 +934,21 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public static double EHArgUnwrapFloat(object x)
         {
-            if(x is LSL_Float)
+            if (x is LSL_Float)
                 return (double)(LSL_Float)x;
             return (double)x;
         }
 
         public static int EHArgUnwrapInteger(object x)
         {
-            if(x is LSL_Integer)
+            if (x is LSL_Integer)
                 return (int)(LSL_Integer)x;
             return (int)x;
         }
 
         public static LSL_Rotation EHArgUnwrapRotation(object x)
         {
-            if(x is OpenMetaverse.Quaternion)
+            if (x is OpenMetaverse.Quaternion)
             {
                 OpenMetaverse.Quaternion q = (OpenMetaverse.Quaternion)x;
                 return new LSL_Rotation(q.X, q.Y, q.Z, q.W);
@@ -958,16 +958,16 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
         public static string EHArgUnwrapString(object x)
         {
-            if(x is LSL_Key)
+            if (x is LSL_Key)
                 return (string)(LSL_Key)x;
-            if(x is LSL_String)
+            if (x is LSL_String)
                 return (string)(LSL_String)x;
             return (string)x;
         }
 
         public static LSL_Vector EHArgUnwrapVector(object x)
         {
-            if(x is OpenMetaverse.Vector3)
+            if (x is OpenMetaverse.Vector3)
             {
                 OpenMetaverse.Vector3 v = (OpenMetaverse.Vector3)x;
                 return new LSL_Vector(v.X, v.Y, v.Z);

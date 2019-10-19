@@ -33,7 +33,7 @@ using log4net;
 #if CSharpSqlite
     using Community.CsharpSqlite.Sqlite;
 #else
-    using Mono.Data.Sqlite;
+using Mono.Data.Sqlite;
 #endif
 
 using OpenMetaverse;
@@ -198,22 +198,22 @@ namespace OpenSim.Data.SQLite
             }
         }
 
-//        /// <summary>
-//        /// Some... logging functionnality
-//        /// </summary>
-//        /// <param name="asset"></param>
-//        private static void LogAssetLoad(AssetBase asset)
-//        {
-//            string temporary = asset.Temporary ? "Temporary" : "Stored";
-//            string local = asset.Local ? "Local" : "Remote";
-//
-//            int assetLength = (asset.Data != null) ? asset.Data.Length : 0;
-//
-//            m_log.Debug("[ASSET DB]: " +
-//                                     string.Format("Loaded {5} {4} Asset: [{0}][{3}] \"{1}\":{2} ({6} bytes)",
-//                                                   asset.FullID, asset.Name, asset.Description, asset.Type,
-//                                                   temporary, local, assetLength));
-//        }
+        //        /// <summary>
+        //        /// Some... logging functionnality
+        //        /// </summary>
+        //        /// <param name="asset"></param>
+        //        private static void LogAssetLoad(AssetBase asset)
+        //        {
+        //            string temporary = asset.Temporary ? "Temporary" : "Stored";
+        //            string local = asset.Local ? "Local" : "Remote";
+        //
+        //            int assetLength = (asset.Data != null) ? asset.Data.Length : 0;
+        //
+        //            m_log.Debug("[ASSET DB]: " +
+        //                                     string.Format("Loaded {5} {4} Asset: [{0}][{3}] \"{1}\":{2} ({6} bytes)",
+        //                                                   asset.FullID, asset.Name, asset.Description, asset.Type,
+        //                                                   temporary, local, assetLength));
+        //        }
 
         /// <summary>
         /// Check if the assets exist in the database.
@@ -268,7 +268,7 @@ namespace OpenSim.Data.SQLite
                 (String)row["CreatorID"]
             );
 
-            asset.Description = (String) row["Description"];
+            asset.Description = (String)row["Description"];
             asset.Local = Convert.ToBoolean(row["Local"]);
             asset.Temporary = Convert.ToBoolean(row["Temporary"]);
             asset.Flags = (AssetFlags)Convert.ToInt32(row["asset_flags"]);
@@ -280,16 +280,16 @@ namespace OpenSim.Data.SQLite
         {
             AssetMetadata metadata = new AssetMetadata();
 
-            metadata.FullID = new UUID((string) row["UUID"]);
-            metadata.Name = (string) row["Name"];
-            metadata.Description = (string) row["Description"];
+            metadata.FullID = new UUID((string)row["UUID"]);
+            metadata.Name = (string)row["Name"];
+            metadata.Description = (string)row["Description"];
             metadata.Type = Convert.ToSByte(row["Type"]);
             metadata.Temporary = Convert.ToBoolean(row["Temporary"]); // Not sure if this is correct.
             metadata.Flags = (AssetFlags)Convert.ToInt32(row["asset_flags"]);
             metadata.CreatorID = row["CreatorID"].ToString();
 
             // Current SHA1s are not stored/computed.
-            metadata.SHA1 = new byte[] {};
+            metadata.SHA1 = new byte[] { };
 
             return metadata;
         }

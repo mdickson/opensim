@@ -25,16 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.IO;
-using System.Reflection;
-using OpenSim.Framework;
-using log4net;
-using OpenMetaverse;
 using Npgsql;
 using NpgsqlTypes;
+using OpenMetaverse;
+using OpenSim.Framework;
+using System;
+using System.Data;
+using System.Reflection;
 
 namespace OpenSim.Data.PGSQL
 {
@@ -43,7 +40,7 @@ namespace OpenSim.Data.PGSQL
     /// </summary>
     public class PGSQLManager
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Connection string for ADO.net
@@ -196,7 +193,7 @@ namespace OpenSim.Data.PGSQL
 
             if (valueType == typeof(UUID)) //TODO check if this works
             {
-                return ((UUID) value).Guid;
+                return ((UUID)value).Guid;
             }
             if (valueType == typeof(UUID))
             {
@@ -277,7 +274,7 @@ namespace OpenSim.Data.PGSQL
         internal NpgsqlParameter CreateParameter(string parameterName, object parameterObject, bool parameterOut)
         {
             //Tweak so we dont always have to add : sign
-            if (parameterName.StartsWith(":")) parameterName = parameterName.Replace(":","");
+            if (parameterName.StartsWith(":")) parameterName = parameterName.Replace(":", "");
 
             //HACK if object is null, it is turned into a string, there are no nullable type till now
             if (parameterObject == null) parameterObject = "";

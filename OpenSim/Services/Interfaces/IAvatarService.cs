@@ -25,14 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
+using OpenSim.Framework;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-
-using OpenSim.Framework;
-
-using OpenMetaverse;
 
 namespace OpenSim.Services.Interfaces
 {
@@ -106,7 +103,7 @@ namespace OpenSim.Services.Interfaces
         // function. Closed, LL-based  grids will never need URLs here.
 
         public int AvatarType;
-        public Dictionary<string,string> Data;
+        public Dictionary<string, string> Data;
 
         public AvatarData()
         {
@@ -151,9 +148,9 @@ namespace OpenSim.Services.Interfaces
             // Wearables
             Data["AvatarHeight"] = appearance.AvatarHeight.ToString();
 
-            for (int i = 0 ; i < AvatarWearable.LEGACY_VERSION_MAX_WEARABLES ; i++)
+            for (int i = 0; i < AvatarWearable.LEGACY_VERSION_MAX_WEARABLES; i++)
             {
-                for (int j = 0 ; j < appearance.Wearables[i].Count ; j++)
+                for (int j = 0; j < appearance.Wearables[i].Count; j++)
                 {
                     string fieldName = String.Format("Wearable {0}:{1}", i, j);
                     Data[fieldName] = String.Format("{0}:{1}",
@@ -207,9 +204,9 @@ namespace OpenSim.Services.Interfaces
                 if (Data.ContainsKey("AvatarHeight"))
                 {
                     float h = float.Parse(Data["AvatarHeight"]);
-                    if( h == 0f)
+                    if (h == 0f)
                         h = 1.9f;
-                    appearance.SetSize(new Vector3(0.45f, 0.6f, h ));
+                    appearance.SetSize(new Vector3(0.45f, 0.6f, h));
                 }
 
                 // Legacy Wearables
@@ -280,7 +277,7 @@ namespace OpenSim.Services.Interfaces
 
                 if (Data.ContainsKey("VisualParams"))
                 {
-                    string[] vps = Data["VisualParams"].Split(new char[] {','});
+                    string[] vps = Data["VisualParams"].Split(new char[] { ',' });
                     byte[] binary = new byte[vps.Length];
 
                     for (int i = 0; i < vps.Length; i++)
@@ -294,22 +291,22 @@ namespace OpenSim.Services.Interfaces
                 foreach (KeyValuePair<string, string> _kvp in Data)
                 {
                     // New style wearables
-                    if (_kvp.Key.StartsWith("Wearable ")  && _kvp.Key.Length > 9)
+                    if (_kvp.Key.StartsWith("Wearable ") && _kvp.Key.Length > 9)
                     {
                         string wearIndex = _kvp.Key.Substring(9);
-                        string[] wearIndices = wearIndex.Split(new char[] {':'});
+                        string[] wearIndices = wearIndex.Split(new char[] { ':' });
                         int index = Convert.ToInt32(wearIndices[0]);
 
-                        string[] ids = _kvp.Value.Split(new char[] {':'});
+                        string[] ids = _kvp.Value.Split(new char[] { ':' });
                         UUID itemID = new UUID(ids[0]);
                         UUID assetID = new UUID(ids[1]);
                         if (index >= currentLength)
                         {
                             Array.Resize(ref wearables, index + 1);
-                            for (int i = currentLength ; i < wearables.Length ; i++)
+                            for (int i = currentLength; i < wearables.Length; i++)
                                 wearables[i] = new AvatarWearable();
-                            currentLength = wearables.Length;           
-                        }   
+                            currentLength = wearables.Length;
+                        }
                         wearables[index].Add(itemID, assetID);
                         continue;
                     }
@@ -320,13 +317,13 @@ namespace OpenSim.Services.Interfaces
                         int point = 0;
                         if (Int32.TryParse(pointStr, out point))
                         {
-                            List<string> idList = new List<string>(_kvp.Value.Split(new char[] {','}));
+                            List<string> idList = new List<string>(_kvp.Value.Split(new char[] { ',' }));
 
                             appearance.SetAttachment(point, UUID.Zero, UUID.Zero);
                             foreach (string id in idList)
                             {
                                 UUID uuid = UUID.Zero;
-                                if(UUID.TryParse(id, out uuid))
+                                if (UUID.TryParse(id, out uuid))
                                     appearance.SetAttachment(point | 0x80, uuid, UUID.Zero);
                             }
                         }

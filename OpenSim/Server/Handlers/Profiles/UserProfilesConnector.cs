@@ -25,21 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
 using Nini.Config;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
 using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Framework;
+using OpenSim.Server.Base;
 using OpenSim.Server.Handlers.Base;
-using log4net;
+using OpenSim.Services.Interfaces;
+using System;
 
 namespace OpenSim.Server.Handlers.Profiles
 {
-    public class UserProfilesConnector: ServiceConnector
+    public class UserProfilesConnector : ServiceConnector
     {
-//        static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         // Our Local Module
         public IUserProfilesService ServiceModule
@@ -62,14 +59,14 @@ namespace OpenSim.Server.Handlers.Profiles
             base(config, server, configName)
         {
             ConfigName = "UserProfilesService";
-            if(!string.IsNullOrEmpty(configName))
+            if (!string.IsNullOrEmpty(configName))
                 ConfigName = configName;
 
             IConfig serverConfig = config.Configs[ConfigName];
             if (serverConfig == null)
                 throw new Exception(String.Format("No section {0} in config file", ConfigName));
 
-            if(!serverConfig.GetBoolean("Enabled",false))
+            if (!serverConfig.GetBoolean("Enabled", false))
             {
                 Enabled = false;
                 return;

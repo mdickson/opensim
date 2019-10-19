@@ -25,23 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Threading;
 using NUnit.Framework;
 using OpenMetaverse;
-using OpenSim.Data;
 using OpenSim.Framework;
-using OpenSim.Framework.Serialization;
-using OpenSim.Framework.Serialization.External;
-using OpenSim.Region.CoreModules.Avatar.Inventory.Archiver;
 using OpenSim.Region.CoreModules.World.Serialiser;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Scenes.Serialization;
 using OpenSim.Services.Interfaces;
 using OpenSim.Tests.Common;
+using System.Collections.Generic;
+using System.IO;
 
 namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
 {
@@ -55,7 +47,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
         public void TestLoadIarToInventoryPaths()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             SerialiserModule serialiserModule = new SerialiserModule();
             InventoryArchiverModule archiverModule = new InventoryArchiverModule();
@@ -100,7 +92,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
         public void TestLoadIarPathStartsWithSlash()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             SerialiserModule serialiserModule = new SerialiserModule();
             InventoryArchiverModule archiverModule = new InventoryArchiverModule();
@@ -121,7 +113,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
         public void TestLoadIarPathWithEscapedChars()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             string itemName = "You & you are a mean/man/";
             string humanEscapedItemName = @"You & you are a mean\/man\/";
@@ -191,9 +183,9 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
                     scene.InventoryService, userId, "Scripts/Objects/" + humanEscapedItemName);
 
             Assert.That(foundItem1, Is.Not.Null, "Didn't find loaded item 1");
-//            Assert.That(
-//                foundItem1.CreatorId, Is.EqualTo(userUuid),
-//                "Loaded item non-uuid creator doesn't match that of the loading user");
+            //            Assert.That(
+            //                foundItem1.CreatorId, Is.EqualTo(userUuid),
+            //                "Loaded item non-uuid creator doesn't match that of the loading user");
             Assert.That(
                 foundItem1.Name, Is.EqualTo(itemName),
                 "Loaded item name doesn't match saved name");
@@ -206,12 +198,12 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
         public void TestNewIarPath()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             Scene scene = new SceneHelpers().SetupScene();
             UserAccount ua1 = UserAccountHelpers.CreateUserWithInventory(scene);
 
-            Dictionary <string, InventoryFolderBase> foldersCreated = new Dictionary<string, InventoryFolderBase>();
+            Dictionary<string, InventoryFolderBase> foldersCreated = new Dictionary<string, InventoryFolderBase>();
             Dictionary<UUID, InventoryNodeBase> nodesLoaded = new Dictionary<UUID, InventoryNodeBase>();
 
             string folder1Name = "1";
@@ -309,7 +301,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
                     break;
                 }
             }
-//            Assert.That(folder1Post.ID, Is.EqualTo(folder1.ID));
+            //            Assert.That(folder1Post.ID, Is.EqualTo(folder1.ID));
 
             List<InventoryFolderBase> folder2PostCandidates
                 = InventoryArchiveUtils.FindFoldersByPath(scene.InventoryService, folder1Post, "b");
@@ -324,7 +316,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Archiver.Tests
         public void TestMergeIarPath()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             Scene scene = new SceneHelpers().SetupScene();
             UserAccount ua1 = UserAccountHelpers.CreateUserWithInventory(scene);

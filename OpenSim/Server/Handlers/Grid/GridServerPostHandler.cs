@@ -25,24 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using Nini.Config;
 using log4net;
-using System;
-using System.Reflection;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml;
-using System.Xml.Serialization;
-using System.Collections.Generic;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Framework.ServiceAuth;
 using OpenSim.Server.Base;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Xml;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using OpenSim.Framework;
-using OpenSim.Framework.ServiceAuth;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenMetaverse;
 
 namespace OpenSim.Server.Handlers.Grid
 {
@@ -66,7 +61,7 @@ namespace OpenSim.Server.Handlers.Grid
                 IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
             string body;
-            using(StreamReader sr = new StreamReader(requestData))
+            using (StreamReader sr = new StreamReader(requestData))
                 body = sr.ReadToEnd();
             body = body.Trim();
 
@@ -588,7 +583,7 @@ namespace OpenSim.Server.Handlers.Grid
                 m_log.WarnFormat("[GRID HANDLER]: no regionID in request to get RegionFlags");
 
             int flags = m_GridService.GetRegionFlags(scopeID, regionID);
-           // m_log.DebugFormat("[GRID HANDLER]: flags for region {0}: {1}", regionID, flags);
+            // m_log.DebugFormat("[GRID HANDLER]: flags for region {0}: {1}", regionID, flags);
 
             Dictionary<string, object> result = new Dictionary<string, object>();
             result["result"] = flags.ToString();
@@ -602,12 +597,12 @@ namespace OpenSim.Server.Handlers.Grid
         byte[] GetGridExtraFeatures(Dictionary<string, object> request)
         {
 
-            Dictionary<string, object> result = new Dictionary<string, object> ();
-            Dictionary<string, object> extraFeatures = m_GridService.GetExtraFeatures ();
+            Dictionary<string, object> result = new Dictionary<string, object>();
+            Dictionary<string, object> extraFeatures = m_GridService.GetExtraFeatures();
 
             foreach (string key in extraFeatures.Keys)
             {
-                result [key] = extraFeatures [key];
+                result[key] = extraFeatures[key];
             }
 
             string xmlString = ServerUtils.BuildXmlResponse(result);

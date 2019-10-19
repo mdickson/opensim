@@ -25,31 +25,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using Nini.Config;
+using Nwc.XmlRpc;
+using OpenMetaverse;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Server.Base;
+using OpenSim.Server.Handlers.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
-using System.Reflection;
-
-using Nini.Config;
-using OpenSim.Framework;
-using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Server.Handlers.Base;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-
-using log4net;
-using Nwc.XmlRpc;
-using OpenMetaverse;
 
 namespace OpenSim.Server.Handlers.Hypergrid
 {
     public class UserAgentServerConnector : ServiceConnector
     {
-//        private static readonly ILog m_log =
-//                LogManager.GetLogger(
-//                MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log =
+        //                LogManager.GetLogger(
+        //                MethodBase.GetCurrentMethod().DeclaringType);
 
         private IUserAgentService m_HomeUsersService;
         public IUserAgentService HomeUsersService
@@ -330,7 +325,7 @@ namespace OpenSim.Server.Handlers.Hypergrid
                 UUID.TryParse(userID_str, out userID);
 
                 //int userFlags = m_HomeUsersService.GetUserFlags(userID);
-                Dictionary<string,object> userInfo = m_HomeUsersService.GetUserInfo(userID);
+                Dictionary<string, object> userInfo = m_HomeUsersService.GetUserInfo(userID);
                 if (userInfo.Count > 0)
                 {
                     foreach (KeyValuePair<string, object> kvp in userInfo)

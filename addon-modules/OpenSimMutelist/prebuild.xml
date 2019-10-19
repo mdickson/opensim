@@ -17,8 +17,6 @@
      <Reference name="OpenMetaverse.Types"/>
      <Reference name="OpenSim.Framework"/>
      <Reference name="OpenSim.Region.Framework"/>
-     <Reference name="OpenSim.Region.Framework.Interfaces"/>
-     <Reference name="OpenSim.Region.Framework.Scenes"/>
      <Reference name="OpenSim.Services.Interfaces"/>
      <Reference name="log4net"/>
      <Reference name="Mono.Addins"/>

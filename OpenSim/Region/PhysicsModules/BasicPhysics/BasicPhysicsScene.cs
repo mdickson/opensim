@@ -25,15 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using Nini.Config;
 using Mono.Addins;
+using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Region.PhysicsModules.SharedBase;
-using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Region.PhysicsModules.SharedBase;
+using System;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.PhysicsModule.BasicPhysics
 {
@@ -118,7 +118,7 @@ namespace OpenSim.Region.PhysicsModule.BasicPhysics
         }
         #endregion
 
-        public override void Dispose() {}
+        public override void Dispose() { }
 
         public override PhysicsActor AddPrimShape(string primName, PrimitiveBaseShape pbs, Vector3 position,
                                                   Vector3 size, Quaternion rotation, bool isPhysical, uint localid)
@@ -161,7 +161,7 @@ namespace OpenSim.Region.PhysicsModule.BasicPhysics
 
         public override float Simulate(float timeStep)
         {
-//            Console.WriteLine("Simulating");
+            //            Console.WriteLine("Simulating");
 
             float fps = 1.0f / timeStep;
             for (int i = 0; i < _actors.Count; ++i)
@@ -199,7 +199,7 @@ namespace OpenSim.Region.PhysicsModule.BasicPhysics
                     terrainHeight = _heightMap[(int)actor.Position.Y * (int)m_regionExtent.Y + (int)actor.Position.X];
 
                 float height = terrainHeight + actor.Size.Z;
-//                Console.WriteLine("height {0}, actorPosition {1}", height, actorPosition);
+                //                Console.WriteLine("height {0}, actorPosition {1}", height, actorPosition);
 
                 if (actor.Flying)
                 {

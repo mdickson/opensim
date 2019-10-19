@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using OpenMetaverse;
 using OpenSim.Framework;
+using System;
 
 namespace OpenSim.Region.Framework.Interfaces
 {
@@ -77,7 +77,7 @@ namespace OpenSim.Region.Framework.Interfaces
         /// <returns>number of the scripts handle</returns>
         int Listen(uint LocalID, UUID itemID, UUID hostID, int channel, string name, UUID id, string msg);
 
-         /// <summary>
+        /// <summary>
         /// Create a listen event callback with the specified filters.
         /// The parameters localID,itemID are needed to uniquely identify
         /// the script during 'peek' time. Parameter hostID is needed to

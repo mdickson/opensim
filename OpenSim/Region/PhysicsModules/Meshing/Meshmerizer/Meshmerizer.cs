@@ -26,23 +26,23 @@
  */
 //#define SPAM
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.IO;
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.PhysicsModules.SharedBase;
+using log4net;
+using Mono.Addins;
+using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+using OpenSim.Framework;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Region.PhysicsModules.SharedBase;
+using PrimMesher;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.IO.Compression;
-using PrimMesher;
-using log4net;
-using Nini.Config;
-using Mono.Addins;
+using System.Reflection;
 
 namespace OpenSim.Region.PhysicsModule.Meshing
 {
@@ -246,7 +246,7 @@ namespace OpenSim.Region.PhysicsModule.Meshing
         /// <param name="faces"></param>
         private void AddSubMesh(OSDMap subMeshData, Vector3 size, List<Coord> coords, List<Face> faces)
         {
-    //                                    Console.WriteLine("subMeshMap for {0} - {1}", primName, Util.GetFormattedXml((OSD)subMeshMap));
+            //                                    Console.WriteLine("subMeshMap for {0} - {1}", primName, Util.GetFormattedXml((OSD)subMeshMap));
 
             // As per http://wiki.secondlife.com/wiki/Mesh/Mesh_Asset_Format, some Mesh Level
             // of Detail Blocks (maps) contain just a NoGeometry key to signal there is no
@@ -294,9 +294,9 @@ namespace OpenSim.Region.PhysicsModule.Meshing
         /// <returns></returns>
         private Mesh CreateMeshFromPrimMesher(string primName, PrimitiveBaseShape primShape, Vector3 size, float lod)
         {
-//            m_log.DebugFormat(
-//                "[MESH]: Creating physics proxy for {0}, shape {1}",
-//                primName, (OpenMetaverse.SculptType)primShape.SculptType);
+            //            m_log.DebugFormat(
+            //                "[MESH]: Creating physics proxy for {0}, shape {1}",
+            //                primName, (OpenMetaverse.SculptType)primShape.SculptType);
 
             List<Coord> coords;
             List<Face> faces;
@@ -360,7 +360,7 @@ namespace OpenSim.Region.PhysicsModule.Meshing
         private bool GenerateCoordsAndFacesFromPrimMeshData(
             string primName, PrimitiveBaseShape primShape, Vector3 size, out List<Coord> coords, out List<Face> faces)
         {
-//            m_log.DebugFormat("[MESH]: experimental mesh proxy generation for {0}", primName);
+            //            m_log.DebugFormat("[MESH]: experimental mesh proxy generation for {0}", primName);
 
             coords = new List<Coord>();
             faces = new List<Face>();
@@ -374,7 +374,7 @@ namespace OpenSim.Region.PhysicsModule.Meshing
                 // XXX: At the moment we can not log here since ODEPrim, for instance, ends up triggering this
                 // method twice - once before it has loaded sculpt data from the asset service and once afterwards.
                 // The first time will always call with unloaded SculptData if this needs to be uploaded.
-//                m_log.ErrorFormat("[MESH]: asset data for {0} is zero length", primName);
+                //                m_log.ErrorFormat("[MESH]: asset data for {0} is zero length", primName);
                 return false;
             }
 
@@ -473,7 +473,7 @@ namespace OpenSim.Region.PhysicsModule.Meshing
                             {
                                 byte[] boundingVertsBytes = convexBlock["BoundingVerts"].AsBinary();
                                 boundingHull = new List<Vector3>();
-                                for (int i = 0; i < boundingVertsBytes.Length; )
+                                for (int i = 0; i < boundingVertsBytes.Length;)
                                 {
                                     ushort uX = Utils.BytesToUInt16(boundingVertsBytes, i); i += 2;
                                     ushort uY = Utils.BytesToUInt16(boundingVertsBytes, i); i += 2;
@@ -779,22 +779,22 @@ namespace OpenSim.Region.PhysicsModule.Meshing
             {
                 switch (iLOD)
                 {
-                    case LevelOfDetail.High:    sides = 24;     break;
-                    case LevelOfDetail.Medium:  sides = 12;     break;
-                    case LevelOfDetail.Low:     sides = 6;      break;
-                    case LevelOfDetail.VeryLow: sides = 3;      break;
-                    default:                    sides = 24;     break;
+                    case LevelOfDetail.High: sides = 24; break;
+                    case LevelOfDetail.Medium: sides = 12; break;
+                    case LevelOfDetail.Low: sides = 6; break;
+                    case LevelOfDetail.VeryLow: sides = 3; break;
+                    default: sides = 24; break;
                 }
             }
             else if ((primShape.ProfileCurve & 0x07) == (byte)ProfileShape.HalfCircle)
             { // half circle, prim is a sphere
                 switch (iLOD)
                 {
-                    case LevelOfDetail.High:    sides = 24;     break;
-                    case LevelOfDetail.Medium:  sides = 12;     break;
-                    case LevelOfDetail.Low:     sides = 6;      break;
-                    case LevelOfDetail.VeryLow: sides = 3;      break;
-                    default:                    sides = 24;     break;
+                    case LevelOfDetail.High: sides = 24; break;
+                    case LevelOfDetail.Medium: sides = 12; break;
+                    case LevelOfDetail.Low: sides = 6; break;
+                    case LevelOfDetail.VeryLow: sides = 3; break;
+                    default: sides = 24; break;
                 }
 
                 profileBegin = 0.5f * profileBegin + 0.5f;
@@ -806,11 +806,11 @@ namespace OpenSim.Region.PhysicsModule.Meshing
             {
                 switch (iLOD)
                 {
-                    case LevelOfDetail.High:    hollowSides = 24;     break;
-                    case LevelOfDetail.Medium:  hollowSides = 12;     break;
-                    case LevelOfDetail.Low:     hollowSides = 6;      break;
-                    case LevelOfDetail.VeryLow: hollowSides = 3;      break;
-                    default:                    hollowSides = 24;     break;
+                    case LevelOfDetail.High: hollowSides = 24; break;
+                    case LevelOfDetail.Medium: hollowSides = 12; break;
+                    case LevelOfDetail.Low: hollowSides = 6; break;
+                    case LevelOfDetail.VeryLow: hollowSides = 3; break;
+                    default: hollowSides = 24; break;
                 }
             }
             else if (primShape.HollowShape == HollowShape.Square)
@@ -829,7 +829,7 @@ namespace OpenSim.Region.PhysicsModule.Meshing
             primMesh.pathCutBegin = pathBegin;
             primMesh.pathCutEnd = pathEnd;
 
-            if (primShape.PathCurve == (byte)Extrusion.Straight || primShape.PathCurve == (byte) Extrusion.Flexible)
+            if (primShape.PathCurve == (byte)Extrusion.Straight || primShape.PathCurve == (byte)Extrusion.Flexible)
             {
                 primMesh.twistBegin = primShape.PathTwistBegin * 18 / 10;
                 primMesh.twistEnd = primShape.PathTwist * 18 / 10;

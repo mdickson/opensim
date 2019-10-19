@@ -33,7 +33,7 @@ namespace OpenSim.Framework
 {
     public static class SLUtil
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// Asset types used only in OpenSim.
@@ -290,13 +290,13 @@ namespace OpenSim.Framework
 
             public string getLine()
             {
-                if(rawInput.Length == 0)
+                if (rawInput.Length == 0)
                 {
                     throw new NotANotecardFormatException(lineNumber + 1);
                 }
 
                 int pos = rawInput.IndexOf('\n');
-                if(pos < 0)
+                if (pos < 0)
                 {
                     pos = rawInput.Length;
                 }
@@ -314,7 +314,7 @@ namespace OpenSim.Framework
                 }
                 /* clean up line from double spaces and tabs */
                 line = line.Replace("\t", " ");
-                while(line.IndexOf("  ") >= 0)
+                while (line.IndexOf("  ") >= 0)
                 {
                     line = line.Replace("  ", " ");
                 }
@@ -324,7 +324,7 @@ namespace OpenSim.Framework
             public string getBlock(int length)
             {
                 /* cut line from rest */
-                if(length > rawInput.Length)
+                if (length > rawInput.Length)
                 {
                     throw new NotANotecardFormatException(lineNumber);
                 }
@@ -340,7 +340,7 @@ namespace OpenSim.Framework
             public NotANotecardFormatException(int _lineNumber)
                 : base()
             {
-               lineNumber = _lineNumber;
+                lineNumber = _lineNumber;
             }
         }
 
@@ -352,7 +352,7 @@ namespace OpenSim.Framework
             string line;
             while ((line = reader.getLine()) != "}")
             {
-                if(line.IndexOf('{')>=0)
+                if (line.IndexOf('{') >= 0)
                 {
                     throw new NotANotecardFormatException(reader.LineNumber);
                 }
@@ -365,18 +365,18 @@ namespace OpenSim.Framework
                 throw new NotANotecardFormatException(reader.LineNumber);
 
             string line;
-            while((line = reader.getLine()) != "}")
+            while ((line = reader.getLine()) != "}")
             {
                 string[] data = line.Split(' ');
-                if(data.Length == 0)
+                if (data.Length == 0)
                 {
                     continue;
                 }
-                if(data[0] == "permissions")
+                if (data[0] == "permissions")
                 {
                     skipSection(reader);
                 }
-                else if(data[0] == "sale_info")
+                else if (data[0] == "sale_info")
                 {
                     skipSection(reader);
                 }
@@ -389,21 +389,21 @@ namespace OpenSim.Framework
 
         private static void skipInventoryItems(NotecardReader reader)
         {
-            if(reader.getLine() != "{")
+            if (reader.getLine() != "{")
             {
                 throw new NotANotecardFormatException(reader.LineNumber);
             }
 
             string line;
-            while((line = reader.getLine()) != "}")
+            while ((line = reader.getLine()) != "}")
             {
                 string[] data = line.Split(' ');
-                if(data.Length == 0)
+                if (data.Length == 0)
                 {
                     continue;
                 }
 
-                if(data[0] == "inv_item")
+                if (data[0] == "inv_item")
                 {
                     skipInventoryItem(reader);
                 }
@@ -421,13 +421,13 @@ namespace OpenSim.Framework
                 throw new NotANotecardFormatException(reader.LineNumber);
 
             string line;
-            while((line = reader.getLine()) != "}")
+            while ((line = reader.getLine()) != "}")
             {
                 string[] data = line.Split(' ');
-                if(data[0] == "count")
+                if (data[0] == "count")
                 {
                     int count = Int32.Parse(data[1]);
-                    for(int i = 0; i < count; ++i)
+                    for (int i = 0; i < count; ++i)
                     {
                         skipInventoryItems(reader);
                     }
@@ -446,7 +446,7 @@ namespace OpenSim.Framework
 
             string notecardString = string.Empty;
             string line;
-            while((line = reader.getLine()) != "}")
+            while ((line = reader.getLine()) != "}")
             {
                 string[] data = line.Split(' ');
                 if (data.Length == 0)
@@ -458,7 +458,7 @@ namespace OpenSim.Framework
                 {
                     skipInventory(reader);
                 }
-                else if(data[0] == "Text" && data.Length == 3)
+                else if (data[0] == "Text" && data.Length == 3)
                 {
                     int length = Int32.Parse(data[2]);
                     notecardString = reader.getBlock(length);
@@ -477,7 +477,7 @@ namespace OpenSim.Framework
             string rawIntermedInput = string.Empty;
 
             /* make up a Raw Encoding here */
-            foreach(byte c in rawInput)
+            foreach (byte c in rawInput)
             {
                 char d = (char)c;
                 rawIntermedInput += d;
@@ -489,16 +489,16 @@ namespace OpenSim.Framework
             {
                 line = reader.getLine();
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return System.Text.Encoding.UTF8.GetString(rawInput);
             }
             string[] versioninfo = line.Split(' ');
-            if(versioninfo.Length < 3)
+            if (versioninfo.Length < 3)
             {
                 return System.Text.Encoding.UTF8.GetString(rawInput);
             }
-            else if(versioninfo[0] != "Linden" || versioninfo[1] != "text")
+            else if (versioninfo[0] != "Linden" || versioninfo[1] != "text")
             {
                 return System.Text.Encoding.UTF8.GetString(rawInput);
             }
@@ -507,7 +507,7 @@ namespace OpenSim.Framework
                 /* now we actually decode the Encoding, before we needed it in raw */
                 string o = readNotecardText(reader);
                 byte[] a = new byte[o.Length];
-                for(int i = 0; i < o.Length; ++i)
+                for (int i = 0; i < o.Length; ++i)
                 {
                     a[i] = (byte)o[i];
                 }

@@ -25,32 +25,32 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
+using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.Imaging;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using log4net;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Reflection;
-using Mono.Addins;
 
 namespace OpenSim.Region.CoreModules.Scripting.DynamicTexture
 {
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "DynamicTextureModule")]
     public class DynamicTextureModule : ISharedRegionModule, IDynamicTextureManager
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private const int ALL_SIDES = -1;
 
         public const int DISP_EXPIRE = 1;
-        public const int DISP_TEMP   = 2;
+        public const int DISP_TEMP = 2;
 
         /// <summary>
         /// If true then where possible dynamic textures are reused.
@@ -158,12 +158,12 @@ namespace OpenSim.Region.CoreModules.Scripting.DynamicTexture
         /// <returns></returns>
         private bool IsDataSizeReuseable(IDynamicTexture texture)
         {
-//            Console.WriteLine("{0} {1}", texture.Size.Width, texture.Size.Height);
+            //            Console.WriteLine("{0} {1}", texture.Size.Width, texture.Size.Height);
             int discardLevel2DataThreshold = (int)Math.Ceiling((texture.Size.Width >> 2) * (texture.Size.Height >> 2) * 0.5);
 
-//            m_log.DebugFormat(
-//                "[DYNAMIC TEXTURE MODULE]: Discard level 2 threshold {0}, texture data length {1}",
-//                discardLevel2DataThreshold, texture.Data.Length);
+            //            m_log.DebugFormat(
+            //                "[DYNAMIC TEXTURE MODULE]: Discard level 2 threshold {0}, texture data length {1}",
+            //                discardLevel2DataThreshold, texture.Data.Length);
 
             return discardLevel2DataThreshold < texture.Data.Length;
         }
@@ -178,7 +178,7 @@ namespace OpenSim.Region.CoreModules.Scripting.DynamicTexture
                                          string extraParams, bool SetBlending, byte AlphaValue)
         {
             return AddDynamicTextureURL(simID, primID, contentType, url, extraParams, SetBlending,
-                                         (DISP_TEMP|DISP_EXPIRE), AlphaValue, ALL_SIDES);
+                                         (DISP_TEMP | DISP_EXPIRE), AlphaValue, ALL_SIDES);
         }
 
         public UUID AddDynamicTextureURL(UUID simID, UUID primID, string contentType, string url,
@@ -217,14 +217,14 @@ namespace OpenSim.Region.CoreModules.Scripting.DynamicTexture
                                           string extraParams)
         {
             return AddDynamicTextureData(simID, primID, contentType, data, extraParams, false,
-                                            (DISP_TEMP|DISP_EXPIRE), 255, ALL_SIDES);
+                                            (DISP_TEMP | DISP_EXPIRE), 255, ALL_SIDES);
         }
 
         public UUID AddDynamicTextureData(UUID simID, UUID primID, string contentType, string data,
                                           string extraParams, bool SetBlending, byte AlphaValue)
         {
             return AddDynamicTextureData(simID, primID, contentType, data, extraParams, SetBlending,
-                                          (DISP_TEMP|DISP_EXPIRE), AlphaValue, ALL_SIDES);
+                                          (DISP_TEMP | DISP_EXPIRE), AlphaValue, ALL_SIDES);
         }
 
         public UUID AddDynamicTextureData(UUID simID, UUID primID, string contentType, string data,
@@ -292,17 +292,17 @@ namespace OpenSim.Region.CoreModules.Scripting.DynamicTexture
                     }
                 }
 
-//                m_log.DebugFormat(
-//                    "[DYNAMIC TEXTURE MODULE]: Requesting generation of new dynamic texture for {0} in {1}",
-//                    part.Name, part.ParentGroup.Scene.Name);
+                //                m_log.DebugFormat(
+                //                    "[DYNAMIC TEXTURE MODULE]: Requesting generation of new dynamic texture for {0} in {1}",
+                //                    part.Name, part.ParentGroup.Scene.Name);
 
                 RenderPlugins[contentType].AsyncConvertData(updater.UpdaterID, data, extraParams);
             }
             else
             {
-//                m_log.DebugFormat(
-//                    "[DYNAMIC TEXTURE MODULE]: Reusing cached texture {0} for {1} in {2}",
-//                    objReusableTextureUUID, part.Name, part.ParentGroup.Scene.Name);
+                //                m_log.DebugFormat(
+                //                    "[DYNAMIC TEXTURE MODULE]: Reusing cached texture {0} for {1} in {2}",
+                //                    objReusableTextureUUID, part.Name, part.ParentGroup.Scene.Name);
 
                 // No need to add to updaters as the texture is always the same.  Not that this functionality
                 // apppears to be implemented anyway.
@@ -434,9 +434,9 @@ namespace OpenSim.Region.CoreModules.Scripting.DynamicTexture
                     {
                         oldID = tmptex.DefaultTexture.TextureID;
                         tmptex.DefaultTexture.TextureID = textureID;
-                        for(int i = 0; i < tmptex.FaceTextures.Length; i++)
+                        for (int i = 0; i < tmptex.FaceTextures.Length; i++)
                         {
-                            if(tmptex.FaceTextures[i] != null)
+                            if (tmptex.FaceTextures[i] != null)
                                 tmptex.FaceTextures[i].TextureID = textureID;
                         }
                     }
@@ -488,7 +488,7 @@ namespace OpenSim.Region.CoreModules.Scripting.DynamicTexture
                 if (BlendWithOldTexture)
                 {
                     Primitive.TextureEntryFace curFace;
-                    if(Face == ALL_SIDES)
+                    if (Face == ALL_SIDES)
                         curFace = part.Shape.Textures.DefaultTexture;
                     else
                     {
@@ -509,7 +509,7 @@ namespace OpenSim.Region.CoreModules.Scripting.DynamicTexture
                             assetData = BlendTextures(data, oldAsset.Data, FrontAlpha);
                     }
                 }
-                else if(FrontAlpha < 255)
+                else if (FrontAlpha < 255)
                     assetData = BlendTextures(data, null, FrontAlpha);
 
 
@@ -571,7 +571,7 @@ namespace OpenSim.Region.CoreModules.Scripting.DynamicTexture
                 Bitmap image1 = new Bitmap(image);
                 image.Dispose();
 
-                if(backImage == null)
+                if (backImage == null)
                 {
                     SetAlpha(ref image1, newAlpha);
                     byte[] result = new byte[0];
@@ -599,7 +599,7 @@ namespace OpenSim.Region.CoreModules.Scripting.DynamicTexture
                 Bitmap image2 = new Bitmap(image);
                 image.Dispose();
 
-                using(Bitmap joint = MergeBitMaps(image1, image2, newAlpha))
+                using (Bitmap joint = MergeBitMaps(image1, image2, newAlpha))
                 {
                     image1.Dispose();
                     image2.Dispose();
@@ -629,7 +629,7 @@ namespace OpenSim.Region.CoreModules.Scripting.DynamicTexture
                 int Height = back.Height;
 
                 PixelFormat format;
-                if(alpha < 255 || front.PixelFormat == PixelFormat.Format32bppArgb || back.PixelFormat == PixelFormat.Format32bppArgb)
+                if (alpha < 255 || front.PixelFormat == PixelFormat.Format32bppArgb || back.PixelFormat == PixelFormat.Format32bppArgb)
                     format = PixelFormat.Format32bppArgb;
                 else
                     format = PixelFormat.Format32bppRgb;
@@ -682,7 +682,7 @@ namespace OpenSim.Region.CoreModules.Scripting.DynamicTexture
                 int Width = b.Width;
                 int Height = b.Height;
                 Bitmap joint = new Bitmap(Width, Height, PixelFormat.Format32bppArgb);
-                if(alpha > 0)
+                if (alpha > 0)
                 {
                     ColorMatrix matrix = new ColorMatrix(new float[][]{
                     new float[] {1F, 0, 0, 0, 0},

@@ -25,10 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -38,6 +34,10 @@ using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Reflection;
 using PermissionMask = OpenSim.Framework.PermissionMask;
 
 namespace OpenSim.Services.Connectors.SimianGrid
@@ -71,7 +71,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
 
         private string m_serverUrl = String.Empty;
         private string m_userServerUrl = String.Empty;
-//        private object m_gestureSyncRoot = new object();
+        //        private object m_gestureSyncRoot = new object();
         private bool m_Enabled = false;
 
         private const double CACHE_EXPIRATION_SECONDS = 20.0;
@@ -714,12 +714,12 @@ namespace OpenSim.Services.Connectors.SimianGrid
             for (int i = 0; i < items.Count; i++)
                 itemIDs[i] = items[i].AsUUID().ToString();
 
-//            NameValueCollection requestArgs = new NameValueCollection
-//            {
-//                { "RequestMethod", "GetInventoryNodes" },
-//                { "OwnerID", userID.ToString() },
-//                { "Items", String.Join(",", itemIDs) }
-//            };
+            //            NameValueCollection requestArgs = new NameValueCollection
+            //            {
+            //                { "RequestMethod", "GetInventoryNodes" },
+            //                { "OwnerID", userID.ToString() },
+            //                { "Items", String.Join(",", itemIDs) }
+            //            };
 
             // FIXME: Implement this in SimianGrid
             return new List<InventoryItemBase>(0);
@@ -735,12 +735,12 @@ namespace OpenSim.Services.Connectors.SimianGrid
         /// the user's inventory</returns>
         public int GetAssetPermissions(UUID userID, UUID assetID)
         {
-//            NameValueCollection requestArgs = new NameValueCollection
-//            {
-//                { "RequestMethod", "GetInventoryNodes" },
-//                { "OwnerID", userID.ToString() },
-//                { "AssetID", assetID.ToString() }
-//            };
+            //            NameValueCollection requestArgs = new NameValueCollection
+            //            {
+            //                { "RequestMethod", "GetInventoryNodes" },
+            //                { "OwnerID", userID.ToString() },
+            //                { "AssetID", assetID.ToString() }
+            //            };
 
             // FIXME: Implement this in SimianGrid
             return (int)PermissionMask.All;
@@ -772,7 +772,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
                 }
             }
 
-//            m_log.Debug("[SIMIAN INVENTORY CONNECTOR]: Parsed " + invFolders.Count + " folders from SimianGrid response");
+            //            m_log.Debug("[SIMIAN INVENTORY CONNECTOR]: Parsed " + invFolders.Count + " folders from SimianGrid response");
             return invFolders;
         }
 
@@ -838,7 +838,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
                 }
             }
 
-//            m_log.Debug("[SIMIAN INVENTORY CONNECTOR]: Parsed " + invItems.Count + " items from SimianGrid response");
+            //            m_log.Debug("[SIMIAN INVENTORY CONNECTOR]: Parsed " + invItems.Count + " items from SimianGrid response");
             return invItems;
         }
 

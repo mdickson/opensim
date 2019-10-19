@@ -24,16 +24,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-
+using log4net;
+using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-
-using OpenMetaverse;
-using log4net;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.GridUser
 {
@@ -63,12 +59,12 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.GridUser
             scene.EventManager.OnNewClient -= OnNewClient;
         }
 
-       public void OnMakeRootAgent(ScenePresence sp)
-       {
+        public void OnMakeRootAgent(ScenePresence sp)
+        {
             if (sp.IsNPC)
                 return;
 
-            if(sp.m_gotCrossUpdate)
+            if (sp.m_gotCrossUpdate)
             {
                 Util.FireAndForget(delegate
                 {
@@ -77,7 +73,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.GridUser
             }
             else
                 DoOnMakeRootAgent(sp);
-       }
+        }
 
         public void DoOnMakeRootAgent(ScenePresence sp)
         {
@@ -112,7 +108,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.GridUser
             {
                 Scene s = (Scene)client.Scene;
                 userId = s.UserManagementModule.GetUserUUI(client.AgentId);
-                if(s.UserManagementModule.GetUserUUI(client.AgentId, out userId))
+                if (s.UserManagementModule.GetUserUUI(client.AgentId, out userId))
                 {
                     m_GridUserService.LoggedOut(
                         userId, client.SessionId, client.Scene.RegionInfo.RegionID,

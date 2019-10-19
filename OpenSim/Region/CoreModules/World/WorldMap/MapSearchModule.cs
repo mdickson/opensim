@@ -24,17 +24,16 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
-using Mono.Addins;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Region.CoreModules.World.WorldMap
@@ -141,7 +140,7 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                     if (mapName.Length < 3 || (mapName.EndsWith("#") && mapName.Length < 4))
                     {
                         // final block, closing the search result
-                        AddFinalBlock(blocks,mapName);
+                        AddFinalBlock(blocks, mapName);
 
                         // flags are agent flags sent from the viewer.
                         // they have different values depending on different viewers, apparently
@@ -182,8 +181,8 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
 
                     // try to fetch from GridServer
                     List<GridRegion> regionInfos = m_scene.GridService.GetRegionsByName(m_scene.RegionInfo.ScopeID, mapName, 20);
-        //            if (regionInfos.Count == 0)
-        //                remoteClient.SendAlertMessage("Hyperlink could not be established.");
+                    //            if (regionInfos.Count == 0)
+                    //                remoteClient.SendAlertMessage("Hyperlink could not be established.");
 
                     //m_log.DebugFormat("[MAPSEARCHMODULE]: search {0} returned {1} regions", mapName, regionInfos.Count);
 
@@ -198,14 +197,14 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                             MapBlockData block = new MapBlockData();
                             WorldMap.MapBlockFromGridRegion(block, info, flags);
 
-                            if (flags == 2 &&  regionInfos.Count == 1 && needOriginalName)
-                                    block.Name = mapNameOrig;
+                            if (flags == 2 && regionInfos.Count == 1 && needOriginalName)
+                                block.Name = mapNameOrig;
                             blocks.Add(block);
                         }
                     }
 
                     // final block, closing the search result
-                    AddFinalBlock(blocks,mapNameOrig);
+                    AddFinalBlock(blocks, mapNameOrig);
 
                     // flags are agent flags sent from the viewer.
                     // they have different values depending on different viewers, apparently
@@ -218,8 +217,8 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                     {
                         if (regionInfos == null || regionInfos.Count == 0)
                             remoteClient.SendAgentAlertMessage("No regions found with that name.", true);
-    //                    else if (regionInfos.Count == 1)
-    //                        remoteClient.SendAgentAlertMessage("Region found!", false);
+                        //                    else if (regionInfos.Count == 1)
+                        //                        remoteClient.SendAgentAlertMessage("Region found!", false);
                     }
                 }
                 finally
@@ -230,28 +229,28 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
             });
         }
 
-        private void AddFinalBlock(List<MapBlockData> blocks,string name)
+        private void AddFinalBlock(List<MapBlockData> blocks, string name)
         {
-                // final block, closing the search result
-                MapBlockData data = new MapBlockData();
-                data.Agents = 0;
-                data.Access = (byte)SimAccess.NonExistent;
-                data.MapImageId = UUID.Zero;
-                data.Name = name;
-                data.RegionFlags = 0;
-                data.WaterHeight = 0; // not used
-                data.X = 0;
-                data.Y = 0;
-                blocks.Add(data);
+            // final block, closing the search result
+            MapBlockData data = new MapBlockData();
+            data.Agents = 0;
+            data.Access = (byte)SimAccess.NonExistent;
+            data.MapImageId = UUID.Zero;
+            data.Name = name;
+            data.RegionFlags = 0;
+            data.WaterHeight = 0; // not used
+            data.X = 0;
+            data.Y = 0;
+            blocks.Add(data);
         }
-//        private Scene GetClientScene(IClientAPI client)
-//        {
-//            foreach (Scene s in m_scenes)
-//            {
-//                if (client.Scene.RegionInfo.RegionHandle == s.RegionInfo.RegionHandle)
-//                    return s;
-//            }
-//            return m_scene;
-//        }
+        //        private Scene GetClientScene(IClientAPI client)
+        //        {
+        //            foreach (Scene s in m_scenes)
+        //            {
+        //                if (client.Scene.RegionInfo.RegionHandle == s.RegionInfo.RegionHandle)
+        //                    return s;
+        //            }
+        //            return m_scene;
+        //        }
     }
 }

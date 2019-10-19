@@ -25,18 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
-using System.Timers;
 using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Monitoring;
-using OpenSim.Framework.Serialization;
 using OpenSim.Framework.Serialization.External;
 using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Timers;
 
 namespace OpenSim.Region.CoreModules.World.Archiver
 {
@@ -130,7 +127,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
             }
 
             m_timeOutTimer = new System.Timers.Timer(60000);
-            m_timeOutTimer .AutoReset = false;
+            m_timeOutTimer.AutoReset = false;
             m_timeOutTimer.Elapsed += OnTimeout;
             m_timeout = false;
             int gccontrol = 0;
@@ -143,12 +140,12 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                 {
                     m_timeOutTimer.Enabled = true;
                     AssetBase asset = m_assetService.Get(thiskey);
-                    if(m_timeout)
+                    if (m_timeout)
                         break;
-                        
+
                     m_timeOutTimer.Enabled = false;
 
-                    if(asset == null)
+                    if (asset == null)
                     {
                         m_notFoundAssetUuids.Add(new UUID(thiskey));
                         continue;
@@ -163,7 +160,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
 
                     m_foundAssetUuids.Add(asset.FullID);
                     m_assetsArchiver.WriteAsset(PostProcess(asset));
-                    if(++gccontrol > 10000)
+                    if (++gccontrol > 10000)
                     {
                         gccontrol = 0;
                         GC.Collect();
@@ -179,9 +176,9 @@ namespace OpenSim.Region.CoreModules.World.Archiver
             m_timeOutTimer.Dispose();
             int totalerrors = m_notFoundAssetUuids.Count + m_previousErrorsCount;
 
-            if(m_timeout)
+            if (m_timeout)
                 m_log.DebugFormat("[ARCHIVER]: Aborted because AssetService request timeout. Successfully added {0} assets", m_foundAssetUuids.Count);
-            else if(totalerrors == 0)
+            else if (totalerrors == 0)
                 m_log.DebugFormat("[ARCHIVER]: Successfully added all {0} assets", m_foundAssetUuids.Count);
             else
                 m_log.DebugFormat("[ARCHIVER]: Successfully added {0} assets ({1} of total possible assets requested were not found, were damaged or were not assets)",
@@ -190,7 +187,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
             GC.Collect();
             PerformAssetsRequestCallback(m_timeout);
         }
-  
+
         private void OnTimeout(object source, ElapsedEventArgs args)
         {
             m_timeout = true;
@@ -201,7 +198,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
         /// </summary>
         private void PerformAssetsRequestCallback(object o)
         {
-            if(m_assetsRequestCallback == null)
+            if (m_assetsRequestCallback == null)
                 return;
             Culture.SetCurrentCulture();
 

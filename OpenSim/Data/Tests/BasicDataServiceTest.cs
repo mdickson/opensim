@@ -25,19 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.IO;
-using System.Collections.Generic;
-using log4net.Config;
-using NUnit.Framework;
-using NUnit.Framework.Constraints;
-using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Tests.Common;
 using log4net;
+using NUnit.Framework;
+using OpenSim.Framework;
+using System;
 using System.Data;
 using System.Data.Common;
-using System.Reflection;
+using System.IO;
 
 namespace OpenSim.Data.Tests
 {
@@ -62,7 +56,7 @@ namespace OpenSim.Data.Tests
 
         // TODO: Is this in the right place here?
         // Later:  apparently it's not, but does it matter here?
-//        protected static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        protected static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         protected ILog m_log;  // doesn't matter here that it's not static, init to correct type in instance .ctor
 
@@ -220,7 +214,8 @@ namespace OpenSim.Data.Tests
                 try
                 {
                     ExecuteSql("DROP TABLE " + tbl + ";");
-                }catch
+                }
+                catch
                 {
                 }
             }

@@ -25,20 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
-using OpenMetaverse.Packets;
 using OpenMetaverse.StructuredData;
-using OpenSim.Framework;
-using OpenSim.Region.Framework;
 using OpenSim.Region.CoreModules.Framework.DynamicAttributes.DAExampleModule;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Region.Framework.DynamicAttributes.DOExampleModule
 {
@@ -68,7 +64,7 @@ namespace OpenSim.Region.Framework.DynamicAttributes.DOExampleModule
         public string Name { get { return "DO"; } }
         public Type ReplaceableInterface { get { return null; } }
 
-        public void Initialise(IConfigSource source) {}
+        public void Initialise(IConfigSource source) { }
 
         public void AddRegion(Scene scene)
         {
@@ -89,7 +85,7 @@ namespace OpenSim.Region.Framework.DynamicAttributes.DOExampleModule
             }
         }
 
-        public void RegionLoaded(Scene scene) {}
+        public void RegionLoaded(Scene scene) { }
 
         public void Close()
         {
@@ -99,14 +95,14 @@ namespace OpenSim.Region.Framework.DynamicAttributes.DOExampleModule
         private void OnObjectAddedToScene(SceneObjectGroup so)
         {
             SceneObjectPart rootPart = so.RootPart;
-            if(rootPart.DynAttrs == null)
+            if (rootPart.DynAttrs == null)
                 return;
 
             OSDMap attrs;
 
             int movesSoFar = 0;
 
-//            Console.WriteLine("Here for {0}", so.Name);
+            //            Console.WriteLine("Here for {0}", so.Name);
 
             if (rootPart.DynAttrs.TryGetStore(DAExampleModule.Namespace, DAExampleModule.StoreName, out attrs))
             {

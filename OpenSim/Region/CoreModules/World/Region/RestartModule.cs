@@ -25,23 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Linq;
-using System.Reflection;
-using System.Timers;
-using System.IO;
-using System.Diagnostics;
-using System.Threading;
-using System.Collections.Generic;
 using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Framework.Console;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using Timer=System.Timers.Timer;
-using Mono.Addins;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace OpenSim.Region.CoreModules.World.Region
 {
@@ -293,7 +290,7 @@ namespace OpenSim.Region.CoreModules.World.Region
                 m_CountdownTimer = null;
                 if (m_DialogModule != null && message != String.Empty)
                     m_DialogModule.SendNotificationToUsersInRegion(UUID.Zero, "System", message);
-                    //m_DialogModule.SendGeneralAlert(message);
+                //m_DialogModule.SendGeneralAlert(message);
             }
             if (m_MarkerPath != String.Empty)
                 File.Delete(Path.Combine(m_MarkerPath,
@@ -334,7 +331,7 @@ namespace OpenSim.Region.CoreModules.World.Region
                 notice = true;
 
             List<int> times = new List<int>();
-            for (int i = 4 ; i < args.Length ; i++)
+            for (int i = 4; i < args.Length; i++)
                 times.Add(Convert.ToInt32(args[i]));
 
             MainConsole.Instance.Output(

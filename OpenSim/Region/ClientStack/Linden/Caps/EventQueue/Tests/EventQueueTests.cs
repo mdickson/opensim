@@ -25,25 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using log4net.Config;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
-using OpenMetaverse.Packets;
 using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
 using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Region.ClientStack.Linden;
 using OpenSim.Region.CoreModules.Framework;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.OptionalModules.World.NPC;
 using OpenSim.Tests.Common;
+using System;
+using System.Collections;
+using System.Net;
+using System.Text;
 
 namespace OpenSim.Region.ClientStack.Linden.Tests
 {
@@ -65,7 +61,7 @@ namespace OpenSim.Region.ClientStack.Linden.Tests
             // variables and the VM is not restarted between tests.
             MainServer.RemoveHttpServer(port);
 
-            BaseHttpServer server = new BaseHttpServer(port, false, "","","");
+            BaseHttpServer server = new BaseHttpServer(port, false, "", "", "");
             MainServer.AddHttpServer(server);
             MainServer.Instance = server;
 
@@ -88,7 +84,7 @@ namespace OpenSim.Region.ClientStack.Linden.Tests
         public void TestAddForClient()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             SceneHelpers.AddScenePresence(m_scene, TestHelpers.ParseTail(0x1));
 
@@ -100,7 +96,7 @@ namespace OpenSim.Region.ClientStack.Linden.Tests
         public void TestRemoveForClient()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID spId = TestHelpers.ParseTail(0x1);
 
@@ -115,7 +111,7 @@ namespace OpenSim.Region.ClientStack.Linden.Tests
         public void TestEnqueueMessage()
         {
             TestHelpers.InMethod();
-//            log4net.Config.XmlConfigurator.Configure();
+            //            log4net.Config.XmlConfigurator.Configure();
 
             ScenePresence sp = SceneHelpers.AddScenePresence(m_scene, TestHelpers.ParseTail(0x1));
 
@@ -126,19 +122,19 @@ namespace OpenSim.Region.ClientStack.Linden.Tests
             Hashtable eventsResponse = m_eqgMod.GetEvents(UUID.Zero, sp.UUID);
 
             // initial queue as null events
-//            eventsResponse = m_eqgMod.GetEvents(UUID.Zero, sp.UUID);
-            if((int)eventsResponse["int_response_code"] != (int)HttpStatusCode.OK)
+            //            eventsResponse = m_eqgMod.GetEvents(UUID.Zero, sp.UUID);
+            if ((int)eventsResponse["int_response_code"] != (int)HttpStatusCode.OK)
             {
                 eventsResponse = m_eqgMod.GetEvents(UUID.Zero, sp.UUID);
-                if((int)eventsResponse["int_response_code"] != (int)HttpStatusCode.OK)
+                if ((int)eventsResponse["int_response_code"] != (int)HttpStatusCode.OK)
                     eventsResponse = m_eqgMod.GetEvents(UUID.Zero, sp.UUID);
             }
 
             Assert.That((int)eventsResponse["int_response_code"], Is.EqualTo((int)HttpStatusCode.OK));
 
-//            Console.WriteLine("Response [{0}]", (string)eventsResponse["str_response_string"]);
+            //            Console.WriteLine("Response [{0}]", (string)eventsResponse["str_response_string"]);
             string data = String.Empty;
-            if(eventsResponse["bin_response_data"] != null)
+            if (eventsResponse["bin_response_data"] != null)
                 data = Encoding.UTF8.GetString((byte[])eventsResponse["bin_response_data"]);
 
             OSDMap rawOsd = (OSDMap)OSDParser.DeserializeLLSDXml(data);
@@ -181,7 +177,7 @@ namespace OpenSim.Region.ClientStack.Linden.Tests
         public void TestEnqueueMessageToNpc()
         {
             TestHelpers.InMethod();
-//            TestHelpers.EnableLogging();
+            //            TestHelpers.EnableLogging();
 
             UUID npcId
                 = m_npcMod.CreateNPC(

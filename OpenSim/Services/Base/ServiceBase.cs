@@ -25,13 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using Nini.Config;
-using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 namespace OpenSim.Services.Base
 {
@@ -39,12 +38,12 @@ namespace OpenSim.Services.Base
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public T LoadPlugin<T>(string dllName) where T:class
+        public T LoadPlugin<T>(string dllName) where T : class
         {
             return LoadPlugin<T>(dllName, new Object[0]);
         }
 
-        public T LoadPlugin<T>(string dllName, Object[] args) where T:class
+        public T LoadPlugin<T>(string dllName, Object[] args) where T : class
         {
             // The path:type separator : is unfortunate because it collides
             // with Windows paths like C:\...
@@ -52,7 +51,7 @@ namespace OpenSim.Services.Base
             // Hence the root/noroot thing going on here.
             string pathRoot = Path.GetPathRoot(dllName);
             string noRoot = dllName.Substring(pathRoot.Length);
-            string[] parts = noRoot.Split(new char[] {':'});
+            string[] parts = noRoot.Split(new char[] { ':' });
 
 
             dllName = pathRoot + parts[0];
@@ -65,7 +64,7 @@ namespace OpenSim.Services.Base
             return LoadPlugin<T>(dllName, className, args);
         }
 
-        public T LoadPlugin<T>(string dllName, string className, Object[] args) where T:class
+        public T LoadPlugin<T>(string dllName, string className, Object[] args) where T : class
         {
             string interfaceName = typeof(T).ToString();
 
@@ -73,11 +72,11 @@ namespace OpenSim.Services.Base
             {
                 Assembly pluginAssembly = Assembly.LoadFrom(dllName);
 
-//                m_log.DebugFormat("[SERVICE BASE]: Found assembly {0}", dllName);
+                //                m_log.DebugFormat("[SERVICE BASE]: Found assembly {0}", dllName);
 
                 foreach (Type pluginType in pluginAssembly.GetTypes())
                 {
-//                    m_log.DebugFormat("[SERVICE BASE]: Found type {0}", pluginType);
+                    //                    m_log.DebugFormat("[SERVICE BASE]: Found type {0}", pluginType);
 
                     if (pluginType.IsPublic)
                     {

@@ -25,27 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-
-using OpenMetaverse;
 using NUnit.Framework;
-
+using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Services.Interfaces;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 using OpenSim.Services.Connectors;
+using System.Collections.Generic;
+using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace Robust.Tests
 {
     [TestFixture]
     public class GridClient
     {
-//        private static readonly ILog m_log =
-//                LogManager.GetLogger(
-//                MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log =
+        //                LogManager.GetLogger(
+        //                MethodBase.GetCurrentMethod().DeclaringType);
 
         [Test]
         public void Grid_001()
@@ -97,13 +91,13 @@ namespace Robust.Tests
 
             regions = m_Connector.GetRegionRange(UUID.Zero,
                 (int)Util.RegionToWorldLoc(900), (int)Util.RegionToWorldLoc(1002),
-                (int)Util.RegionToWorldLoc(900), (int)Util.RegionToWorldLoc(1002) );
+                (int)Util.RegionToWorldLoc(900), (int)Util.RegionToWorldLoc(1002));
             Assert.AreNotEqual(regions, null, "GetRegionRange failed");
             Assert.AreEqual(regions.Count, 2, "GetRegionRange should return 2");
 
             regions = m_Connector.GetRegionRange(UUID.Zero,
                 (int)Util.RegionToWorldLoc(900), (int)Util.RegionToWorldLoc(950),
-                (int)Util.RegionToWorldLoc(900), (int)Util.RegionToWorldLoc(950) );
+                (int)Util.RegionToWorldLoc(900), (int)Util.RegionToWorldLoc(950));
             Assert.AreNotEqual(regions, null, "GetRegionRange (bis) failed");
             Assert.AreEqual(regions.Count, 0, "GetRegionRange (bis) should return 0");
 

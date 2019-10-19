@@ -25,15 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Threading;
-using System.Reflection;
+using Amib.Threading;
 using log4net;
 using OpenSim.Framework.Monitoring;
-using Amib.Threading;
-using System.Collections.Generic;
+using System;
+using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading;
 
 namespace OpenSim.Framework.Servers.HttpServer
 {
@@ -74,7 +74,7 @@ namespace OpenSim.Framework.Servers.HttpServer
 
         public void Start()
         {
-            if(m_running)
+            if (m_running)
                 return;
             m_running = true;
             m_threadPool.Start();
@@ -182,7 +182,7 @@ namespace OpenSim.Framework.Servers.HttpServer
 
         public void Stop()
         {
-            if(!m_running)
+            if (!m_running)
                 return;
 
             m_running = false;
@@ -203,7 +203,7 @@ namespace OpenSim.Framework.Servers.HttpServer
             PollServiceHttpRequest req;
             try
             {
-                while(m_retryRequests.TryDequeue(out req))
+                while (m_retryRequests.TryDequeue(out req))
                     req.DoHTTPstop();
             }
             catch
@@ -212,7 +212,7 @@ namespace OpenSim.Framework.Servers.HttpServer
 
             try
             {
-                while(m_requests.TryTake(out req, 0))
+                while (m_requests.TryTake(out req, 0))
                     req.DoHTTPstop();
             }
             catch

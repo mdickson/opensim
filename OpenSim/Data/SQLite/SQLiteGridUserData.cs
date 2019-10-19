@@ -26,13 +26,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Reflection;
-using System.Threading;
-using log4net;
-using OpenMetaverse;
-using OpenSim.Framework;
 
 namespace OpenSim.Data.SQLite
 {
@@ -41,10 +34,10 @@ namespace OpenSim.Data.SQLite
     /// </summary>
     public class SQLiteGridUserData : SQLiteGenericTableHandler<GridUserData>, IGridUserData
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public SQLiteGridUserData(string connectionString, string realm)
-            : base(connectionString, realm, "GridUserStore") {}
+            : base(connectionString, realm, "GridUserStore") { }
 
         public new GridUserData Get(string userID)
         {

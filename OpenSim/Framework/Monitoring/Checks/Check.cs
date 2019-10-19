@@ -26,13 +26,12 @@
  */
 
 using System;
-using System.Text;
 
 namespace OpenSim.Framework.Monitoring
 {
     public class Check
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public static readonly char[] DisallowedShortNameCharacters = { '.' };
 

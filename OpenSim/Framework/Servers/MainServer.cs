@@ -25,21 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenSim.Framework.Servers.HttpServer;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Net;
 using System.Text;
-using log4net;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Framework.Servers.HttpServer;
 
 namespace OpenSim.Framework.Servers
 {
     public class MainServer
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static BaseHttpServer instance = null;
         private static BaseHttpServer unsecureinstance = null;
@@ -257,9 +253,9 @@ namespace OpenSim.Framework.Servers
                     foreach (String s in httpServer.GetJsonRpcHandlerKeys())
                         handlers.AppendFormat("\t{0}\n", s);
 
-//                    handlers.AppendFormat("* Agent:\n");
-//                    foreach (String s in httpServer.GetAgentHandlerKeys())
-//                        handlers.AppendFormat("\t{0}\n", s);
+                    //                    handlers.AppendFormat("* Agent:\n");
+                    //                    foreach (String s in httpServer.GetAgentHandlerKeys())
+                    //                        handlers.AppendFormat("\t{0}\n", s);
 
                     handlers.AppendFormat("* LLSD:\n");
                     foreach (String s in httpServer.GetLLSDHandlerKeys())

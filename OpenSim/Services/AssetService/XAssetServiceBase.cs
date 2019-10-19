@@ -25,15 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Reflection;
 using log4net;
 using Nini.Config;
-using OpenSim.Framework;
 using OpenSim.Data;
+using OpenSim.Framework;
 using OpenSim.Server.Base;
-using OpenSim.Services.Interfaces;
 using OpenSim.Services.Base;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Reflection;
 
 namespace OpenSim.Services.AssetService
 {

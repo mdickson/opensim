@@ -25,9 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using OpenSim.Framework;
-
 namespace OpenSim.Services.Interfaces
 {
     // Generic Authorization service used for authorizing principals in a particular region

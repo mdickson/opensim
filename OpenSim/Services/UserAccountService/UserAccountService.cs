@@ -25,17 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Data;
 using OpenSim.Framework;
 using OpenSim.Services.Interfaces;
-using OpenSim.Framework.Console;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 using PermissionMask = OpenSim.Framework.PermissionMask;
 
@@ -93,7 +92,7 @@ namespace OpenSim.Services.UserAccountService
 
                 //  create a system grid god account
                 UserAccount ggod = GetUserAccount(UUID.Zero, UUID_GRID_GOD);
-                if(ggod == null)
+                if (ggod == null)
                 {
                     UserAccountData d = new UserAccountData();
                     d.FirstName = "GRID";
@@ -114,7 +113,7 @@ namespace OpenSim.Services.UserAccountService
                 // the console commands are only registered for the root instance
                 if (MainConsole.Instance != null)
                 {
-               
+
                     MainConsole.Instance.Commands.AddCommand("Users", false,
                             "create user",
                             "create user [<first> [<last> [<pass> [<email> [<user id> [<model>]]]]]]",
@@ -151,9 +150,9 @@ namespace OpenSim.Services.UserAccountService
         public UserAccount GetUserAccount(UUID scopeID, string firstName,
                 string lastName)
         {
-//            m_log.DebugFormat(
-//                "[USER ACCOUNT SERVICE]: Retrieving account by username for {0} {1}, scope {2}",
-//                firstName, lastName, scopeID);
+            //            m_log.DebugFormat(
+            //                "[USER ACCOUNT SERVICE]: Retrieving account by username for {0} {1}, scope {2}",
+            //                firstName, lastName, scopeID);
 
             UserAccountData[] d;
 
@@ -303,9 +302,9 @@ namespace OpenSim.Services.UserAccountService
 
         public bool StoreUserAccount(UserAccount data)
         {
-//            m_log.DebugFormat(
-//                "[USER ACCOUNT SERVICE]: Storing user account for {0} {1} {2}, scope {3}",
-//                data.FirstName, data.LastName, data.PrincipalID, data.ScopeID);
+            //            m_log.DebugFormat(
+            //                "[USER ACCOUNT SERVICE]: Storing user account for {0} {1} {2}, scope {3}",
+            //                data.FirstName, data.LastName, data.PrincipalID, data.ScopeID);
 
             UserAccountData d = new UserAccountData();
 
@@ -382,8 +381,8 @@ namespace OpenSim.Services.UserAccountService
             string rawPrincipalId;
             string model;
 
-           // List<char> excluded = new List<char>(new char[]{' '});
-            List<char> excluded = new List<char>(new char[]{' ', '@', '.', ':' }); //Protect user names from using valid HG identifiers.
+            // List<char> excluded = new List<char>(new char[]{' '});
+            List<char> excluded = new List<char>(new char[] { ' ', '@', '.', ':' }); //Protect user names from using valid HG identifiers.
             if (cmdparams.Length < 3)
                 firstName = MainConsole.Instance.Prompt("First name", "Default", excluded);
             else firstName = cmdparams[2];
@@ -406,12 +405,12 @@ namespace OpenSim.Services.UserAccountService
                 rawPrincipalId = cmdparams[6];
 
             if (cmdparams.Length < 8)
-                model = MainConsole.Instance.Prompt("Model name","");
+                model = MainConsole.Instance.Prompt("Model name", "");
             else
                 model = cmdparams[7];
 
             UUID principalId = UUID.Zero;
-            if(String.IsNullOrWhiteSpace(rawPrincipalId))
+            if (String.IsNullOrWhiteSpace(rawPrincipalId))
                 principalId = UUID.Random();
             else if (!UUID.TryParse(rawPrincipalId, out principalId))
                 throw new Exception(string.Format("ID {0} is not a valid UUID", rawPrincipalId));
@@ -537,7 +536,8 @@ namespace OpenSim.Services.UserAccountService
             else lastName = cmdparams[4];
 
             UserAccount account = GetUserAccount(UUID.Zero, firstName, lastName);
-            if (account == null) {
+            if (account == null)
+            {
                 MainConsole.Instance.Output("No such user");
                 return;
             }
@@ -546,7 +546,8 @@ namespace OpenSim.Services.UserAccountService
                 rawLevel = MainConsole.Instance.Prompt("User level");
             else rawLevel = cmdparams[5];
 
-            if(int.TryParse(rawLevel, out level) == false) {
+            if (int.TryParse(rawLevel, out level) == false)
+            {
                 MainConsole.Instance.Output("Invalid user level");
                 return;
             }
@@ -844,7 +845,7 @@ namespace OpenSim.Services.UserAccountService
         {
 
             AvatarWearable[] wearables = avatarAppearance.Wearables;
-            if(wearables.Length == 0)
+            if (wearables.Length == 0)
                 throw new Exception("Model does not have wearables");
 
             // Get Clothing folder of receiver
@@ -860,12 +861,12 @@ namespace OpenSim.Services.UserAccountService
             if (destinationFolder.Type != (short)FolderType.Clothing)
             {
                 destinationFolder = new InventoryFolderBase();
-                destinationFolder.ID       = UUID.Random();
-                destinationFolder.Name     = "Clothing";
-                destinationFolder.Owner    = destination;
-                destinationFolder.Type     = (short)AssetType.Clothing;
+                destinationFolder.ID = UUID.Random();
+                destinationFolder.Name = "Clothing";
+                destinationFolder.Owner = destination;
+                destinationFolder.Type = (short)AssetType.Clothing;
                 destinationFolder.ParentID = m_InventoryService.GetRootFolder(destination).ID;
-                destinationFolder.Version  = 1;
+                destinationFolder.Version = 1;
                 m_InventoryService.AddFolder(destinationFolder);     // store base record
                 m_log.ErrorFormat("[USER ACCOUNT SERVICE]: Created folder for destination {0} Clothing", source);
             }
@@ -879,11 +880,11 @@ namespace OpenSim.Services.UserAccountService
             for (int i = 0; i < wearables.Length; i++)
             {
                 basewearable = wearables[i];
-                if(basewearable == null || basewearable.Count == 0)
+                if (basewearable == null || basewearable.Count == 0)
                     continue;
 
                 newbasewearable.Clear();
-                for(int j = 0; j < basewearable.Count; j++)
+                for (int j = 0; j < basewearable.Count; j++)
                 {
                     wearable = basewearable[j];
                     if (wearable.ItemID != UUID.Zero)
@@ -893,12 +894,12 @@ namespace OpenSim.Services.UserAccountService
                         // Get inventory item and copy it
                         InventoryItemBase item = m_InventoryService.GetItem(source, wearable.ItemID);
 
-                        if(item != null && item.AssetType == (int)AssetType.Link)
+                        if (item != null && item.AssetType == (int)AssetType.Link)
                         {
-                            if(item.AssetID == UUID.Zero )
+                            if (item.AssetID == UUID.Zero)
                                 item = null;
                             else
-                              item = m_InventoryService.GetItem(source, item.AssetID);
+                                item = m_InventoryService.GetItem(source, item.AssetID);
                         }
 
                         if (item != null)
@@ -930,7 +931,7 @@ namespace OpenSim.Services.UserAccountService
                             m_log.DebugFormat("[USER ACCOUNT SERVICE]: Added item {0} to folder {1}", destinationItem.ID, destinationFolder.ID);
 
                             // Wear item
-                            newbasewearable.Add(destinationItem.ID,wearable.AssetID);
+                            newbasewearable.Add(destinationItem.ID, wearable.AssetID);
 
                             // Add to Current Outfit
                             CreateCurrentOutfitLink((int)InventoryType.Wearable, item.Flags, item.Name, destinationItem.ID, destination, currentOutfitFolder.ID);

@@ -29,20 +29,17 @@
 using log4net;
 using Mono.Addins;
 using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework.Servers;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Server.Base;
+using OpenSim.Server.Handlers;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Server.Base;
-using OpenSim.Server.Handlers;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Framework.Servers;
-using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using OpenMetaverse;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Profile
 {
@@ -60,7 +57,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Profile
             get; private set;
         }
 
-         public bool Enabled
+        public bool Enabled
         {
             get; private set;
         }
@@ -108,7 +105,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Profile
                 return;
             }
 
-            if(!config.GetBoolean("Enabled",false))
+            if (!config.GetBoolean("Enabled", false))
             {
                 Enabled = false;
                 return;
@@ -165,7 +162,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Profile
 
         public void PostInitialise()
         {
-            if(!Enabled)
+            if (!Enabled)
                 return;
         }
 

@@ -25,19 +25,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-
+using log4net;
+using Nini.Config;
+using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.ServiceAuth;
 using OpenSim.Server.Base;
-
-using OpenMetaverse;
-using log4net;
-using Nini.Config;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Groups
 {
@@ -187,7 +183,7 @@ namespace OpenSim.Groups
         {
             reason = string.Empty;
 
-            Dictionary<string, object> sendData = new Dictionary<string,object>();
+            Dictionary<string, object> sendData = new Dictionary<string, object>();
             sendData["AgentID"] = AgentID;
             sendData["GroupID"] = GroupID.ToString();
             sendData["RoleID"] = RoleID.ToString();

@@ -26,18 +26,14 @@
  */
 
 using log4net;
+using Nini.Config;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
-using Nini.Config;
-using OpenSim.Framework;
-
-using OpenSim.Framework.ServiceAuth;
-using OpenSim.Services.Interfaces;
-using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using OpenSim.Server.Base;
-using OpenMetaverse;
 
 namespace OpenSim.Services.Connectors
 {
@@ -78,7 +74,7 @@ namespace OpenSim.Services.Connectors
                 m_log.Error("[MUTELIST CONNECTOR]: No Server URI named in section GridUserService");
                 throw new Exception("MuteList connector init error");
             }
-            m_ServerURI = serviceURI + "/mutelist";;
+            m_ServerURI = serviceURI + "/mutelist"; ;
             base.Initialise(source, "MuteListService");
         }
 
@@ -101,7 +97,7 @@ namespace OpenSim.Services.Connectors
                     if (replyData.ContainsKey("result"))
                     {
                         string datastr = replyData["result"].ToString();
-                        if(String.IsNullOrWhiteSpace(datastr))
+                        if (String.IsNullOrWhiteSpace(datastr))
                             return null;
                         return Convert.FromBase64String(datastr);
                     }
@@ -125,16 +121,16 @@ namespace OpenSim.Services.Connectors
             sendData["METHOD"] = "update";
             sendData["agentid"] = mute.AgentID.ToString();
             sendData["muteid"] = mute.MuteID.ToString();
-            if(mute.MuteType != 0)
+            if (mute.MuteType != 0)
                 sendData["mutetype"] = mute.MuteType.ToString();
-            if(mute.MuteFlags != 0)
+            if (mute.MuteFlags != 0)
                 sendData["muteflags"] = mute.MuteFlags.ToString();
             sendData["mutestamp"] = mute.Stamp.ToString();
-            if(!String.IsNullOrEmpty(mute.MuteName))
+            if (!String.IsNullOrEmpty(mute.MuteName))
                 sendData["mutename"] = mute.MuteName;
 
             return doSimplePost(ServerUtils.BuildQueryString(sendData), "update");
-         }
+        }
 
         public bool RemoveMute(UUID agentID, UUID muteID, string muteName)
         {
@@ -142,7 +138,7 @@ namespace OpenSim.Services.Connectors
             sendData["METHOD"] = "delete";
             sendData["agentid"] = agentID.ToString();
             sendData["muteid"] = muteID.ToString();
-            if(!String.IsNullOrEmpty(muteName))
+            if (!String.IsNullOrEmpty(muteName))
                 sendData["mutename"] = muteName;
 
             return doSimplePost(ServerUtils.BuildQueryString(sendData), "remove");

@@ -25,28 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using OpenSim.Framework;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Services.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.IO.Compression;
-using System.Reflection;
 using System.Net;
+using System.Reflection;
 using System.Text;
-using System.Web;
-
-using OpenSim.Server.Base;
-using OpenSim.Server.Handlers.Base;
-using OpenSim.Services.Interfaces;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using OpenSim.Framework;
-using OpenSim.Framework.Servers.HttpServer;
-
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using Nini.Config;
-using log4net;
 
 
 namespace OpenSim.Server.Handlers.Simulation
@@ -66,13 +59,13 @@ namespace OpenSim.Server.Handlers.Simulation
 
         public Hashtable Handler(Hashtable request)
         {
-//            m_log.Debug("[CONNECTION DEBUGGING]: AgentHandler Called");
-//
-//            m_log.Debug("---------------------------");
-//            m_log.Debug(" >> uri=" + request["uri"]);
-//            m_log.Debug(" >> content-type=" + request["content-type"]);
-//            m_log.Debug(" >> http-method=" + request["http-method"]);
-//            m_log.Debug("---------------------------\n");
+            //            m_log.Debug("[CONNECTION DEBUGGING]: AgentHandler Called");
+            //
+            //            m_log.Debug("---------------------------");
+            //            m_log.Debug(" >> uri=" + request["uri"]);
+            //            m_log.Debug(" >> content-type=" + request["content-type"]);
+            //            m_log.Debug(" >> http-method=" + request["http-method"]);
+            //            m_log.Debug("---------------------------\n");
 
             Hashtable responsedata = new Hashtable();
             responsedata["content_type"] = "text/html";
@@ -136,7 +129,7 @@ namespace OpenSim.Server.Handlers.Simulation
 
             bool viaTeleport = true;
             OSD tmpOSD;
-            if (args.TryGetValue("viaTeleport",out tmpOSD))
+            if (args.TryGetValue("viaTeleport", out tmpOSD))
                 viaTeleport = tmpOSD.AsBoolean();
 
             Vector3 position = Vector3.Zero;
@@ -152,7 +145,7 @@ namespace OpenSim.Server.Handlers.Simulation
             if (args.TryGetValue("my_version", out tmpOSD))
             {
                 string theirVersionStr = tmpOSD.AsString();
-                string[] parts = theirVersionStr.Split(new char[] {'/'});
+                string[] parts = theirVersionStr.Split(new char[] { '/' });
                 if (parts.Length > 1)
                     theirVersion = float.Parse(parts[1], Culture.FormatProvider);
             }
@@ -189,7 +182,7 @@ namespace OpenSim.Server.Handlers.Simulation
             {
                 // If there is no version in the packet at all we're looking at 0.6 or
                 // even more ancient. Refuse it.
-                if(theirVersion == 0f)
+                if (theirVersion == 0f)
                 {
                     resp["success"] = OSD.FromBoolean(false);
                     resp["reason"] = OSD.FromString("Your region is running a old version of opensim no longer supported. Consider updating it");
@@ -200,7 +193,7 @@ namespace OpenSim.Server.Handlers.Simulation
                 version = theirVersion;
 
                 if (version < VersionInfo.SimulationServiceVersionAcceptedMin ||
-                    version > VersionInfo.SimulationServiceVersionAcceptedMax )
+                    version > VersionInfo.SimulationServiceVersionAcceptedMax)
                 {
                     resp["success"] = OSD.FromBoolean(false);
                     resp["reason"] = OSD.FromString(String.Format("Your region protocol version is {0} and we accept only {1} - {2}. No version overlap.", theirVersion, VersionInfo.SimulationServiceVersionAcceptedMin, VersionInfo.SimulationServiceVersionAcceptedMax));
@@ -265,7 +258,7 @@ namespace OpenSim.Server.Handlers.Simulation
 
             resp["success"] = OSD.FromBoolean(result);
             resp["reason"] = OSD.FromString(reason);
-            string legacyVersion = String.Format(Culture.FormatProvider,"SIMULATION/{0}", version);
+            string legacyVersion = String.Format(Culture.FormatProvider, "SIMULATION/{0}", version);
             resp["version"] = OSD.FromString(legacyVersion);
             resp["negotiated_inbound_version"] = OSD.FromReal(inboundVersion);
             resp["negotiated_outbound_version"] = OSD.FromReal(outboundVersion);
@@ -279,7 +272,7 @@ namespace OpenSim.Server.Handlers.Simulation
             // We must preserve defaults here, otherwise a false "success" will not be put into the JSON map!
             responsedata["str_response_string"] = OSDParser.SerializeJsonString(resp, true);
 
-//            Console.WriteLine("str_response_string [{0}]", responsedata["str_response_string"]);
+            //            Console.WriteLine("str_response_string [{0}]", responsedata["str_response_string"]);
         }
 
         protected void DoAgentDelete(Hashtable request, Hashtable responsedata, UUID id, string action, UUID regionID, string auth_token)
@@ -332,7 +325,7 @@ namespace OpenSim.Server.Handlers.Simulation
         protected override byte[] ProcessRequest(string path, Stream request,
                 IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
-//            m_log.DebugFormat("[SIMULATION]: Stream handler called");
+            //            m_log.DebugFormat("[SIMULATION]: Stream handler called");
 
             Hashtable keysvals = new Hashtable();
             Hashtable headervals = new Hashtable();
@@ -535,11 +528,11 @@ namespace OpenSim.Server.Handlers.Simulation
 
                 if (!headers.ContainsKey(xff) || headers[xff] == null)
                 {
-//                    m_log.WarnFormat("[AGENT HANDLER]: No XFF header");
+                    //                    m_log.WarnFormat("[AGENT HANDLER]: No XFF header");
                     return Util.GetCallerIP(request);
                 }
 
-//                m_log.DebugFormat("[AGENT HANDLER]: XFF is {0}", headers[xff]);
+                //                m_log.DebugFormat("[AGENT HANDLER]: XFF is {0}", headers[xff]);
 
                 IPEndPoint ep = Util.GetClientIPFromXFF((string)headers[xff]);
                 if (ep != null)
@@ -557,26 +550,26 @@ namespace OpenSim.Server.Handlers.Simulation
             // The data and protocols are already defined so this is just a dummy to satisfy the interface
             // TODO: make this end-to-end
 
-/* this needs to be sync
-            if ((teleportFlags & (uint)TeleportFlags.ViaLogin) == 0)
-            {
-                Util.FireAndForget(x =>
-                {
-                    string r;
-                    m_SimulationService.CreateAgent(source, destination, aCircuit, teleportFlags, ctx, out r);
-                    m_log.DebugFormat("[AGENT HANDLER]: ASYNC CreateAgent {0}", r);
-                });
+            /* this needs to be sync
+                        if ((teleportFlags & (uint)TeleportFlags.ViaLogin) == 0)
+                        {
+                            Util.FireAndForget(x =>
+                            {
+                                string r;
+                                m_SimulationService.CreateAgent(source, destination, aCircuit, teleportFlags, ctx, out r);
+                                m_log.DebugFormat("[AGENT HANDLER]: ASYNC CreateAgent {0}", r);
+                            });
 
-                return true;
-            }
-            else
-            {
-*/
+                            return true;
+                        }
+                        else
+                        {
+            */
 
-                bool ret = m_SimulationService.CreateAgent(source, destination, aCircuit, teleportFlags, ctx, out reason);
-//                m_log.DebugFormat("[AGENT HANDLER]: SYNC CreateAgent {0} {1}", ret.ToString(), reason);
-                return ret;
-//            }
+            bool ret = m_SimulationService.CreateAgent(source, destination, aCircuit, teleportFlags, ctx, out reason);
+            //                m_log.DebugFormat("[AGENT HANDLER]: SYNC CreateAgent {0} {1}", ret.ToString(), reason);
+            return ret;
+            //            }
         }
     }
 
@@ -602,7 +595,7 @@ namespace OpenSim.Server.Handlers.Simulation
         protected override byte[] ProcessRequest(string path, Stream request,
                 IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
-//            m_log.DebugFormat("[SIMULATION]: Stream handler called");
+            //            m_log.DebugFormat("[SIMULATION]: Stream handler called");
 
             Hashtable keysvals = new Hashtable();
             Hashtable headervals = new Hashtable();

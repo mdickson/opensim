@@ -25,17 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenSim.Region.OptionalModules.ViewerSupport
 {
@@ -54,11 +53,13 @@ namespace OpenSim.Region.OptionalModules.ViewerSupport
         {
             IConfig moduleConfig = config.Configs["GodNames"];
 
-            if (moduleConfig == null) {
+            if (moduleConfig == null)
+            {
                 return;
             }
 
-            if (!moduleConfig.GetBoolean("Enabled", false)) {
+            if (!moduleConfig.GetBoolean("Enabled", false))
+            {
                 m_log.Info("[GODNAMES]: Addon is disabled");
                 return;
             }
@@ -68,7 +69,8 @@ namespace OpenSim.Region.OptionalModules.ViewerSupport
             string conf_str = moduleConfig.GetString("FullNames", String.Empty);
             if (conf_str != String.Empty)
             {
-                foreach (string strl in conf_str.Split(',')) {
+                foreach (string strl in conf_str.Split(','))
+                {
                     string strlan = strl.Trim(" \t".ToCharArray());
                     m_log.DebugFormat("[GODNAMES]: Adding {0} as a God name", strlan);
                     m_fullNames.Add(strlan);
@@ -78,7 +80,8 @@ namespace OpenSim.Region.OptionalModules.ViewerSupport
             conf_str = moduleConfig.GetString("Surnames", String.Empty);
             if (conf_str != String.Empty)
             {
-                foreach (string strl in conf_str.Split(',')) {
+                foreach (string strl in conf_str.Split(','))
+                {
                     string strlan = strl.Trim(" \t".ToCharArray());
                     m_log.DebugFormat("[GODNAMES]: Adding {0} as a God last name", strlan);
                     m_lastNames.Add(strlan);
@@ -86,31 +89,38 @@ namespace OpenSim.Region.OptionalModules.ViewerSupport
             }
         }
 
-        public void AddRegion(Scene scene) {
+        public void AddRegion(Scene scene)
+        {
             /*no op*/
         }
 
-        public void RemoveRegion(Scene scene) {
+        public void RemoveRegion(Scene scene)
+        {
             /*no op*/
         }
 
-        public void PostInitialise() {
+        public void PostInitialise()
+        {
             /*no op*/
         }
 
-        public void Close() {
+        public void Close()
+        {
             /*no op*/
         }
 
-        public Type ReplaceableInterface {
+        public Type ReplaceableInterface
+        {
             get { return null; }
         }
 
-        public string Name {
+        public string Name
+        {
             get { return "Godnames"; }
         }
 
-        public bool IsSharedModule {
+        public bool IsSharedModule
+        {
             get { return true; }
         }
 
@@ -135,13 +145,15 @@ namespace OpenSim.Region.OptionalModules.ViewerSupport
                 features["god_names"] = namesmap;
 
             OSDArray fnames = new OSDArray();
-            foreach (string name in m_fullNames) {
+            foreach (string name in m_fullNames)
+            {
                 fnames.Add(name);
             }
             ((OSDMap)namesmap)["full_names"] = fnames;
 
             OSDArray lnames = new OSDArray();
-            foreach (string name in m_lastNames) {
+            foreach (string name in m_lastNames)
+            {
                 lnames.Add(name);
             }
             ((OSDMap)namesmap)["last_names"] = lnames;

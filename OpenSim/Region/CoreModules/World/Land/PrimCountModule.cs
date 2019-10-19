@@ -25,19 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Reflection;
-using log4net;
+using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
-using Mono.Addins;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Services.Interfaces;
+using System;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.CoreModules.World.Land
 {
@@ -47,13 +42,13 @@ namespace OpenSim.Region.CoreModules.World.Land
         public int Group = 0;
         public int Others = 0;
         public int Selected = 0;
-        public Dictionary <UUID, int> Users = new Dictionary <UUID, int>();
+        public Dictionary<UUID, int> Users = new Dictionary<UUID, int>();
     }
 
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "PrimCountModule")]
     public class PrimCountModule : IPrimCountModule, INonSharedRegionModule
     {
-//        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private Scene m_Scene;
         private Dictionary<UUID, PrimCounts> m_PrimCounts =
@@ -92,9 +87,9 @@ namespace OpenSim.Region.CoreModules.World.Land
             m_Scene.RegisterModuleInterface<IPrimCountModule>(this);
 
             m_Scene.EventManager.OnObjectAddedToScene += OnParcelPrimCountAdd;
-            m_Scene.EventManager.OnObjectBeingRemovedFromScene +=  OnObjectBeingRemovedFromScene;
-            m_Scene.EventManager.OnParcelPrimCountTainted +=  OnParcelPrimCountTainted;
-            m_Scene.EventManager.OnLandObjectAdded += delegate(ILandObject lo) { OnParcelPrimCountTainted(); };
+            m_Scene.EventManager.OnObjectBeingRemovedFromScene += OnObjectBeingRemovedFromScene;
+            m_Scene.EventManager.OnParcelPrimCountTainted += OnParcelPrimCountTainted;
+            m_Scene.EventManager.OnLandObjectAdded += delegate (ILandObject lo) { OnParcelPrimCountTainted(); };
         }
 
         public void RegionLoaded(Scene scene)
@@ -122,10 +117,10 @@ namespace OpenSim.Region.CoreModules.World.Land
             {
                 if (!m_Tainted)
                     AddObject(obj);
-//                else
-//                    m_log.DebugFormat(
-//                        "[PRIM COUNT MODULE]: Ignoring OnParcelPrimCountAdd() for {0} on {1} since count is tainted",
-//                        obj.Name, m_Scene.RegionInfo.RegionName);
+                //                else
+                //                    m_log.DebugFormat(
+                //                        "[PRIM COUNT MODULE]: Ignoring OnParcelPrimCountAdd() for {0} on {1} since count is tainted",
+                //                        obj.Name, m_Scene.RegionInfo.RegionName);
             }
         }
 
@@ -136,17 +131,17 @@ namespace OpenSim.Region.CoreModules.World.Land
             {
                 if (!m_Tainted)
                     RemoveObject(obj);
-//                else
-//                    m_log.DebugFormat(
-//                        "[PRIM COUNT MODULE]: Ignoring OnObjectBeingRemovedFromScene() for {0} on {1} since count is tainted",
-//                        obj.Name, m_Scene.RegionInfo.RegionName);
+                //                else
+                //                    m_log.DebugFormat(
+                //                        "[PRIM COUNT MODULE]: Ignoring OnObjectBeingRemovedFromScene() for {0} on {1} since count is tainted",
+                //                        obj.Name, m_Scene.RegionInfo.RegionName);
             }
         }
 
         private void OnParcelPrimCountTainted()
         {
-//            m_log.DebugFormat(
-//                "[PRIM COUNT MODULE]: OnParcelPrimCountTainted() called on {0}", m_Scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat(
+            //                "[PRIM COUNT MODULE]: OnParcelPrimCountTainted() called on {0}", m_Scene.RegionInfo.RegionName);
 
             lock (m_TaintLock)
                 m_Tainted = true;
@@ -184,22 +179,22 @@ namespace OpenSim.Region.CoreModules.World.Land
             // If for some reason there is no land object (perhaps the object is out of bounds) then we can't count it
             if (landObject == null)
             {
-//                m_log.WarnFormat(
-//                    "[PRIM COUNT MODULE]: Found no land object for {0} at position ({1}, {2}) on {3}",
-//                    obj.Name, pos.X, pos.Y, m_Scene.RegionInfo.RegionName);
+                //                m_log.WarnFormat(
+                //                    "[PRIM COUNT MODULE]: Found no land object for {0} at position ({1}, {2}) on {3}",
+                //                    obj.Name, pos.X, pos.Y, m_Scene.RegionInfo.RegionName);
 
                 return;
             }
 
             LandData landData = landObject.LandData;
 
-//            m_log.DebugFormat(
-//                "[PRIM COUNT MODULE]: Adding object {0} with {1} parts to prim count for parcel {2} on {3}",
-//                obj.Name, obj.Parts.Length, landData.Name, m_Scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat(
+            //                "[PRIM COUNT MODULE]: Adding object {0} with {1} parts to prim count for parcel {2} on {3}",
+            //                obj.Name, obj.Parts.Length, landData.Name, m_Scene.RegionInfo.RegionName);
 
-//            m_log.DebugFormat(
-//                "[PRIM COUNT MODULE]: Object {0} is owned by {1} over land owned by {2}",
-//                obj.Name, obj.OwnerID, landData.OwnerID);
+            //            m_log.DebugFormat(
+            //                "[PRIM COUNT MODULE]: Object {0} is owned by {1} over land owned by {2}",
+            //                obj.Name, obj.OwnerID, landData.OwnerID);
 
             ParcelCounts parcelCounts;
             if (m_ParcelCounts.TryGetValue(landData.GlobalID, out parcelCounts))
@@ -228,15 +223,15 @@ namespace OpenSim.Region.CoreModules.World.Land
         // NOTE: Call under Taint Lock
         private void RemoveObject(SceneObjectGroup obj)
         {
-//            m_log.DebugFormat("[PRIM COUNT MODULE]: Removing object {0} {1} from prim count", obj.Name, obj.UUID);
+            //            m_log.DebugFormat("[PRIM COUNT MODULE]: Removing object {0} {1} from prim count", obj.Name, obj.UUID);
 
             // Currently this is being done by tainting the count instead.
         }
 
         public IPrimCounts GetPrimCounts(UUID parcelID)
         {
-//            m_log.DebugFormat(
-//                "[PRIM COUNT MODULE]: GetPrimCounts for parcel {0} in {1}", parcelID, m_Scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat(
+            //                "[PRIM COUNT MODULE]: GetPrimCounts for parcel {0} in {1}", parcelID, m_Scene.RegionInfo.RegionName);
 
             PrimCounts primCounts;
 
@@ -271,9 +266,9 @@ namespace OpenSim.Region.CoreModules.World.Land
                     count = counts.Owner;
             }
 
-//            m_log.DebugFormat(
-//                "[PRIM COUNT MODULE]: GetOwnerCount for parcel {0} in {1} returning {2}",
-//                parcelID, m_Scene.RegionInfo.RegionName, count);
+            //            m_log.DebugFormat(
+            //                "[PRIM COUNT MODULE]: GetOwnerCount for parcel {0} in {1} returning {2}",
+            //                parcelID, m_Scene.RegionInfo.RegionName, count);
 
             return count;
         }
@@ -297,9 +292,9 @@ namespace OpenSim.Region.CoreModules.World.Land
                     count = counts.Group;
             }
 
-//            m_log.DebugFormat(
-//                "[PRIM COUNT MODULE]: GetGroupCount for parcel {0} in {1} returning {2}",
-//                parcelID, m_Scene.RegionInfo.RegionName, count);
+            //            m_log.DebugFormat(
+            //                "[PRIM COUNT MODULE]: GetGroupCount for parcel {0} in {1} returning {2}",
+            //                parcelID, m_Scene.RegionInfo.RegionName, count);
 
             return count;
         }
@@ -323,9 +318,9 @@ namespace OpenSim.Region.CoreModules.World.Land
                     count = counts.Others;
             }
 
-//            m_log.DebugFormat(
-//                "[PRIM COUNT MODULE]: GetOthersCount for parcel {0} in {1} returning {2}",
-//                parcelID, m_Scene.RegionInfo.RegionName, count);
+            //            m_log.DebugFormat(
+            //                "[PRIM COUNT MODULE]: GetOthersCount for parcel {0} in {1} returning {2}",
+            //                parcelID, m_Scene.RegionInfo.RegionName, count);
 
             return count;
         }
@@ -349,9 +344,9 @@ namespace OpenSim.Region.CoreModules.World.Land
                     count = counts.Selected;
             }
 
-//            m_log.DebugFormat(
-//                "[PRIM COUNT MODULE]: GetSelectedCount for parcel {0} in {1} returning {2}",
-//                parcelID, m_Scene.RegionInfo.RegionName, count);
+            //            m_log.DebugFormat(
+            //                "[PRIM COUNT MODULE]: GetSelectedCount for parcel {0} in {1} returning {2}",
+            //                parcelID, m_Scene.RegionInfo.RegionName, count);
 
             return count;
         }
@@ -380,9 +375,9 @@ namespace OpenSim.Region.CoreModules.World.Land
                 }
             }
 
-//            m_log.DebugFormat(
-//                "[PRIM COUNT MODULE]: GetTotalCount for parcel {0} in {1} returning {2}",
-//                parcelID, m_Scene.RegionInfo.RegionName, count);
+            //            m_log.DebugFormat(
+            //                "[PRIM COUNT MODULE]: GetTotalCount for parcel {0} in {1} returning {2}",
+            //                parcelID, m_Scene.RegionInfo.RegionName, count);
 
             return count;
         }
@@ -410,9 +405,9 @@ namespace OpenSim.Region.CoreModules.World.Land
                 }
             }
 
-//            m_log.DebugFormat(
-//                "[PRIM COUNT MODULE]: GetOthersCount for parcel {0} in {1} returning {2}",
-//                parcelID, m_Scene.RegionInfo.RegionName, count);
+            //            m_log.DebugFormat(
+            //                "[PRIM COUNT MODULE]: GetOthersCount for parcel {0} in {1} returning {2}",
+            //                parcelID, m_Scene.RegionInfo.RegionName, count);
 
             return count;
         }
@@ -441,9 +436,9 @@ namespace OpenSim.Region.CoreModules.World.Land
                 }
             }
 
-//            m_log.DebugFormat(
-//                "[PRIM COUNT MODULE]: GetUserCount for user {0} in parcel {1} in region {2} returning {3}",
-//                userID, parcelID, m_Scene.RegionInfo.RegionName, count);
+            //            m_log.DebugFormat(
+            //                "[PRIM COUNT MODULE]: GetUserCount for user {0} in parcel {1} in region {2} returning {3}",
+            //                userID, parcelID, m_Scene.RegionInfo.RegionName, count);
 
             return count;
         }
@@ -451,7 +446,7 @@ namespace OpenSim.Region.CoreModules.World.Land
         // NOTE: This method MUST be called while holding the taint lock!
         private void Recount()
         {
-//            m_log.DebugFormat("[PRIM COUNT MODULE]: Recounting prims on {0}", m_Scene.RegionInfo.RegionName);
+            //            m_log.DebugFormat("[PRIM COUNT MODULE]: Recounting prims on {0}", m_Scene.RegionInfo.RegionName);
 
             m_OwnerMap.Clear();
             m_SimwideCounts.Clear();
@@ -465,9 +460,9 @@ namespace OpenSim.Region.CoreModules.World.Land
 
                 m_OwnerMap[landData.GlobalID] = landData.OwnerID;
                 m_SimwideCounts[landData.OwnerID] = 0;
-//                m_log.DebugFormat(
-//                    "[PRIM COUNT MODULE]: Initializing parcel count for {0} on {1}",
-//                    landData.Name, m_Scene.RegionInfo.RegionName);
+                //                m_log.DebugFormat(
+                //                    "[PRIM COUNT MODULE]: Initializing parcel count for {0} on {1}",
+                //                    landData.Name, m_Scene.RegionInfo.RegionName);
                 m_ParcelCounts[landData.GlobalID] = new ParcelCounts();
             }
 
@@ -493,7 +488,7 @@ namespace OpenSim.Region.CoreModules.World.Land
         private UUID m_ParcelID;
         private UserPrimCounts m_UserPrimCounts;
 
-        public PrimCounts (UUID parcelID, PrimCountModule parent)
+        public PrimCounts(UUID parcelID, PrimCountModule parent)
         {
             m_ParcelID = parcelID;
             m_Parent = parent;

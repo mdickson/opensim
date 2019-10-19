@@ -25,16 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Reflection;
-using OpenSim.Framework;
-using OpenSim.Framework.Console;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Servers.HttpServer;
 using log4net;
 using Nini.Config;
+using OpenSim.Framework;
+using OpenSim.Framework.Servers;
+using OpenSim.Framework.Servers.HttpServer;
+using System;
+using System.Reflection;
+using System.Threading;
 
 namespace OpenSim.Server.Base
 {
@@ -68,9 +66,9 @@ namespace OpenSim.Server.Base
                 Environment.Exit(1);
             }
 
-            bool ssl_main = networkConfig.GetBoolean("https_main",false);
-            bool ssl_listener = networkConfig.GetBoolean("https_listener",false);
-            bool ssl_external = networkConfig.GetBoolean("https_external",false);
+            bool ssl_main = networkConfig.GetBoolean("https_main", false);
+            bool ssl_listener = networkConfig.GetBoolean("https_listener", false);
+            bool ssl_external = networkConfig.GetBoolean("https_external", false);
 
             m_consolePort = (uint)networkConfig.GetInt("ConsolePort", 0);
 
@@ -91,14 +89,14 @@ namespace OpenSim.Server.Base
             }
             else
             {
-                string cert_path = networkConfig.GetString("cert_path",String.Empty);
+                string cert_path = networkConfig.GetString("cert_path", String.Empty);
                 if (cert_path == String.Empty)
                 {
                     System.Console.WriteLine("ERROR: Path to X509 certificate is missing, server can't start.");
                     Environment.Exit(1);
                 }
 
-                string cert_pass = networkConfig.GetString("cert_pass",String.Empty);
+                string cert_pass = networkConfig.GetString("cert_pass", String.Empty);
                 if (cert_pass == String.Empty)
                 {
                     System.Console.WriteLine("ERROR: Password for X509 certificate is missing, server can't start.");
@@ -119,14 +117,14 @@ namespace OpenSim.Server.Base
                 m_log.WarnFormat("[SSL]: External flag is {0}", ssl_external);
                 if (!ssl_external)
                 {
-                    string cert_path = networkConfig.GetString("cert_path",String.Empty);
-                    if ( cert_path == String.Empty )
+                    string cert_path = networkConfig.GetString("cert_path", String.Empty);
+                    if (cert_path == String.Empty)
                     {
                         System.Console.WriteLine("Path to X509 certificate is missing, server can't start.");
                         Thread.CurrentThread.Abort();
                     }
-                    string cert_pass = networkConfig.GetString("cert_pass",String.Empty);
-                    if ( cert_pass == String.Empty )
+                    string cert_pass = networkConfig.GetString("cert_pass", String.Empty);
+                    if (cert_pass == String.Empty)
                     {
                         System.Console.WriteLine("Password for X509 certificate is missing, server can't start.");
                         Thread.CurrentThread.Abort();

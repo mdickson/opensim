@@ -25,16 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using Npgsql;
+using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
-using log4net;
-using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Region.Framework.Interfaces;
 using System.Text;
-using Npgsql;
 
 namespace OpenSim.Data.PGSQL
 {
@@ -183,7 +181,7 @@ namespace OpenSim.Data.PGSQL
             using (NpgsqlConnection conn = new NpgsqlConnection(m_ConnectionString))
             using (NpgsqlCommand cmd = new NpgsqlCommand())
             {
-                if ( m_FieldTypes.ContainsKey(field) )
+                if (m_FieldTypes.ContainsKey(field))
                     cmd.Parameters.Add(m_database.CreateParameter(field, key, m_FieldTypes[field]));
                 else
                     cmd.Parameters.Add(m_database.CreateParameter(field, key));
@@ -201,7 +199,7 @@ namespace OpenSim.Data.PGSQL
         {
 
             int flen = keys.Length;
-            if(flen == 0)
+            if (flen == 0)
                 return new T[0];
 
             int flast = flen - 1;
@@ -212,10 +210,10 @@ namespace OpenSim.Data.PGSQL
             using (NpgsqlCommand cmd = new NpgsqlCommand())
             {
 
-                for (int i = 0 ; i < flen ; i++)
+                for (int i = 0; i < flen; i++)
                 {
                     sb.Append(keys[i]);
-                    if(i < flast)
+                    if (i < flast)
                         sb.Append("','");
                     else
                         sb.Append("')");
@@ -243,7 +241,7 @@ namespace OpenSim.Data.PGSQL
 
                 for (int i = 0; i < fields.Length; i++)
                 {
-                    if ( m_FieldTypes.ContainsKey(fields[i]) )
+                    if (m_FieldTypes.ContainsKey(fields[i]))
                         cmd.Parameters.Add(m_database.CreateParameter(fields[i], keys[i], m_FieldTypes[fields[i]]));
                     else
                         cmd.Parameters.Add(m_database.CreateParameter(fields[i], keys[i]));
@@ -352,7 +350,7 @@ namespace OpenSim.Data.PGSQL
         public virtual T[] Get(string where, NpgsqlParameter parameter)
         {
             using (NpgsqlConnection conn = new NpgsqlConnection(m_ConnectionString))
-                using (NpgsqlCommand cmd = new NpgsqlCommand())
+            using (NpgsqlCommand cmd = new NpgsqlCommand())
             {
 
                 string query = String.Format("SELECT * FROM {0} WHERE {1}",
@@ -396,7 +394,7 @@ namespace OpenSim.Data.PGSQL
 
                     if (constraintFields.Count > 0 && constraintFields.Contains(fi.Name))
                     {
-                        constraints.Add(new KeyValuePair<string, string>(fi.Name, fi.GetValue(row).ToString() ));
+                        constraints.Add(new KeyValuePair<string, string>(fi.Name, fi.GetValue(row).ToString()));
                     }
                     if (m_FieldTypes.ContainsKey(fi.Name))
                         cmd.Parameters.Add(m_database.CreateParameter(fi.Name, fi.GetValue(row), m_FieldTypes[fi.Name]));

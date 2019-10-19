@@ -25,25 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Net;
-using Mono.Addins;
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
-using OpenSim;
-using OpenSim.ApplicationPlugins.RegionModulesController;
 using OpenSim.Framework;
 using OpenSim.Region.CoreModules.ServiceConnectorsOut.Grid;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Tests.Common;
+using System;
+using System.Collections.Generic;
+using System.Net;
 
 namespace OpenSim.Region.Framework.Scenes.Tests
 {
     public class SharedRegionModuleTests : OpenSimTestCase
     {
-//        [Test]
+        //        [Test]
         public void TestLifecycle()
         {
             TestHelpers.InMethod();
@@ -56,13 +53,13 @@ namespace OpenSim.Region.Framework.Scenes.Tests
             configSource.AddConfig("Startup");
             configSource.AddConfig("Modules");
 
-//            // We use this to skip estate questions
+            //            // We use this to skip estate questions
             // Turns out not to be needed is estate owner id is pre-set in region information.
-//            IConfig estateConfig = configSource.AddConfig(OpenSimBase.ESTATE_SECTION_NAME);
-//            estateConfig.Set("DefaultEstateOwnerName", "Zaphod Beeblebrox");
-//            estateConfig.Set("DefaultEstateOwnerUUID", estateOwnerId);
-//            estateConfig.Set("DefaultEstateOwnerEMail", "zaphod@galaxy.com");
-//            estateConfig.Set("DefaultEstateOwnerPassword", "two heads");
+            //            IConfig estateConfig = configSource.AddConfig(OpenSimBase.ESTATE_SECTION_NAME);
+            //            estateConfig.Set("DefaultEstateOwnerName", "Zaphod Beeblebrox");
+            //            estateConfig.Set("DefaultEstateOwnerUUID", estateOwnerId);
+            //            estateConfig.Set("DefaultEstateOwnerEMail", "zaphod@galaxy.com");
+            //            estateConfig.Set("DefaultEstateOwnerPassword", "two heads");
 
             // For grid servic
             configSource.AddConfig("GridService");
@@ -72,7 +69,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
             configSource.Configs["GridService"].Set("ConnectionString", "!static");
 
             LocalGridServicesConnector gridService = new LocalGridServicesConnector();
-//
+            //
             OpenSim sim = new OpenSim(configSource);
 
             sim.SuppressExit = true;
@@ -101,14 +98,14 @@ namespace OpenSim.Region.Framework.Scenes.Tests
 
             // FIXME: Want to use the real one eventually but this is currently directly tied into Mono.Addins
             // which has been written in such a way that makes it impossible to use for regression tests.
-//            RegionModulesControllerPlugin rmcp = new RegionModulesControllerPlugin();
-//            rmcp.LoadModulesFromAddins = false;
-////            reg.RegisterInterface<IRegionModulesController>(rmcp);
-//            rmcp.Initialise(sim);
-//            rmcp.PostInitialise();
-//            TypeExtensionNode node = new TypeExtensionNode();
-//            node.
-//            rmcp.AddNode(node, configSource.Configs["Modules"], new Dictionary<RuntimeAddin, IList<int>>());
+            //            RegionModulesControllerPlugin rmcp = new RegionModulesControllerPlugin();
+            //            rmcp.LoadModulesFromAddins = false;
+            ////            reg.RegisterInterface<IRegionModulesController>(rmcp);
+            //            rmcp.Initialise(sim);
+            //            rmcp.PostInitialise();
+            //            TypeExtensionNode node = new TypeExtensionNode();
+            //            node.
+            //            rmcp.AddNode(node, configSource.Configs["Modules"], new Dictionary<RuntimeAddin, IList<int>>());
 
             sim.Startup();
             IScene scene;
@@ -124,12 +121,12 @@ namespace OpenSim.Region.Framework.Scenes.Tests
                 co.Count,
                 "Expected {0} events but only got {1} ({2})",
                 expectedEventCount, co.Count, string.Join(",", co));
-            Assert.AreEqual("Initialise",       co[0]);
-            Assert.AreEqual("PostInitialise",   co[1]);
-            Assert.AreEqual("AddRegion",        co[2]);
-            Assert.AreEqual("RegionLoaded",     co[3]);
-            Assert.AreEqual("RemoveRegion",     co[4]);
-            Assert.AreEqual("Close",            co[5]);
+            Assert.AreEqual("Initialise", co[0]);
+            Assert.AreEqual("PostInitialise", co[1]);
+            Assert.AreEqual("AddRegion", co[2]);
+            Assert.AreEqual("RegionLoaded", co[3]);
+            Assert.AreEqual("RemoveRegion", co[4]);
+            Assert.AreEqual("Close", co[5]);
         }
     }
 
@@ -184,7 +181,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         public string Version { get { return "0"; } }
         public string Name { get { return "MockRegionModulesControllerPlugin"; } }
 
-        public void Initialise() {}
+        public void Initialise() { }
 
         public void Initialise(OpenSimBase sim)
         {
@@ -222,8 +219,8 @@ namespace OpenSim.Region.Framework.Scenes.Tests
         {
             foreach (IRegionModuleBase module in scene.RegionModules.Values)
             {
-//                m_log.DebugFormat("[REGIONMODULE]: Removing scene {0} from module {1}",
-//                                  scene.RegionInfo.RegionName, module.Name);
+                //                m_log.DebugFormat("[REGIONMODULE]: Removing scene {0} from module {1}",
+                //                                  scene.RegionInfo.RegionName, module.Name);
                 module.RemoveRegion(scene);
             }
 

@@ -27,7 +27,6 @@
 
 using System;
 using System.Collections.Generic;
-using OpenMetaverse;
 
 namespace OpenSim.Framework
 {
@@ -216,7 +215,7 @@ namespace OpenSim.Framework
         private int m_Size = 1024;
         private TimeSpan m_DefaultTTL = new TimeSpan(0);
         private DateTime m_nextExpire;
-        private TimeSpan m_expiresTime = new TimeSpan(0,0,30);
+        private TimeSpan m_expiresTime = new TimeSpan(0, 0, 30);
         public ExpireDelegate OnExpire;
 
         // Comparison interfaces
@@ -232,7 +231,7 @@ namespace OpenSim.Framework
                 if (b == null)
                     return 1;
 
-                return(a.lastUsed.CompareTo(b.lastUsed));
+                return (a.lastUsed.CompareTo(b.lastUsed));
             }
         }
         // same as above, reverse order
@@ -247,7 +246,7 @@ namespace OpenSim.Framework
                 if (b == null)
                     return 1;
 
-                return(b.lastUsed.CompareTo(a.lastUsed));
+                return (b.lastUsed.CompareTo(a.lastUsed));
             }
         }
 
@@ -315,10 +314,10 @@ namespace OpenSim.Framework
             lock (m_Index)
             {
                 int target = newSize;
-                if(m_Strategy == CacheStrategy.Aggressive)
+                if (m_Strategy == CacheStrategy.Aggressive)
                     target = (int)(newSize * 0.9);
 
-                if(Count > target)
+                if (Count > target)
                 {
                     m_Index.Sort(new SortLRUrev());
 
@@ -392,7 +391,7 @@ namespace OpenSim.Framework
 
             if (data == null)
             {
-                if((m_Flags & CacheFlags.CacheMissing) != 0)
+                if ((m_Flags & CacheFlags.CacheMissing) != 0)
                 {
                     lock (m_Index)
                     {
@@ -432,13 +431,13 @@ namespace OpenSim.Framework
 
             switch (m_Medium)
             {
-            case CacheMedium.Memory:
-                container = typeof(MemoryCacheItem);
-                break;
-            case CacheMedium.File:
-                return;
-            default:
-                return;
+                case CacheMedium.Memory:
+                    container = typeof(MemoryCacheItem);
+                    break;
+                case CacheMedium.File:
+                    return;
+                default:
+                    return;
             }
 
             Store(index, data, container);
@@ -500,7 +499,7 @@ namespace OpenSim.Framework
                 return;
 
             DateTime now = DateTime.UtcNow;
-            if(now < m_nextExpire)
+            if (now < m_nextExpire)
                 return;
 
             m_nextExpire = now + m_expiresTime;
@@ -557,8 +556,8 @@ namespace OpenSim.Framework
 
                     break;
 
-                    default:
-                        break;
+                default:
+                    break;
             }
         }
 

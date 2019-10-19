@@ -25,25 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using log4net;
+using OpenMetaverse;
+using OpenMetaverse.Imaging;
+using OpenSim.Framework;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Services.Interfaces;
 using System;
-using System.Collections;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Reflection;
 using System.IO;
+using System.Reflection;
 using System.Web;
-using log4net;
-using Nini.Config;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using OpenMetaverse.Imaging;
-using OpenSim.Framework;
-using OpenSim.Framework.Servers;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Services.Interfaces;
-using Caps = OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Capabilities.Handlers
 {
@@ -86,7 +80,7 @@ namespace OpenSim.Capabilities.Handlers
             UUID textureID;
             if (!String.IsNullOrEmpty(textureStr) && UUID.TryParse(textureStr, out textureID))
             {
-//                m_log.DebugFormat("[GETTEXTURE]: Received request for texture id {0}", textureID);
+                //                m_log.DebugFormat("[GETTEXTURE]: Received request for texture id {0}", textureID);
 
                 string[] formats;
                 if (!string.IsNullOrEmpty(format))
@@ -114,9 +108,9 @@ namespace OpenSim.Capabilities.Handlers
                 m_log.Warn("[GETTEXTURE]: Failed to parse a texture_id from GetTexture request: " + httpRequest.Url);
             }
 
-//            m_log.DebugFormat(
-//                "[GETTEXTURE]: For texture {0} sending back response {1}, data length {2}",
-//                textureID, httpResponse.StatusCode, httpResponse.ContentLength);
+            //            m_log.DebugFormat(
+            //                "[GETTEXTURE]: For texture {0} sending back response {1}, data length {2}",
+            //                textureID, httpResponse.StatusCode, httpResponse.ContentLength);
 
             return null;
         }
@@ -132,7 +126,7 @@ namespace OpenSim.Capabilities.Handlers
         private bool FetchTexture(IOSHttpRequest httpRequest, IOSHttpResponse httpResponse, UUID textureID, string format)
         {
             // m_log.DebugFormat("[GETTEXTURE]: {0} with requested format {1}", textureID, format);
-            if(!String.IsNullOrEmpty(m_RedirectURL))
+            if (!String.IsNullOrEmpty(m_RedirectURL))
             {
                 string textureUrl = m_RedirectURL + "?texture_id=" + textureID.ToString();
                 m_log.Debug("[GETTEXTURE]: Redirecting texture request to " + textureUrl);
@@ -189,9 +183,9 @@ namespace OpenSim.Capabilities.Handlers
                     // sending back the last byte instead of an error status
                     if (start >= texture.Data.Length)
                     {
-//                        m_log.DebugFormat(
-//                            "[GETTEXTURE]: Client requested range for texture {0} starting at {1} but texture has end of {2}",
-//                            texture.ID, start, texture.Data.Length);
+                        //                        m_log.DebugFormat(
+                        //                            "[GETTEXTURE]: Client requested range for texture {0} starting at {1} but texture has end of {2}",
+                        //                            texture.ID, start, texture.Data.Length);
 
                         // Stricly speaking, as per http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html, we should be sending back
                         // Requested Range Not Satisfiable (416) here.  However, it appears that at least recent implementations
@@ -204,9 +198,9 @@ namespace OpenSim.Capabilities.Handlers
                         // here will cause the viewer to treat the texture as bad and never display the full resolution
                         // However, if we return PartialContent (or OK) instead, the viewer will display that resolution.
 
-//                        response.StatusCode = (int)System.Net.HttpStatusCode.RequestedRangeNotSatisfiable;
-//                        response.AddHeader("Content-Range", String.Format("bytes */{0}", texture.Data.Length));
-//                        response.StatusCode = (int)System.Net.HttpStatusCode.OK;
+                        //                        response.StatusCode = (int)System.Net.HttpStatusCode.RequestedRangeNotSatisfiable;
+                        //                        response.AddHeader("Content-Range", String.Format("bytes */{0}", texture.Data.Length));
+                        //                        response.StatusCode = (int)System.Net.HttpStatusCode.OK;
                         response.StatusCode = (int)System.Net.HttpStatusCode.PartialContent;
                         response.ContentType = texture.Metadata.ContentType;
                     }
@@ -221,7 +215,7 @@ namespace OpenSim.Capabilities.Handlers
                         start = Utils.Clamp(start, 0, end);
                         int len = end - start + 1;
 
-//                        m_log.Debug("Serving " + start + " to " + end + " of " + texture.Data.Length + " bytes for texture " + texture.ID);
+                        //                        m_log.Debug("Serving " + start + " to " + end + " of " + texture.Data.Length + " bytes for texture " + texture.ID);
 
                         // Always return PartialContent, even if the range covered the entire data length
                         // We were accidentally sending back 404 before in this situation
@@ -230,9 +224,9 @@ namespace OpenSim.Capabilities.Handlers
                         //
                         // We also do not want to send back OK even if the whole range was satisfiable since this causes
                         // HTTP textures on at least Imprudence 1.4.0-beta2 to never display the final texture quality.
-//                        if (end > maxEnd)
-//                            response.StatusCode = (int)System.Net.HttpStatusCode.OK;
-//                        else
+                        //                        if (end > maxEnd)
+                        //                            response.StatusCode = (int)System.Net.HttpStatusCode.OK;
+                        //                        else
                         response.StatusCode = (int)System.Net.HttpStatusCode.PartialContent;
 
                         response.ContentLength = len;
@@ -260,14 +254,14 @@ namespace OpenSim.Capabilities.Handlers
                 response.Body.Write(texture.Data, 0, texture.Data.Length);
             }
 
-//            if (response.StatusCode < 200 || response.StatusCode > 299)
-//                m_log.WarnFormat(
-//                    "[GETTEXTURE]: For texture {0} requested range {1} responded {2} with content length {3} (actual {4})",
-//                    texture.FullID, range, response.StatusCode, response.ContentLength, texture.Data.Length);
-//            else
-//                m_log.DebugFormat(
-//                    "[GETTEXTURE]: For texture {0} requested range {1} responded {2} with content length {3} (actual {4})",
-//                    texture.FullID, range, response.StatusCode, response.ContentLength, texture.Data.Length);
+            //            if (response.StatusCode < 200 || response.StatusCode > 299)
+            //                m_log.WarnFormat(
+            //                    "[GETTEXTURE]: For texture {0} requested range {1} responded {2} with content length {3} (actual {4})",
+            //                    texture.FullID, range, response.StatusCode, response.ContentLength, texture.Data.Length);
+            //            else
+            //                m_log.DebugFormat(
+            //                    "[GETTEXTURE]: For texture {0} requested range {1} responded {2} with content length {3} (actual {4})",
+            //                    texture.FullID, range, response.StatusCode, response.ContentLength, texture.Data.Length);
         }
 
         /// <summary>
@@ -333,9 +327,9 @@ namespace OpenSim.Capabilities.Handlers
                     // Save to bitmap
                     mTexture = new Bitmap(image);
 
-                    using(EncoderParameters myEncoderParameters = new EncoderParameters())
+                    using (EncoderParameters myEncoderParameters = new EncoderParameters())
                     {
-                        myEncoderParameters.Param[0] = new EncoderParameter(Encoder.Quality,95L);
+                        myEncoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, 95L);
 
                         // Save bitmap to stream
                         ImageCodecInfo codec = GetEncoderInfo("image/" + format);
@@ -364,7 +358,7 @@ namespace OpenSim.Capabilities.Handlers
                 if (image != null)
                     image.Dispose();
 
-                if(managedImage != null)
+                if (managedImage != null)
                     managedImage.Clear();
 
                 if (imgstream != null)

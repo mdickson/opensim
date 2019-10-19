@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using OpenMetaverse;
+using System;
 
 namespace OpenSim.Framework
 {
@@ -167,25 +167,25 @@ namespace OpenSim.Framework
             set { currentPos = value; }
         }
 
-/* 2008-08-28-tyre: Not really useful
-        public virtual float PositionX
-        {
-            get { return currentPos.X; }
-            set { currentPos.X = value; }
-        }
+        /* 2008-08-28-tyre: Not really useful
+                public virtual float PositionX
+                {
+                    get { return currentPos.X; }
+                    set { currentPos.X = value; }
+                }
 
-        public virtual float PositionY
-        {
-            get { return currentPos.Y; }
-            set { currentPos.Y = value; }
-        }
+                public virtual float PositionY
+                {
+                    get { return currentPos.Y; }
+                    set { currentPos.Y = value; }
+                }
 
-        public virtual float PositionZ
-        {
-            get { return currentPos.Z; }
-            set { currentPos.Z = value; }
-        }
-*/
+                public virtual float PositionZ
+                {
+                    get { return currentPos.Z; }
+                    set { currentPos.Z = value; }
+                }
+        */
 
         public virtual Vector3 LookAt
         {

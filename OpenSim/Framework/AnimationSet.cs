@@ -25,13 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using OpenMetaverse;
 using System;
 using System.Collections.Generic;
-using OpenMetaverse;
 
 namespace OpenSim.Framework
 {
-//    public delegate bool AnimationSetValidator(UUID animID);
+    //    public delegate bool AnimationSetValidator(UUID animID);
     public delegate uint AnimationSetValidator(UUID animID);
 
     public class AnimationSet
@@ -142,30 +142,30 @@ namespace OpenSim.Framework
                 assetData += String.Format("{0} {1} {2}\n", kvp.Key, kvp.Value.Value.ToString(), kvp.Value.Key);
             return System.Text.Encoding.ASCII.GetBytes(assetData);
         }
-/*
-        public bool Validate(AnimationSetValidator val)
-        {
-            if (m_parseError)
-                return false;
-
-            List<string> badAnims = new List<string>();
-
-            bool allOk = true;
-            foreach (KeyValuePair<string, KeyValuePair<string, UUID>> kvp in m_animations)
-            {
-                if (!val(kvp.Value.Value))
+        /*
+                public bool Validate(AnimationSetValidator val)
                 {
-                    allOk = false;
-                    badAnims.Add(kvp.Key);
+                    if (m_parseError)
+                        return false;
+
+                    List<string> badAnims = new List<string>();
+
+                    bool allOk = true;
+                    foreach (KeyValuePair<string, KeyValuePair<string, UUID>> kvp in m_animations)
+                    {
+                        if (!val(kvp.Value.Value))
+                        {
+                            allOk = false;
+                            badAnims.Add(kvp.Key);
+                        }
+                    }
+
+                    foreach (string idx in badAnims)
+                        m_animations.Remove(idx);
+
+                    return allOk;
                 }
-            }
-
-            foreach (string idx in badAnims)
-                m_animations.Remove(idx);
-
-            return allOk;
-        }
-*/
+        */
         public uint Validate(AnimationSetValidator val)
         {
             if (m_parseError)

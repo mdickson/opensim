@@ -25,11 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.CoreModules.World.Land
 {
@@ -95,7 +95,7 @@ namespace OpenSim.Region.CoreModules.World.Land
         {
             m_scene = scene;
             m_landManagementModule = landManagementMod;
-            if(landManagementMod != null)
+            if (landManagementMod != null)
                 m_BanLineSafeHeight = landManagementMod.BanLineSafeHeight;
         }
 

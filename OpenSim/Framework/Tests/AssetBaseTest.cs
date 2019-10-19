@@ -25,12 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Tests.Common;
+using System;
 
 namespace OpenSim.Framework.Tests
 {
@@ -45,11 +43,11 @@ namespace OpenSim.Framework.Tests
 
             CheckContainsReferences(AssetType.Animation, false);
             CheckContainsReferences(AssetType.CallingCard, false);
-            CheckContainsReferences(AssetType.Folder     , false);
-            CheckContainsReferences(AssetType.Gesture    , false);
-            CheckContainsReferences(AssetType.ImageJPEG  , false);
-            CheckContainsReferences(AssetType.ImageTGA   , false);
-            CheckContainsReferences(AssetType.Landmark   , false);
+            CheckContainsReferences(AssetType.Folder, false);
+            CheckContainsReferences(AssetType.Gesture, false);
+            CheckContainsReferences(AssetType.ImageJPEG, false);
+            CheckContainsReferences(AssetType.ImageTGA, false);
+            CheckContainsReferences(AssetType.Landmark, false);
             CheckContainsReferences(AssetType.LSLBytecode, false);
             CheckContainsReferences(AssetType.LSLText, false);
             CheckContainsReferences(AssetType.Notecard, false);
@@ -66,7 +64,7 @@ namespace OpenSim.Framework.Tests
         {
             AssetBase asset = new AssetBase(UUID.Zero, String.Empty, (sbyte)assetType, UUID.Zero.ToString());
             bool actual = asset.ContainsReferences;
-            Assert.AreEqual(expected, actual, "Expected "+assetType+".ContainsReferences to be "+expected+" but was "+actual+".");
+            Assert.AreEqual(expected, actual, "Expected " + assetType + ".ContainsReferences to be " + expected + " but was " + actual + ".");
         }
     }
 }

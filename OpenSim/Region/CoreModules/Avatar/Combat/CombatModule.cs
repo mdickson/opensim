@@ -25,16 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
+using Mono.Addins;
 using Nini.Config;
-using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-using OpenMetaverse;
-
-using Mono.Addins;
+using System;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.CoreModules.Avatar.Combat.CombatModule
 {
@@ -114,7 +111,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Combat.CombatModule
         {
             string deadAvatarMessage;
             ScenePresence killingAvatar = null;
-//            string killingAvatarMessage;
+            //            string killingAvatarMessage;
 
             // check to see if it is an NPC and just remove it
             INPCModule NPCmodule = deadAvatar.Scene.RequestModuleInterface<INPCModule>();
@@ -159,7 +156,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Combat.CombatModule
                 }
                 else
                 {
-//                    killingAvatarMessage = String.Format("You fragged {0}!", deadAvatar.Name);
+                    //                    killingAvatarMessage = String.Format("You fragged {0}!", deadAvatar.Name);
                     deadAvatarMessage = String.Format("You got killed by {0}!", killingAvatar.Name);
                 }
             }

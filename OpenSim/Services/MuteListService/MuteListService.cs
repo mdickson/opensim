@@ -25,23 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Text;
-using OpenMetaverse;
-using log4net;
 using Nini.Config;
-using OpenSim.Services.Base;
-using OpenSim.Services.Interfaces;
+using OpenMetaverse;
 using OpenSim.Data;
 using OpenSim.Framework;
+using OpenSim.Services.Base;
+using OpenSim.Services.Interfaces;
+using System;
+using System.Text;
 
 namespace OpenSim.Services.EstateService
 {
     public class MuteListService : ServiceBase, IMuteListService
     {
-//        private static readonly ILog m_log =
-//                LogManager.GetLogger(
-//                MethodBase.GetCurrentMethod().DeclaringType);
+        //        private static readonly ILog m_log =
+        //                LogManager.GetLogger(
+        //                MethodBase.GetCurrentMethod().DeclaringType);
 
         protected IMuteListData m_database;
 
@@ -79,7 +78,7 @@ namespace OpenSim.Services.EstateService
 
         public Byte[] MuteListRequest(UUID agentID, uint crc)
         {
-            if(m_database == null)
+            if (m_database == null)
                 return null;
 
             MuteData[] data = m_database.Get(agentID);
@@ -100,10 +99,10 @@ namespace OpenSim.Services.EstateService
 
             if (dataCrc == crc)
             {
-                if(crc == 0)
-                     return new Byte[0];
+                if (crc == 0)
+                    return new Byte[0];
 
-                Byte[] ret = new Byte[1] {1};
+                Byte[] ret = new Byte[1] { 1 };
                 return ret;
             }
 
@@ -112,14 +111,14 @@ namespace OpenSim.Services.EstateService
 
         public bool UpdateMute(MuteData mute)
         {
-            if(m_database == null)
+            if (m_database == null)
                 return false;
             return m_database.Store(mute);
         }
 
         public bool RemoveMute(UUID agentID, UUID muteID, string muteName)
         {
-            if(m_database == null)
+            if (m_database == null)
                 return false;
             return m_database.Delete(agentID, muteID, muteName);
         }

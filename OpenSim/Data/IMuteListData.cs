@@ -25,14 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-using System.Collections.Generic;
 using OpenMetaverse;
 using OpenSim.Framework;
 
 namespace OpenSim.Data
 {
-     /// <summary>
+    /// <summary>
     /// An interface for connecting to the Mute List datastore
     /// </summary>
     public interface IMuteListData
