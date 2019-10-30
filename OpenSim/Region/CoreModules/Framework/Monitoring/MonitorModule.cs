@@ -317,7 +317,6 @@ namespace OpenSim.Region.CoreModules.Framework.Monitoring
             {
                 MainConsole.Instance.Output(
                     "[MONITOR MODULE]: {0} reports {1} = {2}",
-                    null,
                     m_scene.RegionInfo.RegionName, monitor.GetFriendlyName(), monitor.GetFriendlyValue());
             }
 
@@ -325,7 +324,6 @@ namespace OpenSim.Region.CoreModules.Framework.Monitoring
             {
                 MainConsole.Instance.Output(
                     "[MONITOR MODULE]: {0} reports {1} = {2}",
-                    null,
                     m_scene.RegionInfo.RegionName, tuple.Key, tuple.Value);
             }
         }

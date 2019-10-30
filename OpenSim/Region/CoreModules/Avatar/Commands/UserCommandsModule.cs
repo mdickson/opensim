@@ -141,7 +141,7 @@ namespace OpenSim.Region.CoreModules.Avatars.Commands
 
             if (user == null)
             {
-                MainConsole.Instance.Output("No user found with name {0} {1}", null, firstName, lastName);
+                MainConsole.Instance.Output("No user found with name {0} {1}", firstName, lastName);
                 return;
             }
 
@@ -155,7 +155,7 @@ namespace OpenSim.Region.CoreModules.Avatars.Commands
 
                 if (!m.Success)
                 {
-                    MainConsole.Instance.Output("Invalid destination {0}", null, rawDestination);
+                    MainConsole.Instance.Output("Invalid destination {0}", rawDestination);
                     return;
                 }
             }
@@ -165,7 +165,6 @@ namespace OpenSim.Region.CoreModules.Avatars.Commands
 
             MainConsole.Instance.Output(
                 "Teleporting {0} to {1},{2},{3} in {4}",
-                null,
                 user.Name,
                 m.Groups["x"], m.Groups["y"], m.Groups["z"],
                 regionName);

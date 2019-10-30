@@ -31,11 +31,13 @@ namespace OpenSim.Framework
 {
     public interface IConsole
     {
+
+
         IScene ConsoleScene { get; set; }
 
+        void Output(string format);
         void Output(string format, params object[] components);
-        void Output(string format, string level, params object[] components);
-
+ 
         string Prompt(string p);
         string Prompt(string p, string def);
         string Prompt(string p, List<char> excludedCharacters);

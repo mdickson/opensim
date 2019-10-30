@@ -129,7 +129,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.Friends
 
             if (userId == UUID.Zero)
             {
-                MainConsole.Instance.Output("No such user as {0} {1}", null, firstName, lastName);
+                MainConsole.Instance.Output("No such user as {0} {1}", firstName, lastName);
                 return;
             }
 
@@ -139,7 +139,7 @@ namespace OpenSim.Region.OptionalModules.Avatar.Friends
             {
                 if (!m_friendsModule.AreFriendsCached(userId))
                 {
-                    MainConsole.Instance.Output("No friends cached on this simulator for {0} {1}", null, firstName, lastName);
+                    MainConsole.Instance.Output("No friends cached on this simulator for {0} {1}", firstName, lastName);
                     return;
                 }
                 else
@@ -155,10 +155,10 @@ namespace OpenSim.Region.OptionalModules.Avatar.Friends
                 friends = ((FriendsModule)m_friendsModule).FriendsService.GetFriends(userId);
             }
 
-            MainConsole.Instance.Output("Friends for {0} {1} {2}:", null, firstName, lastName, userId);
+            MainConsole.Instance.Output("Friends for {0} {1} {2}:", firstName, lastName, userId);
 
             MainConsole.Instance.Output(
-                "{0,-36}  {1,-36}  {2,-7}  {3,7}  {4,10}", null, "UUID", "Name", "Status", "MyFlags", "TheirFlags");
+                "{0,-36}  {1,-36}  {2,-7}  {3,7}  {4,10}", "UUID", "Name", "Status", "MyFlags", "TheirFlags");
 
             foreach (FriendInfo friend in friends)
             {
@@ -186,7 +186,6 @@ namespace OpenSim.Region.OptionalModules.Avatar.Friends
 
                 MainConsole.Instance.Output(
                     "{0,-36}  {1,-36}  {2,-7}  {3,-7}  {4,-10}",
-                    null,
                     friend.Friend, friendName, onlineText, friend.MyFlags, friend.TheirFlags);
             }
         }

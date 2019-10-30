@@ -77,7 +77,7 @@ namespace OpenSim.Framework.Monitoring
             if (cmd[2] == "start")
             {
                 Start();
-                con.Output("Now recording all stats to file every {0}ms", null, m_statsLogIntervalMs);
+                con.Output("Now recording all stats to file every {0}ms", m_statsLogIntervalMs);
             }
             else if (cmd[2] == "stop")
             {
@@ -104,7 +104,7 @@ namespace OpenSim.Framework.Monitoring
                     sw.WriteLine(line);
             }
 
-            MainConsole.Instance.Output("Stats saved to file {0}", null, path);
+            MainConsole.Instance.Output("Stats saved to file {0}", path);
         }
 
         public static void Start()
