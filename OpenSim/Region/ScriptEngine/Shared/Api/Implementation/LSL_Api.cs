@@ -49,6 +49,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting.Lifetime;
@@ -68,6 +69,7 @@ using PermissionMask = OpenSim.Framework.PermissionMask;
 using PresenceInfo = OpenSim.Services.Interfaces.PresenceInfo;
 using PrimType = OpenSim.Region.Framework.Scenes.PrimType;
 using RegionFlags = OpenSim.Framework.RegionFlags;
+using RegionInfo = OpenSim.Framework.RegionInfo;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Api
 {
@@ -14769,9 +14771,8 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                             break;
                         case ScriptBaseClass.OBJECT_TOTAL_INVENTORY_COUNT:
                             SceneObjectPart[] parts = obj.ParentGroup.Parts;
-                            int nparts = parts.Count();
-                            int count = 0;
-                            for (int i = 0; i < nparts; i++)
+                            count = 0;
+                            for (int i = 0; i < parts.Count(); i++)
                                 count += parts[i].Inventory.Count;
                             ret.Add(new LSL_Integer(count));
                             break;
