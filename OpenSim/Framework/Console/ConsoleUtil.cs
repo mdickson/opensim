@@ -73,7 +73,7 @@ namespace OpenSim.Framework.Console
         {
             if (File.Exists(path))
             {
-                console.Output("File {0} already exists.  Please move or remove it.", null, path);
+                console.Output("File {0} already exists.  Please move or remove it.", path);
                 return false;
             }
 
@@ -95,7 +95,7 @@ namespace OpenSim.Framework.Console
             if (!UUID.TryParse(rawUuid, out uuid))
             {
                 if (console != null)
-                    console.Output("ERROR: {0} is not a valid uuid", null, rawUuid);
+                    console.Output("ERROR: {0} is not a valid uuid", rawUuid);
 
                 return false;
             }
@@ -108,7 +108,7 @@ namespace OpenSim.Framework.Console
             if (!uint.TryParse(rawLocalId, out localId))
             {
                 if (console != null)
-                    console.Output("ERROR: {0} is not a valid local id", null, localId);
+                    console.Output("ERROR: {0} is not a valid local id", localId);
 
                 return false;
             }
@@ -116,7 +116,7 @@ namespace OpenSim.Framework.Console
             if (localId == 0)
             {
                 if (console != null)
-                    console.Output("ERROR: {0} is not a valid local id - it must be greater than 0", null, localId);
+                    console.Output("ERROR: {0} is not a valid local id - it must be greater than 0", localId);
 
                 return false;
             }
@@ -148,7 +148,7 @@ namespace OpenSim.Framework.Console
             }
 
             if (console != null)
-                console.Output("ERROR: {0} is not a valid UUID or local id", null, rawId);
+                console.Output("ERROR: {0} is not a valid UUID or local id", rawId);
 
             return false;
         }
@@ -165,7 +165,7 @@ namespace OpenSim.Framework.Console
             if (!bool.TryParse(rawConsoleString, out b))
             {
                 if (console != null)
-                    console.Output("ERROR: {0} is not a true or false value", null, rawConsoleString);
+                    console.Output("ERROR: {0} is not a true or false value", rawConsoleString);
 
                 return false;
             }
@@ -185,7 +185,7 @@ namespace OpenSim.Framework.Console
             if (!int.TryParse(rawConsoleInt, out i))
             {
                 if (console != null)
-                    console.Output("ERROR: {0} is not a valid integer", null, rawConsoleInt);
+                    console.Output("ERROR: {0} is not a valid integer", rawConsoleInt);
 
                 return false;
             }
@@ -205,7 +205,7 @@ namespace OpenSim.Framework.Console
             if (!float.TryParse(rawConsoleInput, out i))
             {
                 if (console != null)
-                    console.Output("ERROR: {0} is not a valid float", null, rawConsoleInput);
+                    console.Output("ERROR: {0} is not a valid float", rawConsoleInput);
 
                 return false;
             }
@@ -225,7 +225,7 @@ namespace OpenSim.Framework.Console
             if (!double.TryParse(rawConsoleInput, out i))
             {
                 if (console != null)
-                    console.Output("ERROR: {0} is not a valid double", null, rawConsoleInput);
+                    console.Output("ERROR: {0} is not a valid double", rawConsoleInput);
 
                 return false;
             }
@@ -247,7 +247,7 @@ namespace OpenSim.Framework.Console
                 if (i < 0)
                 {
                     if (console != null)
-                        console.Output("ERROR: {0} is not a positive integer", null, rawConsoleInt);
+                        console.Output("ERROR: {0} is not a positive integer", rawConsoleInt);
 
                     return false;
                 }

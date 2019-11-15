@@ -376,7 +376,7 @@ namespace OpenSim.Services.UserAccountService
         {
             string firstName;
             string lastName;
-            string password;
+            string password = "";
             string email;
             string rawPrincipalId;
             string model;
@@ -392,7 +392,22 @@ namespace OpenSim.Services.UserAccountService
             else lastName = cmdparams[3];
 
             if (cmdparams.Length < 5)
-                password = MainConsole.Instance.Prompt("Password", null, null, false);
+            {
+                int retries = 3;
+                while(--retries >= 0)
+                {
+                    password = MainConsole.Instance.Prompt("Password", null, null, false);
+                    if(String.IsNullOrWhiteSpace(password))
+                        MainConsole.Instance.Output("  You must provide a Password");
+                    else
+                        break;
+                }
+                if (String.IsNullOrWhiteSpace(password))
+                {
+                    MainConsole.Instance.Output("create user aborted");
+                    return;
+                }
+            }
             else password = cmdparams[4];
 
             if (cmdparams.Length < 6)
@@ -433,19 +448,19 @@ namespace OpenSim.Services.UserAccountService
 
             if (ua == null)
             {
-                MainConsole.Instance.Output("No user named {0} {1}", null, firstName, lastName);
+                MainConsole.Instance.Output("No user named {0} {1}", firstName, lastName);
                 return;
             }
 
-            MainConsole.Instance.Output("Name:    {0}", null, ua.Name);
-            MainConsole.Instance.Output("ID:      {0}", null, ua.PrincipalID);
-            MainConsole.Instance.Output("Title:   {0}", null, ua.UserTitle);
-            MainConsole.Instance.Output("E-mail:  {0}", null, ua.Email);
-            MainConsole.Instance.Output("Created: {0}", null, Utils.UnixTimeToDateTime(ua.Created));
-            MainConsole.Instance.Output("Level:   {0}", null, ua.UserLevel);
-            MainConsole.Instance.Output("Flags:   {0}", null, ua.UserFlags);
+            MainConsole.Instance.Output("Name:    {0}", ua.Name);
+            MainConsole.Instance.Output("ID:      {0}", ua.PrincipalID);
+            MainConsole.Instance.Output("Title:   {0}", ua.UserTitle);
+            MainConsole.Instance.Output("E-mail:  {0}", ua.Email);
+            MainConsole.Instance.Output("Created: {0}", Utils.UnixTimeToDateTime(ua.Created));
+            MainConsole.Instance.Output("Level:   {0}", ua.UserLevel);
+            MainConsole.Instance.Output("Flags:   {0}", ua.UserFlags);
             foreach (KeyValuePair<string, Object> kvp in ua.ServiceURLs)
-                MainConsole.Instance.Output("{0}: {1}", null, kvp.Key, kvp.Value);
+                MainConsole.Instance.Output("{0}: {1}", kvp.Key, kvp.Value);
         }
 
         protected void HandleResetUserPassword(string module, string[] cmdparams)
@@ -469,7 +484,7 @@ namespace OpenSim.Services.UserAccountService
             UserAccount account = GetUserAccount(UUID.Zero, firstName, lastName);
             if (account == null)
             {
-                MainConsole.Instance.Output("No such user as {0} {1}", null, firstName, lastName);
+                MainConsole.Instance.Output("No such user as {0} {1}", firstName, lastName);
                 return;
             }
 
@@ -478,9 +493,9 @@ namespace OpenSim.Services.UserAccountService
                 success = m_AuthenticationService.SetPassword(account.PrincipalID, newPassword);
 
             if (!success)
-                MainConsole.Instance.Output("Unable to reset password for account {0} {1}.", null, firstName, lastName);
+                MainConsole.Instance.Output("Unable to reset password for account {0} {1}.", firstName, lastName);
             else
-                MainConsole.Instance.Output("Password reset for user {0} {1}", null, firstName, lastName);
+                MainConsole.Instance.Output("Password reset for user {0} {1}", firstName, lastName);
         }
 
         protected void HandleResetUserEmail(string module, string[] cmdparams)
@@ -504,7 +519,7 @@ namespace OpenSim.Services.UserAccountService
             UserAccount account = GetUserAccount(UUID.Zero, firstName, lastName);
             if (account == null)
             {
-                MainConsole.Instance.Output("No such user as {0} {1}", null, firstName, lastName);
+                MainConsole.Instance.Output("No such user as {0} {1}", firstName, lastName);
                 return;
             }
 
@@ -514,9 +529,9 @@ namespace OpenSim.Services.UserAccountService
 
             success = StoreUserAccount(account);
             if (!success)
-                MainConsole.Instance.Output("Unable to set Email for account {0} {1}.", null, firstName, lastName);
+                MainConsole.Instance.Output("Unable to set Email for account {0} {1}.", firstName, lastName);
             else
-                MainConsole.Instance.Output("User Email set for user {0} {1} to {2}", null, firstName, lastName, account.Email);
+                MainConsole.Instance.Output("User Email set for user {0} {1} to {2}", firstName, lastName, account.Email);
         }
 
 
@@ -556,9 +571,9 @@ namespace OpenSim.Services.UserAccountService
 
             bool success = StoreUserAccount(account);
             if (!success)
-                MainConsole.Instance.Output("Unable to set user level for account {0} {1}.", null, firstName, lastName);
+                MainConsole.Instance.Output("Unable to set user level for account {0} {1}.", firstName, lastName);
             else
-                MainConsole.Instance.Output("User level set for user {0} {1} to {2}", null, firstName, lastName, level);
+                MainConsole.Instance.Output("User level set for user {0} {1} to {2}", firstName, lastName, level);
         }
 
         #endregion
