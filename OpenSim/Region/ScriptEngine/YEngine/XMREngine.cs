@@ -25,7 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// based on YEngine from Mike Rieker (Dreamnation) and Melanie Thielker
+// based on XMREngine from Mike Rieker (DreamNation), Melanie Thielker and meta7
 // but with several changes to be more cross platform.
 
 using log4net;
@@ -860,6 +860,17 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             return true;
         }
 
+        public void CancelScriptEvent(UUID itemID, string eventName)
+        {
+            XMRInstance instance = GetInstance(itemID);
+            if (instance == null)
+                return;
+
+            TraceCalls("[YEngine]: YEngine.CancelScriptEvent({0},{1})", itemID.ToString(), eventName);
+
+            instance.CancelEvent(eventName);
+        }
+
         // Events targeted at all scripts in the given prim.
         //   localID = which prim
         //   parms   = event to post
@@ -1237,6 +1248,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     return;
                 }
                 //                m_log.Info("[YEngine]: will attempt to processing it anyway as default script engine");
+
+                langsrt = "";
             }
 
             if (!string.IsNullOrEmpty(langsrt) && langsrt != "lsl")
