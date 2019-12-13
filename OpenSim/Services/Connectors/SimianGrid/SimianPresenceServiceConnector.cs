@@ -452,6 +452,12 @@ namespace OpenSim.Services.Connectors.SimianGrid
         {
             return new GridUserInfo[0];
         }
+
+        public bool SetDisplayName(string userID, string displayname)
+        {
+            throw new NotImplementedException();
+        }
+        
         #endregion Helpers
     }
 }

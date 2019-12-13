@@ -109,6 +109,11 @@ namespace OpenSim.Services.HypergridService
         {
             return false;
         }
+
+        public bool SetDisplayName(UUID userID, string displayName)
+        {
+            return false;
+        }
         #endregion
 
     }

@@ -342,5 +342,10 @@ namespace OpenSim.Services.Connectors.SimianGrid
                 }
             }
         }
+
+        public bool SetDisplayName(UUID userID, string displayName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
