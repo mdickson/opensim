@@ -448,7 +448,7 @@ namespace OpenSim.Services.Connectors.SimianGrid
             return false;
         }
 
-        public GridUserInfo[] GetGridUserInfo(string[] userIDs)
+        public GridUserInfo[] GetGridUserInfo(string[] userIDs, bool update_name)
         {
             return new GridUserInfo[0];
         }

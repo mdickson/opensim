@@ -208,9 +208,9 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.GridUser
             return info;
         }
 
-        public GridUserInfo[] GetGridUserInfo(string[] userID)
+        public GridUserInfo[] GetGridUserInfo(string[] userID, bool update_name)
         {
-            return m_RemoteConnector.GetGridUserInfo(userID);
+            return m_RemoteConnector.GetGridUserInfo(userID, update_name);
         }
 
         #endregion

@@ -177,7 +177,7 @@ namespace OpenSim.Region.ClientStack.Linden
         {
             Dictionary<UUID, NameInfo> result = GetCachedDisplayNames(ref ids);
 
-            Dictionary<UUID, UserData> names = m_UserManager.GetUsersUserData(ids, UUID.Zero);
+            Dictionary<UUID, UserData> names = m_UserManager.GetUsersUserData(ids, UUID.Zero, true);
 
             if (names.Count != 0)
             {
@@ -207,7 +207,6 @@ namespace OpenSim.Region.ClientStack.Linden
                     nameInfo.LastName = userdata.LastName;
                     nameInfo.DisplayName = userdata.DisplayName;
                     nameInfo.HomeURI = userdata.HomeURL;
-
                     nameInfo.NameChanged = userdata.NameChanged;
 
                     result.Add(kvp.Key, nameInfo);
