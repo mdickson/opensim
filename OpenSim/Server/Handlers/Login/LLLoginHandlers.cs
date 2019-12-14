@@ -81,15 +81,29 @@ namespace OpenSim.Server.Handlers.Login
                 //                    }
                 //                }
 
-                if (requestData.ContainsKey("first") && requestData["first"] != null &&
-                    requestData.ContainsKey("last") && requestData["last"] != null && (
+                if (((requestData.ContainsKey("first") && requestData["first"] != null &&
+                    requestData.ContainsKey("last") && requestData["last"] != null ) ||
+                    (requestData.ContainsKey("username") && requestData["username"] != null)) && (                        
                         (requestData.ContainsKey("passwd") && requestData["passwd"] != null) ||
                         (!requestData.ContainsKey("passwd") && requestData.ContainsKey("web_login_key") && requestData["web_login_key"] != null && requestData["web_login_key"].ToString() != UUID.Zero.ToString())
                     ))
                 {
-                    string first = requestData["first"].ToString();
-                    string last = requestData["last"].ToString();
+                    string first = null;
+                    string last = null;
+
+                    if(requestData.ContainsKey("username"))
+                    {
+                        first = requestData["username"].ToString();
+                        last = "Resident";
+                    }
+                    else
+                    {
+                        first = requestData["first"].ToString();
+                        last = requestData["last"].ToString();
+                    }
+
                     string passwd = null;
+
                     if (requestData.ContainsKey("passwd"))
                     {
                         passwd = requestData["passwd"].ToString();
@@ -99,29 +113,44 @@ namespace OpenSim.Server.Handlers.Login
                         passwd = "$1$" + requestData["web_login_key"].ToString();
                         m_log.InfoFormat("[LOGIN]: XMLRPC Login Req key {0}", passwd);
                     }
+
                     string startLocation = string.Empty;
                     UUID scopeID = UUID.Zero;
+
                     if (requestData["scope_id"] != null)
+                    {
                         scopeID = new UUID(requestData["scope_id"].ToString());
+                    }
+
                     if (requestData.ContainsKey("start"))
+                    {
                         startLocation = requestData["start"].ToString();
+                    }
 
                     string clientVersion = "Unknown";
                     if (requestData.Contains("version") && requestData["version"] != null)
+                    {
                         clientVersion = requestData["version"].ToString();
+                    }
                     // We should do something interesting with the client version...
 
                     string channel = "Unknown";
                     if (requestData.Contains("channel") && requestData["channel"] != null)
+                    {
                         channel = requestData["channel"].ToString();
+                    }
 
                     string mac = "Unknown";
                     if (requestData.Contains("mac") && requestData["mac"] != null)
+                    {
                         mac = requestData["mac"].ToString();
+                    }
 
                     string id0 = "Unknown";
                     if (requestData.Contains("id0") && requestData["id0"] != null)
+                    {
                         id0 = requestData["id0"].ToString();
+                    }
 
                     //m_log.InfoFormat("[LOGIN]: XMLRPC Login Requested for {0} {1}, starting in {2}, using {3}", first, last, startLocation, clientVersion);
 
@@ -131,7 +160,6 @@ namespace OpenSim.Server.Handlers.Login
                     XmlRpcResponse response = new XmlRpcResponse();
                     response.Value = reply.ToHashtable();
                     return response;
-
                 }
             }
 

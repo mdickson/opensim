@@ -25,27 +25,42 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenMetaverse;
 using System;
-using System.Collections.Generic;
+using Nini.Config;
+using OpenSim.Server.Base;
+using OpenSim.Services.Interfaces;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Server.Handlers.Base;
+using OpenSim.Framework.ServiceAuth;
+using Nwc.XmlRpc;
+using System.Net;
 
-namespace OpenSim.Framework
+namespace OpenSim.Server.Handlers.Hypergrid
 {
-    public class UserData
+    public class HGGetDisplayNames : ServiceConnector
     {
-        public UUID Id { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string DisplayName { get; set; }
-        public DateTime NameChanged { get; set; }
-        public string HomeURL { get; set; }
-        public Dictionary<string, object> ServerURLs { get; set; }
-        public bool IsUnknownUser { get; set; }
-        public bool HasGridUserTried { get; set; }
-    }
+		private string m_ConfigName = "UserAccountService";
 
-    public interface IPeople
-    {
-        List<UserData> GetUserData(string query, int page_size, int page_number);
+        IUserAccountService m_UserAccountService = null;
+
+        // Called from Robust
+        public HGGetDisplayNames(IConfigSource config, IHttpServer server, string configName)
+        {
+            IConfig serverConfig = config.Configs[m_ConfigName];
+            if (serverConfig == null)
+                throw new Exception(String.Format("No section {0} in config file", m_ConfigName));
+
+            string service = serverConfig.GetString("LocalServiceModule",
+                    String.Empty);
+
+            if (service == String.Empty)
+                throw new Exception("No LocalServiceModule in config file");
+
+            Object[] args = new Object[] { config };
+            m_UserAccountService = ServerUtils.LoadPlugin<IUserAccountService>(service, args);
+
+            IServiceAuth auth = ServiceAuth.Create(config, m_ConfigName);
+            server.AddStreamHandler(new HGGetDisplayNamesPostHandler(m_UserAccountService));
+        }
     }
 }
