@@ -30,6 +30,7 @@ using OpenMetaverse;
 using OpenSim.Framework;
 using System;
 using System.Net;
+using System.Threading;
 
 namespace OpenSim.Region.ClientStack.LindenUDP
 {
