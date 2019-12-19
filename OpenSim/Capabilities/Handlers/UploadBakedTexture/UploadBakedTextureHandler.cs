@@ -133,7 +133,7 @@ namespace OpenSim.Capabilities.Handlers
             uploaderPath = path;
             httpListener = httpServer;
             AgentId = uUID;
-            //                m_log.InfoFormat("[CAPS] baked texture upload starting for {0}",newAssetID);
+            // m_log.InfoFormat("[CAPS] baked texture upload starting for {0}",newAssetID);
         }
 
         /// <summary>
