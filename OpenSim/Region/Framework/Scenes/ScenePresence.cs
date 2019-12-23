@@ -298,7 +298,11 @@ namespace OpenSim.Region.Framework.Scenes
         public bool Flying
         {
             get { return PhysicsActor != null && PhysicsActor.Flying; }
-            set { PhysicsActor.Flying = value; }
+            set
+            {
+                if(PhysicsActor != null)
+                    PhysicsActor.Flying = value;
+            }
         }
 
         public bool IsColliding
@@ -3120,7 +3124,7 @@ namespace OpenSim.Region.Framework.Scenes
         {
             m_delayedStop = -1;
 
-            if (SitGround)
+            if (SitGround || IsSatOnObject)
                 StandUp();
 
             //            m_log.DebugFormat(
@@ -4838,7 +4842,7 @@ namespace OpenSim.Region.Framework.Scenes
         /// This updates important decision making data about a child agent
         /// The main purpose is to figure out what objects to send to a child agent that's in a neighboring region
         /// </summary>
-        public void UpdateChildAgent(AgentPosition cAgentData, uint tRegionX, uint tRegionY, uint rRegionX, uint rRegionY)
+        public void UpdateChildAgent(AgentPosition cAgentData)
         {
             if (!IsChildAgent)
                 return;
@@ -4846,6 +4850,10 @@ namespace OpenSim.Region.Framework.Scenes
             GodController.SetState(cAgentData.GodData);
 
             RegionHandle = cAgentData.RegionHandle;
+            uint rRegionX = (uint)(RegionHandle >> 40);
+            uint rRegionY = (((uint)RegionHandle) >> 8);
+            uint tRegionX = m_scene.RegionInfo.RegionLocX;
+            uint tRegionY = m_scene.RegionInfo.RegionLocY;
 
             //m_log.Debug("   >>> ChildAgentPositionUpdate <<< " + rRegionX + "-" + rRegionY);
             int shiftx = ((int)rRegionX - (int)tRegionX) * (int)Constants.RegionSize;
@@ -4855,10 +4863,18 @@ namespace OpenSim.Region.Framework.Scenes
 
             DrawDistance = cAgentData.Far;
 
-            if (cAgentData.Position != marker) // UGH!!
-                m_pos = cAgentData.Position + offset;
-
+            m_pos = cAgentData.Position + offset;
             CameraPosition = cAgentData.Center + offset;
+
+            if (cAgentData.ChildrenCapSeeds != null && cAgentData.ChildrenCapSeeds.Count > 0)
+            {
+                if (Scene.CapsModule != null)
+                {
+                    Scene.CapsModule.SetChildrenSeed(UUID, cAgentData.ChildrenCapSeeds);
+                }
+
+                KnownRegions = cAgentData.ChildrenCapSeeds;
+            }
 
             if ((cAgentData.Throttles != null) && cAgentData.Throttles.Length > 0)
             {
@@ -4872,22 +4888,11 @@ namespace OpenSim.Region.Framework.Scenes
 
                 x = x * x + y * y;
 
-                const float distScale = 0.4f / Constants.RegionSize / Constants.RegionSize;
-                float factor = 1.0f - distScale * x;
+                float factor = 1.0f - x * 0.3f / Constants.RegionSize / Constants.RegionSize;
                 if (factor < 0.2f)
                     factor = 0.2f;
 
                 ControllingClient.SetChildAgentThrottle(cAgentData.Throttles, factor);
-            }
-
-            if (cAgentData.ChildrenCapSeeds != null && cAgentData.ChildrenCapSeeds.Count > 0)
-            {
-                if (Scene.CapsModule != null)
-                {
-                    Scene.CapsModule.SetChildrenSeed(UUID, cAgentData.ChildrenCapSeeds);
-                }
-
-                KnownRegions = cAgentData.ChildrenCapSeeds;
             }
 
             //cAgentData.AVHeight;
@@ -5021,7 +5026,7 @@ namespace OpenSim.Region.Framework.Scenes
             }
 
             if ((cAgent.Throttles != null) && cAgent.Throttles.Length > 0)
-                ControllingClient.SetChildAgentThrottle(cAgent.Throttles);
+                ControllingClient.SetChildAgentThrottle(cAgent.Throttles, 1.0f);
 
             m_headrotation = cAgent.HeadRotation;
             Rotation = cAgent.BodyRotation;
@@ -5401,6 +5406,12 @@ namespace OpenSim.Region.Framework.Scenes
             if (bakedModule != null)
                 bakedModule.UpdateMeshAvatar(m_uuid);
         }
+
+        public int GetAttachmentsCount()
+        {
+            return m_attachments.Count;
+        }
+
 
         /// <summary>
         /// Get all the presence's attachments.
@@ -6601,10 +6612,9 @@ namespace OpenSim.Region.Framework.Scenes
                     if (m_lastColliders.Count == 0)
                         return; // nothing to do
 
-                    foreach (uint localID in m_lastColliders)
-                    {
-                        endedColliders.Add(localID);
-                    }
+                    for(int i = 0; i < m_lastColliders.Count; ++i)
+                        endedColliders.Add(m_lastColliders[i]);
+
                     m_lastColliders.Clear();
                 }
                 else
@@ -6664,9 +6674,10 @@ namespace OpenSim.Region.Framework.Scenes
                     if (soundinfolist.Count > 0)
                         CollisionSounds.AvatarCollisionSound(this, soundinfolist);
                 }
-
-                foreach (SceneObjectGroup att in GetAttachments())
+                List<SceneObjectGroup> attachements = GetAttachments();
+                for (int i = 0; i< attachements.Count; ++i)
                 {
+                    SceneObjectGroup att = attachements[i];
                     SendCollisionEvent(att, scriptEvents.collision_start, startedColliders, m_scene.EventManager.TriggerScriptCollidingStart);
                     SendCollisionEvent(att, scriptEvents.collision, m_lastColliders, m_scene.EventManager.TriggerScriptColliding);
                     SendCollisionEvent(att, scriptEvents.collision_end, endedColliders, m_scene.EventManager.TriggerScriptCollidingEnd);

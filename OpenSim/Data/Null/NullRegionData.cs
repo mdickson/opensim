@@ -63,6 +63,28 @@ namespace OpenSim.Data.Null
 
         private delegate bool Matcher(string value);
 
+        public RegionData GetSpecific(string regionName, UUID scopeID)
+        {
+            if (m_useStaticInstance && Instance != this)
+                return Instance.GetSpecific(regionName, scopeID);
+
+            string cleanName = regionName.ToLower();
+            Matcher queryMatch;
+            queryMatch = delegate (string s) { return s.Equals(cleanName); };
+
+            lock (m_regionData)
+            {
+                foreach (RegionData r in m_regionData.Values)
+                {
+                    // m_log.DebugFormat("[NULL REGION DATA]: comparing {0} to {1}", cleanName, r.RegionName.ToLower());
+                    if (queryMatch(r.RegionName.ToLower()))
+                        return(r);
+                }
+            }
+
+            return null;
+        }
+
         public List<RegionData> Get(string regionName, UUID scopeID)
         {
             if (m_useStaticInstance && Instance != this)

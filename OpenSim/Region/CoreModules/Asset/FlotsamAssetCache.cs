@@ -334,8 +334,10 @@ namespace OpenSim.Region.CoreModules.Asset
 
                     }
 
-                    Util.FireAndForget(
-                        delegate { WriteFileCache(filename, asset); }, null, "FlotsamAssetCache.UpdateFileCache");
+                    // Util.FireAndForget(
+                    //   delegate { WriteFileCache(filename, asset); }, null, "FlotsamAssetCache.UpdateFileCache");
+                    //this must be sync
+                    WriteFileCache(filename, asset);
                 }
             }
             catch (Exception e)
@@ -797,6 +799,7 @@ namespace OpenSim.Region.CoreModules.Asset
                     stream = File.Open(tempname, FileMode.Create);
                     BinaryFormatter bformatter = new BinaryFormatter();
                     bformatter.Serialize(stream, asset);
+                    stream.Flush();
                 }
                 catch (IOException e)
                 {

@@ -172,9 +172,32 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.GridUser
             return false;
         }
 
+        public bool SetDisplayName(string userID, string displayName)
+        {
+
+            m_log.InfoFormat("[RemoteGridServiceConnector]: SetDisplayName for {0} to {1}", userID, displayName);
+
+            if (m_RemoteConnector.SetDisplayName(userID, displayName))
+            {
+                // Update the cache too
+                GridUserInfo info = null;
+
+                if (m_Infos.TryGetValue(userID, out info))
+                {
+                    info.DisplayName = displayName;
+                    info.NameCached = DateTime.UtcNow;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
         public GridUserInfo GetGridUserInfo(string userID)
         {
             GridUserInfo info = null;
+            
             if (m_Infos.TryGetValue(userID, out info))
                 return info;
 
@@ -185,9 +208,9 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.GridUser
             return info;
         }
 
-        public GridUserInfo[] GetGridUserInfo(string[] userID)
+        public GridUserInfo[] GetGridUserInfo(string[] userID, bool update_name)
         {
-            return m_RemoteConnector.GetGridUserInfo(userID);
+            return m_RemoteConnector.GetGridUserInfo(userID, update_name);
         }
 
         #endregion

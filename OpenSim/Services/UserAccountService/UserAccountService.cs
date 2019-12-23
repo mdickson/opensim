@@ -141,6 +141,11 @@ namespace OpenSim.Services.UserAccountService
                             "show account",
                             "show account <first> <last>",
                             "Show account details for the given user", HandleShowAccount);
+
+                    MainConsole.Instance.Commands.AddCommand("Users", false,
+                        "set user displayname",
+                        "set user displayname [<first> [<last> [<display name>]]]",
+                        "Set a user's display name. Leave display name blank to reset", HandleSetUserDisplayName);
                 }
             }
         }
@@ -205,6 +210,14 @@ namespace OpenSim.Services.UserAccountService
                 u.UserCountry = d.Data["UserCountry"].ToString();
             else
                 u.UserCountry = string.Empty;
+
+            if (d.Data.ContainsKey("DisplayName") && !string.IsNullOrWhiteSpace(d.Data["DisplayName"]?.ToString()))
+                u.DisplayName = d.Data["DisplayName"].ToString();
+            else
+                u.DisplayName = string.Empty;
+
+            if (d.Data.ContainsKey("NameChanged") && !string.IsNullOrWhiteSpace(d.Data["NameChanged"]?.ToString()))
+                u.NameChanged = Convert.ToInt32(d.Data["NameChanged"].ToString());
 
             if (d.Data.ContainsKey("ServiceURLs") && d.Data["ServiceURLs"] != null)
             {
@@ -293,6 +306,8 @@ namespace OpenSim.Services.UserAccountService
         public List<UserAccount> GetUserAccounts(UUID scopeID, List<string> IDs)
         {
             UserAccountData[] ret = m_Database.GetUsersWhere(scopeID, "PrincipalID in ('" + String.Join("', '", IDs) + "')");
+            if(ret == null || ret.Length == 0)
+                return new List<UserAccount>();
             return new List<UserAccount>(ret.Select((x) => MakeUserAccount(x)));
         }
 
@@ -319,6 +334,8 @@ namespace OpenSim.Services.UserAccountService
             d.Data["UserFlags"] = data.UserFlags.ToString();
             if (data.UserTitle != null)
                 d.Data["UserTitle"] = data.UserTitle.ToString();
+			d.Data["DisplayName"] = data.DisplayName;
+            d.Data["NameChanged"] = data.NameChanged.ToString();
 
             List<string> parts = new List<string>();
 
@@ -388,7 +405,7 @@ namespace OpenSim.Services.UserAccountService
             else firstName = cmdparams[2];
 
             if (cmdparams.Length < 4)
-                lastName = MainConsole.Instance.Prompt("Last name", "User", excluded);
+                lastName = MainConsole.Instance.Prompt("Last name", "Resident", excluded);
             else lastName = cmdparams[3];
 
             if (cmdparams.Length < 5)
@@ -452,17 +469,69 @@ namespace OpenSim.Services.UserAccountService
                 return;
             }
 
-            MainConsole.Instance.Output("Name:    {0}", ua.Name);
+			var name = 
+                ua.LastName.ToLower() == "resident" ? 
+                    ua.FirstName : 
+                    string.Format("{0} {1}", ua.FirstName, ua.LastName);
+
+			if (string.IsNullOrWhiteSpace(ua.DisplayName))
+			{
+ 			    MainConsole.Instance.Output("Name:    {0}", name);
+            }
+            else
+            {
+				MainConsole.Instance.Output("Name:    {0} ({1})", ua.DisplayName, name);
+            }
+
             MainConsole.Instance.Output("ID:      {0}", ua.PrincipalID);
             MainConsole.Instance.Output("Title:   {0}", ua.UserTitle);
             MainConsole.Instance.Output("E-mail:  {0}", ua.Email);
             MainConsole.Instance.Output("Created: {0}", Utils.UnixTimeToDateTime(ua.Created));
             MainConsole.Instance.Output("Level:   {0}", ua.UserLevel);
             MainConsole.Instance.Output("Flags:   {0}", ua.UserFlags);
+
             foreach (KeyValuePair<string, Object> kvp in ua.ServiceURLs)
+            {
                 MainConsole.Instance.Output("{0}: {1}", kvp.Key, kvp.Value);
+            }
         }
 
+		protected void HandleSetUserDisplayName(string module, string[] cmdparams)
+        {
+            string firstName;
+            string lastName;
+            string newName;
+
+            if (cmdparams.Length < 4)
+                firstName = MainConsole.Instance.Prompt("First name");
+            else firstName = cmdparams[3];
+
+            if (cmdparams.Length < 5)
+                lastName = MainConsole.Instance.Prompt("Last name");
+            else lastName = cmdparams[4];
+
+            if (cmdparams.Length < 6)
+                newName = MainConsole.Instance.Prompt("New Display Name", string.Empty);
+            else newName = cmdparams[5];
+
+            UserAccount account = GetUserAccount(UUID.Zero, firstName, lastName);
+            if (account == null)
+            {
+                MainConsole.Instance.Output("No such user as {0} {1}", null, firstName, lastName);
+                return;
+            }
+
+            bool success = false;
+
+            account.DisplayName = newName;
+
+            success = StoreUserAccount(account);
+            if (!success)
+                MainConsole.Instance.Output("Unable to set display name for account {0} {1}.", null, firstName, lastName);
+            else
+                MainConsole.Instance.Output("User display name set for user {0} {1} to {2}", null, firstName, lastName, account.DisplayName);
+        }
+	
         protected void HandleResetUserPassword(string module, string[] cmdparams)
         {
             string firstName;
@@ -1055,6 +1124,11 @@ namespace OpenSim.Services.UserAccountService
             item.CurrentPermissions &= item.NextPermissions;
             item.BasePermissions &= item.NextPermissions;
             item.EveryOnePermissions &= item.NextPermissions;
+        }
+
+        public bool SetDisplayName(UUID userID, string displayName)
+        {
+            throw new NotImplementedException();
         }
     }
 }

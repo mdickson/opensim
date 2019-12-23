@@ -228,6 +228,37 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
         }
 
+        public void CancelEvent(string eventName)
+        {
+            ScriptEventCode evc;
+            try
+            {
+                evc = (ScriptEventCode)Enum.Parse(typeof(ScriptEventCode), eventName);
+            }
+            catch
+            {
+                return;
+            }
+
+            lock (m_QueueLock)
+            {
+                if(m_EventQueue.Count == 0)
+                    return;
+
+                LinkedListNode<EventParams> lln2 = null;
+                for (lln2 = m_EventQueue.First; lln2 != null; lln2 = lln2.Next)
+                {
+                    EventParams evt2 = lln2.Value;
+                    if(evt2.EventName.Equals(eventName))
+                    {
+                        m_EventQueue.Remove(lln2);
+                        if (evc >= 0 && m_EventCounts[(int)evc] > 0)
+                            m_EventCounts[(int)evc]--;
+                    }
+                }
+            }
+        }
+
         // This is called in the script thread to step script until it calls
         // CheckRun().  It returns what the instance's next state should be,
         // ONSLEEPQ, ONYIELDQ, SUSPENDED or FINISHED.
@@ -848,7 +879,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             m_SleepUntil = DateTime.MinValue;     // not doing llSleep()
             m_ResetCount++;                        // has been reset once more
 
-            heapUsed = 0;
+            m_localsHeapUsed = 0;
+            m_arraysHeapUsed = 0;
             glblVars.Clear();
 
             // Tell next call to 'default state_entry()' to reset all global

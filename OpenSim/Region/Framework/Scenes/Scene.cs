@@ -403,7 +403,7 @@ namespace OpenSim.Region.Framework.Scenes
         private readonly Timer m_restartTimer = new Timer(15000); // Wait before firing
         private volatile bool m_backingup;
         private Dictionary<UUID, ReturnInfo> m_returns = new Dictionary<UUID, ReturnInfo>();
-        private Dictionary<UUID, int> m_groupsWithTargets = new Dictionary<UUID, int>();
+        private HashSet<UUID> m_groupsWithTargets = new HashSet<UUID>();
 
         private string m_defaultScriptEngine;
 
@@ -840,7 +840,8 @@ namespace OpenSim.Region.Framework.Scenes
 
             Random random = new Random();
 
-            m_lastAllocatedLocalId = (uint)(random.NextDouble() * (double)(uint.MaxValue / 2)) + (uint)(uint.MaxValue / 4);
+            m_lastAllocatedLocalId = (int)(random.NextDouble() * (uint.MaxValue / 4));
+            m_lastAllocatedIntId = (int)(random.NextDouble() * (int.MaxValue / 4));
             m_authenticateHandler = authen;
             m_sceneGridService = new SceneCommunicationService();
             m_SimulationDataService = simDataService;
@@ -1636,7 +1637,7 @@ namespace OpenSim.Region.Framework.Scenes
 
                 // m_log.DebugFormat("[SCENE]: Processing frame {0} in {1}", Frame, RegionInfo.RegionName);
 
-                agentMS = tempOnRezMS = eventMS = backupMS = terrainMS = landMS = 0f;
+                otherMS = agentMS = tempOnRezMS = eventMS = backupMS = terrainMS = landMS = 0f;
 
                 try
                 {
@@ -1715,6 +1716,10 @@ namespace OpenSim.Region.Framework.Scenes
                     // Objects queue their updates onto all scene presences
                     if (Frame % m_update_objects == 0)
                         m_sceneGraph.UpdateObjectGroups();
+
+                    tmpMS2 = Util.GetTimeStampMS();
+                    otherMS = (float)(tmpMS2 - tmpMS);
+                    tmpMS = tmpMS2;
 
                     // Run through all ScenePresences looking for updates
                     // Presence updates and queued object updates for each presence are sent to clients
@@ -1831,7 +1836,7 @@ namespace OpenSim.Region.Framework.Scenes
                 m_firstHeartbeat = false;
                 Watchdog.UpdateThread();
 
-                otherMS = tempOnRezMS + eventMS + backupMS + terrainMS + landMS;
+                otherMS += tempOnRezMS + eventMS + backupMS + terrainMS + landMS;
 
                 tmpMS = Util.GetTimeStampMS();
 
@@ -1915,7 +1920,7 @@ namespace OpenSim.Region.Framework.Scenes
         public void AddGroupTarget(SceneObjectGroup grp)
         {
             lock (m_groupsWithTargets)
-                m_groupsWithTargets[grp.UUID] = 0;
+                m_groupsWithTargets.Add(grp.UUID);
         }
 
         public void RemoveGroupTarget(SceneObjectGroup grp)
@@ -1931,13 +1936,14 @@ namespace OpenSim.Region.Framework.Scenes
             lock (m_groupsWithTargets)
             {
                 if (m_groupsWithTargets.Count != 0)
-                    objs = new List<UUID>(m_groupsWithTargets.Keys);
+                    objs = new List<UUID>(m_groupsWithTargets);
             }
 
             if (objs != null)
             {
-                foreach (UUID entry in objs)
+                for(int i = 0; i< objs.Count; ++i)
                 {
+                    UUID entry = objs[i];
                     SceneObjectGroup grp = GetSceneObjectGroup(entry);
                     if (grp == null)
                         m_groupsWithTargets.Remove(entry);
@@ -2966,7 +2972,6 @@ namespace OpenSim.Region.Framework.Scenes
             if (sceneObject.IsAttachmentCheckFull()) // Attachment
             {
                 sceneObject.RootPart.AddFlag(PrimFlags.TemporaryOnRez);
-                //                sceneObject.RootPart.AddFlag(PrimFlags.Phantom);
 
                 // Don't sent a full update here because this will cause full updates to be sent twice for
                 // attachments on region crossings, resulting in viewer glitches.
@@ -2987,13 +2992,17 @@ namespace OpenSim.Region.Framework.Scenes
                     // m_log.DebugFormat(
                     //     "[ATTACHMENT]: Attach to avatar {0} at position {1}", sp.UUID, grp.AbsolutePosition);
 
-                    RootPrim.RemFlag(PrimFlags.TemporaryOnRez);
-
                     // We must currently not resume scripts at this stage since AttachmentsModule does not have the
                     // information that this is due to a teleport/border cross rather than an ordinary attachment.
                     // We currently do this in Scene.MakeRootAgent() instead.
+                    bool attached = false;
                     if (AttachmentsModule != null)
-                        AttachmentsModule.AttachObject(sp, grp, 0, false, false, true);
+                        attached = AttachmentsModule.AttachObject(sp, grp, 0, false, false, true);
+
+                    if (attached)
+                        RootPrim.RemFlag(PrimFlags.TemporaryOnRez);
+                    else
+                        m_log.DebugFormat("[SCENE]: Attachment {0} arrived but failed to attach, setting to temp", sceneObject.UUID);
                 }
                 else
                 {
@@ -4625,12 +4634,8 @@ namespace OpenSim.Region.Framework.Scenes
                 // however to avoid a race condition crossing borders..
                 if (childAgentUpdate.IsChildAgent)
                 {
-                    uint rRegionX = (uint)(cAgentData.RegionHandle >> 40);
-                    uint rRegionY = (((uint)(cAgentData.RegionHandle)) >> 8);
-                    uint tRegionX = RegionInfo.RegionLocX;
-                    uint tRegionY = RegionInfo.RegionLocY;
                     //Send Data to ScenePresence
-                    childAgentUpdate.UpdateChildAgent(cAgentData, tRegionX, tRegionY, rRegionX, rRegionY);
+                    childAgentUpdate.UpdateChildAgent(cAgentData);
                     // Not Implemented:
                     //TODO: Do we need to pass the message on to one of our neighbors?
                 }

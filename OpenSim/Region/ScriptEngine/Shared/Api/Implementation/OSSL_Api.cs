@@ -600,7 +600,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
 
             if (World.Permissions.CanTerraformLand(m_host.OwnerID, new Vector3(x, y, 0)))
             {
-                World.Heightmap[x, y] = val;
+                World.Heightmap[x, y] = (float)val;
                 return 1;
             }
             else
@@ -3690,7 +3690,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
         {
             CheckThreatLevel(ThreatLevel.Moderate, "osGetSimulatorMemory");
 
-            long pws = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64;
+            long pws = Util.GetPhysicalMemUse();
 
             if (pws > Int32.MaxValue)
                 return Int32.MaxValue;
@@ -3704,7 +3704,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
         {
             CheckThreatLevel(ThreatLevel.Moderate, "osGetSimulatorMemoryKB");
 
-            long pws = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64;
+            long pws = Util.GetPhysicalMemUse();
 
             if ((pws & 0x3FFL) != 0)
                 pws += 0x400L;

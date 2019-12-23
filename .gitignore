@@ -34,6 +34,7 @@ packages/
 */*/*/*/*/*/bin
 */*/*/*/*/*/*/bin
 .vs/
+.vscode/
 bin/Debug/*.dll
 bin/*.dll.mdb
 bin/*.db
