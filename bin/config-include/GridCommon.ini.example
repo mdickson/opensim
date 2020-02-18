@@ -51,6 +51,10 @@
     ;; For example http://myworld.com:9000 or http://myworld.com:8002
     ;; This is a default that can be overwritten in some sections.
     ; GatekeeperURI = "${Const|BaseURL}:${Const|PublicPort}"
+	
+	;# {GatekeeperURIAlias} {Hypergrid} {Old hostnames, FQDN or ips of the gatekeeper of this world} {}
+	;; comma separated list
+	; GatekeeperURIAlias = myoldname.something.org, 127.0.0.1
 
 [Modules]
     ;; Choose one cache module and the corresponding config file, if it exists.
@@ -235,13 +239,6 @@
     ; Example:
     ; Region_Test_1 = "DisallowForeigners"
 
-;; Uncomment if you are using SimianGrid for grid services
-[SimianGrid]
-    ;; SimianGrid services URL
-    ;; SimianServiceURL = "http://grid.sciencesim.com/Grid/"
-
-    ;; Capability assigned by the grid administrator for the simulator
-    ;; SimulatorCapability = "00000000-0000-0000-0000-000000000000"
 
 [MuteListService]
     MuteListServerURI = "${Const|PrivURL}:${Const|PrivatePort}"

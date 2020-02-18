@@ -63,6 +63,8 @@ namespace OpenSim.Region.OptionalModules.Materials
         public Dictionary<UUID, int> m_MaterialsRefCount = new Dictionary<UUID, int>();
 
         private Dictionary<FaceMaterial, double> m_changed = new Dictionary<FaceMaterial, double>();
+        private Queue<UUID> delayedDelete = new Queue<UUID>();
+        private bool m_storeBusy;
 
         public void Initialise(IConfigSource source)
         {
@@ -122,12 +124,36 @@ namespace OpenSim.Region.OptionalModules.Materials
 
         private void EventManager_OnBackup(ISimulationDataService datastore, bool forcedBackup)
         {
-            List<FaceMaterial> toStore;
+            List<FaceMaterial> toStore = null;
 
             lock (materialslock)
             {
-                if (m_changed.Count == 0)
+                if(m_storeBusy && !forcedBackup)
                     return;
+
+                if(m_changed.Count == 0)
+                {
+                    if(forcedBackup)
+                        return;
+
+                    UUID id;
+                    int throttle = 0;
+                    while(delayedDelete.Count > 0 && throttle < 5)
+                    {
+                        id = delayedDelete.Dequeue();
+                        if (m_Materials.ContainsKey(id))
+                        {
+                            if (m_MaterialsRefCount[id] <= 0)
+                            {
+                                m_Materials.Remove(id);
+                                m_MaterialsRefCount.Remove(id);
+                                m_cache.Expire(id.ToString());
+                                ++throttle;
+                            }
+                        }
+                    }
+                    return;
+                }
 
                 if (forcedBackup)
                 {
@@ -137,8 +163,8 @@ namespace OpenSim.Region.OptionalModules.Materials
                 else
                 {
                     toStore = new List<FaceMaterial>();
-                    double storetime = Util.GetTimeStamp() - 60.0;
-                    foreach (KeyValuePair<FaceMaterial, double> kvp in m_changed)
+                    double storetime = Util.GetTimeStamp() - 30.0;
+                    foreach(KeyValuePair<FaceMaterial, double> kvp in m_changed)
                     {
                         if (kvp.Value < storetime)
                         {
@@ -154,6 +180,7 @@ namespace OpenSim.Region.OptionalModules.Materials
 
             if (toStore.Count > 0)
             {
+                m_storeBusy = true;
                 if (forcedBackup)
                 {
                     foreach (FaceMaterial fm in toStore)
@@ -161,6 +188,7 @@ namespace OpenSim.Region.OptionalModules.Materials
                         AssetBase a = MakeAsset(fm, false);
                         m_scene.AssetService.Store(a);
                     }
+                    m_storeBusy = false;
                 }
                 else
                 {
@@ -171,6 +199,7 @@ namespace OpenSim.Region.OptionalModules.Materials
                             AssetBase a = MakeAsset(fm, false);
                             m_scene.AssetService.Store(a);
                         }
+                        m_storeBusy = false;
                     });
                 }
             }
@@ -186,16 +215,18 @@ namespace OpenSim.Region.OptionalModules.Materials
         private void EventManager_OnObjectDeleteFromScene(SceneObjectGroup obj)
         {
             foreach (var part in obj.Parts)
+            {
                 if (part != null)
                     RemoveMaterialsInPart(part);
+            }
         }
 
         private void OnRegisterCaps(OpenMetaverse.UUID agentID, OpenSim.Framework.Capabilities.Caps caps)
         {
-            string capsBase = "/CAPS/" + caps.CapsObjectPath;
+            string capsBase = "/CAPS/" + caps.CapsObjectPath + "/";
 
             IRequestHandler renderMaterialsPostHandler
-                = new RestStreamHandler("POST", capsBase + "/",
+                = new RestStreamHandler("POST", capsBase,
                     (request, path, param, httpRequest, httpResponse)
                         => RenderMaterialsPostCap(request, agentID),
                     "RenderMaterials", null);
@@ -206,7 +237,7 @@ namespace OpenSim.Region.OptionalModules.Materials
             // handler normally and then add a GET handler via MainServer
 
             IRequestHandler renderMaterialsGetHandler
-                = new RestStreamHandler("GET", capsBase + "/",
+                = new RestStreamHandler("GET", capsBase,
                     (request, path, param, httpRequest, httpResponse)
                         => RenderMaterialsGetCap(request),
                     "RenderMaterials", null);
@@ -214,7 +245,7 @@ namespace OpenSim.Region.OptionalModules.Materials
 
             // materials viewer seems to use either POST or PUT, so assign POST handler for PUT as well
             IRequestHandler renderMaterialsPutHandler
-                = new RestStreamHandler("PUT", capsBase + "/",
+                = new RestStreamHandler("PUT", capsBase,
                     (request, path, param, httpRequest, httpResponse)
                         => RenderMaterialsPutCap(request, agentID),
                     "RenderMaterials", null);
@@ -435,19 +466,11 @@ namespace OpenSim.Region.OptionalModules.Materials
 
             lock (materialslock)
             {
-                if (!m_Materials.ContainsKey(id))
-                    return;
-                else
+                if(m_Materials.ContainsKey(id))
                 {
                     m_MaterialsRefCount[id]--;
                     if (m_MaterialsRefCount[id] <= 0)
-                    {
-                        FaceMaterial oldFaceMat = m_Materials[id];
-                        m_changed.Remove(oldFaceMat);
-                        m_Materials.Remove(id);
-                        m_MaterialsRefCount.Remove(id);
-                        m_cache.Expire(id.ToString());
-                    }
+                        delayedDelete.Enqueue(id);
                 }
             }
         }

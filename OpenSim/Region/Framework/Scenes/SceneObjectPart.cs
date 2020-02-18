@@ -37,10 +37,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
-using System.Text;
 using System.Threading;
+using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+
 using PermissionMask = OpenSim.Framework.PermissionMask;
 
 namespace OpenSim.Region.Framework.Scenes
@@ -1254,6 +1255,9 @@ namespace OpenSim.Region.Framework.Scenes
             get { return m_sitTargetOrientation; }
             set { m_sitTargetOrientation = value; }
         }
+
+        public float SitActiveRange { get; set;}
+        public Vector3 StandOffset { get; set;}
 
         public bool Stopped
         {
@@ -2661,9 +2665,10 @@ namespace OpenSim.Region.Framework.Scenes
             detobj.velVector = obj.Velocity;
             detobj.colliderType = 0;
             detobj.groupUUID = obj.GroupID;
-            if (VolumeDetectActive)
-                detobj.linkNumber = 0;
-            else
+            // allow detector link number to be seen, unlike spec
+            //if (VolumeDetectActive)
+            //    detobj.linkNumber = 0;
+            //else
                 detobj.linkNumber = LinkNum;
             return detobj;
         }
@@ -2683,9 +2688,9 @@ namespace OpenSim.Region.Framework.Scenes
             else if (detobj.velVector != Vector3.Zero)
                 detobj.colliderType |= 0x2; //active
             detobj.groupUUID = av.ControllingClient.ActiveGroupId;
-            if (VolumeDetectActive)
-                detobj.linkNumber = 0;
-            else
+            //if (VolumeDetectActive)
+            //    detobj.linkNumber = 0;
+            //else
                 detobj.linkNumber = LinkNum;
 
             return detobj;
