@@ -2779,8 +2779,13 @@ namespace OpenSim.Region.Framework.Scenes
 
             SceneObjectPart[] partList = group.Parts;
 
-            foreach (SceneObjectPart part in partList)
+            for(int i = 0; i < partList.Length; ++i)
             {
+                SceneObjectPart part = partList[i];
+
+                if (removeScripts)
+                    part.Inventory.SendReleaseScriptsControl();
+
                 if (part.KeyframeMotion != null)
                 {
                     part.KeyframeMotion.Delete();
@@ -5201,7 +5206,7 @@ namespace OpenSim.Region.Framework.Scenes
         /// <param name="action"></param>
         public void ForEachRootScenePresence(Action<ScenePresence> action)
         {
-            m_sceneGraph.ForEachAvatar(action);
+            m_sceneGraph.ForEachRootScenePresence(action);
         }
 
         /// <summary>

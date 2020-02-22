@@ -37,11 +37,6 @@ using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Scenes.Serialization;
 using OpenSim.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using OpenSimAssetType = OpenSim.Framework.SLUtil.OpenSimAssetType;
 
 namespace OpenSim.Region.Framework.Scenes
