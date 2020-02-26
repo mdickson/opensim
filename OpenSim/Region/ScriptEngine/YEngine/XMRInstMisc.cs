@@ -48,8 +48,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         // up.  This makes sure we decrement m_CompiledScriptRefCount.
         ~XMRInstance()
         {
-            if(!m_disposed)
-                Dispose();
+            Dispose(false);
         }
 
         /**
@@ -58,6 +57,15 @@ namespace OpenSim.Region.ScriptEngine.Yengine
          */
         public void Dispose()
         {
+            Dispose(true);
+            //GC.SuppressFinalize(this);
+        }
+
+        public void Dispose(bool fromdispose)
+        {
+            if (m_disposed)
+                return;
+
             // Tell script stop executing next time it calls CheckRun().
             suspendOnCheckRunHold = true;
 

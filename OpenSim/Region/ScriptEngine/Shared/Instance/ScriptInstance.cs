@@ -864,6 +864,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
                 // and processing other non-timer events
                 m_StateChangeInProgress = false;
 
+                Part.RemoveScriptTargets(ItemID);
                 Part.SetScriptEvents(ItemID, (int)m_Script.GetStateEventFlags(State));
             }
             else
@@ -1061,8 +1062,6 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
             ReleaseControlsorPermissions(true);
 
             Stop(timeout);
-            SceneObjectPart part = Engine.World.GetSceneObjectPart(LocalID);
-            part.CollisionSound = UUID.Zero;
             AsyncCommandManager.RemoveScript(Engine, LocalID, ItemID);
 
             m_TimerQueued = false;
@@ -1073,7 +1072,12 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
             StartParam = 0;
             State = "default";
 
+            SceneObjectPart part = Engine.World.GetSceneObjectPart(LocalID);
+            if (part == null)
+                return;
 
+            part.CollisionSound = UUID.Zero;
+            part.RemoveScriptTargets(ItemID);
             part.SetScriptEvents(ItemID, m_Script.GetStateEventFlags(State));
             if (running)
                 Start();
@@ -1092,9 +1096,6 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
             RemoveState();
             ReleaseControlsorPermissions(true);
 
-            m_Script.ResetVars();
-            SceneObjectPart part = Engine.World.GetSceneObjectPart(LocalID);
-            part.CollisionSound = UUID.Zero;
             AsyncCommandManager.RemoveScript(Engine, LocalID, ItemID);
 
             m_TimerQueued = false;
@@ -1105,8 +1106,13 @@ namespace OpenSim.Region.ScriptEngine.Shared.Instance
             StartParam = 0;
             State = "default";
 
-            part.SetScriptEvents(ItemID, m_Script.GetStateEventFlags(State));
-
+            SceneObjectPart part = Engine.World.GetSceneObjectPart(LocalID);
+            if(part != null)
+            {
+                part.CollisionSound = UUID.Zero;
+                part.RemoveScriptTargets(ItemID);
+                part.SetScriptEvents(ItemID, m_Script.GetStateEventFlags(State));
+            }
             if (m_CurrentEvent != "state_entry" || oldState != "default")
             {
                 m_SaveState = StatePersistedHere;
