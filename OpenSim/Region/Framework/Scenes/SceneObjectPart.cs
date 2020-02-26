@@ -243,7 +243,7 @@ namespace OpenSim.Region.Framework.Scenes
             set { m_fromUserInventoryItemID = value; }
         }
 
-        public scriptEvents AggregateScriptEvents;
+        public scriptEvents AggregatedScriptEvents;
 
         public Vector3 AttachedPos { get; set; }
 
@@ -1219,7 +1219,7 @@ namespace OpenSim.Region.Framework.Scenes
 
         public scriptEvents ScriptEvents
         {
-            get { return AggregateScriptEvents; }
+            get { return AggregatedScriptEvents; }
         }
 
         public Quaternion SitTargetOrientation
@@ -4006,19 +4006,9 @@ namespace OpenSim.Region.Framework.Scenes
             // scriptEvents oldparts;
             lock (m_scriptEvents)
             {
-                if (m_scriptEvents.ContainsKey(scriptid))
-                {
-                    // oldparts = m_scriptEvents[scriptid];
-
-                    // remove values from aggregated script events
-                    if (m_scriptEvents[scriptid] == (scriptEvents)events)
+                if (m_scriptEvents.ContainsKey(scriptid) && m_scriptEvents[scriptid] == (scriptEvents) events)
                         return;
-                    m_scriptEvents[scriptid] = (scriptEvents)events;
-                }
-                else
-                {
-                    m_scriptEvents.Add(scriptid, (scriptEvents)events);
-                }
+                m_scriptEvents[scriptid] = (scriptEvents) events;
             }
             aggregateScriptEvents();
         }
@@ -5205,11 +5195,11 @@ namespace OpenSim.Region.Framework.Scenes
 
             bool hassound = (!VolumeDetectActive && CollisionSoundType >= 0 && ((Flags & PrimFlags.Physics) != 0));
 
-            scriptEvents CombinedEvents = AggregateScriptEvents;
+            scriptEvents CombinedEvents = AggregatedScriptEvents;
 
             // merge with root part
             if (ParentGroup != null && ParentGroup.RootPart != null)
-                CombinedEvents |= ParentGroup.RootPart.AggregateScriptEvents;
+                CombinedEvents |= ParentGroup.RootPart.AggregatedScriptEvents;
 
             // submit to this part case
             if (VolumeDetectActive)
@@ -5231,35 +5221,34 @@ namespace OpenSim.Region.Framework.Scenes
             }
         }
 
-
         public void aggregateScriptEvents()
         {
             if (ParentGroup == null || ParentGroup.RootPart == null)
                 return;
 
-            AggregateScriptEvents = 0;
+            AggregatedScriptEvents = 0;
 
             // Aggregate script events
             lock (m_scriptEvents)
             {
                 foreach (scriptEvents s in m_scriptEvents.Values)
                 {
-                    AggregateScriptEvents |= s;
+                    AggregatedScriptEvents |= s;
                 }
             }
 
             uint objectflagupdate = 0;
 
             if (
-                ((AggregateScriptEvents & scriptEvents.touch) != 0) ||
-                ((AggregateScriptEvents & scriptEvents.touch_end) != 0) ||
-                ((AggregateScriptEvents & scriptEvents.touch_start) != 0)
+                ((AggregatedScriptEvents & scriptEvents.touch) != 0) ||
+                ((AggregatedScriptEvents & scriptEvents.touch_end) != 0) ||
+                ((AggregatedScriptEvents & scriptEvents.touch_start) != 0)
                 )
             {
                 objectflagupdate |= (uint)PrimFlags.Touch;
             }
 
-            if ((AggregateScriptEvents & scriptEvents.money) != 0)
+            if ((AggregatedScriptEvents & scriptEvents.money) != 0)
             {
                 objectflagupdate |= (uint)PrimFlags.Money;
             }
