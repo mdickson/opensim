@@ -33,11 +33,9 @@ using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Server.Base;
-using OpenSim.Services.Connectors;
-using OpenSim.Services.Connectors.SimianGrid;
-using OpenSim.Services.Interfaces;
-using System;
 using System.Collections.Generic;
+using System;
+using OpenSim.Services.Interfaces;
 using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Inventory
@@ -693,18 +691,9 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Inventory
                 {
                     // Still not as flexible as I would like this to be,
                     // but good enough for now
-                    string connectorType = new HeloServicesConnector(url).Helo();
-                    m_log.DebugFormat("[HG INVENTORY SERVICE]: HELO returned {0}", connectorType);
-                    if (connectorType == "opensim-simian")
-                    {
-                        connector = new SimianInventoryServiceConnector(url);
-                    }
-                    else
-                    {
-                        RemoteXInventoryServicesConnector rxisc = new RemoteXInventoryServicesConnector(url);
-                        rxisc.Scene = m_Scenes[0];
-                        connector = rxisc;
-                    }
+                    RemoteXInventoryServicesConnector rxisc = new RemoteXInventoryServicesConnector(url);
+                    rxisc.Scene = m_Scenes[0];
+                    connector = rxisc;
 
                     m_connectors.Add(url, connector);
                 }

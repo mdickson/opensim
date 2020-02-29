@@ -37,10 +37,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
-using System.Text;
 using System.Threading;
+using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+
 using PermissionMask = OpenSim.Framework.PermissionMask;
 
 namespace OpenSim.Region.Framework.Scenes
@@ -242,7 +243,7 @@ namespace OpenSim.Region.Framework.Scenes
             set { m_fromUserInventoryItemID = value; }
         }
 
-        public scriptEvents AggregateScriptEvents;
+        public scriptEvents AggregatedScriptEvents;
 
         public Vector3 AttachedPos { get; set; }
 
@@ -1218,7 +1219,7 @@ namespace OpenSim.Region.Framework.Scenes
 
         public scriptEvents ScriptEvents
         {
-            get { return AggregateScriptEvents; }
+            get { return AggregatedScriptEvents; }
         }
 
         public Quaternion SitTargetOrientation
@@ -1254,6 +1255,9 @@ namespace OpenSim.Region.Framework.Scenes
             get { return m_sitTargetOrientation; }
             set { m_sitTargetOrientation = value; }
         }
+
+        public float SitActiveRange { get; set;}
+        public Vector3 StandOffset { get; set;}
 
         public bool Stopped
         {
@@ -2661,9 +2665,10 @@ namespace OpenSim.Region.Framework.Scenes
             detobj.velVector = obj.Velocity;
             detobj.colliderType = 0;
             detobj.groupUUID = obj.GroupID;
-            if (VolumeDetectActive)
-                detobj.linkNumber = 0;
-            else
+            // allow detector link number to be seen, unlike spec
+            //if (VolumeDetectActive)
+            //    detobj.linkNumber = 0;
+            //else
                 detobj.linkNumber = LinkNum;
             return detobj;
         }
@@ -2683,9 +2688,9 @@ namespace OpenSim.Region.Framework.Scenes
             else if (detobj.velVector != Vector3.Zero)
                 detobj.colliderType |= 0x2; //active
             detobj.groupUUID = av.ControllingClient.ActiveGroupId;
-            if (VolumeDetectActive)
-                detobj.linkNumber = 0;
-            else
+            //if (VolumeDetectActive)
+            //    detobj.linkNumber = 0;
+            //else
                 detobj.linkNumber = LinkNum;
 
             return detobj;
@@ -3014,12 +3019,20 @@ namespace OpenSim.Region.Framework.Scenes
         {
             lock (m_scriptEvents)
             {
-                if (m_scriptEvents.ContainsKey(scriptid))
+                if (m_scriptEvents.TryGetValue(scriptid, out scriptEvents ev))
                 {
+                    if((ev & (scriptEvents.anyTarget)) != 0 && ParentGroup != null)
+                            ParentGroup.RemoveScriptTargets(scriptid);
                     m_scriptEvents.Remove(scriptid);
                     aggregateScriptEvents();
                 }
             }
+        }
+
+        public void RemoveScriptTargets(UUID scriptid)
+        {
+            if(ParentGroup != null)
+                ParentGroup.RemoveScriptTargets(scriptid);
         }
 
         /// <summary>
@@ -3997,23 +4010,15 @@ namespace OpenSim.Region.Framework.Scenes
             //            m_log.DebugFormat(
             //                "[SCENE OBJECT PART]: Set script events for script with id {0} on {1}/{2} to {3} in {4}",
             //                scriptid, Name, ParentGroup.Name, events, ParentGroup.Scene.Name);
-
             // scriptEvents oldparts;
             lock (m_scriptEvents)
             {
-                if (m_scriptEvents.ContainsKey(scriptid))
+                if (m_scriptEvents.TryGetValue(scriptid, out scriptEvents ev))
                 {
-                    // oldparts = m_scriptEvents[scriptid];
-
-                    // remove values from aggregated script events
-                    if (m_scriptEvents[scriptid] == (scriptEvents)events)
+                    if (ev == (scriptEvents)events)
                         return;
-                    m_scriptEvents[scriptid] = (scriptEvents)events;
                 }
-                else
-                {
-                    m_scriptEvents.Add(scriptid, (scriptEvents)events);
-                }
+                m_scriptEvents[scriptid] = (scriptEvents) events;
             }
             aggregateScriptEvents();
         }
@@ -5200,11 +5205,11 @@ namespace OpenSim.Region.Framework.Scenes
 
             bool hassound = (!VolumeDetectActive && CollisionSoundType >= 0 && ((Flags & PrimFlags.Physics) != 0));
 
-            scriptEvents CombinedEvents = AggregateScriptEvents;
+            scriptEvents CombinedEvents = AggregatedScriptEvents;
 
             // merge with root part
             if (ParentGroup != null && ParentGroup.RootPart != null)
-                CombinedEvents |= ParentGroup.RootPart.AggregateScriptEvents;
+                CombinedEvents |= ParentGroup.RootPart.AggregatedScriptEvents;
 
             // submit to this part case
             if (VolumeDetectActive)
@@ -5226,35 +5231,34 @@ namespace OpenSim.Region.Framework.Scenes
             }
         }
 
-
         public void aggregateScriptEvents()
         {
             if (ParentGroup == null || ParentGroup.RootPart == null)
                 return;
 
-            AggregateScriptEvents = 0;
+            AggregatedScriptEvents = 0;
 
             // Aggregate script events
             lock (m_scriptEvents)
             {
                 foreach (scriptEvents s in m_scriptEvents.Values)
                 {
-                    AggregateScriptEvents |= s;
+                    AggregatedScriptEvents |= s;
                 }
             }
 
             uint objectflagupdate = 0;
 
             if (
-                ((AggregateScriptEvents & scriptEvents.touch) != 0) ||
-                ((AggregateScriptEvents & scriptEvents.touch_end) != 0) ||
-                ((AggregateScriptEvents & scriptEvents.touch_start) != 0)
+                ((AggregatedScriptEvents & scriptEvents.touch) != 0) ||
+                ((AggregatedScriptEvents & scriptEvents.touch_end) != 0) ||
+                ((AggregatedScriptEvents & scriptEvents.touch_start) != 0)
                 )
             {
                 objectflagupdate |= (uint)PrimFlags.Touch;
             }
 
-            if ((AggregateScriptEvents & scriptEvents.money) != 0)
+            if ((AggregatedScriptEvents & scriptEvents.money) != 0)
             {
                 objectflagupdate |= (uint)PrimFlags.Money;
             }

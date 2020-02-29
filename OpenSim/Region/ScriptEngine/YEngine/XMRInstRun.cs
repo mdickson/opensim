@@ -862,11 +862,10 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         private void ResetLocked(string from)
         {
             m_RunOnePhase = "ResetLocked: releasing controls";
-            ReleaseControls();
+            ReleaseControlsOrPermissions(true);
+            m_Part.CollisionSound = UUID.Zero;
 
             m_RunOnePhase = "ResetLocked: removing script";
-            m_Part.Inventory.GetInventoryItem(m_ItemID).PermsMask = 0;
-            m_Part.Inventory.GetInventoryItem(m_ItemID).PermsGranter = UUID.Zero;
             IUrlModule urlModule = m_Engine.World.RequestModuleInterface<IUrlModule>();
             if (urlModule != null)
                 urlModule.ScriptRemoved(m_ItemID);
@@ -896,6 +895,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             // 'state_entry()' event handler.
             m_RunOnePhase = "ResetLocked: posting default:state_entry() event";
             stateCode = 0;
+            m_Part.RemoveScriptTargets(m_ItemID);
             m_Part.SetScriptEvents(m_ItemID, GetStateEventFlags(0));
             PostEvent(new EventParams("state_entry",
                                       zeroObjectArray,
@@ -907,28 +907,30 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             m_RunOnePhase = "ResetLocked: reset complete";
         }
 
-        private void ReleaseControls()
+        private void ReleaseControlsOrPermissions(bool fullPermissions)
         {
-            if (m_Part != null)
+            if(m_Part != null && m_Part.TaskInventory != null)
             {
-                bool found;
                 int permsMask;
                 UUID permsGranter;
-
-                try
+                m_Part.TaskInventory.LockItemsForWrite(true);
+                if (!m_Part.TaskInventory.TryGetValue(m_ItemID, out TaskInventoryItem item))
                 {
-                    permsGranter = m_Part.TaskInventory[m_ItemID].PermsGranter;
-                    permsMask = m_Part.TaskInventory[m_ItemID].PermsMask;
-                    found = true;
+                    m_Part.TaskInventory.LockItemsForWrite(false);
+                    return;
                 }
-                catch
+                permsGranter = item.PermsGranter;
+                permsMask = item.PermsMask;
+                if(fullPermissions)
                 {
-                    permsGranter = UUID.Zero;
-                    permsMask = 0;
-                    found = false;
+                    item.PermsGranter = UUID.Zero;
+                    item.PermsMask = 0;
                 }
+                else
+                    item.PermsMask = permsMask & ~(ScriptBaseClass.PERMISSION_TAKE_CONTROLS | ScriptBaseClass.PERMISSION_CONTROL_CAMERA);
+                m_Part.TaskInventory.LockItemsForWrite(false);
 
-                if (found && ((permsMask & ScriptBaseClass.PERMISSION_TAKE_CONTROLS) != 0))
+                if ((permsMask & ScriptBaseClass.PERMISSION_TAKE_CONTROLS) != 0)
                 {
                     ScenePresence presence = m_Engine.World.GetScenePresence(permsGranter);
                     if (presence != null)

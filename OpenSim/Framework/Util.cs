@@ -719,6 +719,254 @@ namespace OpenSim.Framework
             }
         }
 
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        static bool IsHexa(char c)
+        {
+            if (c >= '0' && c <= '9')
+                return true;
+            if (c >= 'a' && c <= 'f')
+                return true;
+            if (c >= 'A' && c <= 'F')
+                return true;
+
+            return false;
+        }
+
+        public static List<UUID> GetUUIDsOnString(ref string s, int indx, int len)
+        {
+            var ids = new List<UUID>();
+
+            int endA = indx + len;
+            if(endA > s.Length)
+                endA = s.Length;
+            if (endA - indx < 36)
+                return ids;
+
+            int endB = endA - 26;
+            endA -= 35;
+
+            int idbase;
+            int next;
+            int retry;
+
+            while (indx < endA)
+            {
+                for (; indx < endA; ++indx)
+                {
+                    if (IsHexa(s[indx]))
+                        break;
+                }
+                if (indx == endA)
+                    break;
+
+                idbase = indx;
+                for (; indx < endB; ++indx)
+                {
+                    if (!IsHexa(s[indx]))
+                        break;
+                    if (indx - idbase >= 8)
+                        ++idbase;
+                }
+
+                if (s[indx] != '-')
+                    continue;
+
+                ++indx;
+                retry = indx;
+                next = indx + 4;
+                for (; indx < next; ++indx)
+                {
+                    if (!IsHexa(s[indx]))
+                        break;
+                }
+                if (indx != next)
+                    continue;
+
+                if (s[indx] != '-')
+                {
+                    indx = retry;
+                    continue;
+                }
+
+                ++indx;
+                retry = indx;
+                next = indx + 4;
+                for (; indx < next; ++indx)
+                {
+                    if (!IsHexa(s[indx]))
+                        break;
+                }
+                if (indx != next)
+                    continue;
+
+                if (s[indx] != '-')
+                {
+                    indx = retry;
+                    continue;
+                }
+
+                ++indx;
+                retry = indx;
+                next = indx + 4;
+                for (; indx < next; ++indx)
+                {
+                    if (!IsHexa(s[indx]))
+                        break;
+                }
+                if (indx != next)
+                    continue;
+
+                if (s[indx] != '-')
+                {
+                    indx = retry;
+                    continue;
+                }
+                ++indx;
+                retry = indx;
+
+                next = indx + 12;
+                for (; indx < next; ++indx)
+                {
+                    if (!IsHexa(s[indx]))
+                        break;
+                }
+                if (indx != next)
+                    continue;
+
+                if (UUID.TryParse(s.Substring(idbase, 36), out UUID u))
+                {
+                    ids.Add(u);
+                }
+                ++indx;
+            }
+
+            return ids;
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        static bool IsHexa(byte c)
+        {
+            if (c >= '0' && c <= '9')
+                return true;
+            if (c >= 'a' && c <= 'f')
+                return true;
+            if (c >= 'A' && c <= 'F')
+                return true;
+
+            return false;
+        }
+
+        public static List<UUID> GetUUIDsOnData(byte[] s, int indx, int len)
+        {
+            var ids = new List<UUID>();
+
+            int endA = indx + len;
+            if (endA > s.Length)
+                endA = s.Length;
+            if (endA - indx < 36)
+                return ids;
+
+            int endB = endA - 26;
+            endA -= 35;
+
+            int idbase;
+            int next;
+            int retry;
+
+            while (indx < endA)
+            {
+                for (; indx < endA; ++indx)
+                {
+                    if (IsHexa(s[indx]))
+                        break;
+                }
+                if (indx == endA)
+                    break;
+
+                idbase = indx;
+                for (; indx < endB; ++indx)
+                {
+                    if (!IsHexa(s[indx]))
+                        break;
+                    if (indx - idbase >= 8)
+                        ++idbase;
+                }
+
+                if (s[indx] != '-')
+                    continue;
+
+                ++indx;
+                retry = indx;
+                next = indx + 4;
+                for (; indx < next; ++indx)
+                {
+                    if (!IsHexa(s[indx]))
+                        break;
+                }
+                if (indx != next)
+                    continue;
+
+                if (s[indx] != '-')
+                {
+                    indx = retry;
+                    continue;
+                }
+
+                ++indx;
+                retry = indx;
+                next = indx + 4;
+                for (; indx < next; ++indx)
+                {
+                    if (!IsHexa(s[indx]))
+                        break;
+                }
+                if (indx != next)
+                    continue;
+
+                if (s[indx] != '-')
+                {
+                    indx = retry;
+                    continue;
+                }
+
+                ++indx;
+                retry = indx;
+                next = indx + 4;
+                for (; indx < next; ++indx)
+                {
+                    if (!IsHexa(s[indx]))
+                        break;
+                }
+                if (indx != next)
+                    continue;
+
+                if (s[indx] != '-')
+                {
+                    indx = retry;
+                    continue;
+                }
+                ++indx;
+                retry = indx;
+
+                next = indx + 12;
+                for (; indx < next; ++indx)
+                {
+                    if (!IsHexa(s[indx]))
+                        break;
+                }
+                if (indx != next)
+                    continue;
+
+                if (UUID.TryParse(Encoding.ASCII.GetString(s, idbase, 36), out UUID u))
+                {
+                    ids.Add(u);
+                }
+                ++indx;
+            }
+
+            return ids;
+        }
+
         /// <summary>
         /// Is the platform Windows?
         /// </summary>
@@ -2365,6 +2613,29 @@ namespace OpenSim.Framework
                 }
                 Array.Resize<byte>(ref data, cut + 1);
                 data[cut] = 0;
+            }
+
+            return data;
+        }
+
+        public static byte[] StringToBytesNoTerm(string str, int MaxLength)
+        {
+            if (String.IsNullOrEmpty(str))
+                return Utils.EmptyBytes;
+
+            // Because this is UTF-8 encoding and not ASCII, it's possible we
+            // might have gotten an oversized array even after the string trim
+            byte[] data = UTF8.GetBytes(str);
+
+            if (data.Length > MaxLength)
+            {
+                int cut = MaxLength - 1;
+                if ((data[cut] & 0x80) != 0)
+                {
+                    while (cut > 0 && (data[cut] & 0xc0) != 0xc0)
+                        cut--;
+                }
+                Array.Resize<byte>(ref data, cut);
             }
 
             return data;
