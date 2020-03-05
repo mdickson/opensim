@@ -2074,7 +2074,12 @@ namespace OpenSim.Region.Framework.Scenes
                 return;
 
             if (PhysicsShapeType == (byte)PhysShapeType.none)
-                return;
+            {
+                if(ParentID == 0)
+                    m_physicsShapeType = DefaultPhysicsShapeType();
+                else
+                    return;
+            }
 
             bool isPhysical = (_ObjectFlags & (uint)PrimFlags.Physics) != 0;
             bool isPhantom = (_ObjectFlags & (uint)PrimFlags.Phantom) != 0;
@@ -5687,6 +5692,24 @@ namespace OpenSim.Region.Framework.Scenes
                 }
             }
             return false;
+        }
+
+        public int ClearObjectAnimations()
+        {
+            int ret = 0;
+            if(Animations != null)
+            {
+                ret = Animations.Count;
+                Animations.Clear();
+                AnimationsNames.Clear();
+            }
+            else
+            {
+                Animations = new Dictionary<UUID, int>();
+                AnimationsNames = new Dictionary<UUID, string>();
+            }
+            ScheduleUpdate(PrimUpdateFlags.Animations);
+            return ret;
         }
 
         public int GetAnimations(out UUID[] ids, out int[] seqs)

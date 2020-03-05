@@ -141,7 +141,7 @@ namespace OpenSim.Tests.Common
         public event SpinStop OnSpinStop;
         public event ViewerEffectEventHandler OnViewerEffect;
 
-        public event FetchInventory OnAgentDataUpdateRequest;
+        public event AgentDataUpdate OnAgentDataUpdateRequest;
         public event TeleportLocationRequest OnSetStartLocationRequest;
 
         public event UpdateShape OnUpdatePrimShape;
@@ -583,7 +583,7 @@ namespace OpenSim.Tests.Common
         {
         }
 
-        public virtual void SendAvatarPickerReply(AvatarPickerReplyAgentDataArgs AgentData, List<AvatarPickerReplyDataArgs> Data)
+        public virtual void SendAvatarPickerReply(UUID QueryID, List<UserData> users)
         {
         }
 
@@ -791,12 +791,13 @@ namespace OpenSim.Tests.Common
                                                        List<InventoryItemBase> items,
                                                        List<InventoryFolderBase> folders,
                                                        int version,
+                                                       int descendents,
                                                        bool fetchFolders,
                                                        bool fetchItems)
         {
         }
 
-        public virtual void SendInventoryItemDetails(UUID ownerID, InventoryItemBase item)
+        public virtual void SendInventoryItemDetails(InventoryItemBase[] items)
         {
         }
 

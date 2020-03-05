@@ -131,7 +131,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         public event TeleportCancel OnTeleportCancel;
         public event RequestAvatarProperties OnRequestAvatarProperties;
         public event SetAlwaysRun OnSetAlwaysRun;
-        public event FetchInventory OnAgentDataUpdateRequest;
+        public event AgentDataUpdate OnAgentDataUpdateRequest;
         public event TeleportLocationRequest OnSetStartLocationRequest;
         public event UpdateAvatarProperties OnUpdateAvatarProperties;
         public event CreateNewInventoryItem OnCreateNewInventoryItem;
@@ -822,8 +822,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
             // allow access override (was taxfree)
             if (!Scene.RegionInfo.EstateSettings.TaxFree) // this is now wrong means !ALLOW_ACCESS_OVERRIDE
-                //flags |= RegionFlags.AllowParcelAccessOverride;
-                flags |= RegionFlags.TaxFree;
+                flags |= RegionFlags.AllowParcelAccessOverride;
 
             if (Scene.RegionInfo.RegionSettings.BlockTerraform)
                 flags |= RegionFlags.BlockTerraform;
@@ -2322,7 +2321,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         /// <param name="fetchFolders">Do we need to send folder information?</param>
         /// <param name="fetchItems">Do we need to send item information?</param>
         public void SendInventoryFolderDetails(UUID ownerID, UUID folderID, List<InventoryItemBase> items,
-                                               List<InventoryFolderBase> folders, int version,
+                                               List<InventoryFolderBase> folders, int version, int descendents,
                                                bool fetchFolders, bool fetchItems)
         {
             // An inventory descendents packet consists of a single agent section and an inventory details
@@ -2343,7 +2342,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             // Handle empty folders
             //
             if (totalItems == 0 && totalFolders == 0)
-                currentPacket = CreateInventoryDescendentsPacket(ownerID, folderID, version, items.Count + folders.Count, 0, 0);
+                currentPacket = CreateInventoryDescendentsPacket(ownerID, folderID, version, descendents, 0, 0);
 
             // To preserve SL compatibility, we will NOT combine folders and items in one packet
             //
@@ -2362,7 +2361,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                             itemsToSend = MAX_ITEMS_PER_PACKET;
                     }
 
-                    currentPacket = CreateInventoryDescendentsPacket(ownerID, folderID, version, items.Count + folders.Count, foldersToSend, itemsToSend);
+                    currentPacket = CreateInventoryDescendentsPacket(ownerID, folderID, version, descendents, foldersToSend, itemsToSend);
                 }
 
                 if (foldersToSend-- > 0)
@@ -2500,50 +2499,74 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             return descend;
         }
 
-        public void SendInventoryItemDetails(UUID ownerID, InventoryItemBase item)
+        public void SendInventoryItemDetails(InventoryItemBase[] items)
         {
             // Fudge this value. It's only needed to make the CRC anyway
             const uint FULL_MASK_PERMISSIONS = (uint)0x7fffffff;
 
             FetchInventoryReplyPacket inventoryReply = (FetchInventoryReplyPacket)PacketPool.Instance.GetPacket(PacketType.FetchInventoryReply);
-            // TODO: don't create new blocks if recycling an old packet
             inventoryReply.AgentData.AgentID = AgentId;
-            inventoryReply.InventoryData = new FetchInventoryReplyPacket.InventoryDataBlock[1];
-            inventoryReply.InventoryData[0] = new FetchInventoryReplyPacket.InventoryDataBlock();
-            inventoryReply.InventoryData[0].ItemID = item.ID;
-            inventoryReply.InventoryData[0].AssetID = item.AssetID;
-            inventoryReply.InventoryData[0].CreatorID = item.CreatorIdAsUuid;
-            inventoryReply.InventoryData[0].BaseMask = item.BasePermissions;
-            inventoryReply.InventoryData[0].CreationDate = item.CreationDate;
 
-            inventoryReply.InventoryData[0].Description = Util.StringToBytes256(item.Description);
-            inventoryReply.InventoryData[0].EveryoneMask = item.EveryOnePermissions;
-            inventoryReply.InventoryData[0].FolderID = item.Folder;
-            inventoryReply.InventoryData[0].InvType = (sbyte)item.InvType;
-            inventoryReply.InventoryData[0].Name = Util.StringToBytes256(item.Name);
-            inventoryReply.InventoryData[0].NextOwnerMask = item.NextPermissions;
-            inventoryReply.InventoryData[0].OwnerID = item.Owner;
-            inventoryReply.InventoryData[0].OwnerMask = item.CurrentPermissions;
-            inventoryReply.InventoryData[0].Type = (sbyte)item.AssetType;
+            int total = items.Length;
+            int count = 0;
+            for(int i = 0; i < items.Length; ++i)
+            {
+                if(count == 0)
+                {
+                    if(total < 10)
+                    {
+                        inventoryReply.InventoryData = new FetchInventoryReplyPacket.InventoryDataBlock[total];
+                        total = 0;
+                    }
+                    else
+                    {
+                        inventoryReply.InventoryData = new FetchInventoryReplyPacket.InventoryDataBlock[10];
+                        total -= 10;
+                    }
+                }
 
-            inventoryReply.InventoryData[0].GroupID = item.GroupID;
-            inventoryReply.InventoryData[0].GroupOwned = item.GroupOwned;
-            inventoryReply.InventoryData[0].GroupMask = item.GroupPermissions;
-            inventoryReply.InventoryData[0].Flags = item.Flags;
-            inventoryReply.InventoryData[0].SalePrice = item.SalePrice;
-            inventoryReply.InventoryData[0].SaleType = item.SaleType;
+                inventoryReply.InventoryData[count] = new FetchInventoryReplyPacket.InventoryDataBlock();
+                FetchInventoryReplyPacket.InventoryDataBlock data = inventoryReply.InventoryData[count];
 
-            inventoryReply.InventoryData[0].CRC =
-                Helpers.InventoryCRC(
-                    1000, 0, inventoryReply.InventoryData[0].InvType,
-                    inventoryReply.InventoryData[0].Type, inventoryReply.InventoryData[0].AssetID,
-                    inventoryReply.InventoryData[0].GroupID, 100,
-                    inventoryReply.InventoryData[0].OwnerID, inventoryReply.InventoryData[0].CreatorID,
-                    inventoryReply.InventoryData[0].ItemID, inventoryReply.InventoryData[0].FolderID,
-                    FULL_MASK_PERMISSIONS, 1, FULL_MASK_PERMISSIONS, FULL_MASK_PERMISSIONS,
-                    FULL_MASK_PERMISSIONS);
-            inventoryReply.Header.Zerocoded = true;
-            OutPacket(inventoryReply, ThrottleOutPacketType.Asset);
+                data.ItemID = items[i].ID;
+                data.AssetID = items[i].AssetID;
+                data.CreatorID = items[i].CreatorIdAsUuid;
+                data.BaseMask = items[i].BasePermissions;
+                data.CreationDate = items[i].CreationDate;
+
+                data.Description = Util.StringToBytes256(items[i].Description);
+                data.EveryoneMask = items[i].EveryOnePermissions;
+                data.FolderID = items[i].Folder;
+                data.InvType = (sbyte)items[i].InvType;
+                data.Name = Util.StringToBytes256(items[i].Name);
+                data.NextOwnerMask = items[i].NextPermissions;
+                data.OwnerID = items[i].Owner;
+                data.OwnerMask = items[i].CurrentPermissions;
+                data.Type = (sbyte)items[i].AssetType;
+
+                data.GroupID = items[i].GroupID;
+                data.GroupOwned = items[i].GroupOwned;
+                data.GroupMask = items[i].GroupPermissions;
+                data.Flags = items[i].Flags;
+                data.SalePrice = items[i].SalePrice;
+                data.SaleType = items[i].SaleType;
+
+                data.CRC = Helpers.InventoryCRC(
+                        1000, 0, data.InvType, data.Type, data.AssetID,
+                        data.GroupID, 100, data.OwnerID, data.CreatorID,
+                        data.ItemID, data.FolderID, FULL_MASK_PERMISSIONS, 1, FULL_MASK_PERMISSIONS, FULL_MASK_PERMISSIONS,
+                        FULL_MASK_PERMISSIONS);
+
+                ++count;
+                if(count == 10 || total == 0)
+                {
+                    inventoryReply.Header.Zerocoded = true;
+                    OutPacket(inventoryReply, ThrottleOutPacketType.Asset);
+                    if(total == 0)
+                        break;
+                    count = 0;
+                }
+            }
         }
 
         protected void SendBulkUpdateInventoryFolder(InventoryFolderBase folderBase)
@@ -2979,24 +3002,77 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             OutPacket(economyData, ThrottleOutPacketType.Task);
         }
 
-        public void SendAvatarPickerReply(AvatarPickerReplyAgentDataArgs AgentData, List<AvatarPickerReplyDataArgs> Data)
+        static private readonly byte[] AvatarPickerReplyHeader = new byte[] {
+                Helpers.MSG_RELIABLE,
+                0, 0, 0, 0, // sequence number
+                0, // extra
+                0xff, 0xff, 0, 28 // ID 28 (low frequency bigendian)
+                };
+
+        public void SendAvatarPickerReply(UUID QueryID, List<UserData> users)
         {
-            //construct the AvatarPickerReply packet.
-            AvatarPickerReplyPacket replyPacket = new AvatarPickerReplyPacket();
-            replyPacket.AgentData.AgentID = AgentData.AgentID;
-            replyPacket.AgentData.QueryID = AgentData.QueryID;
-            //int i = 0;
-            List<AvatarPickerReplyPacket.DataBlock> data_block = new List<AvatarPickerReplyPacket.DataBlock>();
-            foreach (AvatarPickerReplyDataArgs arg in Data)
+            UDPPacketBuffer buf = m_udpServer.GetNewUDPBuffer(m_udpClient.RemoteEndPoint);
+            byte[] data = buf.Data;
+
+            //setup header
+            Buffer.BlockCopy(AvatarPickerReplyHeader, 0, data, 0, 10);
+            AgentId.ToBytes(data, 10); //26
+            QueryID.ToBytes(data, 26); //42
+
+            if (users.Count == 0)
             {
-                AvatarPickerReplyPacket.DataBlock db = new AvatarPickerReplyPacket.DataBlock();
-                db.AvatarID = arg.AvatarID;
-                db.FirstName = arg.FirstName;
-                db.LastName = arg.LastName;
-                data_block.Add(db);
+                data[42] = 0;
+                buf.DataLength = 43;
+                m_udpServer.SendUDPPacket(m_udpClient, buf, ThrottleOutPacketType.Task);
+                return;
             }
-            replyPacket.Data = data_block.ToArray();
-            OutPacket(replyPacket, ThrottleOutPacketType.Task);
+
+            int pos = 43;
+            int count = 0;
+            for(int u = 0; u < users.Count; ++u)
+            {
+                UserData user = users[u];
+                user.Id.ToBytes(data,pos);
+                pos+= 16;
+                byte[] tmp = Utils.StringToBytes(user.FirstName);
+                data[pos++] = (byte)tmp.Length;
+                if(tmp.Length > 0)
+                {
+                    Buffer.BlockCopy(tmp, 0, data, pos, tmp.Length);
+                    pos += tmp.Length;
+                }
+                tmp = Utils.StringToBytes(user.LastName);
+                data[pos++] = (byte)tmp.Length;
+                if (tmp.Length > 0)
+                {
+                    Buffer.BlockCopy(tmp, 0, data, pos, tmp.Length);
+                    pos += tmp.Length;
+                }
+                ++count;
+
+                if (pos >= LLUDPServer.MAXPAYLOAD - 120)
+                {
+                    data[42] = (byte)count;
+                    buf.DataLength = pos;
+                    m_udpServer.SendUDPPacket(m_udpClient, buf, ThrottleOutPacketType.Task);
+                    if (u < users.Count - 1)
+                    {
+                        UDPPacketBuffer newbuf = m_udpServer.GetNewUDPBuffer(m_udpClient.RemoteEndPoint);
+                        byte[] newdata = newbuf.Data;
+                        Buffer.BlockCopy(data, 0, newdata, 0, 42);
+                        buf = newbuf;
+                        data = newdata;
+                        pos = 43;
+                    }
+                    count = 0;
+                }
+            }
+            if(count > 0)
+            {
+                data[42] = (byte)count;
+                buf.DataLength = pos;
+                m_udpServer.SendUDPPacket(m_udpClient, buf, ThrottleOutPacketType.Task);
+            }
         }
 
         public void SendAgentDataUpdate(UUID agentid, UUID activegroupid, string firstname, string lastname, ulong grouppowers, string groupname, string grouptitle)
@@ -4761,10 +4837,8 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             // because we are requeuing the list of updates. They will be resent in new packets
             // with the most recent state and priority.
             m_udpClient.NeedAcks.Remove(oPacket.SequenceNumber);
-            if(oPacket.Buffer == null)
+            if (oPacket.Buffer == null)
                 return;
-
-            m_udpClient.FreeUDPBuffer(oPacket.Buffer);
 
             // Count this as a resent packet since we are going to requeue all of the updates contained in it
             Interlocked.Increment(ref m_udpClient.PacketsResent);
@@ -4987,7 +5061,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         continue;
                     }
 
-                    if (updateFlags == PrimUpdateFlags.Animations)
+                    if (updateFlags.HasFlag(PrimUpdateFlags.Animations))
                     {
                         if (m_SupportObjectAnimations && part.Animations != null)
                         {
@@ -4996,7 +5070,6 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                             ObjectAnimationUpdates.Add(part);
                             maxUpdatesBytes -= 20 * part.Animations.Count + 24;
                         }
-                        continue;
                     }
 
                     if (viewerCache)
@@ -5152,16 +5225,6 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                     {
                         SceneObjectPart part = (SceneObjectPart)eu.Entity;
                         shouldCreateSelected = part.CreateSelected;
-                        if (eu.Flags.HasFlag(PrimUpdateFlags.Animations))
-                        {
-                            if (m_SupportObjectAnimations && part.Animations != null)
-                            {
-                                if (ObjectAnimationUpdates == null)
-                                    ObjectAnimationUpdates = new List<SceneObjectPart>();
-                                ObjectAnimationUpdates.Add(part);
-                            }
-                            eu.Flags &= ~PrimUpdateFlags.Animations;
-                        }
                         CreatePrimUpdateBlock(part, mysp, zc);
                     }
                     if (zc.Position < LLUDPServer.MAXPAYLOAD - 300)
@@ -5317,17 +5380,6 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         continue;
 
                     shouldCreateSelected = sop.CreateSelected;
-
-                    if (eu.Flags.HasFlag(PrimUpdateFlags.Animations))
-                    {
-                        if (m_SupportObjectAnimations && sop.Animations != null)
-                        {
-                            if (ObjectAnimationUpdates == null)
-                                ObjectAnimationUpdates = new List<SceneObjectPart>();
-                            ObjectAnimationUpdates.Add(sop);
-                        }
-                        eu.Flags &= ~PrimUpdateFlags.Animations;
-                    }
 
                     lastpos = zc.Position;
                     lastzc = zc.ZeroCount;
@@ -6587,9 +6639,10 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
             LLSDxmlEncode.AddEndMapAndArray(sb);
 
+            bool allowenvovr = Scene.RegionInfo.EstateSettings.AllowEnviromentOverride;
             LLSDxmlEncode.AddArrayAndMap("ParcelEnvironmentBlock", sb);
-            LLSDxmlEncode.AddElem("ParcelEnvironmentVersion", -1, sb);
-            LLSDxmlEncode.AddElem("RegionAllowEnvironmentOverride", true, sb);
+            LLSDxmlEncode.AddElem("ParcelEnvironmentVersion", allowenvovr ? -1: -1, sb);
+            LLSDxmlEncode.AddElem("RegionAllowEnvironmentOverride", allowenvovr, sb);
             LLSDxmlEncode.AddEndMapAndArray(sb);
 
             bool accessovr = !Scene.RegionInfo.EstateSettings.TaxFree;
@@ -8482,7 +8535,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 catch (Exception e)
                 {
                     m_log.ErrorFormat(
-                        "[LLCLIENTVIEW]: Exeception when handling generic message {0}{1}", e.Message, e.StackTrace);
+                        "[LLCLIENTVIEW]: Exception when handling generic message {0}{1}", e.Message, e.StackTrace);
                 }
             }
         }
@@ -10150,11 +10203,18 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             if (FetchInventoryx.AgentData.SessionID != SessionId || FetchInventoryx.AgentData.AgentID != AgentId)
                 return;
 
-            for (int i = 0; i < FetchInventoryx.InventoryData.Length; i++)
+            FetchInventoryPacket.InventoryDataBlock[] data = FetchInventoryx.InventoryData;
+
+            UUID[] items = new UUID[data.Length];
+            UUID[]  owners = new UUID[data.Length];
+
+            for (int i = 0; i < data.Length; ++i)
             {
-                OnFetchInventory?.Invoke(this, FetchInventoryx.InventoryData[i].ItemID,
-                                        FetchInventoryx.InventoryData[i].OwnerID);
+                items[i] =data[i].ItemID;
+                owners[i] = data[i].OwnerID;
             }
+
+            OnFetchInventory?.Invoke(this, items, owners);
         }
 
         private void HandleFetchInventoryDescendents(Packet Pack)
@@ -10163,9 +10223,10 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             if (Fetch.AgentData.SessionID != SessionId || Fetch.AgentData.AgentID != AgentId)
                 return;
 
-            OnFetchInventoryDescendents?.Invoke(this, Fetch.InventoryData.FolderID, Fetch.InventoryData.OwnerID,
-                                                Fetch.InventoryData.FetchFolders, Fetch.InventoryData.FetchItems,
-                                                Fetch.InventoryData.SortOrder);
+            FetchInventoryDescendentsPacket.InventoryDataBlock data = Fetch.InventoryData;
+            OnFetchInventoryDescendents?.Invoke(this, data.FolderID, data.OwnerID,
+                                                data.FetchFolders, data.FetchItems,
+                                                data.SortOrder);
         }
 
         private void HandlePurgeInventoryDescendents(Packet Pack)
