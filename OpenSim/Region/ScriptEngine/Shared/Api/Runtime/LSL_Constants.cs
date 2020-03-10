@@ -34,7 +34,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
     public partial class ScriptBaseClass
     {
         // SCRIPTS CONSTANTS
-        public static readonly LSLInteger OS_APIVERSION = 10;
+        public static readonly LSLInteger OS_APIVERSION = 11;
 
         public static readonly LSLInteger TRUE = 1;
         public static readonly LSLInteger FALSE = 0;
@@ -534,11 +534,11 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
         public const int MASK_EVERYONE = 3;
         public const int MASK_NEXT = 4;
 
-        public const int PERM_TRANSFER = 8192;
-        public const int PERM_MODIFY = 16384;
-        public const int PERM_COPY = 32768;
-        public const int PERM_MOVE = 524288;
-        public const int PERM_ALL = 2147483647;
+        public const int PERM_TRANSFER = 0x2000;
+        public const int PERM_MODIFY = 0x4000;
+        public const int PERM_COPY = 0x8000;
+        public const int PERM_MOVE = 0x80000;
+        public const int PERM_ALL = 0x7fffffff;
 
         public const int PARCEL_MEDIA_COMMAND_STOP = 0;
         public const int PARCEL_MEDIA_COMMAND_PAUSE = 1;

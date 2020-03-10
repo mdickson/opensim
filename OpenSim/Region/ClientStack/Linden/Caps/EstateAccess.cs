@@ -130,12 +130,12 @@ namespace OpenSim.Region.ClientStack.Linden
                 new RestHTTPHandler(
                     "GET",
                     capUrl,
-                    httpMethod => ProcessRequest(httpMethod, agentID, caps),
-                    "EstateAccess",
+                    httpMethod => ProcessGetRequest(httpMethod, agentID, caps),
+                    "EstateAccessGet",
                     agentID.ToString())); ;
         }
 
-        public Hashtable ProcessRequest(Hashtable request, UUID AgentId, Caps cap)
+        public Hashtable ProcessGetRequest(Hashtable request, UUID AgentId, Caps cap)
         {
             Hashtable responsedata = new Hashtable();
             responsedata["int_response_code"] = 200; //501; //410; //404;
@@ -180,6 +180,8 @@ namespace OpenSim.Region.ClientStack.Linden
                 }
                 LLSDxmlEncode.AddEndArray(sb);
             }
+            else
+                LLSDxmlEncode.AddEmptyArray("AllowedAgents", sb);
 
             if (groups != null && groups.Length > 0)
             {
@@ -195,6 +197,8 @@ namespace OpenSim.Region.ClientStack.Linden
                 }
                 LLSDxmlEncode.AddEndArray(sb);
             }
+            else
+                LLSDxmlEncode.AddEmptyArray("AllowedGroups", sb);
 
             if (EstateBans != null && EstateBans.Length > 0)
             {
@@ -217,6 +221,8 @@ namespace OpenSim.Region.ClientStack.Linden
                 }
                 LLSDxmlEncode.AddEndArray(sb);
             }
+            else
+                LLSDxmlEncode.AddEmptyArray("BannedAgents", sb);
 
             if (managers != null && managers.Length > 0)
             {
@@ -229,6 +235,8 @@ namespace OpenSim.Region.ClientStack.Linden
                 }
                 LLSDxmlEncode.AddEndArray(sb);
             }
+            else
+                LLSDxmlEncode.AddEmptyArray("Managers", sb);
 
             LLSDxmlEncode.AddEndMap(sb);
             responsedata["str_response_string"] = LLSDxmlEncode.End(sb);

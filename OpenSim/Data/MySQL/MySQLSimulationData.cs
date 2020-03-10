@@ -151,16 +151,15 @@ namespace OpenSim.Data.MySQL
                                     "Name, Text, Description, " +
                                     "SitName, TouchName, ObjectFlags, " +
                                     "OwnerMask, NextOwnerMask, GroupMask, " +
-                                    "EveryoneMask, BaseMask, PositionX, " +
-                                    "PositionY, PositionZ, GroupPositionX, " +
-                                    "GroupPositionY, GroupPositionZ, VelocityX, " +
-                                    "VelocityY, VelocityZ, AngularVelocityX, " +
-                                    "AngularVelocityY, AngularVelocityZ, " +
-                                    "AccelerationX, AccelerationY, " +
-                                    "AccelerationZ, RotationX, " +
-                                    "RotationY, RotationZ, " +
-                                    "RotationW, SitTargetOffsetX, " +
-                                    "SitTargetOffsetY, SitTargetOffsetZ, " +
+                                    "EveryoneMask, BaseMask, " +
+                                    "PositionX, PositionY, PositionZ, " +
+                                    "GroupPositionX, GroupPositionY, GroupPositionZ, " +
+                                    "VelocityX, VelocityY, VelocityZ, " +
+                                    "AngularVelocityX, AngularVelocityY, AngularVelocityZ, " +
+                                    "AccelerationX, AccelerationY, AccelerationZ, " +
+                                    "standtargetx, standtargety, standtargetz, " +
+                                    "RotationX, RotationY, RotationZ, RotationW, " +
+                                    "SitTargetOffsetX, SitTargetOffsetY, SitTargetOffsetZ, " +
                                     "SitTargetOrientW, SitTargetOrientX, " +
                                     "SitTargetOrientY, SitTargetOrientZ, " +
                                     "RegionUUID, CreatorID, " +
@@ -186,20 +185,19 @@ namespace OpenSim.Data.MySQL
                                     "AttachedPosY, AttachedPosZ, " +
                                     "PhysicsShapeType, Density, GravityModifier, " +
                                     "Friction, Restitution, Vehicle, PhysInertia, DynAttrs, " +
-                                    "RotationAxisLocks, sopanims" +
+                                    "RotationAxisLocks, sopanims, sitactrange" +
                                     ") values (" + "?UUID, " +
                                     "?CreationDate, ?Name, ?Text, " +
                                     "?Description, ?SitName, ?TouchName, " +
                                     "?ObjectFlags, ?OwnerMask, ?NextOwnerMask, " +
                                     "?GroupMask, ?EveryoneMask, ?BaseMask, " +
                                     "?PositionX, ?PositionY, ?PositionZ, " +
-                                    "?GroupPositionX, ?GroupPositionY, " +
-                                    "?GroupPositionZ, ?VelocityX, " +
-                                    "?VelocityY, ?VelocityZ, ?AngularVelocityX, " +
-                                    "?AngularVelocityY, ?AngularVelocityZ, " +
-                                    "?AccelerationX, ?AccelerationY, " +
-                                    "?AccelerationZ, ?RotationX, " +
-                                    "?RotationY, ?RotationZ, " +
+                                    "?GroupPositionX, ?GroupPositionY, ?GroupPositionZ, " +
+                                    "?VelocityX, ?VelocityY, ?VelocityZ, "+
+                                    "?AngularVelocityX, ?AngularVelocityY, ?AngularVelocityZ, " +
+                                    "?AccelerationX, ?AccelerationY, ?AccelerationZ, " +
+                                    "?standtargetx, ?standtargety, ?standtargetz, " +
+                                    "?RotationX, ?RotationY, ?RotationZ, " +
                                     "?RotationW, ?SitTargetOffsetX, " +
                                     "?SitTargetOffsetY, ?SitTargetOffsetZ, " +
                                     "?SitTargetOrientW, ?SitTargetOrientX, " +
@@ -223,7 +221,7 @@ namespace OpenSim.Data.MySQL
                                     "?AttachedPosY, ?AttachedPosZ, " +
                                     "?PhysicsShapeType, ?Density, ?GravityModifier, " +
                                     "?Friction, ?Restitution, ?Vehicle, ?PhysInertia, ?DynAttrs," +
-                                    "?RotationAxisLocks, ?sopanims)";
+                                    "?RotationAxisLocks, ?sopanims, ?sitactrange)";
 
                             FillPrimCommand(cmd, prim, obj.UUID, regionUUID);
 
@@ -1349,48 +1347,56 @@ namespace OpenSim.Data.MySQL
 
             // Vectors
             prim.OffsetPosition = new Vector3(
-                (float)(double)row["PositionX"],
-                (float)(double)row["PositionY"],
-                (float)(double)row["PositionZ"]
+                (float)row["PositionX"],
+                (float)row["PositionY"],
+                (float)row["PositionZ"]
                 );
             prim.GroupPosition = new Vector3(
-                (float)(double)row["GroupPositionX"],
-                (float)(double)row["GroupPositionY"],
-                (float)(double)row["GroupPositionZ"]
+                (float)row["GroupPositionX"],
+                (float)row["GroupPositionY"],
+                (float)row["GroupPositionZ"]
                 );
             prim.Velocity = new Vector3(
-                (float)(double)row["VelocityX"],
-                (float)(double)row["VelocityY"],
-                (float)(double)row["VelocityZ"]
+                (float)row["VelocityX"],
+                (float)row["VelocityY"],
+                (float)row["VelocityZ"]
                 );
             prim.AngularVelocity = new Vector3(
-                (float)(double)row["AngularVelocityX"],
-                (float)(double)row["AngularVelocityY"],
-                (float)(double)row["AngularVelocityZ"]
+                (float)row["AngularVelocityX"],
+                (float)row["AngularVelocityY"],
+                (float)row["AngularVelocityZ"]
                 );
             prim.Acceleration = new Vector3(
-                (float)(double)row["AccelerationX"],
-                (float)(double)row["AccelerationY"],
-                (float)(double)row["AccelerationZ"]
+                (float)row["AccelerationX"],
+                (float)row["AccelerationY"],
+                (float)row["AccelerationZ"]
                 );
             // quaternions
             prim.RotationOffset = new Quaternion(
-                (float)(double)row["RotationX"],
-                (float)(double)row["RotationY"],
-                (float)(double)row["RotationZ"],
-                (float)(double)row["RotationW"]
+                (float)row["RotationX"],
+                (float)row["RotationY"],
+                (float)row["RotationZ"],
+                (float)row["RotationW"]
                 );
             prim.SitTargetPositionLL = new Vector3(
-                (float)(double)row["SitTargetOffsetX"],
-                (float)(double)row["SitTargetOffsetY"],
-                (float)(double)row["SitTargetOffsetZ"]
+                (float)row["SitTargetOffsetX"],
+                (float)row["SitTargetOffsetY"],
+                (float)row["SitTargetOffsetZ"]
                 );
             prim.SitTargetOrientationLL = new Quaternion(
-                (float)(double)row["SitTargetOrientX"],
-                (float)(double)row["SitTargetOrientY"],
-                (float)(double)row["SitTargetOrientZ"],
-                (float)(double)row["SitTargetOrientW"]
+                (float)row["SitTargetOrientX"],
+                (float)row["SitTargetOrientY"],
+                (float)row["SitTargetOrientZ"],
+                (float)row["SitTargetOrientW"]
                 );
+
+            prim.StandOffset = new Vector3(
+                (float)row["standtargetx"],
+                (float)row["standtargety"],
+                (float)row["standtargetz"]
+                );
+
+            prim.SitActiveRange = (float)row["sitactrange"];
 
             prim.PayPrice[0] = (int)row["PayPrice"];
             prim.PayPrice[1] = (int)row["PayButton1"];
@@ -1399,7 +1405,7 @@ namespace OpenSim.Data.MySQL
             prim.PayPrice[4] = (int)row["PayButton4"];
 
             prim.Sound = DBGuid.FromDB(row["LoopedSound"].ToString());
-            prim.SoundGain = (float)(double)row["LoopedSoundGain"];
+            prim.SoundGain = (float)row["LoopedSoundGain"];
             if (prim.Sound != UUID.Zero)
                 prim.SoundFlags = 1; // If it's persisted at all, it's looped
             else
@@ -1411,21 +1417,21 @@ namespace OpenSim.Data.MySQL
                 prim.ParticleSystem = (byte[])row["ParticleSystem"];
 
             prim.AngularVelocity = new Vector3(
-                (float)(double)row["OmegaX"],
-                (float)(double)row["OmegaY"],
-                (float)(double)row["OmegaZ"]
+                (float)row["OmegaX"],
+                (float)row["OmegaY"],
+                (float)row["OmegaZ"]
                 );
 
             prim.SetCameraEyeOffset(new Vector3(
-                (float)(double)row["CameraEyeOffsetX"],
-                (float)(double)row["CameraEyeOffsetY"],
-                (float)(double)row["CameraEyeOffsetZ"]
+                (float)row["CameraEyeOffsetX"],
+                (float)row["CameraEyeOffsetY"],
+                (float)row["CameraEyeOffsetZ"]
                 ));
 
             prim.SetCameraAtOffset(new Vector3(
-                (float)(double)row["CameraAtOffsetX"],
-                (float)(double)row["CameraAtOffsetY"],
-                (float)(double)row["CameraAtOffsetZ"]
+                (float)row["CameraAtOffsetX"],
+                (float)row["CameraAtOffsetY"],
+                (float)row["CameraAtOffsetZ"]
                 ));
 
             prim.SetForceMouselook((sbyte)row["ForceMouselook"] != 0);
@@ -1454,9 +1460,9 @@ namespace OpenSim.Data.MySQL
             if (!(row["AttachedPosX"] is System.DBNull))
             {
                 prim.AttachedPos = new Vector3(
-                    (float)(double)row["AttachedPosX"],
-                    (float)(double)row["AttachedPosY"],
-                    (float)(double)row["AttachedPosZ"]
+                    (float)row["AttachedPosX"],
+                    (float)row["AttachedPosY"],
+                    (float)row["AttachedPosZ"]
                     );
             }
 
@@ -1479,10 +1485,10 @@ namespace OpenSim.Data.MySQL
             }
 
             prim.PhysicsShapeType = (byte)Convert.ToInt32(row["PhysicsShapeType"].ToString());
-            prim.Density = (float)(double)row["Density"];
-            prim.GravityModifier = (float)(double)row["GravityModifier"];
-            prim.Friction = (float)(double)row["Friction"];
-            prim.Restitution = (float)(double)row["Restitution"];
+            prim.Density = (float)row["Density"];
+            prim.GravityModifier = (float)row["GravityModifier"];
+            prim.Friction = (float)row["Friction"];
+            prim.Restitution = (float)row["Restitution"];
             prim.RotationAxisLocks = (byte)Convert.ToInt32(row["RotationAxisLocks"].ToString());
 
             SOPVehicle vehicle = null;
@@ -1511,6 +1517,8 @@ namespace OpenSim.Data.MySQL
             {
                 prim.Animations = null;
             }
+
+            prim.SitActiveRange = (float)row["sitactrange"];
 
             return prim;
         }
@@ -1753,38 +1761,43 @@ namespace OpenSim.Data.MySQL
             cmd.Parameters.AddWithValue("EveryoneMask", prim.EveryoneMask);
             cmd.Parameters.AddWithValue("BaseMask", prim.BaseMask);
             // vectors
-            cmd.Parameters.AddWithValue("PositionX", (double)prim.OffsetPosition.X);
-            cmd.Parameters.AddWithValue("PositionY", (double)prim.OffsetPosition.Y);
-            cmd.Parameters.AddWithValue("PositionZ", (double)prim.OffsetPosition.Z);
-            cmd.Parameters.AddWithValue("GroupPositionX", (double)prim.GroupPosition.X);
-            cmd.Parameters.AddWithValue("GroupPositionY", (double)prim.GroupPosition.Y);
-            cmd.Parameters.AddWithValue("GroupPositionZ", (double)prim.GroupPosition.Z);
-            cmd.Parameters.AddWithValue("VelocityX", (double)prim.Velocity.X);
-            cmd.Parameters.AddWithValue("VelocityY", (double)prim.Velocity.Y);
-            cmd.Parameters.AddWithValue("VelocityZ", (double)prim.Velocity.Z);
-            cmd.Parameters.AddWithValue("AngularVelocityX", (double)prim.AngularVelocity.X);
-            cmd.Parameters.AddWithValue("AngularVelocityY", (double)prim.AngularVelocity.Y);
-            cmd.Parameters.AddWithValue("AngularVelocityZ", (double)prim.AngularVelocity.Z);
-            cmd.Parameters.AddWithValue("AccelerationX", (double)prim.Acceleration.X);
-            cmd.Parameters.AddWithValue("AccelerationY", (double)prim.Acceleration.Y);
-            cmd.Parameters.AddWithValue("AccelerationZ", (double)prim.Acceleration.Z);
+            cmd.Parameters.AddWithValue("PositionX", prim.OffsetPosition.X);
+            cmd.Parameters.AddWithValue("PositionY", prim.OffsetPosition.Y);
+            cmd.Parameters.AddWithValue("PositionZ", prim.OffsetPosition.Z);
+            cmd.Parameters.AddWithValue("GroupPositionX", prim.GroupPosition.X);
+            cmd.Parameters.AddWithValue("GroupPositionY", prim.GroupPosition.Y);
+            cmd.Parameters.AddWithValue("GroupPositionZ", prim.GroupPosition.Z);
+            cmd.Parameters.AddWithValue("VelocityX", prim.Velocity.X);
+            cmd.Parameters.AddWithValue("VelocityY", prim.Velocity.Y);
+            cmd.Parameters.AddWithValue("VelocityZ", prim.Velocity.Z);
+            cmd.Parameters.AddWithValue("AngularVelocityX", prim.AngularVelocity.X);
+            cmd.Parameters.AddWithValue("AngularVelocityY", prim.AngularVelocity.Y);
+            cmd.Parameters.AddWithValue("AngularVelocityZ", prim.AngularVelocity.Z);
+            cmd.Parameters.AddWithValue("AccelerationX", prim.Acceleration.X);
+            cmd.Parameters.AddWithValue("AccelerationY", prim.Acceleration.Y);
+            cmd.Parameters.AddWithValue("AccelerationZ", prim.Acceleration.Z);
+
+            cmd.Parameters.AddWithValue("standtargetx", prim.StandOffset.X);
+            cmd.Parameters.AddWithValue("standtargety", prim.StandOffset.Y);
+            cmd.Parameters.AddWithValue("standtargetz", prim.StandOffset.Z);
+
             // quaternions
-            cmd.Parameters.AddWithValue("RotationX", (double)prim.RotationOffset.X);
-            cmd.Parameters.AddWithValue("RotationY", (double)prim.RotationOffset.Y);
-            cmd.Parameters.AddWithValue("RotationZ", (double)prim.RotationOffset.Z);
-            cmd.Parameters.AddWithValue("RotationW", (double)prim.RotationOffset.W);
+            cmd.Parameters.AddWithValue("RotationX", prim.RotationOffset.X);
+            cmd.Parameters.AddWithValue("RotationY", prim.RotationOffset.Y);
+            cmd.Parameters.AddWithValue("RotationZ", prim.RotationOffset.Z);
+            cmd.Parameters.AddWithValue("RotationW", prim.RotationOffset.W);
 
             // Sit target
             Vector3 sitTargetPos = prim.SitTargetPositionLL;
-            cmd.Parameters.AddWithValue("SitTargetOffsetX", (double)sitTargetPos.X);
-            cmd.Parameters.AddWithValue("SitTargetOffsetY", (double)sitTargetPos.Y);
-            cmd.Parameters.AddWithValue("SitTargetOffsetZ", (double)sitTargetPos.Z);
+            cmd.Parameters.AddWithValue("SitTargetOffsetX", sitTargetPos.X);
+            cmd.Parameters.AddWithValue("SitTargetOffsetY", sitTargetPos.Y);
+            cmd.Parameters.AddWithValue("SitTargetOffsetZ", sitTargetPos.Z);
 
             Quaternion sitTargetOrient = prim.SitTargetOrientationLL;
-            cmd.Parameters.AddWithValue("SitTargetOrientW", (double)sitTargetOrient.W);
-            cmd.Parameters.AddWithValue("SitTargetOrientX", (double)sitTargetOrient.X);
-            cmd.Parameters.AddWithValue("SitTargetOrientY", (double)sitTargetOrient.Y);
-            cmd.Parameters.AddWithValue("SitTargetOrientZ", (double)sitTargetOrient.Z);
+            cmd.Parameters.AddWithValue("SitTargetOrientW", sitTargetOrient.W);
+            cmd.Parameters.AddWithValue("SitTargetOrientX", sitTargetOrient.X);
+            cmd.Parameters.AddWithValue("SitTargetOrientY", sitTargetOrient.Y);
+            cmd.Parameters.AddWithValue("SitTargetOrientZ", sitTargetOrient.Z);
 
             cmd.Parameters.AddWithValue("PayPrice", prim.PayPrice[0]);
             cmd.Parameters.AddWithValue("PayButton1", prim.PayPrice[1]);
@@ -1795,7 +1808,7 @@ namespace OpenSim.Data.MySQL
             if ((prim.SoundFlags & 1) != 0) // Looped
             {
                 cmd.Parameters.AddWithValue("LoopedSound", prim.Sound.ToString());
-                cmd.Parameters.AddWithValue("LoopedSoundGain", prim.SoundGain);
+                cmd.Parameters.AddWithValue("LoopedSoundGain", (float)prim.SoundGain);
             }
             else
             {
@@ -1806,17 +1819,17 @@ namespace OpenSim.Data.MySQL
             cmd.Parameters.AddWithValue("TextureAnimation", prim.TextureAnimation);
             cmd.Parameters.AddWithValue("ParticleSystem", prim.ParticleSystem);
 
-            cmd.Parameters.AddWithValue("OmegaX", (double)prim.AngularVelocity.X);
-            cmd.Parameters.AddWithValue("OmegaY", (double)prim.AngularVelocity.Y);
-            cmd.Parameters.AddWithValue("OmegaZ", (double)prim.AngularVelocity.Z);
+            cmd.Parameters.AddWithValue("OmegaX", prim.AngularVelocity.X);
+            cmd.Parameters.AddWithValue("OmegaY", prim.AngularVelocity.Y);
+            cmd.Parameters.AddWithValue("OmegaZ", prim.AngularVelocity.Z);
 
-            cmd.Parameters.AddWithValue("CameraEyeOffsetX", (double)prim.GetCameraEyeOffset().X);
-            cmd.Parameters.AddWithValue("CameraEyeOffsetY", (double)prim.GetCameraEyeOffset().Y);
-            cmd.Parameters.AddWithValue("CameraEyeOffsetZ", (double)prim.GetCameraEyeOffset().Z);
+            cmd.Parameters.AddWithValue("CameraEyeOffsetX", prim.GetCameraEyeOffset().X);
+            cmd.Parameters.AddWithValue("CameraEyeOffsetY", prim.GetCameraEyeOffset().Y);
+            cmd.Parameters.AddWithValue("CameraEyeOffsetZ", prim.GetCameraEyeOffset().Z);
 
-            cmd.Parameters.AddWithValue("CameraAtOffsetX", (double)prim.GetCameraAtOffset().X);
-            cmd.Parameters.AddWithValue("CameraAtOffsetY", (double)prim.GetCameraAtOffset().Y);
-            cmd.Parameters.AddWithValue("CameraAtOffsetZ", (double)prim.GetCameraAtOffset().Z);
+            cmd.Parameters.AddWithValue("CameraAtOffsetX", prim.GetCameraAtOffset().X);
+            cmd.Parameters.AddWithValue("CameraAtOffsetY", prim.GetCameraAtOffset().Y);
+            cmd.Parameters.AddWithValue("CameraAtOffsetZ", prim.GetCameraAtOffset().Z);
 
             if (prim.GetForceMouselook())
                 cmd.Parameters.AddWithValue("ForceMouselook", 1);
@@ -1860,9 +1873,9 @@ namespace OpenSim.Data.MySQL
             cmd.Parameters.AddWithValue("MediaURL", prim.MediaUrl);
             if (prim.AttachedPos != null)
             {
-                cmd.Parameters.AddWithValue("AttachedPosX", (double)prim.AttachedPos.X);
-                cmd.Parameters.AddWithValue("AttachedPosY", (double)prim.AttachedPos.Y);
-                cmd.Parameters.AddWithValue("AttachedPosZ", (double)prim.AttachedPos.Z);
+                cmd.Parameters.AddWithValue("AttachedPosX", prim.AttachedPos.X);
+                cmd.Parameters.AddWithValue("AttachedPosY", prim.AttachedPos.Y);
+                cmd.Parameters.AddWithValue("AttachedPosZ", prim.AttachedPos.Z);
             }
 
             if (prim.KeyframeMotion != null)
@@ -1886,16 +1899,18 @@ namespace OpenSim.Data.MySQL
                 cmd.Parameters.AddWithValue("DynAttrs", null);
 
             cmd.Parameters.AddWithValue("PhysicsShapeType", prim.PhysicsShapeType);
-            cmd.Parameters.AddWithValue("Density", (double)prim.Density);
-            cmd.Parameters.AddWithValue("GravityModifier", (double)prim.GravityModifier);
-            cmd.Parameters.AddWithValue("Friction", (double)prim.Friction);
-            cmd.Parameters.AddWithValue("Restitution", (double)prim.Restitution);
+            cmd.Parameters.AddWithValue("Density", prim.Density);
+            cmd.Parameters.AddWithValue("GravityModifier", prim.GravityModifier);
+            cmd.Parameters.AddWithValue("Friction", prim.Friction);
+            cmd.Parameters.AddWithValue("Restitution", prim.Restitution);
             cmd.Parameters.AddWithValue("RotationAxisLocks", prim.RotationAxisLocks);
 
             if (prim.Animations != null)
                 cmd.Parameters.AddWithValue("sopanims", prim.SerializeAnimations());
             else
                 cmd.Parameters.AddWithValue("sopanims", null);
+
+            cmd.Parameters.AddWithValue("sitactrange", prim.SitActiveRange);
         }
 
         /// <summary>

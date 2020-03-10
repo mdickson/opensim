@@ -332,11 +332,10 @@ namespace OpenSim.Services.UserAccountService
             d.Data["Created"] = data.Created.ToString();
             d.Data["UserLevel"] = data.UserLevel.ToString();
             d.Data["UserFlags"] = data.UserFlags.ToString();
-            if (data.UserTitle != null)
-                d.Data["UserTitle"] = data.UserTitle.ToString();
-			d.Data["DisplayName"] = data.DisplayName;
-            d.Data["NameChanged"] = data.NameChanged.ToString();
-
+            if (!string.IsNullOrEmpty(data.UserTitle))
+                d.Data["UserTitle"] = data.UserTitle;
+            if (!string.IsNullOrEmpty(data.UserCountry))
+                d.Data["UserCountry"] = data.UserCountry;
             List<string> parts = new List<string>();
 
             foreach (KeyValuePair<string, object> kvp in data.ServiceURLs)

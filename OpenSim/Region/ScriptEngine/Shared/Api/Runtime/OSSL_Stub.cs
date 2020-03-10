@@ -1414,5 +1414,45 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
         {
             return m_OSSL_Functions.osIsNotValidNumber(v);
         }
+
+        public void osSetSitActiveRange(LSL_Float v)
+        {
+            m_OSSL_Functions.osSetSitActiveRange(v);
+        }
+
+        public void osSetLinkSitActiveRange(LSL_Integer linkNumber, LSL_Float v)
+        {
+            m_OSSL_Functions.osSetLinkSitActiveRange(linkNumber, v);
+        }
+
+        public LSL_Float osGetSitActiveRange()
+        {
+            return m_OSSL_Functions.osGetSitActiveRange();
+        }
+
+        public LSL_Float osGetLinkSitActiveRange(LSL_Integer linkNumber)
+        {
+            return m_OSSL_Functions.osGetLinkSitActiveRange(linkNumber);
+        }
+
+        public void osSetStandTarget(vector v)
+        {
+            m_OSSL_Functions.osSetStandTarget(v);
+        }
+
+        public void osSetLinkStandTarget(LSL_Integer linkNumber, vector v)
+        {
+            m_OSSL_Functions.osSetLinkStandTarget(linkNumber, v);
+        }
+
+        public vector osGetStandTarget()
+        {
+            return m_OSSL_Functions.osGetStandTarget();
+        }
+
+        public vector osGetLinkStandTarget(LSL_Integer linkNumber)
+        {
+            return m_OSSL_Functions.osGetLinkStandTarget(linkNumber);
+        }
     }
 }

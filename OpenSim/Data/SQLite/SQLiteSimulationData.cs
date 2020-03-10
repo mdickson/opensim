@@ -624,9 +624,12 @@ namespace OpenSim.Data.SQLite
                     //                    m_log.Info("[REGION DB]: Adding obj: " + obj.UUID + " to region: " + regionUUID);
                     addPrim(prim, obj.UUID, regionUUID);
                 }
+                primDa.Update(ds, "prims");
+                shapeDa.Update(ds, "primshapes");
+                itemsDa.Update(ds, "primitems");
+                ds.AcceptChanges();
             }
 
-            Commit();
             //            m_log.Info("[Dump of prims]: " + ds.GetXml());
         }
 
@@ -1055,12 +1058,9 @@ namespace OpenSim.Data.SQLite
                     if (rowToCheck["LandUUID"].ToString() == parcel.LandData.GlobalID.ToString())
                         rowsToDelete.Add(rowToCheck);
                 }
-                for (int iter = 0; iter < rowsToDelete.Count; iter++)
-                {
+                for (int iter = 0; iter < rowsToDelete.Count; ++iter)
                     rowsToDelete[iter].Delete();
-                    landaccesslist.Rows.Remove(rowsToDelete[iter]);
-                }
-                rowsToDelete.Clear();
+
                 foreach (LandAccessEntry entry in parcel.LandData.ParcelAccessList)
                 {
                     DataRow newAccessRow = landaccesslist.NewRow();
@@ -1310,6 +1310,17 @@ namespace OpenSim.Data.SQLite
 
             createCol(prims, "KeyframeMotion", typeof(Byte[]));
 
+            createCol(prims, "PassTouches", typeof(bool));
+            createCol(prims, "PassCollisions", typeof(bool));
+            createCol(prims, "Vehicle", typeof(string));
+
+            createCol(prims, "PhysInertia", typeof(string));
+
+            createCol(prims, "standtargetx", typeof(float));
+            createCol(prims, "standtargety", typeof(float));
+            createCol(prims, "standtargetz", typeof(float));
+            createCol(prims, "sitactrange", typeof(float));
+
             // Add in contraints
             prims.PrimaryKey = new DataColumn[] { prims.Columns["UUID"] };
 
@@ -1517,6 +1528,8 @@ namespace OpenSim.Data.SQLite
             createCol(regionsettings, "map_tile_ID", typeof(String));
             createCol(regionsettings, "TelehubObject", typeof(String));
             createCol(regionsettings, "parcel_tile_ID", typeof(String));
+            createCol(regionsettings, "block_search", typeof(Boolean));
+            createCol(regionsettings, "casino", typeof(Boolean));
             regionsettings.PrimaryKey = new DataColumn[] { regionsettings.Columns["regionUUID"] };
             return regionsettings;
         }
@@ -1722,14 +1735,18 @@ namespace OpenSim.Data.SQLite
                                                    Convert.ToSingle(row["SitTargetOffsetY"]),
                                                    Convert.ToSingle(row["SitTargetOffsetZ"]));
             prim.SitTargetOrientationLL = new Quaternion(
-                                                         Convert.ToSingle(
-                                                                          row["SitTargetOrientX"]),
-                                                         Convert.ToSingle(
-                                                                          row["SitTargetOrientY"]),
-                                                         Convert.ToSingle(
-                                                                          row["SitTargetOrientZ"]),
-                                                         Convert.ToSingle(
-                                                                          row["SitTargetOrientW"]));
+                                                         Convert.ToSingle(row["SitTargetOrientX"]),
+                                                         Convert.ToSingle(row["SitTargetOrientY"]),
+                                                         Convert.ToSingle(row["SitTargetOrientZ"]),
+                                                         Convert.ToSingle(row["SitTargetOrientW"]));
+
+            prim.StandOffset = new Vector3(
+                            Convert.ToSingle(row["standtargetx"]),
+                            Convert.ToSingle(row["standtargety"]),
+                            Convert.ToSingle(row["standtargetz"])
+                            );
+
+            prim.SitActiveRange = Convert.ToSingle(row["sitactrange"]);
 
             prim.ClickAction = Convert.ToByte(row["ClickAction"]);
             prim.PayPrice[0] = Convert.ToInt32(row["PayPrice"]);
@@ -2172,6 +2189,14 @@ namespace OpenSim.Data.SQLite
             row["SitTargetOrientX"] = sitTargetOrient.X;
             row["SitTargetOrientY"] = sitTargetOrient.Y;
             row["SitTargetOrientZ"] = sitTargetOrient.Z;
+
+            Vector3 standTarget = prim.StandOffset;
+            row["standtargetx"] = standTarget.X;
+            row["standtargety"] = standTarget.Y;
+            row["standtargetz"] = standTarget.Z;
+
+            row["sitactrange"] = prim.SitActiveRange;
+
             row["ColorR"] = Convert.ToInt32(prim.Color.R);
             row["ColorG"] = Convert.ToInt32(prim.Color.G);
             row["ColorB"] = Convert.ToInt32(prim.Color.B);
@@ -2196,7 +2221,6 @@ namespace OpenSim.Data.SQLite
             row["CameraAtOffsetX"] = prim.GetCameraAtOffset().X;
             row["CameraAtOffsetY"] = prim.GetCameraAtOffset().Y;
             row["CameraAtOffsetZ"] = prim.GetCameraAtOffset().Z;
-
 
             if ((prim.SoundFlags & 1) != 0) // Looped
             {

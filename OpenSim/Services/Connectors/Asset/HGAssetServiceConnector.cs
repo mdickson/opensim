@@ -29,7 +29,6 @@ using log4net;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
-using OpenSim.Services.Connectors.SimianGrid;
 using OpenSim.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -94,15 +93,7 @@ namespace OpenSim.Services.Connectors
                 {
                     // Still not as flexible as I would like this to be,
                     // but good enough for now
-                    string connectorType = new HeloServicesConnector(url).Helo();
-                    m_log.DebugFormat("[HG ASSET SERVICE]: HELO returned {0}", connectorType);
-                    if (connectorType == "opensim-simian")
-                    {
-                        connector = new SimianAssetServiceConnector(url);
-                    }
-                    else
-                        connector = new AssetServicesConnector(url);
-
+                    connector = new AssetServicesConnector(url);
                     m_connectors.Add(url, connector);
                 }
             }

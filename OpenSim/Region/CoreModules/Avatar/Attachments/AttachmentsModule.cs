@@ -837,6 +837,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Attachments
             m_scene.EventManager.TriggerOnAttach(so.LocalId, so.UUID, UUID.Zero);
 
             // Attach (NULL) stops scripts. We don't want that. Resume them.
+            so.RemoveScriptsPermissions(4 | 2048); // take controls and camera control
             so.ResumeScripts();
             so.HasGroupChanged = true;
             so.RootPart.ScheduleFullUpdate();
@@ -854,11 +855,12 @@ namespace OpenSim.Region.CoreModules.Avatar.Attachments
                 return;
             }
 
+            so.RemoveScriptsPermissions(4 | 2048); // take controls and camera control
+
             // If this didn't come from inventory, it also shouldn't go there
             // on detach. It's likely a temp attachment.
             if (so.FromItemID == UUID.Zero)
             {
-                // Retirn value is ignored
                 PrepareScriptInstanceForSave(so, true);
 
                 lock (sp.AttachmentsSyncLock)
@@ -887,6 +889,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Attachments
             // clobber the run flag
             // This must be done outside the sp.AttachmentSyncLock so that there is no risk of a deadlock from
             // scripts performing attachment operations at the same time.  Getting object states stops the scripts.
+
             string scriptedState = PrepareScriptInstanceForSave(so, true);
 
             lock (sp.AttachmentsSyncLock)
@@ -1159,7 +1162,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Attachments
             {
                 m_scene.EventManager.TriggerOnAttach(grp.LocalId, grp.FromItemID, UUID.Zero);
                 // Allow detach event time to do some work before stopping the script
-                Thread.Sleep(2);
+                Thread.Sleep(30);
             }
 
             using (StringWriter sw = new StringWriter())
@@ -1193,6 +1196,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Attachments
             m_scene.DeleteSceneObject(so, false, false);
 
             // Prepare sog for storage
+
             so.AttachedAvatar = UUID.Zero;
             so.RootPart.SetParentLocalId(0);
             so.IsAttachment = false;
@@ -1267,6 +1271,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Attachments
 
             Vector3 lastPos = objatt.RootPart.OffsetPosition;
             Vector3 lastAttPos = objatt.RootPart.AttachedPos;
+            uint lastattPoint = objatt.AttachmentPoint;
             bool doneAttach = false;
             // FIXME: Detect whether it's really likely for AttachObject to throw an exception in the normal
             // course of events.  If not, then it's probably not worth trying to recover the situation
@@ -1300,7 +1305,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Attachments
                 return null;
             }
 
-            if ((attachmentPt != 0 && attachmentPt != objatt.AttachmentPoint) ||
+            if (lastattPoint != objatt.AttachmentPoint ||
                     lastPos != objatt.RootPart.OffsetPosition ||
                     lastAttPos != objatt.RootPart.AttachedPos)
                 objatt.HasGroupChanged = true;
