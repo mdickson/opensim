@@ -181,7 +181,17 @@ namespace OpenSim.Framework.Servers
             //m_log.Info("[STARTUP]: Virtual machine runtime version: " + Environment.Version + Environment.NewLine);
             m_log.InfoFormat(
                 "[STARTUP]: Operating system version: {0}, .NET platform {1}, {2}-bit\n",
-                Environment.OSVersion, Environment.OSVersion.Platform, Util.Is64BitProcess() ? "64" : "32");
+                Environment.OSVersion, Environment.OSVersion.Platform, Environment.Is64BitProcess ? "64" : "32");
+
+            // next code can be changed on .net 4.7.x
+            if(Util.IsWindows())
+                m_log.InfoFormat("[STARTUP]: Processor Architecture: {0}({1})",
+                    System.Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE", EnvironmentVariableTarget.Machine),
+                    BitConverter.IsLittleEndian ?"le":"be");
+            else
+                m_log.InfoFormat("[STARTUP]: Processor Architecture: {0}({1})",
+                    System.Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE"),
+                    BitConverter.IsLittleEndian ? "le" : "be");
 
             try
             {
