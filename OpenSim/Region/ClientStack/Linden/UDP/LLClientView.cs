@@ -914,7 +914,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             //BillableFactor
             zc.AddFloat(es.BillableFactor);
             //CacheID
-            zc.AddUUID(regionInfo.CacheID);
+            zc.AddUUID(regionSettings.CacheID);
             //TerrainBase0
             //TerrainBase1
             //TerrainBase2
@@ -5471,7 +5471,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                     }
 
                     Utils.UIntToBytes(sop.LocalId, data, pos); pos += 4;
-                    Utils.UIntToBytes((uint)sop.ParentGroup.PseudoCRC, data, pos); pos += 4; //WRONG
+                    Utils.UIntToBytes((uint)sop.PseudoCRC, data, pos); pos += 4; //WRONG
                     Utils.UIntToBytes(primflags, data, pos); pos += 4;
 
                     ++count;
@@ -7120,7 +7120,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 zc.AddUInt(part.LocalId);
                 zc.AddByte(state); // state
                 zc.AddUUID(part.UUID);
-                zc.AddUInt((uint)part.ParentGroup.PseudoCRC);
+                zc.AddUInt((uint)part.PseudoCRC);
                 zc.AddByte((byte)pcode);
                 // material 1
                 // clickaction 1
@@ -7232,7 +7232,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             zc.AddUInt(part.LocalId);
             zc.AddByte(state); // state
             zc.AddUUID(part.UUID);
-            zc.AddUInt((uint)part.ParentGroup.PseudoCRC);
+            zc.AddUInt((uint)part.PseudoCRC);
             zc.AddByte((byte)pcode);
             zc.AddByte(part.Material);
             zc.AddByte(part.ClickAction); // clickaction
@@ -7687,7 +7687,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 zc.AddByte((byte)pcode);
                 zc.AddByte(state);
 
-                zc.AddUInt((uint)part.ParentGroup.PseudoCRC);
+                zc.AddUInt((uint)part.PseudoCRC);
 
                 zc.AddZeros(2); // material and click action
 
@@ -7850,7 +7850,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             zc.AddByte((byte)pcode);
             zc.AddByte(state);
 
-            zc.AddUInt((uint)part.ParentGroup.PseudoCRC);
+            zc.AddUInt((uint)part.PseudoCRC);
 
             zc.AddByte(part.Material);
             zc.AddByte(part.ClickAction);

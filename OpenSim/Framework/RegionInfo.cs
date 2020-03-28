@@ -179,7 +179,6 @@ namespace OpenSim.Framework
 
         private Dictionary<String, String> m_extraSettings = new Dictionary<string, string>();
 
-        public UUID CacheID { get; set; }
         // Apparently, we're applying the same estatesettings regardless of whether it's local or remote.
 
         // MT: Yes. Estates can't span trust boundaries. Therefore, it can be
@@ -196,8 +195,6 @@ namespace OpenSim.Framework
         public RegionInfo(string description, string filename, bool skipConsoleConfig, IConfigSource configSource, string configName)
         {
             // m_configSource = configSource;
-            CacheID = UUID.Random();
-
             if (filename.ToLower().EndsWith(".ini"))
             {
                 if (!File.Exists(filename)) // New region config request
@@ -256,7 +253,6 @@ namespace OpenSim.Framework
             ReadNiniConfig(source, name);
 
             m_serverURI = string.Empty;
-            CacheID = UUID.Random();
         }
 
         public RegionInfo(uint legacyRegionLocX, uint legacyRegionLocY, IPEndPoint internalEndPoint, string externalUri)
@@ -268,13 +264,11 @@ namespace OpenSim.Framework
             m_internalEndPoint = internalEndPoint;
             m_externalHostName = externalUri;
             m_serverURI = string.Empty;
-            CacheID = UUID.Random();
         }
 
         public RegionInfo()
         {
             m_serverURI = string.Empty;
-            CacheID = UUID.Random();
         }
 
         public EstateSettings EstateSettings

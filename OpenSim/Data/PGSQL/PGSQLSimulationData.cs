@@ -352,7 +352,7 @@ namespace OpenSim.Data.PGSQL
             ""ClickAction"" = :ClickAction, ""Material"" = :Material, ""CollisionSound"" = :CollisionSound, ""CollisionSoundVolume"" = :CollisionSoundVolume, ""PassTouches"" = :PassTouches,
             ""LinkNumber"" = :LinkNumber, ""MediaURL"" = :MediaURL, ""DynAttrs"" = :DynAttrs, ""Vehicle"" = :Vehicle,
             ""PhysInertia"" = :PhysInertia, ""standtargetx"" =:standtargetx, ""standtargety"" =:standtargety, ""standtargetz"" =:standtargetz,
-            ""sitactrange"" =:sitactrange
+            ""sitactrange"" =:sitactrange, ""pseudocrc"" = :pseudocrc
 
         WHERE ""UUID"" = :UUID ;
 
@@ -368,7 +368,7 @@ namespace OpenSim.Data.PGSQL
             ""ForceMouselook"", ""ScriptAccessPin"", ""AllowedDrop"", ""DieAtEdge"", ""SalePrice"", ""SaleType"", ""ColorR"", ""ColorG"", ""ColorB"", ""ColorA"",
             ""ParticleSystem"", ""ClickAction"", ""Material"", ""CollisionSound"", ""CollisionSoundVolume"", ""PassTouches"", ""LinkNumber"", ""MediaURL"", ""DynAttrs"",
             ""PhysicsShapeType"", ""Density"", ""GravityModifier"", ""Friction"", ""Restitution"", ""PassCollisions"", ""RotationAxisLocks"", ""RezzerID"" , ""Vehicle"", ""PhysInertia"",
-            ""standtargetx"", ""standtargety"", ""standtargetz"", ""sitactrange""
+            ""standtargetx"", ""standtargety"", ""standtargetz"", ""sitactrange"", ""pseudocrc""
             ) Select
             :UUID, :CreationDate, :Name, :Text, :Description, :SitName, :TouchName, :ObjectFlags, :OwnerMask, :NextOwnerMask, :GroupMask,
             :EveryoneMask, :BaseMask, :PositionX, :PositionY, :PositionZ, :GroupPositionX, :GroupPositionY, :GroupPositionZ, :VelocityX,
@@ -380,7 +380,7 @@ namespace OpenSim.Data.PGSQL
             :ForceMouselook, :ScriptAccessPin, :AllowedDrop, :DieAtEdge, :SalePrice, :SaleType, :ColorR, :ColorG, :ColorB, :ColorA,
             :ParticleSystem, :ClickAction, :Material, :CollisionSound, :CollisionSoundVolume, :PassTouches, :LinkNumber, :MediaURL, :DynAttrs,
             :PhysicsShapeType, :Density, :GravityModifier, :Friction, :Restitution, :PassCollisions, :RotationAxisLocks, :RezzerID, :Vehicle, :PhysInertia,
-            :standtargetx, :standtargety, :standtargetz,:sitactrange 
+            :standtargetx, :standtargety, :standtargetz,:sitactrange, :pseudocrc 
             where not EXISTS (SELECT ""UUID"" FROM prims WHERE ""UUID"" = :UUID);
         ";
 
@@ -1433,7 +1433,7 @@ namespace OpenSim.Data.PGSQL
 ,terrain_lower_limit = :terrain_lower_limit ,use_estate_sun = :use_estate_sun ,fixed_sun = :fixed_sun ,sun_position = :sun_position
 ,covenant = :covenant ,covenant_datetime = :covenant_datetime, sunvectorx = :sunvectorx, sunvectory = :sunvectory, sunvectorz = :sunvectorz,
 ""Sandbox"" = :Sandbox, loaded_creation_datetime = :loaded_creation_datetime, loaded_creation_id = :loaded_creation_id, ""map_tile_ID"" = :TerrainImageID,
-""TelehubObject"" = :telehubobject, ""parcel_tile_ID"" = :ParcelImageID
+""TelehubObject"" = :telehubobject, ""parcel_tile_ID"" = :ParcelImageID, ""cacheID"" = :cacheID
  WHERE ""regionUUID"" = :regionUUID";
 
                 using (NpgsqlConnection conn = new NpgsqlConnection(m_connectionString))
@@ -1548,6 +1548,8 @@ namespace OpenSim.Data.PGSQL
             newSettings.ParcelImageID = new UUID((Guid)row["parcel_tile_ID"]);
             newSettings.TelehubObject = new UUID((Guid)row["TelehubObject"]);
 
+            if (!(row["cacheID"] is DBNull))
+                newSettings.CacheID = new UUID((Guid)row["cacheID"]);
             return newSettings;
         }
 
@@ -1831,6 +1833,10 @@ namespace OpenSim.Data.PGSQL
                 pdata = PhysicsInertiaData.FromXml2(primRow["PhysInertia"].ToString());
             prim.PhysicsInertia = pdata;
 
+            int pseudocrc = Convert.ToInt32(primRow["pseudocrc"]);
+            if(pseudocrc != 0)
+                prim.PseudoCRC = pseudocrc;
+
             return prim;
         }
 
@@ -2016,6 +2022,8 @@ namespace OpenSim.Data.PGSQL
             parameters.Add(_Database.CreateParameter("TerrainImageID", settings.TerrainImageID));
             parameters.Add(_Database.CreateParameter("ParcelImageID", settings.ParcelImageID));
             parameters.Add(_Database.CreateParameter("TelehubObject", settings.TelehubObject));
+
+            parameters.Add(_Database.CreateParameter("cacheID", settings.CacheID));
 
             return parameters.ToArray();
         }
@@ -2275,6 +2283,8 @@ namespace OpenSim.Data.PGSQL
             parameters.Add(_Database.CreateParameter("Friction", (double)prim.Friction));
             parameters.Add(_Database.CreateParameter("Restitution", (double)prim.Restitution));
             parameters.Add(_Database.CreateParameter("RotationAxisLocks", prim.RotationAxisLocks));
+
+            parameters.Add(_Database.CreateParameter("pseudocrc", prim.PseudoCRC));
 
             return parameters.ToArray();
         }
