@@ -183,7 +183,11 @@ namespace OpenSim.Region.Framework.Scenes
         public Vector3 StatusSandboxPos;
 
         [XmlIgnore]
-        public int[] PayPrice = { -2, -2, -2, -2, -2 };
+        public int PseudoCRC; // this is local to region. should only be stored on its db.
+                              // This is just a number that needs to change to invalidate prim data caches
+
+        [XmlIgnore]
+        public int[] PayPrice = {-2,-2,-2,-2,-2};
 
         [XmlIgnore]
         /// <summary>
@@ -406,6 +410,7 @@ namespace OpenSim.Region.Framework.Scenes
             m_particleSystem = Utils.EmptyBytes;
             Rezzed = DateTime.UtcNow;
             Description = String.Empty;
+            PseudoCRC = (int)DateTime.UtcNow.Ticks; // random could be as good; fallbak if not on region db
 
             // Prims currently only contain a single folder (Contents).  From looking at the Second Life protocol,
             // this appears to have the same UUID (!) as the prim.  If this isn't the case, one can't drag items from
@@ -445,6 +450,7 @@ namespace OpenSim.Region.Framework.Scenes
             APIDActive = false;
             Flags = 0;
             CreateSelected = true;
+            PseudoCRC = (int)DateTime.UtcNow.Ticks; // random could be as good
             TrimPermissions();
             AggregateInnerPerms();
         }
@@ -2074,7 +2080,12 @@ namespace OpenSim.Region.Framework.Scenes
                 return;
 
             if (PhysicsShapeType == (byte)PhysShapeType.none)
-                return;
+            {
+                if(ParentID == 0)
+                    m_physicsShapeType = DefaultPhysicsShapeType();
+                else
+                    return;
+            }
 
             bool isPhysical = (_ObjectFlags & (uint)PrimFlags.Physics) != 0;
             bool isPhantom = (_ObjectFlags & (uint)PrimFlags.Phantom) != 0;
@@ -2193,6 +2204,8 @@ namespace OpenSim.Region.Framework.Scenes
 
             if (dupe.PhysActor != null)
                 dupe.PhysActor.LocalID = plocalID;
+
+            dupe.PseudoCRC = (int)(DateTime.UtcNow.Ticks);
 
             ParentGroup.Scene.EventManager.TriggerOnSceneObjectPartCopy(dupe, this, userExposed);
 
@@ -3046,6 +3059,7 @@ namespace OpenSim.Region.Framework.Scenes
             LinkNum = linkNum;
             LocalId = 0;
             Inventory.ResetInventoryIDs();
+            ++PseudoCRC;
         }
 
 
@@ -3197,6 +3211,7 @@ namespace OpenSim.Region.Framework.Scenes
             if (ParentGroup == null || ParentGroup.IsDeleted || ParentGroup.Scene == null)
                 return;
 
+            ++PseudoCRC;
             if (ParentGroup.Scene.GetNumberOfClients() == 0)
                 return;
 
@@ -3212,6 +3227,8 @@ namespace OpenSim.Region.Framework.Scenes
         {
             if (ParentGroup == null || ParentGroup.IsDeleted || ParentGroup.Scene == null)
                 return;
+
+            ++PseudoCRC;
 
             if (ParentGroup.Scene.GetNumberOfClients() == 0)
                 return;
@@ -3237,6 +3254,7 @@ namespace OpenSim.Region.Framework.Scenes
             if (ParentGroup == null || ParentGroup.IsDeleted || ParentGroup.Scene == null)
                 return;
 
+            ++PseudoCRC;
             ParentGroup.HasGroupChanged = true;
 
             if (ParentGroup.Scene.GetNumberOfClients() == 0)
@@ -3270,6 +3288,7 @@ namespace OpenSim.Region.Framework.Scenes
             if (update == PrimUpdateFlags.None)
                 return;
 
+            ++PseudoCRC;
             ParentGroup.HasGroupChanged = true;
 
             if (ParentGroup.Scene.GetNumberOfClients() == 0)
@@ -3341,6 +3360,7 @@ namespace OpenSim.Region.Framework.Scenes
             if (ParentGroup == null)
                 return;
 
+            ++PseudoCRC;
             // Update the "last" values
             lock (UpdateFlagLock)
             {
@@ -3364,6 +3384,7 @@ namespace OpenSim.Region.Framework.Scenes
             if (ParentGroup == null)
                 return;
 
+            ++PseudoCRC;
             // Update the "last" values
             lock (UpdateFlagLock)
             {
@@ -3964,14 +3985,15 @@ namespace OpenSim.Region.Framework.Scenes
         public void SetGroup(UUID groupID, IClientAPI client)
         {
             // Scene.AddNewPrims() calls with client == null so can't use this.
-            //            m_log.DebugFormat(
-            //                "[SCENE OBJECT PART]: Setting group for {0} to {1} for {2}",
-            //                Name, groupID, OwnerID);
+            // m_log.DebugFormat(
+            //      "[SCENE OBJECT PART]: Setting group for {0} to {1} for {2}",
+            //      Name, groupID, OwnerID);
 
+            ++PseudoCRC;
             GroupID = groupID;
-            //            if (client != null)
-            //                SendPropertiesToClient(client);
-            lock (UpdateFlagLock)
+            // if (client != null)
+            //      SendPropertiesToClient(client);
+            lock(UpdateFlagLock)
                 UpdateFlag |= PrimUpdateFlags.FullUpdate;
         }
 
@@ -5687,6 +5709,24 @@ namespace OpenSim.Region.Framework.Scenes
                 }
             }
             return false;
+        }
+
+        public int ClearObjectAnimations()
+        {
+            int ret = 0;
+            if(Animations != null)
+            {
+                ret = Animations.Count;
+                Animations.Clear();
+                AnimationsNames.Clear();
+            }
+            else
+            {
+                Animations = new Dictionary<UUID, int>();
+                AnimationsNames = new Dictionary<UUID, string>();
+            }
+            ScheduleUpdate(PrimUpdateFlags.Animations);
+            return ret;
         }
 
         public int GetAnimations(out UUID[] ids, out int[] seqs)

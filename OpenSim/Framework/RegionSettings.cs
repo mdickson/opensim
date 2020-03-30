@@ -126,6 +126,8 @@ namespace OpenSim.Framework
             set { m_RegionUUID = value; }
         }
 
+        public UUID CacheID { get; set; } = UUID.Random();
+
         private bool m_BlockTerraform = false;
 
         public bool BlockTerraform

@@ -254,39 +254,43 @@ namespace OpenSim.Region.ClientStack.Linden
             {
                 m_module = module;
 
-                HasEvents = (x, y) => { lock (responses) return responses.ContainsKey(x); };
+                HasEvents = (requestID, y) =>
+                {
+                    lock (responses)
+                        return responses.ContainsKey(requestID);
+                };
 
-                Drop = (x, y) =>
+                Drop = (requestID, y) =>
                 {
                     lock (responses)
                     {
-                        responses.Remove(x);
-                        lock (dropedResponses)
-                            dropedResponses.Add(x);
+                        responses.Remove(requestID);
+                        lock(dropedResponses)
+                            dropedResponses.Add(requestID);
                     }
                 };
 
-                GetEvents = (x, y) =>
+                GetEvents = (requestID, y) =>
                 {
                     lock (responses)
                     {
                         try
                         {
-                            return responses[x];
+                            return responses[requestID];
                         }
                         finally
                         {
-                            responses.Remove(x);
+                            responses.Remove(requestID);
                         }
                     }
                 };
 
-                Request = (x, y) =>
+                Request = (requestID, request) =>
                 {
                     APollRequest reqinfo = new APollRequest();
                     reqinfo.thepoll = this;
-                    reqinfo.reqID = x;
-                    reqinfo.request = y;
+                    reqinfo.reqID = requestID;
+                    reqinfo.request = request;
                     m_queue.Add(reqinfo);
                 };
 
@@ -374,7 +378,7 @@ namespace OpenSim.Region.ClientStack.Linden
 
                 // Register this as a poll service
                 PollServiceInventoryEventArgs args = new PollServiceInventoryEventArgs(this, capUrl, agentID);
-                args.Type = PollServiceEventArgs.EventType.Inventory;
+                //args.Type = PollServiceEventArgs.EventType.Inventory;
 
                 caps.RegisterPollHandler(capName, args);
             }

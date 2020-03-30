@@ -1,1 +1,1 @@
-msbuild /t:Build /p:Configuration=Debug
+msbuild /t:Build /p:AllowUnsafeBlocks=true /p:Configuration=Debug

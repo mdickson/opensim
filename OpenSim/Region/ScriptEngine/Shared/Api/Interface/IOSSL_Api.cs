@@ -564,5 +564,6 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         void osSetLinkStandTarget(LSL_Integer linkNumber, vector v);
         vector osGetStandTarget();
         vector osGetLinkStandTarget(LSL_Integer linkNumber);
+        LSL_Integer osClearObjectAnimations();
     }
 }

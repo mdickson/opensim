@@ -1,1 +1,1 @@
-msbuild /t:Build /p:Configuration=Release
+msbuild /t:Build  /p:AllowUnsafeBlocks=true /p:Configuration=Release

@@ -1454,5 +1454,11 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
         {
             return m_OSSL_Functions.osGetLinkStandTarget(linkNumber);
         }
+
+        public LSL_Integer osClearObjectAnimations()
+        {
+            return m_OSSL_Functions.osClearObjectAnimations();
+        }
+        
     }
 }
