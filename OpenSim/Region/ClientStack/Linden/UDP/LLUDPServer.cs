@@ -415,7 +415,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             if (config != null)
             {
                 m_recvBufferSize = config.GetInt("client_socket_rcvbuf_size", 0);
-                sceneThrottleBps = config.GetInt("scene_throttle_max_bps", 0);
+                sceneThrottleBps = config.GetInt("scene_throttle_max_bps", 6250000);
 
                 TextureSendLimit = config.GetInt("TextureSendLimit", 20);
 
@@ -1190,8 +1190,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             SyncSend(buffer);
 
             // Keep track of when this packet was sent out (right now)
-            int enow = Environment.TickCount & Int32.MaxValue;
-            Interlocked.Exchange(ref outgoingPacket.TickCount, enow);
+            Interlocked.Exchange(ref outgoingPacket.TickCount, Environment.TickCount & Int32.MaxValue);
 
             if (outgoingPacket.UnackedMethod == null)
                 FreeUDPBuffer(buffer);

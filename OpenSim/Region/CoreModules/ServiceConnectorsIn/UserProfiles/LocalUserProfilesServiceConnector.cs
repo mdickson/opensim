@@ -113,8 +113,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Profile
 
             Enabled = true;
 
-            string serviceDll = config.GetString("LocalServiceModule",
-                                                      String.Empty);
+            string serviceDll = config.GetString("LocalServiceModule", String.Empty);
 
             if (serviceDll == String.Empty)
             {
@@ -123,9 +122,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Profile
             }
 
             Object[] args = new Object[] { source, ConfigName };
-            ServiceModule =
-                ServerUtils.LoadPlugin<IUserProfilesService>(serviceDll,
-                                                     args);
+            ServiceModule = ServerUtils.LoadPlugin<IUserProfilesService>(serviceDll, args);
 
             if (ServiceModule == null)
             {

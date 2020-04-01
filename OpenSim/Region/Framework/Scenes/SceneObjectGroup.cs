@@ -142,8 +142,6 @@ namespace OpenSim.Region.Framework.Scenes
         private long m_maxPersistTime = 0;
         private long m_minPersistTime = 0;
 
-        public int PseudoCRC;
-
         /// <summary>
         /// This indicates whether the object has changed such that it needs to be repersisted to permenant storage
         /// (the database).
@@ -162,7 +160,6 @@ namespace OpenSim.Region.Framework.Scenes
                     if (Backup)
                         m_scene.SceneGraph.FireChangeBackup(this);
 
-                    PseudoCRC = (int)(DateTime.UtcNow.Ticks);
                     timeLastChanged = DateTime.UtcNow.Ticks;
                     if (!m_hasGroupChanged)
                         timeFirstChanged = timeLastChanged;
@@ -1332,7 +1329,6 @@ namespace OpenSim.Region.Framework.Scenes
         public SceneObjectGroup()
         {
             m_lastCollisionSoundMS = Util.GetTimeStampMS() + 1000.0;
-            PseudoCRC = (int)(DateTime.UtcNow.Ticks);
         }
 
         /// <summary>
@@ -2541,7 +2537,7 @@ namespace OpenSim.Region.Framework.Scenes
             }
 
             dupe.InvalidatePartsLinkMaps();
-            dupe.PseudoCRC = (int)(DateTime.UtcNow.Ticks);
+            
             m_dupeInProgress = false;
             return dupe;
         }
@@ -2795,7 +2791,6 @@ namespace OpenSim.Region.Framework.Scenes
                 }
             }
 
-            PseudoCRC = (int)(DateTime.UtcNow.Ticks);
             rpart.ScheduleFullUpdate();
         }
 
@@ -2835,7 +2830,6 @@ namespace OpenSim.Region.Framework.Scenes
                     part.ResetIDs(part.LinkNum); // Don't change link nums
                     m_parts.Add(part.UUID, part);
                 }
-                PseudoCRC = (int)(DateTime.UtcNow.Ticks);
             }
         }
 
@@ -3416,28 +3410,21 @@ namespace OpenSim.Region.Framework.Scenes
             linkPart.setGroupPosition(worldPos);
             linkPart.setOffsetPosition(Vector3.Zero);
             linkPart.setRotationOffset(worldRot);
-            linkPart.Rezzed = RootPart.Rezzed;
 
             // Create a new SOG to go around this unlinked and unattached SOP
             SceneObjectGroup objectGroup = new SceneObjectGroup(linkPart);
+            m_scene.AddNewSceneObject(objectGroup, true);
+            linkPart.Rezzed = RootPart.Rezzed;
+
             InvalidBoundsRadius();
             InvalidatePartsLinkMaps();
-            objectGroup.InvalidateEffectivePerms();
-
-            objectGroup.HasGroupChangedDueToDelink = true;
-
-            // When we delete a group, we currently have to force persist to the database if the object id has changed
-            // (since delete works by deleting all rows which have a given object id)
-
-            // this is as it seems to be in sl now
-            if (linkPart.PhysicsShapeType == (byte)PhysShapeType.none)
-                linkPart.PhysicsShapeType = linkPart.DefaultPhysicsShapeType(); // root prims can't have type none for now
-
-            m_scene.AddNewSceneObject(objectGroup, true);
+            InvalidateEffectivePerms();
 
             if (m_rootPart.PhysActor != null)
                 m_rootPart.PhysActor.Building = false;
 
+            objectGroup.HasGroupChangedDueToDelink = true;
+            
             if (sendEvents)
                 linkPart.TriggerScriptChangedEvent(Changed.LINK);
 
