@@ -138,6 +138,9 @@ namespace OpenSim.Framework.Servers.HttpServer
             if (responsedata.ContainsKey("keepalive"))
                 response.KeepAlive = (bool)responsedata["keepalive"];
 
+            if (responsedata.ContainsKey("prio"))
+                response.Priority = (int)responsedata["prio"];
+
             // Cross-Origin Resource Sharing with simple requests
             if (responsedata.ContainsKey("access_control_allow_origin"))
                 response.AddHeader("Access-Control-Allow-Origin", (string)responsedata["access_control_allow_origin"]);
@@ -203,7 +206,6 @@ namespace OpenSim.Framework.Servers.HttpServer
                 buffer = null;
 
                 response.Send();
-                response.RawBuffer = null;
             }
             catch (Exception ex)
             {

@@ -856,7 +856,6 @@ namespace OpenSim.Framework.Servers.HttpServer
 
                 buffer = null;
                 response.Send();
-                response.RawBuffer = null;
             }
             catch (SocketException e)
             {
