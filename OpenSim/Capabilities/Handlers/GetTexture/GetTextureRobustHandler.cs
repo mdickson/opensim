@@ -131,7 +131,7 @@ namespace OpenSim.Capabilities.Handlers
                 string textureUrl = m_RedirectURL + "?texture_id=" + textureID.ToString();
                 m_log.Debug("[GETTEXTURE]: Redirecting texture request to " + textureUrl);
                 httpResponse.StatusCode = (int)OSHttpStatusCode.RedirectMovedPermanently;
-                httpResponse.RedirectLocation = textureUrl;
+                httpResponse.AddHeader("Location:", textureUrl);
                 return true;
             }
 
@@ -232,8 +232,9 @@ namespace OpenSim.Capabilities.Handlers
                         response.ContentLength = len;
                         response.ContentType = texture.Metadata.ContentType;
                         response.AddHeader("Content-Range", String.Format("bytes {0}-{1}/{2}", start, end, texture.Data.Length));
-
-                        response.Body.Write(texture.Data, start, len);
+                        response.RawBuffer = texture.Data;
+                        response.RawBufferStart = start;
+                        response.RawBufferLen = len;
                     }
                 }
                 else
@@ -251,7 +252,9 @@ namespace OpenSim.Capabilities.Handlers
                     response.ContentType = texture.Metadata.ContentType;
                 else
                     response.ContentType = "image/" + format;
-                response.Body.Write(texture.Data, 0, texture.Data.Length);
+                response.RawBuffer = texture.Data;
+                response.RawBufferStart = 0;
+                response.RawBufferLen = texture.Data.Length;
             }
 
             //            if (response.StatusCode < 200 || response.StatusCode > 299)

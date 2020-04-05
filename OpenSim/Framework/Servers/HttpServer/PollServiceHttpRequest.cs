@@ -25,13 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using HttpServer;
 using log4net;
 using OpenMetaverse;
 using System;
 using System.Collections;
 using System.Reflection;
 using System.Text;
+using OSHttpServer;
 
 namespace OpenSim.Framework.Servers.HttpServer
 {
@@ -129,8 +129,16 @@ namespace OpenSim.Framework.Servers.HttpServer
                 return;
             }
 
-            if (responsedata.ContainsKey("error_status_text"))
-                response.StatusDescription = (string)responsedata["error_status_text"];
+
+            response.StatusCode = responsecode;
+            if (responsecode == (int)OSHttpStatusCode.RedirectMovedPermanently)
+            {
+                response.AddHeader("Location:", (string)responsedata["str_redirect_location"]);
+                response.KeepAlive = false;
+                PollServiceArgs.RequestsHandled++;
+                response.Send();
+                return;
+            }
 
             if (responsedata.ContainsKey("http_protocol_version"))
                 response.ProtocolVersion = (string)responsedata["http_protocol_version"];
@@ -141,16 +149,12 @@ namespace OpenSim.Framework.Servers.HttpServer
             if (responsedata.ContainsKey("prio"))
                 response.Priority = (int)responsedata["prio"];
 
+            if (responsedata.ContainsKey("error_status_text"))
+                response.StatusDescription = (string)responsedata["error_status_text"];
+
             // Cross-Origin Resource Sharing with simple requests
             if (responsedata.ContainsKey("access_control_allow_origin"))
                 response.AddHeader("Access-Control-Allow-Origin", (string)responsedata["access_control_allow_origin"]);
-
-            response.StatusCode = responsecode;
-
-            if (responsecode == (int)OSHttpStatusCode.RedirectMovedPermanently)
-            {
-                response.RedirectLocation = (string)responsedata["str_redirect_location"];
-            }
 
             if (string.IsNullOrEmpty(contentType))
                 response.AddHeader("Content-Type", "text/html");

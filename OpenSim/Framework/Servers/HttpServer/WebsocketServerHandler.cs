@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using HttpServer;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,6 +32,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using OSHttpServer;
 
 namespace OpenSim.Framework.Servers.HttpServer
 {

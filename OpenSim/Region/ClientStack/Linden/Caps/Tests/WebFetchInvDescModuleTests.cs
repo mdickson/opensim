@@ -25,6 +25,31 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Text;
+using OSHttpServer;
+using log4net.Config;
+using Nini.Config;
+using NUnit.Framework;
+using OpenMetaverse;
+using OpenMetaverse.Packets;
+using OpenMetaverse.StructuredData;
+using OpenSim.Framework;
+using OpenSim.Framework.Capabilities;
+using OpenSim.Framework.Servers;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Region.ClientStack.Linden;
+using OpenSim.Region.CoreModules.Framework;
+using OpenSim.Region.Framework.Scenes;
+using OpenSim.Services.Interfaces;
+using OpenSim.Tests.Common;
+using OSDArray = OpenMetaverse.StructuredData.OSDArray;
+using OSDMap = OpenMetaverse.StructuredData.OSDMap;
+
 namespace OpenSim.Region.ClientStack.Linden.Caps.Tests
 {
     /*

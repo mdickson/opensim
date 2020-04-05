@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using HttpServer;
 using log4net;
 using Nwc.XmlRpc;
 using OpenMetaverse.StructuredData;
@@ -44,8 +43,10 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Xml;
-using CoolHTTPListener = HttpServer.HttpListener;
-using LogPrio = HttpServer.LogPrio;
+using OSHttpServer;
+
+using tinyHTTPListener = OSHttpServer.OSHttpListener;
+
 
 namespace OpenSim.Framework.Servers.HttpServer
 {
@@ -91,11 +92,10 @@ namespace OpenSim.Framework.Servers.HttpServer
         private volatile int NotSocketErrors = 0;
         public volatile bool HTTPDRunning = false;
 
-        // protected HttpListener m_httpListener;
-        protected CoolHTTPListener m_httpListener2;
-        protected Dictionary<string, XmlRpcMethod> m_rpcHandlers = new Dictionary<string, XmlRpcMethod>();
-        protected Dictionary<string, JsonRPCMethod> jsonRpcHandlers = new Dictionary<string, JsonRPCMethod>();
-        protected Dictionary<string, bool> m_rpcHandlersKeepAlive = new Dictionary<string, bool>();
+        protected tinyHTTPListener m_httpListener;
+        protected Dictionary<string, XmlRpcMethod> m_rpcHandlers        = new Dictionary<string, XmlRpcMethod>();
+        protected Dictionary<string, JsonRPCMethod> jsonRpcHandlers     = new Dictionary<string, JsonRPCMethod>();
+        protected Dictionary<string, bool> m_rpcHandlersKeepAlive       = new Dictionary<string, bool>();
         protected DefaultLLSDMethod m_defaultLlsdHandler = null; // <--   Moving away from the monolithic..  and going to /registered/
         protected Dictionary<string, LLSDMethod> m_llsdHandlers = new Dictionary<string, LLSDMethod>();
         protected Dictionary<string, IRequestHandler> m_streamHandlers = new Dictionary<string, IRequestHandler>();
@@ -117,7 +117,6 @@ namespace OpenSim.Framework.Servers.HttpServer
         protected RemoteCertificateValidationCallback m_certificateValidationCallback = null;
 
         protected IPAddress m_listenIPAddress = IPAddress.Any;
-
 
         public string Protocol
         {
@@ -1952,7 +1951,7 @@ namespace OpenSim.Framework.Servers.HttpServer
 
             if (responsecode == (int)OSHttpStatusCode.RedirectMovedPermanently)
             {
-                response.RedirectLocation = (string)responsedata["str_redirect_location"];
+                response.AddHeader("Location:", (string)responsedata["str_redirect_location"]);
                 response.StatusCode = responsecode;
             }
 
@@ -2048,32 +2047,32 @@ namespace OpenSim.Framework.Servers.HttpServer
                 NotSocketErrors = 0;
                 if (!m_ssl)
                 {
-                    //m_httpListener.Prefixes.Add("http://+:" + m_port + "/");
-                    //m_httpListener.Prefixes.Add("http://10.1.1.5:" + m_port + "/");
-                    m_httpListener2 = CoolHTTPListener.Create(m_listenIPAddress, (int)m_port);
-                    m_httpListener2.ExceptionThrown += httpServerException;
-                    m_httpListener2.LogWriter = httpserverlog;
-
+                    m_httpListener = tinyHTTPListener.Create(m_listenIPAddress, (int)m_port);
+                    m_httpListener.ExceptionThrown += httpServerException;
+                    if (DebugLevel > 0)
+                    {
+                        m_httpListener.LogWriter = httpserverlog;
+                        httpserverlog.DebugLevel = 1;
+                    }
                     // Uncomment this line in addition to those in HttpServerLogWriter
                     // if you want more detailed trace information from the HttpServer
-                    //m_httpListener2.UseTraceLogs = true;
-
                     //m_httpListener2.DisconnectHandler = httpServerDisconnectMonitor;
                 }
                 else
                 {
-                    //m_httpListener.Prefixes.Add("https://+:" + (m_sslport) + "/");
-                    //m_httpListener.Prefixes.Add("http://+:" + m_port + "/");
-                    m_httpListener2 = CoolHTTPListener.Create(IPAddress.Any, (int)m_port, m_cert);
-                    if (m_certificateValidationCallback != null)
-                        m_httpListener2.CertificateValidationCallback = m_certificateValidationCallback;
-                    m_httpListener2.ExceptionThrown += httpServerException;
-                    m_httpListener2.LogWriter = httpserverlog;
+                    m_httpListener = tinyHTTPListener.Create(IPAddress.Any, (int)m_port, m_cert);
+                    if(m_certificateValidationCallback != null)
+                        m_httpListener.CertificateValidationCallback = m_certificateValidationCallback;
+                    m_httpListener.ExceptionThrown += httpServerException;
+                    if (DebugLevel > 0)
+                    {
+                        m_httpListener.LogWriter = httpserverlog;
+                        httpserverlog.DebugLevel = 1;
+                    }
                 }
 
-                m_httpListener2.RequestReceived += OnRequest;
-                //m_httpListener.Start();
-                m_httpListener2.Start(64);
+                m_httpListener.RequestReceived += OnRequest;
+                m_httpListener.Start(64);
 
                 lock (m_generalLock)
                 {
@@ -2086,13 +2085,6 @@ namespace OpenSim.Framework.Servers.HttpServer
                 }
 
                 HTTPDRunning = true;
-
-                //HttpListenerContext context;
-                //while (true)
-                //{
-                //    context = m_httpListener.GetContext();
-                //    ThreadPool.UnsafeQueueUserWorkItem(new WaitCallback(HandleRequest), context);
-                // }
             }
             catch (Exception e)
             {
@@ -2152,12 +2144,12 @@ namespace OpenSim.Framework.Servers.HttpServer
                         m_pollServiceManager.Stop();
                 }
 
-                m_httpListener2.ExceptionThrown -= httpServerException;
+                m_httpListener.ExceptionThrown -= httpServerException;
                 //m_httpListener2.DisconnectHandler = null;
 
-                m_httpListener2.LogWriter = null;
-                m_httpListener2.RequestReceived -= OnRequest;
-                m_httpListener2.Stop();
+                m_httpListener.LogWriter = null;
+                m_httpListener.RequestReceived -= OnRequest;
+                m_httpListener.Stop();
             }
             catch (NullReferenceException)
             {
@@ -2302,13 +2294,17 @@ namespace OpenSim.Framework.Servers.HttpServer
     ///
     /// You may also be able to get additional trace information from HttpServer if you uncomment the UseTraceLogs
     /// property in StartHttp() for the HttpListener
+    /// 
     public class HttpServerLogWriter : ILogWriter
     {
-        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public int DebugLevel {get; set;} = (int)LogPrio.Error;
 
         public void Write(object source, LogPrio priority, string message)
         {
-            /*
+            if((int)priority < DebugLevel)
+                return;
+
             switch (priority)
             {
                 case LogPrio.Trace:
@@ -2332,8 +2328,6 @@ namespace OpenSim.Framework.Servers.HttpServer
                 default:
                     break;
             }
-            */
-
             return;
         }
     }
