@@ -120,7 +120,7 @@ namespace OpenSim.Framework
             if (e)
                 sb.Append("<boolean>1</boolean>");
             else
-                sb.Append("<boolean />");
+                sb.Append("<boolean>0</boolean>");
         }
 
         public static void AddElem(byte e, StringBuilder sb)
@@ -171,8 +171,8 @@ namespace OpenSim.Framework
 
         public static void AddElem(float e, StringBuilder sb)
         {
-            if (e == 0)
-                sb.Append("<real />");
+            if(e == 0)
+                sb.Append("<real>0</real>");
             else
             {
                 sb.Append("<real>");
@@ -185,8 +185,8 @@ namespace OpenSim.Framework
         {
             sb.Append("<array>");
 
-            if (e.X == 0)
-                sb.Append("<real />");
+            if(e.X == 0)
+                sb.Append("<real>0</real>");
             else
             {
                 sb.Append("<real>");
@@ -194,8 +194,8 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if (e.Y == 0)
-                sb.Append("<real /></array>");
+            if(e.Y == 0)
+                sb.Append("<real>0</real></array>");
             else
             {
                 sb.Append("<real>");
@@ -208,8 +208,8 @@ namespace OpenSim.Framework
         {
             sb.Append("<array>");
 
-            if (e.X == 0)
-                sb.Append("<real />");
+            if(e.X == 0)
+                sb.Append("<real>0</real>");
             else
             {
                 sb.Append("<real>");
@@ -217,8 +217,8 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if (e.Y == 0)
-                sb.Append("<real />");
+            if(e.Y == 0)
+                sb.Append("<real>0</real>");
             else
             {
                 sb.Append("<real>");
@@ -226,8 +226,8 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if (e.Z == 0)
-                sb.Append("<real /></array>");
+            if(e.Z == 0)
+                sb.Append("<real>0</real></array>");
             else
             {
                 sb.Append("<real>");
@@ -240,8 +240,8 @@ namespace OpenSim.Framework
         {
             sb.Append("<array><key>x</key>");
 
-            if (e.X == 0)
-                sb.Append("<real />");
+            if(e.X == 0)
+                sb.Append("<real>0</real>");
             else
             {
                 sb.Append("<real>");
@@ -249,16 +249,16 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if (e.Y == 0)
-                sb.Append("<real />");
+            if(e.Y == 0)
+                sb.Append("<real>0</real>");
             else
             {
                 sb.Append("<real>");
                 sb.Append(e.Y.ToString(CultureInfo.InvariantCulture));
                 sb.Append("</real>");
             }
-            if (e.Z == 0)
-                sb.Append("<real />");
+            if(e.Z == 0)
+                sb.Append("<real>0</real>");
             else
             {
                 sb.Append("<real>");
@@ -266,8 +266,8 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if (e.W == 0)
-                sb.Append("<real /></array>");
+            if(e.W == 0)
+                sb.Append("<real>0</real></array>");
             else
             {
                 sb.Append("<real>");
@@ -278,8 +278,8 @@ namespace OpenSim.Framework
 
         public static void AddElem(double e, StringBuilder sb)
         {
-            if (e == 0)
-                sb.Append("<real />");
+            if(e == 0)
+                sb.Append("<real>0</real>");
             else
             {
                 sb.Append("<real>");
@@ -420,7 +420,7 @@ namespace OpenSim.Framework
             if (e)
                 sb.Append("<boolean>1</boolean>");
             else
-                sb.Append("<boolean />");
+                sb.Append("<boolean>0</boolean>");
         }
 
         public static void AddElem(string name, byte e, StringBuilder sb)
@@ -487,8 +487,8 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key>");
 
-            if (e == 0)
-                sb.Append("<real />");
+            if(e == 0)
+                sb.Append("<real>0</real>");
             else
             {
                 sb.Append("<real>");
@@ -503,8 +503,8 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key><array>>");
 
-            if (e.X == 0)
-                sb.Append("<real />");
+            if(e.X == 0)
+                sb.Append("<real>0</real>");
             else
             {
                 sb.Append("<real>");
@@ -512,8 +512,8 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if (e.Y == 0)
-                sb.Append("<real /></array>");
+            if(e.Y == 0)
+                sb.Append("<real>0</real></array>");
             else
             {
                 sb.Append("<real>");
@@ -528,8 +528,8 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key><array>");
 
-            if (e.X == 0)
-                sb.Append("<real />");
+            if(e.X == 0)
+                sb.Append("<real>0</real>");
             else
             {
                 sb.Append("<real>");
@@ -537,8 +537,8 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if (e.Y == 0)
-                sb.Append("<real />");
+            if(e.Y == 0)
+                sb.Append("<real>0</real>");
             else
             {
                 sb.Append("<real>");
@@ -546,8 +546,8 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if (e.Z == 0)
-                sb.Append("<real /></array>");
+            if(e.Z == 0)
+                sb.Append("<real>0</real></array>");
             else
             {
                 sb.Append("<real>");
@@ -562,8 +562,8 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key><array>");
 
-            if (e.X == 0)
-                sb.Append("<real />");
+            if(e.X == 0)
+                sb.Append("<real>0</real>");
             else
             {
                 sb.Append("<real>");
@@ -571,16 +571,16 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if (e.Y == 0)
-                sb.Append("<real />");
+            if(e.Y == 0)
+                sb.Append("<real>0</real>");
             else
             {
                 sb.Append("<real>");
                 sb.Append(e.Y.ToString(CultureInfo.InvariantCulture));
                 sb.Append("</real>");
             }
-            if (e.Z == 0)
-                sb.Append("<real />");
+            if(e.Z == 0)
+                sb.Append("<real>0</real>");
             else
             {
                 sb.Append("<real>");
@@ -588,8 +588,8 @@ namespace OpenSim.Framework
                 sb.Append("</real>");
             }
 
-            if (e.W == 0)
-                sb.Append("<real /></array>");
+            if(e.W == 0)
+                sb.Append("<real>0</real></array>");
             else
             {
                 sb.Append("<real>");
@@ -604,8 +604,8 @@ namespace OpenSim.Framework
             sb.Append(name);
             sb.Append("</key>");
 
-            if (e == 0)
-                sb.Append("<real />");
+            if(e == 0)
+                sb.Append("<real>0</real>");
             else
             {
                 sb.Append("<real>");

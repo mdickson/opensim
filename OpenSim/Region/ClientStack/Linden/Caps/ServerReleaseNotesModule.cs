@@ -27,6 +27,10 @@
 
 // Dedicated to Quill Littlefeather
 
+using System;
+using System.Collections;
+using System.Net;
+using System.Reflection;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -34,9 +38,7 @@ using OpenMetaverse;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using System;
-using System.Collections;
-using System.Reflection;
+
 using Caps = OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Region.ClientStack.LindenCaps
@@ -122,7 +124,7 @@ namespace OpenSim.Region.ClientStack.LindenCaps
         private Hashtable ProcessServerReleaseNotes(Hashtable request, UUID agentID)
         {
             Hashtable responsedata = new Hashtable();
-            responsedata["int_response_code"] = 301;
+            responsedata["int_response_code"] = HttpStatusCode.Moved;
             responsedata["str_redirect_location"] = m_ServerReleaseNotesURL;
             return responsedata;
         }

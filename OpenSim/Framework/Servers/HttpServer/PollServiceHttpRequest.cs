@@ -29,6 +29,7 @@ using log4net;
 using OpenMetaverse;
 using System;
 using System.Collections;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using OSHttpServer;
@@ -131,7 +132,7 @@ namespace OpenSim.Framework.Servers.HttpServer
 
 
             response.StatusCode = responsecode;
-            if (responsecode == (int)OSHttpStatusCode.RedirectMovedPermanently)
+            if (responsecode == (int)HttpStatusCode.Moved)
             {
                 response.AddHeader("Location:", (string)responsedata["str_redirect_location"]);
                 response.KeepAlive = false;

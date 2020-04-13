@@ -43,23 +43,23 @@ namespace OpenSim.Framework.Servers.HttpServer
     {
         private static readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        protected IHttpRequest _request = null;
-        protected IHttpClientContext _context = null;
+        protected IHttpRequest m_request = null;
+        protected IHttpClientContext m_context = null;
 
         public string[] AcceptTypes
         {
-            get { return _request.AcceptTypes; }
+            get { return m_request.AcceptTypes; }
         }
 
         public Encoding ContentEncoding
         {
-            get { return _contentEncoding; }
+            get { return m_contentEncoding; }
         }
-        private Encoding _contentEncoding;
+        private Encoding m_contentEncoding;
 
         public long ContentLength
         {
-            get { return _request.ContentLength; }
+            get { return m_request.ContentLength; }
         }
 
         public long ContentLength64
@@ -69,15 +69,15 @@ namespace OpenSim.Framework.Servers.HttpServer
 
         public string ContentType
         {
-            get { return _contentType; }
+            get { return m_contentType; }
         }
-        private string _contentType;
+        private string m_contentType;
 
         public HttpCookieCollection Cookies
         {
             get
             {
-                RequestCookies cookies = _request.Cookies;
+                RequestCookies cookies = m_request.Cookies;
                 HttpCookieCollection httpCookies = new HttpCookieCollection();
                 if(cookies != null)
                 {
@@ -90,81 +90,111 @@ namespace OpenSim.Framework.Servers.HttpServer
 
         public bool HasEntityBody
         {
-            get { return _request.ContentLength != 0; }
+            get { return m_request.ContentLength != 0; }
         }
 
         public NameValueCollection Headers
         {
-            get { return _request.Headers; }
+            get { return m_request.Headers; }
         }
 
         public string HttpMethod
         {
-            get { return _request.Method; }
+            get { return m_request.Method; }
         }
 
         public Stream InputStream
         {
-            get { return _request.Body; }
+            get { return m_request.Body; }
         }
 
         public bool IsSecured
         {
-            get { return _context.IsSecured; }
+            get { return m_context.IsSecured; }
         }
 
         public bool KeepAlive
         {
-            get { return ConnectionType.KeepAlive == _request.Connection; }
+            get { return ConnectionType.KeepAlive == m_request.Connection; }
         }
 
         public NameValueCollection QueryString
         {
-            get { return _queryString; }
+            get { return m_request.QueryString;}
         }
-        private NameValueCollection _queryString;
 
+        private Hashtable m_queryAsHashtable = null;
         public Hashtable Query
         {
-            get { return _query; }
+            get
+            {
+                if (m_queryAsHashtable == null)
+                    BuildQueryHashtable();
+                return m_queryAsHashtable;
+            }
         }
-        private Hashtable _query;
 
-        /// <value>
-        /// POST request values, if applicable
-        /// </value>
-//        public Hashtable Form { get; private set; }
-
-        public string RawUrl
+        //faster than Query
+        private Dictionary<string, string> _queryAsDictionay = null;
+        public Dictionary<string,string> QueryAsDictionary
         {
-            get { return _request.Uri.AbsolutePath; }
+            get
+            {
+                if (_queryAsDictionay == null)
+                    BuildQueryDictionary();
+                return _queryAsDictionay;
+            }
+        }
+
+        private HashSet<string> m_queryFlags = null;
+        public HashSet<string> QueryFlags
+        {
+            get
+            {
+                if (m_queryFlags == null)
+                    BuildQueryDictionary();
+                return m_queryFlags;
+            }
+        }
+    /// <value>
+    /// POST request values, if applicable
+    /// </value>
+    //        public Hashtable Form { get; private set; }
+
+    public string RawUrl
+        {
+            get { return m_request.Uri.AbsolutePath; }
         }
 
         public IPEndPoint RemoteIPEndPoint
         {
-            get { return _remoteIPEndPoint; }
+            get { return m_request.RemoteIPEndPoint; }
         }
-        private IPEndPoint _remoteIPEndPoint;
+
+        public IPEndPoint LocalIPEndPoint
+        {
+            get { return m_request.LocalIPEndPoint; }
+        }
 
         public Uri Url
         {
-            get { return _request.Uri; }
+            get { return m_request.Uri; }
         }
 
         public string UserAgent
         {
-            get { return _userAgent; }
+            get { return m_userAgent; }
         }
-        private string _userAgent;
+        private string m_userAgent;
 
         internal IHttpRequest IHttpRequest
         {
-            get { return _request; }
+            get { return m_request; }
         }
 
         internal IHttpClientContext IHttpClientContext
         {
-            get { return _context; }
+            get { return m_context; }
         }
 
         /// <summary>
@@ -181,78 +211,70 @@ namespace OpenSim.Framework.Servers.HttpServer
 
         public OSHttpRequest(IHttpClientContext context, IHttpRequest req)
         {
-            _request = req;
-            _context = context;
+            m_request = req;
+            m_context = context;
 
             if (null != req.Headers["content-encoding"])
             {
                 try
                 {
-                    _contentEncoding = Encoding.GetEncoding(_request.Headers["content-encoding"]);
+                    m_contentEncoding = Encoding.GetEncoding(m_request.Headers["content-encoding"]);
                 }
-                catch (Exception)
+                catch
                 {
                     // ignore
                 }
             }
 
             if (null != req.Headers["content-type"])
-                _contentType = _request.Headers["content-type"];
+                m_contentType = m_request.Headers["content-type"];
             if (null != req.Headers["user-agent"])
-                _userAgent = req.Headers["user-agent"];
+                m_userAgent = req.Headers["user-agent"];
 
-            if (null != req.Headers["remote_addr"])
+//            Form = new Hashtable();
+//            foreach (HttpInputItem item in req.Form)
+//            {
+//                _log.DebugFormat("[OSHttpRequest]: Got form item {0}={1}", item.Name, item.Value);
+//                Form.Add(item.Name, item.Value);
+//            }
+        }
+
+        private void BuildQueryDictionary()
+        {
+            NameValueCollection q = m_request.QueryString;
+            _queryAsDictionay = new Dictionary<string, string>();
+            m_queryFlags = new HashSet<string>();
+            for(int i = 0; i <q.Count; ++i)
             {
                 try
                 {
-                    IPAddress addr = IPAddress.Parse(req.Headers["remote_addr"]);
-                    // sometimes req.Headers["remote_port"] returns a comma separated list, so use
-                    // the first one in the list and log it
-                    string[] strPorts = req.Headers["remote_port"].Split(new char[] { ',' });
-                    if (strPorts.Length > 1)
-                    {
-                        _log.ErrorFormat("[OSHttpRequest]: format exception on addr/port {0}:{1}, ignoring",
-                                     req.Headers["remote_addr"], req.Headers["remote_port"]);
-                    }
-                    int port = Int32.Parse(strPorts[0]);
-                    _remoteIPEndPoint = new IPEndPoint(addr, port);
+                    var name = q.GetKey(i);
+                    if(!string.IsNullOrEmpty(name))
+                        _queryAsDictionay[name] = q[i];
+                    else
+                        m_queryFlags.Add(q[i]);
                 }
-                catch (FormatException)
-                {
-                    _log.ErrorFormat("[OSHttpRequest]: format exception on addr/port {0}:{1}, ignoring",
-                                     req.Headers["remote_addr"], req.Headers["remote_port"]);
-                }
+                catch {}
             }
+        }
 
-            _queryString = new NameValueCollection();
-            _query = new Hashtable();
-            try
+        private void BuildQueryHashtable()
+        {
+            NameValueCollection q = m_request.QueryString;
+            m_queryAsHashtable = new Hashtable();
+            m_queryFlags = new HashSet<string>();
+            for (int i = 0; i < q.Count; ++i)
             {
-                foreach (HttpInputItem item in req.QueryString)
+                try
                 {
-                    try
-                    {
-                        _queryString.Add(item.Name, item.Value);
-                        _query[item.Name] = item.Value;
-                    }
-                    catch (InvalidCastException)
-                    {
-                        _log.DebugFormat("[OSHttpRequest]: error parsing {0} query item, skipping it", item.Name);
-                        continue;
-                    }
+                    var name = q.GetKey(i);
+                    if (!string.IsNullOrEmpty(name))
+                        m_queryAsHashtable[name] = q[i];
+                    else
+                        m_queryFlags.Add(q[i]);
                 }
+                catch { }
             }
-            catch (Exception)
-            {
-                _log.ErrorFormat("[OSHttpRequest]: Error parsing querystring");
-            }
-
-            //            Form = new Hashtable();
-            //            foreach (HttpInputItem item in req.Form)
-            //            {
-            //                _log.DebugFormat("[OSHttpRequest]: Got form item {0}={1}", item.Name, item.Value);
-            //                Form.Add(item.Name, item.Value);
-            //            }
         }
 
         public override string ToString()

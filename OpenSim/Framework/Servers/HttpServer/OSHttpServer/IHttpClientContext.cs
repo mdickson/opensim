@@ -16,6 +16,8 @@ namespace OSHttpServer
         /// </summary>
         string SSLCommonName { get; }
 
+        IPEndPoint LocalIPEndPoint {get; set;}
+
         /// <summary>
         /// Using SSL or other encryption method.
         /// </summary>
@@ -23,7 +25,7 @@ namespace OSHttpServer
 
         int contextID {get;}
         int TimeoutKeepAlive {get; set; }
-        int MaxPipeRequests{get; set; }
+        int MaxRequests{get; set; }
 
         bool CanSend();
         bool IsSending();
@@ -92,11 +94,11 @@ namespace OSHttpServer
         HTTPNetworkContext GiveMeTheNetworkStreamIKnowWhatImDoing();
 
         void StartSendResponse(HttpResponse response);
-        void ContinueSendResponse();
-        void ReqResponseAboutToSend(uint requestID);
-        void ReqResponseSent(uint requestID, ConnectionType connection);
+        void ContinueSendResponse(bool notThrottled);
+        void EndSendResponse(uint requestID, ConnectionType connection);
         bool TrySendResponse(int limit);
     }
+
     public class HTTPNetworkContext
     {
         public NetworkStream Stream;
@@ -142,5 +144,7 @@ namespace OSHttpServer
             Request = request;
         }
     }
+
+
 
 }

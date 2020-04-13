@@ -25,19 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Specialized;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Reflection;
+using System.IO;
+using System.Net;
+using System.Web;
 using log4net;
 using OpenMetaverse;
 using OpenMetaverse.Imaging;
 using OpenSim.Framework;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Services.Interfaces;
-using System;
-using System.Collections.Specialized;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Reflection;
-using System.Web;
 
 namespace OpenSim.Capabilities.Handlers
 {
@@ -130,7 +131,7 @@ namespace OpenSim.Capabilities.Handlers
             {
                 string textureUrl = m_RedirectURL + "?texture_id=" + textureID.ToString();
                 m_log.Debug("[GETTEXTURE]: Redirecting texture request to " + textureUrl);
-                httpResponse.StatusCode = (int)OSHttpStatusCode.RedirectMovedPermanently;
+                httpResponse.StatusCode = (int)HttpStatusCode.Moved;
                 httpResponse.AddHeader("Location:", textureUrl);
                 return true;
             }

@@ -1526,18 +1526,17 @@ namespace OpenSim.Region.CoreModules.World.Land
 
                     if (avatar.IsChildAgent)
                     {
-                        if (client == remote_client)
-                            land.SendLandProperties(-10000, false, LandChannel.LAND_RESULT_SINGLE, client);
+                        land.SendLandProperties(-10000, false, LandChannel.LAND_RESULT_SINGLE, client);
                         return;
                     }
 
                     ILandObject aland = GetLandObject(avatar.AbsolutePosition.X, avatar.AbsolutePosition.Y);
                     if (aland != null)
                     {
-                        if (client == remote_client && land != aland)
+                        if(land != aland)
                             land.SendLandProperties(-10000, false, LandChannel.LAND_RESULT_SINGLE, client);
                         else if (land == aland)
-                            aland.SendLandProperties(0, false, LandChannel.LAND_RESULT_SINGLE, client);
+                             aland.SendLandProperties(0, true, LandChannel.LAND_RESULT_SINGLE, client);
                     }
                     if (avatar.currentParcelUUID == parcelID)
                         avatar.currentParcelUUID = parcelID; // force parcel flags review
@@ -1610,10 +1609,10 @@ namespace OpenSim.Region.CoreModules.World.Land
                     land.LandData.OwnerID = ownerID;
                     land.LandData.GroupID = UUID.Zero;
                     land.LandData.IsGroupOwned = false;
-                    land.LandData.Flags &= ~(uint)(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
+                    land.LandData.Flags &= ~(uint) (ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
+                    UpdateLandObject(land.LandData.LocalID, land.LandData);
                     m_scene.ForEachClient(SendParcelOverlay);
                     land.SendLandUpdateToClient(true, remote_client);
-                    UpdateLandObject(land.LandData.LocalID, land.LandData);
                 }
             }
         }
@@ -1635,9 +1634,9 @@ namespace OpenSim.Region.CoreModules.World.Land
                     land.LandData.IsGroupOwned = false;
                     land.LandData.Flags &= ~(uint)(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
 
-                    m_scene.ForEachClient(SendParcelOverlay);
-                    land.SendLandUpdateToClient(true, remote_client);
                     UpdateLandObject(land.LandData.LocalID, land.LandData);
+                    m_scene.ForEachClient(SendParcelOverlay);
+                    land.SendLandUpdateToAvatars();
                 }
             }
         }
@@ -1663,10 +1662,10 @@ namespace OpenSim.Region.CoreModules.World.Land
                     land.LandData.SeeAVs = true;
                     land.LandData.AnyAVSounds = true;
                     land.LandData.GroupAVSounds = true;
-                    land.LandData.Flags &= ~(uint)(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
-                    m_scene.ForEachClient(SendParcelOverlay);
-                    land.SendLandUpdateToClient(true, remote_client);
+                    land.LandData.Flags &= ~(uint) (ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
                     UpdateLandObject(land.LandData.LocalID, land.LandData);
+                    m_scene.ForEachClient(SendParcelOverlay);
+                    land.SendLandUpdateToAvatars();
                 }
             }
         }
@@ -1689,6 +1688,8 @@ namespace OpenSim.Region.CoreModules.World.Land
                 if (land != null)
                 {
                     land.UpdateLandSold(e.agentId, e.groupId, e.groupOwned, (uint)e.transactionID, e.parcelPrice, e.parcelArea);
+                    m_scene.ForEachClient(SendParcelOverlay);
+                    land.SendLandUpdateToAvatars();
                 }
             }
         }
@@ -1741,6 +1742,8 @@ namespace OpenSim.Region.CoreModules.World.Land
                 if (!m_scene.Permissions.CanDeedParcel(remote_client.AgentId, land))
                     return;
                 land.DeedToGroup(groupID);
+                m_scene.ForEachClient(SendParcelOverlay);
+                land.SendLandUpdateToAvatars();
             }
         }
 
@@ -2294,10 +2297,11 @@ namespace OpenSim.Region.CoreModules.World.Land
                 land.LandData.GroupID = UUID.Zero;
 
             land.LandData.Name = DefaultGodParcelName;
+            UpdateLandObject(land.LandData.LocalID, land.LandData);
+            //m_scene.EventManager.TriggerParcelPrimCountUpdate();
+
             m_scene.ForEachClient(SendParcelOverlay);
             land.SendLandUpdateToClient(true, client);
-            UpdateLandObject(land.LandData.LocalID, land.LandData);
-            m_scene.EventManager.TriggerParcelPrimCountUpdate();
         }
 
         private void ClientOnSimWideDeletes(IClientAPI client, UUID agentID, int flags, UUID targetID)

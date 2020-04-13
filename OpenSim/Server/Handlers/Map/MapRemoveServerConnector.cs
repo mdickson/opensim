@@ -25,19 +25,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using log4net;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Net;
+using System.Xml;
+
 using Nini.Config;
+using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Server.Base;
 using OpenSim.Server.Handlers.Base;
 using OpenSim.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Xml;
+
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Server.Handlers.MapImage
@@ -110,7 +113,7 @@ namespace OpenSim.Server.Handlers.MapImage
 
                 if (!request.ContainsKey("X") || !request.ContainsKey("Y"))
                 {
-                    httpResponse.StatusCode = (int)OSHttpStatusCode.ClientErrorBadRequest;
+                    httpResponse.StatusCode = (int)HttpStatusCode.BadRequest;
                     return FailureResult("Bad request.");
                 }
                 int x = 0, y = 0;

@@ -79,7 +79,7 @@ namespace OpenSim.Capabilities.Handlers
             m_assetService = assService;
         }
 
-        public Hashtable Handle(Hashtable request)
+        public Hashtable Handle(OSHttpRequest req)
         {
             Hashtable responsedata = new Hashtable();
             responsedata["content_type"] = "text/plain";
@@ -95,25 +95,27 @@ namespace OpenSim.Capabilities.Handlers
 
             responsedata["int_response_code"] = (int)System.Net.HttpStatusCode.BadRequest;
 
-            string[] queries = null;
-            if(request.Contains("querystringkeys"))
-                queries = (string[])request["querystringkeys"];
-            
-            if(queries == null || queries.Length == 0)
+            var queries = req.Query;
+            if(queries.Count == 0)
                 return responsedata;
 
-            string query = queries[0];
-            if(!queryTypes.ContainsKey(query))
+            AssetType type = AssetType.Unknown;
+            string assetStr = string.Empty;
+            foreach (KeyValuePair<string,string> kvp in queries)
             {
-                m_log.Warn("[GETASSET]: Unknown type: " + query);
-                return responsedata;
+                if (queryTypes.ContainsKey(kvp.Key))
+                {
+                    type = queryTypes[kvp.Key];
+                    assetStr = kvp.Value;
+                }
             }
 
-            AssetType type = queryTypes[query];
-
-            string assetStr = string.Empty;
-            if (request.ContainsKey(query))
-                assetStr = request[query].ToString();
+            if(type == AssetType.Unknown)
+            {
+                //m_log.Warn("[GETASSET]: Unknown type: " + query);
+                m_log.Warn("[GETASSET]: Unknown type");
+                return responsedata;
+            }
 
             if (String.IsNullOrEmpty(assetStr))
                 return responsedata;
@@ -139,11 +141,11 @@ namespace OpenSim.Capabilities.Handlers
 
             int len = asset.Data.Length;
 
-            string range = String.Empty;
-            if (((Hashtable)request["headers"])["range"] != null)
-               range = (string)((Hashtable)request["headers"])["range"];
-            else if (((Hashtable)request["headers"])["Range"] != null)
-                range = (string)((Hashtable)request["headers"])["Range"];
+            string range = null;
+            if (req.Headers["Range"] != null)
+                range = req.Headers["Range"];
+            else if (req.Headers["range"] != null)
+                range = req.Headers["range"];
 
             // range request
             int start, end;
@@ -180,8 +182,16 @@ namespace OpenSim.Capabilities.Handlers
             responsedata["int_bytes"] = len;
             if (type == AssetType.Mesh || type == AssetType.Texture)
             {
-                responsedata["throttle"] = true;
-                responsedata["prio"] = len < 8196 ? 1 : 2;
+                if(len > 8196)
+                {
+                    responsedata["throttle"] = true;
+                    if(type == AssetType.Texture && ((asset.Flags & AssetFlags.AvatarBake)!= 0))
+                        responsedata["prio"] = 1;
+                    else
+                        responsedata["prio"] = 2;
+                }
+                else
+                    responsedata["prio"] = 1;
             }
             return responsedata; // full asset
         }

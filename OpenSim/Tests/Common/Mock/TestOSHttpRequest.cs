@@ -28,6 +28,7 @@
 using OpenSim.Framework.Servers.HttpServer;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Net;
@@ -144,6 +145,22 @@ namespace OpenSim.Tests.Common
             }
         }
 
+        public Dictionary<string, string> QueryAsDictionary
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public HashSet<string> QueryFlags
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public string RawUrl
         {
             get
@@ -153,6 +170,14 @@ namespace OpenSim.Tests.Common
         }
 
         public IPEndPoint RemoteIPEndPoint
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public IPEndPoint LocalIPEndPoint
         {
             get
             {

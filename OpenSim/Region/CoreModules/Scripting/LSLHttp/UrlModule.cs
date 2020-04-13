@@ -25,6 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Net;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -34,11 +42,6 @@ using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Net;
-using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
 {
@@ -635,18 +638,16 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
             return response;
         }
 
-        public void HttpRequestHandler(UUID requestID, Hashtable request)
+        public void HttpRequestHandler(UUID requestID, OSHttpRequest request)
         {
             lock (request)
             {
-                string uri = request["uri"].ToString();
+                string uri = request.RawUrl;
                 bool is_ssl = uri.Contains("lslhttps");
 
                 try
                 {
-                    Hashtable headers = (Hashtable)request["headers"];
-
-                    //                    string uri_full = "http://" + ExternalHostNameForLSL + ":" + m_HttpServer.Port.ToString() + uri;// "/lslhttp/" + urlcode.ToString() + "/";
+                    //string uri_full = "http://" + ExternalHostNameForLSL + ":" + m_HttpServer.Port.ToString() + uri;// "/lslhttp/" + urlcode.ToString() + "/";
 
                     int pos1 = uri.IndexOf("/");// /lslhttp
                     int pos2 = uri.IndexOf("/", pos1 + 1);// /lslhttp/
@@ -655,8 +656,7 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
                     string uri_tmp = uri.Substring(0, pos3 + 1);
                     //HTTP server code doesn't provide us with QueryStrings
                     string pathInfo;
-                    string queryString;
-                    queryString = "";
+
 
                     pathInfo = uri.Substring(pos3);
 
@@ -675,6 +675,7 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
                     else
                     {
                         //m_log.Warn("[HttpRequestHandler]: http-in request failed; no such url: "+urlkey.ToString());
+                        request.InputStream.Dispose();
                         return;
                     }
 
@@ -692,44 +693,40 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
                     if (requestData.headers == null)
                         requestData.headers = new Dictionary<string, string>();
 
-                    foreach (DictionaryEntry header in headers)
+                    NameValueCollection headers = request.Headers;
+                    if (headers.Count > 0)
                     {
-                        string key = (string)header.Key;
-                        string value = (string)header.Value;
-                        requestData.headers.Add(key, value);
-                    }
-                    foreach (DictionaryEntry de in request)
-                    {
-                        if (de.Key.ToString() == "querystringkeys")
+                        for(int i = 0; i < headers.Count; ++i)
                         {
-                            System.String[] keys = (System.String[])de.Value;
-                            foreach (String key in keys)
-                            {
-                                if (request.ContainsKey(key))
-                                {
-                                    string val = (String)request[key];
-                                    if (key != "")
-                                    {
-                                        queryString = queryString + key + "=" + val + "&";
-                                    }
-                                    else
-                                    {
-                                        queryString = queryString + val + "&";
-                                    }
-                                }
-                            }
-                            if (queryString.Length > 1)
-                                queryString = queryString.Substring(0, queryString.Length - 1);
-
+                            string name = headers.GetKey(i);
+                            if (!string.IsNullOrEmpty(name))
+                                requestData.headers[name] = headers[i];
                         }
-
                     }
+
+                    NameValueCollection query = request.QueryString;
+                    if (query.Count > 0)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < query.Count; ++i)
+                        {
+                            string key = query.GetKey(i);
+                            if (string.IsNullOrEmpty(key))
+                                sb.AppendFormat("{0}&", query[i]);
+                            else
+                                sb.AppendFormat("{0} = {1}&", key, query[i]);
+                        }
+                        if (sb.Length > 1)
+                            sb.Remove(sb.Length - 1, 1);
+                        requestData.headers["x-query-string"] = sb.ToString();
+                    }
+                    else
+                        requestData.headers["x-query-string"] = String.Empty;
 
                     //if this machine is behind DNAT/port forwarding, currently this is being
                     //set to address of port forwarding router
-                    requestData.headers["x-remote-ip"] = requestData.headers["remote_addr"];
+                    requestData.headers["x-remote-ip"] = request.RemoteIPEndPoint.Address.ToString();
                     requestData.headers["x-path-info"] = pathInfo;
-                    requestData.headers["x-query-string"] = queryString;
                     requestData.headers["x-script-url"] = url.url;
 
                     //requestData.ev = new ManualResetEvent(false);
@@ -743,10 +740,18 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
                         m_RequestMap.Add(requestID, url);
                     }
 
-                    url.engine.PostScriptEvent(url.itemID, "http_request", new Object[] { requestID.ToString(), request["http-method"].ToString(), request["body"].ToString() });
+                    string requestBody;
+                    if (request.InputStream.Length > 0)
+                    {
+                        using (StreamReader reader = new StreamReader(request.InputStream, Encoding.UTF8))
+                            requestBody = reader.ReadToEnd();
+                    }
+                    else
+                        requestBody = string.Empty;
 
-                    //send initial response?
-                    //                    Hashtable response = new Hashtable();
+                    request.InputStream.Dispose();
+
+                    url.engine.PostScriptEvent(url.itemID, "http_request", new Object[] { requestID.ToString(), request.HttpMethod, requestBody });
 
                     return;
 
