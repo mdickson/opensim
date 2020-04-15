@@ -14905,6 +14905,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             {
                 wComm.DeliverMessage(ChatTypeEnum.Shout, ScriptBaseClass.DEBUG_CHANNEL, m_host.Name, m_host.UUID, text);
             }
+            Sleep(1000);
         }
 
         /// <summary>
