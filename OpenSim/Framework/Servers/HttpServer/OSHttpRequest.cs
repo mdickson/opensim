@@ -161,7 +161,7 @@ namespace OpenSim.Framework.Servers.HttpServer
     /// </value>
     //        public Hashtable Form { get; private set; }
 
-    public string RawUrl
+        public string RawUrl
         {
             get { return m_request.Uri.AbsolutePath; }
         }
@@ -179,6 +179,11 @@ namespace OpenSim.Framework.Servers.HttpServer
         public Uri Url
         {
             get { return m_request.Uri; }
+        }
+
+        public string UriPath
+        {
+            get { return m_request.UriPath; }
         }
 
         public string UserAgent
@@ -209,10 +214,10 @@ namespace OpenSim.Framework.Servers.HttpServer
 
         public OSHttpRequest() { }
 
-        public OSHttpRequest(IHttpClientContext context, IHttpRequest req)
+        public OSHttpRequest(IHttpRequest req)
         {
             m_request = req;
-            m_context = context;
+            m_context = req.Context;
 
             if (null != req.Headers["content-encoding"])
             {

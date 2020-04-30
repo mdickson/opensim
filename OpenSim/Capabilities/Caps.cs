@@ -31,7 +31,11 @@ using OpenSim.Framework.Servers.HttpServer;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.IO;
+using System.Reflection;
 using System.Threading;
+using log4net;
 
 // using OpenSim.Region.Framework.Interfaces;
 
@@ -46,7 +50,7 @@ namespace OpenSim.Framework.Capabilities
 
     public class Caps
     {
-        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private string m_httpListenerHostName;
         private uint m_httpListenPort;
@@ -59,8 +63,8 @@ namespace OpenSim.Framework.Capabilities
 
         private CapsHandlers m_capsHandlers;
 
-        private Dictionary<string, PollServiceEventArgs> m_pollServiceHandlers
-            = new Dictionary<string, PollServiceEventArgs>();
+        private ConcurrentDictionary<string, PollServiceEventArgs> m_pollServiceHandlers
+            = new ConcurrentDictionary<string, PollServiceEventArgs>();
 
         private Dictionary<string, string> m_externalCapsHandlers = new Dictionary<string, string>();
 
@@ -170,15 +174,27 @@ namespace OpenSim.Framework.Capabilities
             m_capsHandlers[capName] = handler;
         }
 
+        public void RegisterSimpleHandler(string capName, ISimpleStreamHandler handler, bool addToListener = true)
+        {
+            //m_log.DebugFormat("[CAPS]: Registering handler for \"{0}\": path {1}", capName, handler.Path);
+            m_capsHandlers.AddSimpleHandler(capName, handler, addToListener);
+        }
+
         public void RegisterPollHandler(string capName, PollServiceEventArgs pollServiceHandler)
         {
             //            m_log.DebugFormat(
             //                "[CAPS]: Registering handler with name {0}, url {1} for {2}",
             //                capName, pollServiceHandler.Url, m_agentID, m_regionName);
 
-            m_pollServiceHandlers.Add(capName, pollServiceHandler);
+            if(!m_pollServiceHandlers.TryAdd(capName, pollServiceHandler))
+            {
+                m_log.ErrorFormat(
+                    "[CAPS]: Handler with name {0} already registered (ulr {1}, agent {2}, region {3}",
+                    capName, pollServiceHandler.Url, m_agentID, m_regionName);
+                return;
+            }
 
-            m_httpListener.AddPollServiceHTTPHandler(pollServiceHandler.Url, pollServiceHandler);
+            m_httpListener.AddPollServiceHTTPHandler(pollServiceHandler);
 
             //            uint port = (MainServer.Instance == null) ? 0 : MainServer.Instance.Port;
             //            string protocol = "http";
@@ -218,7 +234,7 @@ namespace OpenSim.Framework.Capabilities
 
             foreach (PollServiceEventArgs handler in m_pollServiceHandlers.Values)
             {
-                m_httpListener.RemovePollServiceHTTPHandler("", handler.Url);
+                m_httpListener.RemovePollServiceHTTPHandler(handler.Url);
             }
             m_pollServiceHandlers.Clear();
         }

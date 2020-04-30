@@ -1,21 +1,15 @@
 using log4net;
 using Mono.Addins;
 using Nini.Config;
-using Nwc.XmlRpc;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-//using OpenSim.Services.Connectors.Hypergrid;
 using OpenSim.Services.Interfaces;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
 using System.Reflection;
 using System.Timers;
-using System.Xml;
 
 namespace OpenSim.Region.ClientStack.Linden
 {

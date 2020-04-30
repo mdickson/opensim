@@ -25,8 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Timers;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.IO;
+using System.Net;
+using System.Reflection;
+using System.Text;
+using System.Web;
+
 using log4net;
 using Nini.Config;
+
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
@@ -36,15 +48,7 @@ using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.Framework.Scenes.Serialization;
 using OpenSim.Services.Interfaces;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Timers;
-using System.Web;
+
 using Caps = OpenSim.Framework.Capabilities.Caps;
 using OSDArray = OpenMetaverse.StructuredData.OSDArray;
 using OSDMap = OpenMetaverse.StructuredData.OSDMap;
@@ -58,21 +62,14 @@ namespace OpenSim.Region.ClientStack.Linden
         int cost, UUID texturesFolder, int nreqtextures, int nreqmeshs, int nreqinstances,
         bool IsAtestUpload, ref string error, ref int nextOwnerMask, ref int groupMask, ref int everyoneMask, int[] meshesSides);
 
-    public delegate UUID UpdateItem(UUID itemID, byte[] data);
-
     public delegate void UpdateTaskScript(UUID itemID, UUID primID, bool isScriptRunning, byte[] data, ref ArrayList errors);
 
     public delegate void NewInventoryItem(UUID userID, InventoryItemBase item, uint cost);
 
     public delegate void NewAsset(AssetBase asset);
 
-    public delegate UUID ItemUpdatedCallback(UUID userID, UUID itemID, byte[] data);
-
     public delegate ArrayList TaskScriptUpdatedCallback(UUID userID, UUID itemID, UUID primID,
                                                    bool isScriptRunning, byte[] data);
-
-    public delegate InventoryCollection FetchInventoryDescendentsCAPS(UUID agentID, UUID folderID, UUID ownerID,
-                                                                          bool fetchFolders, bool fetchItems, int sortOrder, out int version);
 
     /// <summary>
     /// XXX Probably not a particularly nice way of allow us to get the scene presence from the scene (chiefly so that
@@ -81,7 +78,7 @@ namespace OpenSim.Region.ClientStack.Linden
     /// </summary>
     public delegate IClientAPI GetClientDelegate(UUID agentID);
 
-    public class BunchOfCaps
+    public partial class BunchOfCaps
     {
         private static readonly ILog m_log =
             LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -100,7 +97,6 @@ namespace OpenSim.Region.ClientStack.Linden
         public NewAsset AddNewAsset = null;
         public ItemUpdatedCallback ItemUpdatedCall = null;
         public TaskScriptUpdatedCallback TaskScriptUpdatedCall = null;
-        public FetchInventoryDescendentsCAPS CAPSFetchInventoryDescendents = null;
         public GetClientDelegate GetClient = null;
 
         private bool m_persistBakedTextures = false;
@@ -132,15 +128,8 @@ namespace OpenSim.Region.ClientStack.Linden
         private bool m_TrimResident = true;
 
         IEventQueue m_EventQueue;
-        IEventQueue EventQueue
-        {
-            get
-            {
-                if (m_EventQueue == null)
-                    m_EventQueue = m_Scene.RequestModuleInterface<IEventQueue>();
-                return m_EventQueue;
-            }
-        }
+
+        private IMoneyModule m_moneyModule;
 
         private enum FileAgentInventoryState : int
         {
@@ -184,6 +173,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 {
                     m_persistBakedTextures = appearanceConfig.GetBoolean("PersistBakedTextures", m_persistBakedTextures);
                 }
+
                 // economy for model upload
                 IConfig EconomyConfig = config.Configs["Economy"];
                 if (EconomyConfig != null)
@@ -196,6 +186,7 @@ namespace OpenSim.Region.ClientStack.Linden
                     m_enableFreeTestUpload = EconomyConfig.GetBoolean("AllowFreeTestUpload", m_enableFreeTestUpload);
                     m_ForceFreeTestUpload = EconomyConfig.GetBoolean("ForceFreeTestUpload", m_ForceFreeTestUpload);
                     string testcreator = EconomyConfig.GetString("TestAssetsCreatorID", "");
+                    
                     if (testcreator != "")
                     {
                         UUID id;
@@ -236,12 +227,17 @@ namespace OpenSim.Region.ClientStack.Linden
 
             m_assetService = m_Scene.AssetService;
             m_regionName = m_Scene.RegionInfo.RegionName;
+            
             m_UserManager = m_Scene.RequestModuleInterface<IUserManagement>();
             m_userAccountService = m_Scene.RequestModuleInterface<IUserAccountService>();
+            m_EventQueue = m_Scene.RequestModuleInterface<IEventQueue>();
             m_DisplayNames = m_Scene.RequestModuleInterface<IDisplayNamesModule>();
+            m_moneyModule = m_Scene.RequestModuleInterface<IMoneyModule>();
 
             if (m_DisplayNames == null)
+            {
                 m_log.Error("[CAPS]: GetDisplayNames disabled because display names component not found");
+            }
 
 			if (m_UserManager == null)
             {
@@ -249,25 +245,34 @@ namespace OpenSim.Region.ClientStack.Linden
                 m_AllowSetDisplayName = false;
             }
 
-            UserAccount account = m_userAccountService.GetUserAccount(m_Scene.RegionInfo.ScopeID, m_AgentID);
-            if (account == null) // Hypergrid?
-                m_scopeID = m_Scene.RegionInfo.ScopeID;
-            else
-                m_scopeID = account.ScopeID;
+            if (m_UserManager == null)
+            {
+                m_log.Error("[CAPS]: GetDisplayNames disabled because user management component not found");
+            }
 
-            RegisterHandlers();
+            UserAccount account = m_userAccountService?.GetUserAccount(m_Scene.RegionInfo.ScopeID, m_AgentID);
+            if (account == null) // Hypergrid?
+            {
+                m_scopeID = m_Scene.RegionInfo.ScopeID;
+            }
+            else
+            {
+                m_scopeID = account.ScopeID;
+            }
 
             AddNewInventoryItem = m_Scene.AddUploadedInventoryItem;
-            ItemUpdatedCall = m_Scene.CapsUpdateInventoryItemAsset;
+            ItemUpdatedCall = m_Scene.CapsUpdateItemAsset;
             TaskScriptUpdatedCall = m_Scene.CapsUpdateTaskInventoryScriptAsset;
             GetClient = m_Scene.SceneGraph.GetControllingClient;
+
+            RegisterHandlers();
 
             m_FileAgentInventoryState = FileAgentInventoryState.idle;
         }
 
         public string GetNewCapPath()
         {
-            return "/CAPS/" + UUID.Random();
+            return  "/" + UUID.Random();
         }
 
         /// <summary>
@@ -278,12 +283,9 @@ namespace OpenSim.Region.ClientStack.Linden
             // this path is also defined elsewhere so keeping it
             string seedcapsBase = "/CAPS/" + m_HostCapsObj.CapsObjectPath + "0000/";
 
-            // the root of all evil path needs to be capsBase + m_requestPath
-            m_HostCapsObj.RegisterHandler(
-                    "SEED", new RestStreamHandler("POST", seedcapsBase, SeedCapRequest, "SEED", null));
-
-            //                m_log.DebugFormat(
-            //                    "[CAPS]: Registered seed capability {0} for {1}", seedcapsBase, m_HostCapsObj.AgentID);
+            m_HostCapsObj.RegisterSimpleHandler("SEED", new SimpleStreamHandler(seedcapsBase, SeedCapRequest));
+            // m_log.DebugFormat(
+            //     "[CAPS]: Registered seed capability {0} for {1}", seedcapsBase, m_HostCapsObj.AgentID);
 
             RegisterRegionServiceHandlers();
             RegisterInventoryServiceHandlers();
@@ -299,17 +301,14 @@ namespace OpenSim.Region.ClientStack.Linden
                 //                                                                GetNewCapPath(),
                 //                                                               GetMapLayer);
 
-                IRequestHandler getObjectPhysicsDataHandler = new RestStreamHandler(
-                        "POST", GetNewCapPath(), GetObjectPhysicsData, "GetObjectPhysicsData", null);
-                m_HostCapsObj.RegisterHandler("GetObjectPhysicsData", getObjectPhysicsDataHandler);
+                m_HostCapsObj.RegisterSimpleHandler("GetObjectPhysicsData",
+                    new SimpleOSDMapHandler("POST", GetNewCapPath(), GetObjectPhysicsData));
 
-                IRequestHandler getObjectCostHandler = new RestStreamHandler(
-                        "POST", GetNewCapPath(), GetObjectCost, "GetObjectCost", null);
-                m_HostCapsObj.RegisterHandler("GetObjectCost", getObjectCostHandler);
+                m_HostCapsObj.RegisterSimpleHandler("GetObjectCost",
+                    new SimpleOSDMapHandler("POST", GetNewCapPath(), GetObjectCost));
 
-                IRequestHandler ResourceCostSelectedHandler = new RestStreamHandler(
-                        "POST", GetNewCapPath(), ResourceCostSelected, "ResourceCostSelected", null);
-                m_HostCapsObj.RegisterHandler("ResourceCostSelected", ResourceCostSelectedHandler);
+                m_HostCapsObj.RegisterSimpleHandler("ResourceCostSelected",
+                    new SimpleOSDMapHandler("POST", GetNewCapPath(), ResourceCostSelected));
 
                 IRequestHandler req = new RestStreamHandler(
                         "POST", GetNewCapPath(), ScriptTaskInventory, "UpdateScript", null);
@@ -318,16 +317,14 @@ namespace OpenSim.Region.ClientStack.Linden
 
                 if (m_AllowCapHomeLocation)
                 {
-                    IRequestHandler HomeLocationHandler = new RestStreamHandler(
-                        "POST", GetNewCapPath(), HomeLocation, "HomeLocation", null);
-                    m_HostCapsObj.RegisterHandler("HomeLocation", HomeLocationHandler);
+                    m_HostCapsObj.RegisterSimpleHandler("HomeLocation",
+                        new SimpleStreamHandler(GetNewCapPath(), HomeLocation));
                 }
 
                 if (m_AllowCapGroupMemberData)
                 {
-                    IRequestHandler GroupMemberDataHandler = new RestStreamHandler(
-                        "POST", GetNewCapPath(), GroupMemberData, "GroupMemberData", null);
-                    m_HostCapsObj.RegisterHandler("GroupMemberData", GroupMemberDataHandler);
+                    m_HostCapsObj.RegisterSimpleHandler("GroupMemberData",
+                        new SimpleStreamHandler(GetNewCapPath(), GroupMemberData));
                 }
 
 
@@ -351,25 +348,32 @@ namespace OpenSim.Region.ClientStack.Linden
                     new LLSDStreamhandler<LLSDAssetUploadRequest, LLSDAssetUploadResponse>(
                         "POST", GetNewCapPath(), NewAgentInventoryRequest, "NewFileAgentInventory", null));
 
-                IRequestHandler req = new RestStreamHandler(
-                        "POST", GetNewCapPath(), NoteCardAgentInventory, "Update*", null);
-                m_HostCapsObj.RegisterHandler("UpdateNotecardAgentInventory", req);
-                m_HostCapsObj.RegisterHandler("UpdateAnimSetAgentInventory", req);
-                m_HostCapsObj.RegisterHandler("UpdateScriptAgentInventory", req);
-                m_HostCapsObj.RegisterHandler("UpdateScriptAgent", req);
+                if (ItemUpdatedCall != null)
+                {
+                    // we have a single "do it all" method
+                    var oreq = new SimpleOSDMapHandler("POST", GetNewCapPath(), UpdateInventoryItemAsset);
 
-                IRequestHandler UpdateAgentInformationHandler = new RestStreamHandler(
-                        "POST", GetNewCapPath(), UpdateAgentInformation, "UpdateAgentInformation", null);
-                m_HostCapsObj.RegisterHandler("UpdateAgentInformation", UpdateAgentInformationHandler);
+                    // first also sets the http handler, others only register the cap, using it
+                    m_HostCapsObj.RegisterSimpleHandler("UpdateNotecardAgentInventory", oreq, true); 
+                    m_HostCapsObj.RegisterSimpleHandler("UpdateNotecardTaskInventory", oreq, false); // a object inv
+                    m_HostCapsObj.RegisterSimpleHandler("UpdateAnimSetAgentInventory", oreq, false);
+                    m_HostCapsObj.RegisterSimpleHandler("UpdateScriptAgentInventory", oreq, false);
+                    m_HostCapsObj.RegisterSimpleHandler("UpdateScriptAgent", oreq, false);
+                    m_HostCapsObj.RegisterSimpleHandler("UpdateSettingsAgentInventory", oreq, false);
+                    m_HostCapsObj.RegisterSimpleHandler("UpdateSettingsTaskInventory", oreq, false); // a object inv
+                    m_HostCapsObj.RegisterSimpleHandler("UpdateGestureAgentInventory", oreq, false);
+                    m_HostCapsObj.RegisterSimpleHandler("UpdateGestureTaskInventory", oreq, false);
+                }
+
+                m_HostCapsObj.RegisterSimpleHandler("UpdateAgentInformation",
+                    new SimpleStreamHandler(GetNewCapPath(), UpdateAgentInformation));
 
                 IRequestHandler CopyInventoryFromNotecardHandler = new RestStreamHandler(
                         "POST", GetNewCapPath(), CopyInventoryFromNotecard, "CopyInventoryFromNotecard", null);
                 m_HostCapsObj.RegisterHandler("CopyInventoryFromNotecard", CopyInventoryFromNotecardHandler);
 
-                IRequestHandler CreateInventoryCategoryHandler = new RestStreamHandler(
-                        "POST", GetNewCapPath(), CreateInventoryCategory, "CreateInventoryCategory", null);
-                m_HostCapsObj.RegisterHandler("CreateInventoryCategory", CreateInventoryCategoryHandler);
-
+                m_HostCapsObj.RegisterSimpleHandler("CreateInventoryCategory",
+                    new SimpleStreamHandler(GetNewCapPath(), CreateInventoryCategory));
             }
             catch (Exception e)
             {
@@ -383,14 +387,15 @@ namespace OpenSim.Region.ClientStack.Linden
             {
                 if (m_DisplayNames != null)
                 {
-                    IRequestHandler GetDisplayNamesHandler = new RestStreamHandler(
-                        "GET", GetNewCapPath(), GetDisplayNames, "GetDisplayNames", null);
-                    m_HostCapsObj.RegisterHandler("GetDisplayNames", GetDisplayNamesHandler);
+                    m_HostCapsObj.RegisterSimpleHandler("GetDisplayNames",
+                        new SimpleStreamHandler(GetNewCapPath() +"/", GetDisplayNames));
 
                     if (m_AllowSetDisplayName)
                     {
+                        // m_HostCapsObj.RegisterSimpleHandler("SetDisplayNames",
+                        //     new SimpleStreamHandler(GetNewCapPath() +"/", SetDisplayNames));
                         IRequestHandler SetDisplayNameHandler = new RestStreamHandler(
-                            "POST", GetNewCapPath(), SetDisplayName, "SetDisplayName", null);
+                            "POST", GetNewCapPath(), SetDisplayNames, "SetDisplayName", null);
                         m_HostCapsObj.RegisterHandler("SetDisplayName", SetDisplayNameHandler);
                     }
                 }
@@ -410,41 +415,62 @@ namespace OpenSim.Region.ClientStack.Linden
         /// <param name="httpRequest">HTTP request header object</param>
         /// <param name="httpResponse">HTTP response header object</param>
         /// <returns></returns>
-        public string SeedCapRequest(string request, string path, string param,
-                                  IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
+        public void SeedCapRequest(IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
             UUID agentID = m_HostCapsObj.AgentID;
             m_log.DebugFormat(
                 "[CAPS]: Received SEED caps request in {0} for agent {1}", m_regionName, agentID);
 
+            if(httpRequest.HttpMethod != "POST" || httpRequest.ContentType != "application/llsd+xml")
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.NotFound;
+                return;
+            }
+
             if (!m_HostCapsObj.WaitForActivation())
-                return string.Empty;
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.ServiceUnavailable;
+                httpResponse.AddHeader("Retry-After", "30");
+                return;
+            }
 
             if (!m_Scene.CheckClient(agentID, httpRequest.RemoteIPEndPoint))
             {
                 m_log.WarnFormat(
                     "[CAPS]: Unauthorized CAPS client {0} from {1}",
                     agentID, httpRequest.RemoteIPEndPoint);
-
-                return string.Empty;
+                httpResponse.StatusCode = (int)HttpStatusCode.Forbidden;
+                return;
             }
 
-            OSDArray capsRequested = (OSDArray)OSDParser.DeserializeLLSDXml(request);
+            OSDArray capsRequested;
+            try
+            {
+                capsRequested = (OSDArray)OSDParser.DeserializeLLSDXml(httpRequest.InputStream);
+            }
+            catch
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.BadRequest;
+                return;
+            }
+
+
             List<string> validCaps = new List<string>();
 
             foreach (OSD c in capsRequested)
             {
                 string cstr = c.AsString();
-                if (cstr == "ObjectAnimation")
+                if (cstr.Equals("ObjectAnimation"))
                     m_HostCapsObj.Flags |= Caps.CapsFlags.ObjectAnim;
+                else if (cstr.Equals("ExtEnvironment"))
+                    m_HostCapsObj.Flags |= Caps.CapsFlags.AdvEnv;
                 validCaps.Add(cstr);
             }
 
             string result = LLSDHelpers.SerialiseLLSDReply(m_HostCapsObj.GetCapsDetails(true, validCaps));
-
+            httpResponse.RawBuffer = Encoding.UTF8.GetBytes(result);
+            httpResponse.StatusCode = (int)HttpStatusCode.OK;
             //m_log.DebugFormat("[CAPS] CapsRequest {0}", result);
-
-            return result;
         }
 
         /// <summary>
@@ -484,10 +510,7 @@ namespace OpenSim.Region.ClientStack.Linden
                     new BinaryStreamHandler(
                         "POST", uploaderPath, uploader.uploaderCaps, "TaskInventoryScriptUpdater", null));
 
-                string protocol = "http://";
-
-                if (m_HostCapsObj.SSLCaps)
-                    protocol = "https://";
+                string protocol = m_HostCapsObj.SSLCaps ?  "https://" : "http://";
 
                 string uploaderURL = protocol + m_HostCapsObj.HostName + ":" + m_HostCapsObj.Port.ToString() + uploaderPath;
 
@@ -532,11 +555,11 @@ namespace OpenSim.Region.ClientStack.Linden
         /// <param name="itemID">Item to update</param>
         /// <param name="data">New asset data</param>
         /// <returns></returns>
-        public UUID ItemUpdated(UUID itemID, byte[] data)
+        public UUID ItemUpdated(UUID itemID, UUID objectID, byte[] data)
         {
             if (ItemUpdatedCall != null)
             {
-                return ItemUpdatedCall(m_HostCapsObj.AgentID, itemID, data);
+                return ItemUpdatedCall(m_HostCapsObj.AgentID, itemID, objectID, data);
             }
 
             return UUID.Zero;
@@ -1300,161 +1323,100 @@ namespace OpenSim.Region.ClientStack.Linden
                 m_FileAgentInventoryState = FileAgentInventoryState.idle;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="mapReq"></param>
-        /// <returns></returns>
-        public LLSDMapLayerResponse GetMapLayer(LLSDMapRequest mapReq)
+        public void CreateInventoryCategory(IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
-            m_log.Debug("[CAPS]: MapLayer Request in region: " + m_regionName);
-            LLSDMapLayerResponse mapResponse = new LLSDMapLayerResponse();
-            mapResponse.LayerData.Array.Add(GetOSDMapLayerResponse());
-            return mapResponse;
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <returns></returns>
-        protected static OSDMapLayer GetOSDMapLayerResponse()
-        {
-            OSDMapLayer mapLayer = new OSDMapLayer();
-            mapLayer.Right = 5000;
-            mapLayer.Top = 5000;
-            mapLayer.ImageID = new UUID("00000000-0000-1111-9999-000000000006");
-
-            return mapLayer;
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="path"></param>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public string RequestTexture(string request, string path, string param)
-        {
-            m_log.Debug("texture request " + request);
-            // Needs implementing (added to remove compiler warning)
-            return String.Empty;
-        }
-
-        public string CreateInventoryCategory(string request, string path, string param,
-                                             IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
-        {
+            if(httpRequest.HttpMethod != "POST")
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.NotFound;
+                return;
+            }
             if (m_Scene.InventoryService == null)
             {
-                httpResponse.StatusCode = (int)System.Net.HttpStatusCode.ServiceUnavailable;
-                httpResponse.StatusDescription = "Service not avaiable";
-                return "";
+                httpResponse.StatusCode = (int)HttpStatusCode.NotImplemented;
+                return;
             }
 
             ScenePresence sp = m_Scene.GetScenePresence(m_AgentID);
             if (sp == null || sp.IsDeleted)
             {
-                httpResponse.StatusCode = (int)System.Net.HttpStatusCode.ServiceUnavailable;
-                httpResponse.StatusDescription = "Retry later";
-                httpResponse.AddHeader("Retry-After", "30");
-                return "";
+                httpResponse.StatusCode = (int)HttpStatusCode.ServiceUnavailable;
+                httpResponse.AddHeader("Retry-After", "60");
+                return;
             }
 
-            Hashtable hash = (Hashtable)LLSD.LLSDDeserialize(Utils.StringToBytes(request));
-
-            while (true) // kinda goto
+            OSDMap req;
+            OSD tmp;
+            try
             {
-                if (!hash.Contains("folder_id") || !(hash["folder_id"] is UUID))
-                    break;
-                UUID folderID = (UUID)hash["folder_id"];
-
-                if (!hash.Contains("parent_id") || !(hash["parent_id"] is UUID))
-                    break;
-                UUID parentID = (UUID)hash["parent_id"];
-
-                if (!hash.Contains("name") || !(hash["name"] is string))
-                    break;
-                string folderName = (string)hash["name"];
-
-                if (!hash.Contains("type") || !(hash["type"] is int))
-                    break;
-                int folderType = (int)hash["type"];
-
-                InventoryFolderBase folder = new InventoryFolderBase(folderID, folderName, m_AgentID, (short)folderType, parentID, 1);
-                if (!m_Scene.InventoryService.AddFolder(folder))
-                    break;
-
-                // costly double check plus possible service changes
-                folder = m_Scene.InventoryService.GetFolder(m_AgentID, folderID);
-                if (folder == null)
-                    break;
-
-                StringBuilder sb = LLSDxmlEncode.Start();
-                LLSDxmlEncode.AddMap(sb);
-                LLSDxmlEncode.AddElem("folder_id", folder.ID, sb);
-                LLSDxmlEncode.AddElem("name", folder.Name, sb);
-                LLSDxmlEncode.AddElem("parent_id", folder.ParentID, sb);
-                LLSDxmlEncode.AddElem("type", folder.Type, sb);
-                LLSDxmlEncode.AddEndMap(sb);
-                string resp = LLSDxmlEncode.End(sb);
-
-                return resp;
+                req = (OSDMap)OSDParser.DeserializeLLSDXml(httpRequest.InputStream);
+            }
+            catch
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.BadRequest;
+                return;
             }
 
-            httpResponse.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
-            return "";
-        }
+            try
+            {
+                while (true) // kinda goto
+                {
+                    if (!req.TryGetValue("folder_id", out tmp) || !(tmp is OSDUUID))
+                        break;
+                    UUID folderID = tmp.AsUUID();
 
-        /// <summary>
-        /// Called by the notecard update handler.  Provides a URL to which the client can upload a new asset.
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="path"></param>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public string NoteCardAgentInventory(string request, string path, string param,
-                                             IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
-        {
-            //m_log.Debug("[CAPS]: NoteCardAgentInventory Request in region: " + m_regionName + "\n" + request);
-            //m_log.Debug("[CAPS]: NoteCardAgentInventory Request is: " + request);
+                    if(folderID == UUID.Zero)
+                        break;
 
-            //OpenMetaverse.StructuredData.OSDMap hash = (OpenMetaverse.StructuredData.OSDMap)OpenMetaverse.StructuredData.LLSDParser.DeserializeBinary(Utils.StringToBytes(request));
-            Hashtable hash = (Hashtable)LLSD.LLSDDeserialize(Utils.StringToBytes(request));
-            LLSDItemUpdate llsdRequest = new LLSDItemUpdate();
-            LLSDHelpers.DeserialiseOSDMap(hash, llsdRequest);
+                    if (!req.TryGetValue("parent_id", out tmp) || !(tmp is OSDUUID))
+                        break;
+                    UUID parentID = tmp.AsUUID();
 
-            string uploaderPath = GetNewCapPath();
+                    if (!req.TryGetValue("name", out tmp) || !(tmp is OSDString))
+                        break;
+                    string folderName = tmp.AsString();
 
-            ItemUpdater uploader =
-                new ItemUpdater(llsdRequest.item_id, uploaderPath, m_HostCapsObj.HttpListener, m_dumpAssetsToFile);
-            uploader.OnUpLoad += ItemUpdated;
+                    if(string.IsNullOrEmpty(folderName))
+                        break;
 
-            m_HostCapsObj.HttpListener.AddStreamHandler(
-                new BinaryStreamHandler(
-                    "POST", uploaderPath, uploader.uploaderCaps, "NoteCardAgentInventory", null));
+                    if(folderName.Length > 63)
+                        folderName = folderName.Substring(0, 63);
 
-            string protocol = "http://";
+                    if (!req.TryGetValue("type", out tmp) || !(tmp is OSDInteger))
+                        break;
+                    int folderType = tmp.AsInteger();
 
-            if (m_HostCapsObj.SSLCaps)
-                protocol = "https://";
+                    InventoryFolderBase folder = new InventoryFolderBase(folderID, folderName, m_AgentID, (short)folderType, parentID, 1);
+                    if (!m_Scene.InventoryService.AddFolder(folder))
+                        break;
 
-            string uploaderURL = protocol + m_HostCapsObj.HostName + ":" + m_HostCapsObj.Port.ToString() + uploaderPath;
+                    // costly double check plus possible service changes
+                    folder = m_Scene.InventoryService.GetFolder(m_AgentID, folderID);
+                    if (folder == null)
+                        break;
 
-            LLSDAssetUploadResponse uploadResponse = new LLSDAssetUploadResponse();
-            uploadResponse.uploader = uploaderURL;
-            uploadResponse.state = "upload";
+                    StringBuilder sb = LLSDxmlEncode.Start();
+                    LLSDxmlEncode.AddMap(sb);
+                    LLSDxmlEncode.AddElem("folder_id", folder.ID, sb);
+                    LLSDxmlEncode.AddElem("name", folder.Name, sb);
+                    LLSDxmlEncode.AddElem("parent_id", folder.ParentID, sb);
+                    LLSDxmlEncode.AddElem("type", folder.Type, sb);
+                    LLSDxmlEncode.AddEndMap(sb);
 
-            //            m_log.InfoFormat("[CAPS]: " +
-            //                             "NoteCardAgentInventory response: {0}",
-            //                             LLSDHelpers.SerialiseLLSDReply(uploadResponse)));
+                    httpResponse.RawBuffer = Encoding.UTF8.GetBytes(LLSDxmlEncode.End(sb));
+                    httpResponse.StatusCode = (int)HttpStatusCode.OK;
+                    return;
+                }
+            }
+            catch { }
 
-            return LLSDHelpers.SerialiseLLSDReply(uploadResponse);
+            m_log.Debug("[CAPS]: CreateInventoryCategory failed to process request");
+            httpResponse.StatusCode = (int)HttpStatusCode.BadRequest;
         }
 
 
         private string CopyInventoryFromNotecardError(IOSHttpResponse response)
         {
-            response.StatusCode = (int)System.Net.HttpStatusCode.NotFound;
+            response.StatusCode = (int)HttpStatusCode.NotFound;
             response.StatusDescription = "";
             return "";
         }
@@ -1647,12 +1609,18 @@ namespace OpenSim.Region.ClientStack.Linden
             return "";
         }
 
-        public string GetObjectPhysicsData(string request, string path,
-                string param, IOSHttpRequest httpRequest,
-                IOSHttpResponse httpResponse)
+        public void GetObjectPhysicsData(IOSHttpRequest httpRequest, IOSHttpResponse httpResponse, OSDMap req)
         {
-            OSDMap req = (OSDMap)OSDParser.DeserializeLLSDXml(request);
-            OSDArray object_ids = (OSDArray)req["object_ids"];
+            OSDArray object_ids;
+            try
+            {
+                object_ids = (OSDArray)req["object_ids"];
+            }
+            catch
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.BadRequest;
+                return;
+            }
 
             StringBuilder lsl = LLSDxmlEncode.Start();
 
@@ -1682,15 +1650,22 @@ namespace OpenSim.Region.ClientStack.Linden
                 }
             }
 
-            return LLSDxmlEncode.End(lsl);
+            httpResponse.RawBuffer = Encoding.UTF8.GetBytes(LLSDxmlEncode.End(lsl));
+            httpResponse.StatusCode = (int)HttpStatusCode.OK;
         }
 
-        public string GetObjectCost(string request, string path,
-                string param, IOSHttpRequest httpRequest,
-                IOSHttpResponse httpResponse)
+        public void GetObjectCost(IOSHttpRequest httpRequest, IOSHttpResponse httpResponse, OSDMap req)
         {
-            OSDMap req = (OSDMap)OSDParser.DeserializeLLSDXml(request);
-            OSDArray object_ids = (OSDArray)req["object_ids"];
+            OSDArray object_ids;
+            try
+            {
+                object_ids = (OSDArray)req["object_ids"];
+            }
+            catch
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.BadRequest;
+                return;
+            }
 
             StringBuilder lsl = LLSDxmlEncode.Start(512);
 
@@ -1742,18 +1717,15 @@ namespace OpenSim.Region.ClientStack.Linden
                 LLSDxmlEncode.AddEndMap(lsl);
             }
 
-            return LLSDxmlEncode.End(lsl);
+            httpResponse.RawBuffer = Encoding.UTF8.GetBytes(LLSDxmlEncode.End(lsl));
+            httpResponse.StatusCode = (int)HttpStatusCode.OK;
         }
 
-        public string ResourceCostSelected(string request, string path,
-                string param, IOSHttpRequest httpRequest,
-                IOSHttpResponse httpResponse)
+        public void ResourceCostSelected(IOSHttpRequest httpRequest,IOSHttpResponse httpResponse, OSDMap req)
         {
-            OSDMap req = (OSDMap)OSDParser.DeserializeLLSDXml(request);
-
-            float phys = 0;
-            float stream = 0;
-            float simul = 0;
+            float phys=0;
+            float stream=0;
+            float simul=0;
 
             if (req.ContainsKey("selected_roots"))
             {
@@ -1812,16 +1784,23 @@ namespace OpenSim.Region.ClientStack.Linden
             LLSDxmlEncode.AddEndMap(lsl);
             LLSDxmlEncode.AddEndMap(lsl);
 
-            //            resp["transaction_id"] = "undef";
-            return LLSDxmlEncode.End(lsl);
-
+            // resp["transaction_id"] = "undef";
+            httpResponse.RawBuffer = Encoding.UTF8.GetBytes(LLSDxmlEncode.End(lsl));
+            httpResponse.StatusCode = (int)HttpStatusCode.OK;
         }
 
-        public string UpdateAgentInformation(string request, string path,
-                string param, IOSHttpRequest httpRequest,
-                IOSHttpResponse httpResponse)
+        public void UpdateAgentInformation(IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
-            //            OSDMap req = (OSDMap)OSDParser.DeserializeLLSDXml(request);
+            if (httpRequest.HttpMethod != "POST")
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.NotFound;
+                return;
+            }
+
+            // this is wrong now ignores request and sends same result for all
+            // we don't store and worse don't use that to filter contents
+
+            // OSDMap req = (OSDMap)OSDParser.DeserializeLLSDXml(request);
             OSDMap resp = new OSDMap();
 
             OSDMap accessPrefs = new OSDMap();
@@ -1829,8 +1808,8 @@ namespace OpenSim.Region.ClientStack.Linden
 
             resp["access_prefs"] = accessPrefs;
 
-            string response = OSDParser.SerializeLLSDXmlString(resp);
-            return response;
+            httpResponse.RawBuffer = OSDParser.SerializeLLSDXmlBytes(resp);
+            httpResponse.StatusCode = (int)HttpStatusCode.OK;
         }
 
         public bool OSDMapTOVector3(OSDMap map, out Vector3 v)
@@ -1848,17 +1827,17 @@ namespace OpenSim.Region.ClientStack.Linden
             return true;
         }
 
-        public string HomeLocation(string request, string path, string param, IOSHttpRequest httpRequest,
-                IOSHttpResponse httpResponse)
+        public void HomeLocation(IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
-            OSDMap resp = new OSDMap();
-
-            resp["success"] = "false";
-
+            if (httpRequest.HttpMethod != "POST")
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.NotFound;
+                return;
+            }
 
             bool fail = true;
             string message = "Set Home request failed";
-            int locationID = 1;
+            //int locationID = 1;
             Vector3 pos = Vector3.Zero;
             Vector3 lookAt = Vector3.Zero;
 
@@ -1885,23 +1864,34 @@ namespace OpenSim.Region.ClientStack.Linden
                 if (!m_Scene.UserManagementModule.IsLocalGridUser(m_AgentID))
                     break;
 
-                OSDMap req = (OSDMap)OSDParser.DeserializeLLSDXml(request);
-                if (!req.ContainsKey("HomeLocation"))
+                OSDMap req;
+                try
+                {
+                    req = (OSDMap)OSDParser.DeserializeLLSDXml(httpRequest.InputStream);
+                }
+                catch
+                {
+                    httpResponse.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return;
+                }
+
+                OSD tmp;
+                if (!req.TryGetValue("HomeLocation", out tmp) || !(tmp is OSDMap))
                     break;
 
-                OSDMap HLocation = (OSDMap)req["HomeLocation"];
-                if (!HLocation.ContainsKey("LocationPos"))
+                OSDMap HLocation = (OSDMap)tmp;
+
+                if(!HLocation.TryGetValue("LocationPos", out tmp) || !(tmp is OSDMap))
                     break;
-                if (!HLocation.ContainsKey("LocationLookAt"))
+                if (!OSDMapTOVector3((OSDMap)tmp, out pos))
                     break;
 
-                locationID = HLocation["LocationId"].AsInteger();
-
-                if (!OSDMapTOVector3((OSDMap)HLocation["LocationPos"], out pos))
+                if (!HLocation.TryGetValue("LocationLookAt", out tmp) || !(tmp is OSDMap))
+                    break;
+                if (!OSDMapTOVector3((OSDMap)tmp, out lookAt))
                     break;
 
-                if (!OSDMapTOVector3((OSDMap)HLocation["LocationLookAt"], out lookAt))
-                    break;
+                //locationID = HLocation["LocationId"].AsInteger();
 
                 ILandObject land = m_Scene.LandChannel.GetLandObject(pos);
                 if (land == null)
@@ -1945,33 +1935,34 @@ namespace OpenSim.Region.ClientStack.Linden
                 break;
             }
 
-            string response;
+            OSDMap resp = new OSDMap();
 
             if (fail)
             {
                 if (client != null)
                     client.SendAlertMessage(message);
-                response = OSDParser.SerializeLLSDXmlString(resp);
-                return response;
+                resp["success"] = "false";
+            }
+            else
+            {
+                // so its http but still needs a udp reply to inform user? crap :p
+                if(client != null)
+                   client.SendAlertMessage("Home position set.","HomePositionSet");
+
+                resp["success"] = "true";
+                OSDMap homeloc = new OSDMap();
+                OSDMap homelocpos = new OSDMap();
+                // for some odd reason viewers send pos as reals but read as integer
+                homelocpos["X"] = new OSDReal(pos.X);
+                homelocpos["Y"] = new OSDReal(pos.Y);
+                homelocpos["Z"] = new OSDReal(pos.Z);
+                homeloc["LocationPos"] = homelocpos;
+
+                resp["HomeLocation"] = homeloc;
             }
 
-            // so its http but still needs a udp reply to inform user? crap :p
-            if (client != null)
-                client.SendAlertMessage("Home position set.", "HomePositionSet");
-
-            resp["success"] = "true";
-            OSDMap homeloc = new OSDMap();
-            OSDMap homelocpos = new OSDMap();
-            // for some odd reason viewers send pos as reals but read as integer
-            homelocpos["X"] = new OSDReal(pos.X);
-            homelocpos["Y"] = new OSDReal(pos.Y);
-            homelocpos["Z"] = new OSDReal(pos.Z);
-            homeloc["LocationPos"] = homelocpos;
-
-            resp["HomeLocation"] = homeloc;
-
-            response = OSDParser.SerializeLLSDXmlString(resp);
-            return response;
+            httpResponse.RawBuffer = Encoding.UTF8.GetBytes(OSDParser.SerializeLLSDXmlString(resp));
+            httpResponse.StatusCode = (int)HttpStatusCode.OK;
         }
 
         private static int CompareRolesByMembersDesc(GroupRolesData x, GroupRolesData y)
@@ -1979,12 +1970,15 @@ namespace OpenSim.Region.ClientStack.Linden
             return -(x.Members.CompareTo(y.Members));
         }
 
-        public string GroupMemberData(string request, string path, string param, IOSHttpRequest httpRequest,
-                IOSHttpResponse httpResponse)
+        public void GroupMemberData(IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
-            OSDMap resp = new OSDMap();
+            if (httpRequest.HttpMethod != "POST")
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.NotFound;
+                return;
+            }
 
-            string response;
+            OSDMap resp = new OSDMap();
 
             bool fail = true;
             IClientAPI client = null;
@@ -2007,12 +2001,23 @@ namespace OpenSim.Region.ClientStack.Linden
 
                 client = sp.ControllingClient;
 
-                OSDMap req = (OSDMap)OSDParser.DeserializeLLSDXml(request);
-                if (!req.ContainsKey("group_id"))
+                OSDMap req;
+                try
+                {
+                    req = (OSDMap)OSDParser.DeserializeLLSDXml(httpRequest.InputStream);
+                }
+                catch
+                {
+                    httpResponse.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return;
+                }
+
+                OSD tmp;
+                if(!req.TryGetValue("group_id", out tmp) || !(tmp is OSDUUID))
                     break;
 
-                groupID = req["group_id"].AsUUID();
-                if (groupID == UUID.Zero)
+                groupID = tmp.AsUUID();
+                if(groupID == UUID.Zero)
                     break;
 
                 List<GroupRolesData> roles = m_GroupsModule.GroupRoleDataRequest(client, groupID);
@@ -2095,8 +2100,8 @@ namespace OpenSim.Region.ClientStack.Linden
                 resp["members"] = new OSDMap();
             }
 
-            response = OSDParser.SerializeLLSDXmlString(resp);
-            return response;
+            httpResponse.RawBuffer = Encoding.UTF8.GetBytes(OSDParser.SerializeLLSDXmlString(resp));
+            httpResponse.StatusCode = (int)HttpStatusCode.OK;
         }
 
         #region Cool Name functions
@@ -2152,7 +2157,7 @@ namespace OpenSim.Region.ClientStack.Linden
 
         void DisplayNameUpdate(string newDisplayName, string oldDisplayName, NameInfo nameInfo, UUID toAgentID, DateTime nextUpdate)
         {
-            if (EventQueue != null)
+            if (m_EventQueue != null)
             {
                 if (string.IsNullOrWhiteSpace(newDisplayName))
                     newDisplayName = m_TrimResident && nameInfo.LastName.ToLower() == "resident" ? newDisplayName = nameInfo.FirstName : nameInfo.Name;
@@ -2184,7 +2189,7 @@ namespace OpenSim.Region.ClientStack.Linden
                     update = DisplayNameUpdate(newDisplayName, oldDisplayName, m_AgentID, is_default, firstname, lastname, username, nextUpdate);
                 }
 
-                EventQueue.Enqueue(update, toAgentID);
+                m_EventQueue.Enqueue(update, toAgentID);
             }
         }
 
@@ -2220,7 +2225,7 @@ namespace OpenSim.Region.ClientStack.Linden
 
         public void SetDisplayNameReply(string newDisplayName, string oldDisplayName, NameInfo nameInfo, DateTime nextUpdate)
         {
-            if (EventQueue != null)
+            if (m_EventQueue != null)
             {
                 if (string.IsNullOrWhiteSpace(newDisplayName))
                     newDisplayName = m_TrimResident && nameInfo.LastName.ToLower() == "resident" ? newDisplayName = nameInfo.FirstName : nameInfo.Name;
@@ -2228,34 +2233,36 @@ namespace OpenSim.Region.ClientStack.Linden
                 OSD item = DisplayNameReply(newDisplayName, oldDisplayName, m_AgentID, nameInfo.IsDefault,
                                             nameInfo.FirstName, nameInfo.LastName, m_TrimResident ? nameInfo.UserName : getUserName(nameInfo.FirstName, nameInfo.LastName), nextUpdate);
 
-                EventQueue.Enqueue(item, m_AgentID);
+                m_EventQueue.Enqueue(item, m_AgentID);
             }
         }
         #endregion
 
-        public string GetDisplayNames(string request, string path,
-                string param, IOSHttpRequest httpRequest,
-                IOSHttpResponse httpResponse)
+        public void GetDisplayNames(IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
-            httpResponse.StatusCode = (int)System.Net.HttpStatusCode.Gone;
-            httpResponse.ContentType = "text/plain";
+            if (httpRequest.HttpMethod != "GET")
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.NotFound;
+                return;
+            }
 
             ScenePresence sp = m_Scene.GetScenePresence(m_AgentID);
+
             if (sp == null || sp.IsDeleted)
-                return "";
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.Gone;
+                return;
+            }
 
             if (sp.IsInTransit && !sp.IsInLocalTransit)
             {
-                httpResponse.StatusCode = (int)System.Net.HttpStatusCode.ServiceUnavailable;
-                httpResponse.AddHeader("Retry-After", "30");
-                return "";
+                httpResponse.StatusCode = (int)HttpStatusCode.ServiceUnavailable;
+                httpResponse.AddHeader("Retry-After","30");
+                return;
             }
 
             // Full content request
-            httpResponse.StatusCode = (int)System.Net.HttpStatusCode.OK;
-            httpResponse.ContentType = "application/llsd+xml";
-
-            NameValueCollection query = HttpUtility.ParseQueryString(httpRequest.Url.Query);
+            NameValueCollection query = httpRequest.QueryString;
             string[] ids = query.GetValues("ids");
 
             Dictionary<UUID, NameInfo> names = m_DisplayNames.GetDisplayNames(ids);
@@ -2358,14 +2365,17 @@ namespace OpenSim.Region.ClientStack.Linden
             }
 
             LLSDxmlEncode.AddEndMap(lsl);
-            return LLSDxmlEncode.End(lsl); ;
+
+            httpResponse.RawBuffer = Encoding.UTF8.GetBytes(LLSDxmlEncode.End(lsl));
+            httpResponse.ContentType = "application/llsd+xml";
+            httpResponse.StatusCode = (int)HttpStatusCode.OK;
         }
 	
-        public string SetDisplayName(string request, string path,
+        public string SetDisplayNames(string request, string path,
                 string param, IOSHttpRequest httpRequest,
                 IOSHttpResponse httpResponse)
         {
-            if (EventQueue == null)
+            if (m_EventQueue == null)
                 return string.Empty;
             
             if (!m_UserManager.IsLocalGridUser(m_AgentID))
@@ -2570,16 +2580,6 @@ namespace OpenSim.Region.ClientStack.Linden
             httpListener.RemoveStreamHandler("POST", uploaderPath);
         }
 
-        ///Left this in and commented in case there are unforseen issues
-        //private void SaveAssetToFile(string filename, byte[] data)
-        //{
-        //    FileStream fs = File.Create(filename);
-        //    BinaryWriter bw = new BinaryWriter(fs);
-        //    bw.Write(data);
-        //    bw.Close();
-        //    fs.Close();
-        //}
-
         private static void SaveAssetToFile(string filename, byte[] data)
         {
             string assetPath = "UserAssets";
@@ -2595,89 +2595,7 @@ namespace OpenSim.Region.ClientStack.Linden
         }
     }
 
-    /// <summary>
-    /// This class is a callback invoked when a client sends asset data to
-    /// an agent inventory notecard update url
-    /// </summary>
-    public class ItemUpdater
-    {
-        public event UpdateItem OnUpLoad;
 
-        private UpdateItem handlerUpdateItem = null;
-
-        private string uploaderPath = String.Empty;
-        private UUID inventoryItemID;
-        private IHttpServer httpListener;
-        private bool m_dumpAssetToFile;
-
-        public ItemUpdater(UUID inventoryItem, string path, IHttpServer httpServer, bool dumpAssetToFile)
-        {
-            m_dumpAssetToFile = dumpAssetToFile;
-
-            inventoryItemID = inventoryItem;
-            uploaderPath = path;
-            httpListener = httpServer;
-        }
-
-        /// <summary>
-        /// Handle raw uploaded asset data.
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="path"></param>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public string uploaderCaps(byte[] data, string path, string param)
-        {
-            UUID inv = inventoryItemID;
-            string res = String.Empty;
-            LLSDAssetUploadComplete uploadComplete = new LLSDAssetUploadComplete();
-            UUID assetID = UUID.Zero;
-            handlerUpdateItem = OnUpLoad;
-            if (handlerUpdateItem != null)
-            {
-                assetID = handlerUpdateItem(inv, data);
-            }
-
-            uploadComplete.new_asset = assetID.ToString();
-            uploadComplete.new_inventory_item = inv;
-            uploadComplete.state = "complete";
-
-            res = LLSDHelpers.SerialiseLLSDReply(uploadComplete);
-
-            httpListener.RemoveStreamHandler("POST", uploaderPath);
-
-            if (m_dumpAssetToFile)
-            {
-                SaveAssetToFile("updateditem" + Util.RandomClass.Next(1, 1000) + ".dat", data);
-            }
-
-            return res;
-        }
-
-        ///Left this in and commented in case there are unforseen issues
-        //private void SaveAssetToFile(string filename, byte[] data)
-        //{
-        //    FileStream fs = File.Create(filename);
-        //    BinaryWriter bw = new BinaryWriter(fs);
-        //    bw.Write(data);
-        //    bw.Close();
-        //    fs.Close();
-        //}
-
-        private static void SaveAssetToFile(string filename, byte[] data)
-        {
-            string assetPath = "UserAssets";
-            if (!Directory.Exists(assetPath))
-            {
-                Directory.CreateDirectory(assetPath);
-            }
-            FileStream fs = File.Create(Path.Combine(assetPath, filename));
-            BinaryWriter bw = new BinaryWriter(fs);
-            bw.Write(data);
-            bw.Close();
-            fs.Close();
-        }
-    }
 
     /// <summary>
     /// This class is a callback invoked when a client sends asset data to

@@ -76,7 +76,11 @@ namespace OpenSim.Framework.Servers.HttpServer
         /// </returns>
         bool AddHTTPHandler(string methodName, GenericHTTPMethod handler);
 
-        bool AddPollServiceHTTPHandler(string methodName, PollServiceEventArgs args);
+        bool AddPollServiceHTTPHandler(string uripath, PollServiceEventArgs args);
+        bool AddPollServiceHTTPHandler(PollServiceEventArgs args);
+
+        void RemovePollServiceHTTPHandler(string url, string path);
+        void RemovePollServiceHTTPHandler(string path);
 
         /// <summary>
         /// Adds a LLSD handler, yay.
@@ -91,6 +95,7 @@ namespace OpenSim.Framework.Servers.HttpServer
         /// </summary>
         /// <param name="handler"></param>
         void AddStreamHandler(IRequestHandler handler);
+        void AddSimpleStreamHandler(ISimpleStreamHandler handler, bool varPath = false);
 
         bool AddXmlRPCHandler(string method, XmlRpcMethod handler);
         bool AddXmlRPCHandler(string method, XmlRpcMethod handler, bool keepAlive);
@@ -131,18 +136,19 @@ namespace OpenSim.Framework.Servers.HttpServer
         /// <param name="path"></param>
         void RemoveHTTPHandler(string httpMethod, string path);
 
-        void RemovePollServiceHTTPHandler(string httpMethod, string path);
 
         bool RemoveLLSDHandler(string path, LLSDMethod handler);
 
         void RemoveStreamHandler(string httpMethod, string path);
+        void RemoveSimpleStreamHandler(string path);
 
         void RemoveXmlRPCHandler(string method);
 
         void RemoveJsonRPCHandler(string method);
 
-        string GetHTTP404(string host);
-
-        string GetHTTP500();
+        string GetHTTP404();
+        void AddIndexPHPMethodHandler(string key, SimpleStreamMethod sh);
+        void RemoveIndexPHPMethodHandler(string key);
+        SimpleStreamMethod TryGetIndexPHPMethodHandler(string key);
     }
 }

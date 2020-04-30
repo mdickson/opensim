@@ -39,7 +39,7 @@ namespace OSHttpServer
         {
             m_httpVersion = request.HttpVersion;
             if (string.IsNullOrEmpty(m_httpVersion))
-                m_httpVersion = "HTTP/1.0";
+                m_httpVersion = "HTTP/1.1";
 
             Status = HttpStatusCode.OK;
             m_context = context;
@@ -222,7 +222,7 @@ namespace OSHttpServer
 
             var sb = new StringBuilder();
             if(string.IsNullOrWhiteSpace(m_httpVersion))
-                sb.AppendFormat("HTTP1/0 {0} {1}\r\n", (int)Status,
+                sb.AppendFormat("HTTP/1.1 {0} {1}\r\n", (int)Status,
                                 string.IsNullOrEmpty(Reason) ? Status.ToString() : Reason);
             else
                 sb.AppendFormat("{0} {1} {2}\r\n", m_httpVersion, (int)Status,
@@ -246,14 +246,25 @@ namespace OSHttpServer
             if (m_headers["Server"] == null)
                 sb.Append("Server: OSWebServer\r\n");
 
-            int keepaliveS = m_context.TimeoutKeepAlive / 1000;
-            if (Connection == ConnectionType.KeepAlive && keepaliveS > 0 && m_context.MaxRequests > 0)
+            if(Status != HttpStatusCode.OK)
             {
-                sb.AppendFormat("Keep-Alive:timeout={0}, max={1}\r\n", keepaliveS, m_context.MaxRequests);
-                sb.Append("Connection: Keep-Alive\r\n");
+                sb.Append("Connection: close\r\n");
+                Connection = ConnectionType.Close;
             }
             else
-                sb.Append("Connection: close\r\n");
+            {
+                int keepaliveS = m_context.TimeoutKeepAlive / 1000;
+                if (Connection == ConnectionType.KeepAlive && keepaliveS > 0 && m_context.MaxRequests > 0)
+                {
+                    sb.AppendFormat("Keep-Alive:timeout={0}, max={1}\r\n", keepaliveS, m_context.MaxRequests);
+                    sb.Append("Connection: Keep-Alive\r\n");
+                }
+                else
+                {
+                    sb.Append("Connection: close\r\n");
+                    Connection = ConnectionType.Close;
+                }
+            }
 
             if (m_headers["Connection"] != null)
                 m_headers["Connection"] = null;
@@ -281,6 +292,9 @@ namespace OSHttpServer
 
         public void Send()
         {
+            if(m_context.IsClosing)
+                return;
+
             if (Sent)
                 throw new InvalidOperationException("Everything have already been sent.");
 
@@ -295,18 +309,25 @@ namespace OSHttpServer
                     m_context.TimeoutKeepAlive = m_keepAlive * 1000;
             }
 
-            m_headerBytes = GetHeaders();
             if (RawBuffer != null)
             {
-                if (RawBufferStart < 0 || RawBufferStart > RawBuffer.Length)
+                if (RawBufferStart > RawBuffer.Length)
                     return;
+
+                if (RawBufferStart < 0)
+                    RawBufferStart = 0;
 
                 if (RawBufferLen < 0)
                     RawBufferLen = RawBuffer.Length;
 
                 if (RawBufferLen + RawBufferStart > RawBuffer.Length)
                     RawBufferLen = RawBuffer.Length - RawBufferStart;
+            }
 
+            m_headerBytes = GetHeaders();
+
+            if (RawBuffer != null)
+            {
                 int tlen = m_headerBytes.Length + RawBufferLen;
                 if(RawBufferLen > 0 && tlen < 16384)
                 {
@@ -446,7 +467,7 @@ namespace OSHttpServer
             if (m_body != null)
                 m_body.Dispose();
             Sent = true;
-            m_context.EndSendResponse(requestID, Connection);
+            await m_context.EndSendResponse(requestID, Connection).ConfigureAwait(false);
         }
 
         private int CheckBandwidth(int request, int bytesLimit)

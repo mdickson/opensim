@@ -21,13 +21,13 @@ namespace OSHttpServer
     public class HttpClientContext : IHttpClientContext, IDisposable
     {
         const int MAXREQUESTS = 20;
-        const int MAXKEEPALIVE = 60000;
+        const int MAXKEEPALIVE = 120000;
 
         static private int basecontextID;
 
         private readonly byte[] m_ReceiveBuffer;
         private int m_ReceiveBytesLeft;
-        private ILogWriter _log;
+        private ILogWriter m_log;
         private readonly IHttpRequestParser m_parser;
         private HashSet<uint> requestsInServiceIDs;
         private Socket m_sock;
@@ -41,9 +41,8 @@ namespace OSHttpServer
         public int TimeoutFirstLine = 10000; // 10 seconds
         public int TimeoutRequestReceived = 30000; // 30 seconds
 
-        // The difference between this and request received is on POST more time is needed before we get the full request.
-        public int TimeoutMaxIdle = 600000; // 3 minutes
-        public int m_TimeoutKeepAlive = MAXKEEPALIVE; // 400 seconds before keepalive timeout
+        public int TimeoutMaxIdle = 180000; // 3 minutes
+        public int m_TimeoutKeepAlive = 60000;
 
         public int m_maxRequests = MAXREQUESTS;
 
@@ -51,6 +50,7 @@ namespace OSHttpServer
         public bool FullRequestReceived;
 
         private bool isSendingResponse = false;
+        private bool m_isClosing = false;
 
         private HttpRequest m_currentRequest;
         private HttpResponse m_currentResponse;
@@ -63,6 +63,11 @@ namespace OSHttpServer
             {
                 m_TimeoutKeepAlive = (value > MAXKEEPALIVE) ? MAXKEEPALIVE : value;
             }
+        }
+
+        public bool IsClosing
+        {
+            get { return m_isClosing;}
         }
 
         public int MaxRequests
@@ -102,14 +107,15 @@ namespace OSHttpServer
         /// <exception cref="SocketException">If <see cref="Socket.BeginReceive(byte[],int,int,SocketFlags,AsyncCallback,object)"/> fails</exception>
         /// <exception cref="ArgumentException">Stream must be writable and readable.</exception>
         public HttpClientContext(bool secured, IPEndPoint remoteEndPoint,
-                                    Stream stream, IRequestParserFactory parserFactory, Socket sock)
+                                    Stream stream, ILogWriter m_logWriter, Socket sock)
         {
             if (!stream.CanWrite || !stream.CanRead)
                 throw new ArgumentException("Stream must be writable and readable.");
 
             LocalIPEndPoint = remoteEndPoint;
-            _log = NullLogWriter.Instance;
-            m_parser = parserFactory.CreateParser(_log);
+            m_log = m_logWriter;
+            m_isClosing = false;
+            m_parser = new HttpRequestParser(m_log);
             m_parser.RequestCompleted += OnRequestCompleted;
             m_parser.RequestLineReceived += OnRequestLine;
             m_parser.HeaderReceived += OnHeaderReceived;
@@ -145,7 +151,7 @@ namespace OSHttpServer
 
         public bool CanSend()
         {
-            if (contextID < 0)
+            if (contextID < 0 || m_isClosing)
                 return false;
 
             if (m_stream == null || m_sock == null || !m_sock.Connected)
@@ -273,11 +279,11 @@ namespace OSHttpServer
         /// </summary>
         public ILogWriter LogWriter
         {
-            get { return _log; }
+            get { return m_log; }
             set
             {
-                _log = value ?? NullLogWriter.Instance;
-                m_parser.LogWriter = _log;
+                m_log = value ?? NullLogWriter.Instance;
+                m_parser.LogWriter = m_log;
             }
         }
 
@@ -309,9 +315,10 @@ namespace OSHttpServer
                         {
                             try
                             {
-                                m_stream.Flush(); // we should be on a work task so hold on it
+                                m_stream.Flush();
                             }
                             catch { }
+
                         }
                         m_stream.Close();
                         m_stream = null;
@@ -345,6 +352,9 @@ namespace OSHttpServer
                         Disconnect(SocketError.Success);
                         return;
                     }
+
+                    if(m_isClosing)
+                        continue;
 
                     m_ReceiveBytesLeft += bytesRead;
                     if (m_ReceiveBytesLeft > m_ReceiveBuffer.Length)
@@ -386,7 +396,7 @@ namespace OSHttpServer
                 LogWriter.Write(this, LogPrio.Warning, "Bad request, responding with it. Error: " + err);
                 try
                 {
-                    Respond("HTTP/1.0", HttpStatusCode.BadRequest, err.Message);
+                    Respond("HTTP/1.1", HttpStatusCode.BadRequest, err.Message);
                 }
                 catch (Exception err2)
                 {
@@ -494,7 +504,8 @@ namespace OSHttpServer
 
             if(!CanSend())
                 return false;
- 
+
+            LastActivityTimeMS = ContextTimeoutManager.EnvironmentTickCount();
             m_currentResponse?.SendNextAsync(bytesLimit);
             return false;
         }
@@ -506,7 +517,7 @@ namespace OSHttpServer
             ContextTimeoutManager.EnqueueSend(this, m_currentResponse.Priority, notThrottled);
         }
 
-        public void EndSendResponse(uint requestID, ConnectionType ctype)
+        public async Task EndSendResponse(uint requestID, ConnectionType ctype)
         {
             isSendingResponse = false;
             m_currentResponse?.Clear();
@@ -522,19 +533,28 @@ namespace OSHttpServer
             }
 
             if (doclose)
-                Disconnect(SocketError.Success);
+            {
+                m_isClosing = true;
+                lock (requestsInServiceIDs)
+                    requestsInServiceIDs.Clear();
+
+                TriggerKeepalive = true;
+                return;
+            }
             else
             {
                 LastActivityTimeMS = ContextTimeoutManager.EnvironmentTickCount();
                 if(Stream!=null && Stream.CanWrite)
                 {
+                    ContextTimeoutManager.ContextEnterActiveSend();
                     try
                     {
-                        Stream.Flush();
+                        await Stream.FlushAsync().ConfigureAwait(false);
                     }
                     catch
                     {
                     };
+                    ContextTimeoutManager.ContextLeaveActiveSend();
                 }
 
                 lock (requestsInServiceIDs)
@@ -621,7 +641,10 @@ namespace OSHttpServer
             if (offset + size > buffer.Length)
                 throw new ArgumentOutOfRangeException("offset", offset, "offset + size is beyond end of buffer.");
 
+            LastActivityTimeMS = ContextTimeoutManager.EnvironmentTickCount();
+
             bool ok = true;
+            ContextTimeoutManager.ContextEnterActiveSend();
             lock (sendLock) // can't have overlaps here
             {
                 try
@@ -632,11 +655,12 @@ namespace OSHttpServer
                 {
                     ok = false;
                 }
-
-                if (!ok && m_stream != null)
-                    Disconnect(SocketError.NoRecovery);
-                return ok;
             }
+
+            ContextTimeoutManager.ContextLeaveActiveSend();
+            if (!ok && m_stream != null)
+                Disconnect(SocketError.NoRecovery);
+            return ok;
         }
 
         public async Task<bool> SendAsync(byte[] buffer, int offset, int size)
