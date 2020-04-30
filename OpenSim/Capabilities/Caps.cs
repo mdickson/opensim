@@ -48,7 +48,7 @@ namespace OpenSim.Framework.Capabilities
     /// </summary>
     public delegate IClientAPI GetClientDelegate(UUID agentID);
 
-    public class Caps
+    public class Caps : IDisposable
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -156,6 +156,23 @@ namespace OpenSim.Framework.Capabilities
         ~Caps()
         {
             Flags = CapsFlags.None;
+            if (m_capsActive != null)
+            {
+                m_capsActive.Dispose();
+                m_capsActive = null;
+            }
+        }
+        
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        public void Dispose(bool disposing)
+        {
+            Flags = CapsFlags.None;
+            DeregisterHandlers();
             if (m_capsActive != null)
             {
                 m_capsActive.Dispose();
