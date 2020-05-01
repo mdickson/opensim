@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using HttpServer;
 using log4net;
 using Nwc.XmlRpc;
 using OpenMetaverse.StructuredData;
@@ -33,6 +32,7 @@ using OpenSim.Framework.Monitoring;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
@@ -44,8 +44,10 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Xml;
-using CoolHTTPListener = HttpServer.HttpListener;
-using LogPrio = HttpServer.LogPrio;
+using OSHttpServer;
+
+using tinyHTTPListener = OSHttpServer.OSHttpListener;
+
 
 namespace OpenSim.Framework.Servers.HttpServer
 {
@@ -91,21 +93,21 @@ namespace OpenSim.Framework.Servers.HttpServer
         private volatile int NotSocketErrors = 0;
         public volatile bool HTTPDRunning = false;
 
-        // protected HttpListener m_httpListener;
-        protected CoolHTTPListener m_httpListener2;
-        protected Dictionary<string, XmlRpcMethod> m_rpcHandlers = new Dictionary<string, XmlRpcMethod>();
-        protected Dictionary<string, JsonRPCMethod> jsonRpcHandlers = new Dictionary<string, JsonRPCMethod>();
-        protected Dictionary<string, bool> m_rpcHandlersKeepAlive = new Dictionary<string, bool>();
+        protected tinyHTTPListener m_httpListener;
+        protected Dictionary<string, XmlRpcMethod> m_rpcHandlers        = new Dictionary<string, XmlRpcMethod>();
+        protected Dictionary<string, JsonRPCMethod> jsonRpcHandlers     = new Dictionary<string, JsonRPCMethod>();
+        protected Dictionary<string, bool> m_rpcHandlersKeepAlive       = new Dictionary<string, bool>();
         protected DefaultLLSDMethod m_defaultLlsdHandler = null; // <--   Moving away from the monolithic..  and going to /registered/
-        protected Dictionary<string, LLSDMethod> m_llsdHandlers = new Dictionary<string, LLSDMethod>();
-        protected Dictionary<string, IRequestHandler> m_streamHandlers = new Dictionary<string, IRequestHandler>();
-        protected Dictionary<string, GenericHTTPMethod> m_HTTPHandlers = new Dictionary<string, GenericHTTPMethod>();
-        //        protected Dictionary<string, IHttpAgentHandler> m_agentHandlers = new Dictionary<string, IHttpAgentHandler>();
-        protected Dictionary<string, PollServiceEventArgs> m_pollHandlers =
-            new Dictionary<string, PollServiceEventArgs>();
+        protected Dictionary<string, LLSDMethod> m_llsdHandlers         = new Dictionary<string, LLSDMethod>();
+        protected Dictionary<string, GenericHTTPMethod> m_HTTPHandlers  = new Dictionary<string, GenericHTTPMethod>();
+//        protected Dictionary<string, IHttpAgentHandler> m_agentHandlers = new Dictionary<string, IHttpAgentHandler>();
+        protected ConcurrentDictionary<string, PollServiceEventArgs> m_pollHandlers = new ConcurrentDictionary<string, PollServiceEventArgs>();
+        protected Dictionary<string, WebSocketRequestDelegate> m_WebSocketHandlers = new Dictionary<string, WebSocketRequestDelegate>();
 
-        protected Dictionary<string, WebSocketRequestDelegate> m_WebSocketHandlers =
-            new Dictionary<string, WebSocketRequestDelegate>();
+        protected ConcurrentDictionary<string, IRequestHandler> m_streamHandlers = new ConcurrentDictionary<string, IRequestHandler>();
+        protected ConcurrentDictionary<string, ISimpleStreamHandler> m_simpleStreamHandlers = new ConcurrentDictionary<string, ISimpleStreamHandler>();
+        protected ConcurrentDictionary<string, ISimpleStreamHandler> m_simpleStreamVarPath = new ConcurrentDictionary<string, ISimpleStreamHandler>();
+        protected ConcurrentDictionary<string, SimpleStreamMethod> m_indexPHPmethods = new ConcurrentDictionary<string, SimpleStreamMethod>();
 
         protected uint m_port;
         protected bool m_ssl;
@@ -117,7 +119,6 @@ namespace OpenSim.Framework.Servers.HttpServer
         protected RemoteCertificateValidationCallback m_certificateValidationCallback = null;
 
         protected IPAddress m_listenIPAddress = IPAddress.Any;
-
 
         public string Protocol
         {
@@ -330,14 +331,26 @@ namespace OpenSim.Framework.Servers.HttpServer
             string path = handler.Path;
             string handlerKey = GetHandlerKey(httpMethod, path);
 
-            lock (m_streamHandlers)
-            {
-                if (!m_streamHandlers.ContainsKey(handlerKey))
-                {
-                    // m_log.DebugFormat("[BASE HTTP SERVER]: Adding handler key {0}", handlerKey);
-                    m_streamHandlers.Add(handlerKey, handler);
-                }
-            }
+            // m_log.DebugFormat("[BASE HTTP SERVER]: Adding handler key {0}", handlerKey);
+            m_streamHandlers.TryAdd(handlerKey, handler);
+        }
+
+        public void AddGenericStreamHandler(IRequestHandler handler)
+        {
+            if(String.IsNullOrWhiteSpace(handler.Path))
+                return;
+
+            // m_log.DebugFormat("[BASE HTTP SERVER]: Adding handler key {0}", handlerKey);
+            m_streamHandlers.TryAdd(handler.Path, handler);
+        }
+
+        public void AddSimpleStreamHandler(ISimpleStreamHandler handler, bool varPath = false)
+        {
+            // m_log.DebugFormat("[BASE HTTP SERVER]: Adding handler key {0}", handlerKey);
+            if(varPath)
+                m_simpleStreamVarPath.TryAdd(handler.Path, handler);
+            else
+                m_simpleStreamHandlers.TryAdd(handler.Path, handler);
         }
 
         public void AddWebSocketHandler(string servicepath, WebSocketRequestDelegate handler)
@@ -358,8 +371,19 @@ namespace OpenSim.Framework.Servers.HttpServer
 
         public List<string> GetStreamHandlerKeys()
         {
-            lock (m_streamHandlers)
-                return new List<string>(m_streamHandlers.Keys);
+            return new List<string>(m_streamHandlers.Keys);
+        }
+
+        public List<string> GetSimpleStreamHandlerKeys()
+        {
+            List<string> ssh = new List<string>(m_simpleStreamHandlers.Keys);
+            ssh.AddRange(new List<string>(m_simpleStreamVarPath.Keys));
+            return ssh;
+        }
+
+        public List<string> GetIndexPHPHandlerKeys()
+        {
+            return new List<string>(m_indexPHPmethods.Keys);
         }
 
         private static string GetHandlerKey(string httpMethod, string path)
@@ -458,49 +482,20 @@ namespace OpenSim.Framework.Servers.HttpServer
                 return new List<string>(m_HTTPHandlers.Keys);
         }
 
-        public bool AddPollServiceHTTPHandler(string methodName, PollServiceEventArgs args)
+        public bool AddPollServiceHTTPHandler(string url, PollServiceEventArgs args)
         {
-            lock (m_pollHandlers)
-            {
-                if (!m_pollHandlers.ContainsKey(methodName))
-                {
-                    m_pollHandlers.Add(methodName, args);
-                    return true;
-                }
-            }
+            return m_pollHandlers.TryAdd(url, args);
+        }
 
-            return false;
+        public bool AddPollServiceHTTPHandler(PollServiceEventArgs args)
+        {
+            return m_pollHandlers.TryAdd(args.Url, args);
         }
 
         public List<string> GetPollServiceHandlerKeys()
         {
-            lock (m_pollHandlers)
-                return new List<string>(m_pollHandlers.Keys);
+            return new List<string>(m_pollHandlers.Keys);
         }
-
-        //        // Note that the agent string is provided simply to differentiate
-        //        // the handlers - it is NOT required to be an actual agent header
-        //        // value.
-        //        public bool AddAgentHandler(string agent, IHttpAgentHandler handler)
-        //        {
-        //            lock (m_agentHandlers)
-        //            {
-        //                if (!m_agentHandlers.ContainsKey(agent))
-        //                {
-        //                    m_agentHandlers.Add(agent, handler);
-        //                    return true;
-        //                }
-        //            }
-        //
-        //            //must already have a handler for that path so return false
-        //            return false;
-        //        }
-        //
-        //        public List<string> GetAgentHandlerKeys()
-        //        {
-        //            lock (m_agentHandlers)
-        //                return new List<string>(m_agentHandlers.Keys);
-        //        }
 
         public bool AddLLSDHandler(string path, LLSDMethod handler)
         {
@@ -527,6 +522,24 @@ namespace OpenSim.Framework.Servers.HttpServer
             return true;
         }
 
+        public void AddIndexPHPMethodHandler(string key, SimpleStreamMethod sh)
+        {
+            m_indexPHPmethods.TryAdd(key, sh);
+        }
+
+        public void RemoveIndexPHPMethodHandler(string key)
+        {
+            m_indexPHPmethods.TryRemove(key, out SimpleStreamMethod sh);
+        }
+
+        public SimpleStreamMethod TryGetIndexPHPMethodHandler(string key)
+        {
+            if(m_indexPHPmethods.TryGetValue(key, out SimpleStreamMethod sh))
+                return sh;
+            return null;
+        }
+
+
         public void OnRequest(object source, RequestEventArgs args)
         {
             RequestNumber++;
@@ -534,55 +547,16 @@ namespace OpenSim.Framework.Servers.HttpServer
             {
                 IHttpClientContext context = (IHttpClientContext)source;
                 IHttpRequest request = args.Request;
-
-                PollServiceEventArgs psEvArgs;
-
-                if (TryGetPollServiceHTTPHandler(request.UriPath.ToString(), out psEvArgs))
+                if (TryGetPollServiceHTTPHandler(request.UriPath, out PollServiceEventArgs psEvArgs))
                 {
                     psEvArgs.RequestsReceived++;
-
                     PollServiceHttpRequest psreq = new PollServiceHttpRequest(psEvArgs, context, request);
-
-                    if (psEvArgs.Request != null)
-                    {
-                        OSHttpRequest req = new OSHttpRequest(context, request);
-                        string requestBody;
-                        Encoding encoding = Encoding.UTF8;
-                        using (StreamReader reader = new StreamReader(req.InputStream, encoding))
-                            requestBody = reader.ReadToEnd();
-
-                        Hashtable keysvals = new Hashtable();
-                        Hashtable headervals = new Hashtable();
-
-                        string[] querystringkeys = req.QueryString.AllKeys;
-                        string[] rHeaders = req.Headers.AllKeys;
-
-                        keysvals.Add("body", requestBody);
-                        keysvals.Add("uri", req.RawUrl);
-                        keysvals.Add("content-type", req.ContentType);
-                        keysvals.Add("http-method", req.HttpMethod);
-
-                        foreach (string queryname in querystringkeys)
-                        {
-                            keysvals.Add(queryname, req.QueryString[queryname]);
-                        }
-
-                        foreach (string headername in rHeaders)
-                        {
-                            headervals[headername] = req.Headers[headername];
-                        }
-
-                        keysvals.Add("headers", headervals);
-                        keysvals.Add("querystringkeys", querystringkeys);
-
-                        psEvArgs.Request(psreq.RequestID, keysvals);
-                    }
-
+                    psEvArgs.Request?.Invoke(psreq.RequestID, new OSHttpRequest(request));
                     m_pollServiceManager.Enqueue(psreq);
                 }
                 else
                 {
-                    OnHandleRequestIOThread(context, request);
+                    OnHandleRequestIOThread(request);
                 }
             }
             catch (Exception e)
@@ -591,9 +565,9 @@ namespace OpenSim.Framework.Servers.HttpServer
             }
         }
 
-        private void OnHandleRequestIOThread(IHttpClientContext context, IHttpRequest request)
+        private void OnHandleRequestIOThread(IHttpRequest request)
         {
-            OSHttpRequest req = new OSHttpRequest(context, request);
+            OSHttpRequest req = new OSHttpRequest(request);
             WebSocketRequestDelegate dWebSocketRequestDelegate = null;
             lock (m_WebSocketHandlers)
             {
@@ -602,20 +576,11 @@ namespace OpenSim.Framework.Servers.HttpServer
             }
             if (dWebSocketRequestDelegate != null)
             {
-                dWebSocketRequestDelegate(req.Url.AbsolutePath, new WebSocketHttpServerHandler(req, context, 8192));
+                dWebSocketRequestDelegate(req.Url.AbsolutePath, new WebSocketHttpServerHandler(req, request.Context, 8192));
                 return;
             }
 
-            OSHttpResponse resp = new OSHttpResponse(new HttpResponse(context, request));
-
-            HandleRequest(req, resp);
-
-            // !!!HACK ALERT!!!
-            // There seems to be a bug in the underlying http code that makes subsequent requests
-            // come up with trash in Accept headers. Until that gets fixed, we're cleaning them up here.
-            if (request.AcceptTypes != null)
-                for (int i = 0; i < request.AcceptTypes.Length; i++)
-                    request.AcceptTypes[i] = string.Empty;
+            HandleRequest(req, new OSHttpResponse(req));
         }
 
         /// <summary>
@@ -625,23 +590,6 @@ namespace OpenSim.Framework.Servers.HttpServer
         /// <param name="response"></param>
         public virtual void HandleRequest(OSHttpRequest request, OSHttpResponse response)
         {
-            if (request.HttpMethod == String.Empty) // Can't handle empty requests, not wasting a thread
-            {
-                try
-                {
-                    if (request.InputStream != null && request.InputStream.CanRead)
-                        request.InputStream.Close();
-                    byte[] buffer500 = SendHTML500(response);
-                    response.OutputStream.Write(buffer500, 0, buffer500.Length);
-                    response.Send();
-                }
-                catch
-                {
-                }
-
-                return;
-            }
-
             string requestMethod = request.HttpMethod;
             string uriString = request.RawUrl;
 
@@ -661,24 +609,71 @@ namespace OpenSim.Framework.Servers.HttpServer
 
                 Culture.SetCurrentCulture();
 
-                //                //  This is the REST agent interface. We require an agent to properly identify
-                //                //  itself. If the REST handler recognizes the prefix it will attempt to
-                //                //  satisfy the request. If it is not recognizable, and no damage has occurred
-                //                //  the request can be passed through to the other handlers. This is a low
-                //                //  probability event; if a request is matched it is normally expected to be
-                //                //  handled
-                //                IHttpAgentHandler agentHandler;
-                //
-                //                if (TryGetAgentHandler(request, response, out agentHandler))
-                //                {
-                //                    if (HandleAgentRequest(agentHandler, request, response))
-                //                    {
-                //                        requestEndTick = Environment.TickCount;
-                //                        return;
-                //                    }
-                //                }
+                if(request.HttpMethod == "OPTIONS")
+                {
+                    //need to check this
+                    response.AddHeader("Access-Control-Allow-Origin", "*");
+                    response.AddHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS");
+                    response.AddHeader("Access-Control-Allow-Headers", "Content-Type");
+                    response.StatusCode = (int)HttpStatusCode.OK;
 
-                string path = request.RawUrl;
+                    if (request.InputStream != null && request.InputStream.CanRead)
+                        request.InputStream.Dispose();
+
+                    requestEndTick = Environment.TickCount;
+                    response.Send();
+                    return;
+                }
+
+                string path = request.UriPath;
+                if (path == "/")
+                {
+                    response.StatusCode =(int)HttpStatusCode.NotFound; // falback
+                    switch (request.ContentType)
+                    {
+                        case "application/json-rpc":
+                        {
+                            if (DebugLevel >= 3)
+                                LogIncomingToContentTypeHandler(request);
+
+                            HandleJsonRpcRequests(request, response);
+                            break;
+                        }
+
+                        case "application/llsd+xml":
+                        {
+                            HandleLLSDLogin(request, response);
+                            break;
+                        }
+                        default: // not sure about xmlrpc content type coerence at this point
+                        { 
+                            if (DebugLevel >= 3)
+                                LogIncomingToXmlRpcHandler(request);
+
+                            HandleXmlRpcRequests(request, response);
+                            break;
+                        }
+                    }
+
+                    if (request.InputStream != null && request.InputStream.CanRead)
+                        request.InputStream.Dispose();
+
+                    requestEndTick = Environment.TickCount;
+                    response.Send();
+                    return;
+                }
+
+                if (TryGetSimpleStreamHandler(path, out ISimpleStreamHandler hdr))
+                {
+                    hdr.Handle(request, response);
+                    if (request.InputStream != null && request.InputStream.CanRead)
+                        request.InputStream.Dispose();
+
+                    requestEndTick = Environment.TickCount;
+                    response.Send();
+                    return;
+                }
+
                 string handlerKey = GetHandlerKey(request.HttpMethod, path);
                 byte[] buffer = null;
 
@@ -723,11 +718,6 @@ namespace OpenSim.Framework.Servers.HttpServer
                             headervals[headername] = request.Headers[headername];
                         }
 
-                        //                        if (headervals.Contains("Host"))
-                        //                        {
-                        //                            host = (string)headervals["Host"];
-                        //                        }
-
                         keysvals.Add("requestbody", requestBody);
                         keysvals.Add("headers", headervals);
                         if (keysvals.Contains("method"))
@@ -771,17 +761,9 @@ namespace OpenSim.Framework.Servers.HttpServer
                             buffer = HandleLLSDRequests(request, response);
                             break;
 
-                        case "application/json-rpc":
-                            if (DebugLevel >= 3)
-                                LogIncomingToContentTypeHandler(request);
-
-                            buffer = HandleJsonRpcRequests(request, response);
-                            break;
-
                         case "text/xml":
                         case "application/xml":
                         case "application/json":
-
                         default:
                             //m_log.Info("[Debug BASE HTTP SERVER]: in default handler");
                             // Point of note..  the DoWeHaveA methods check for an EXACT path
@@ -804,14 +786,6 @@ namespace OpenSim.Framework.Servers.HttpServer
                                     LogIncomingToContentTypeHandler(request);
 
                                 buffer = HandleHTTPRequest(request, response);
-                            }
-                            else
-                            {
-                                if (DebugLevel >= 3)
-                                    LogIncomingToXmlRpcHandler(request);
-
-                                // generic login request.
-                                buffer = HandleXmlRpcRequests(request, response);
                             }
 
                             break;
@@ -856,7 +830,6 @@ namespace OpenSim.Framework.Servers.HttpServer
 
                 buffer = null;
                 response.Send();
-                response.RawBuffer = null;
             }
             catch (SocketException e)
             {
@@ -878,8 +851,7 @@ namespace OpenSim.Framework.Servers.HttpServer
                 m_log.Error("[BASE HTTP SERVER]: HandleRequest() threw exception ", e);
                 try
                 {
-                    byte[] buffer500 = SendHTML500(response);
-                    response.OutputStream.Write(buffer500, 0, buffer500.Length);
+                    response.StatusCode =(int)HttpStatusCode.InternalServerError;
                     response.Send();
                 }
                 catch
@@ -1009,14 +981,16 @@ namespace OpenSim.Framework.Servers.HttpServer
 
         private bool TryGetStreamHandler(string handlerKey, out IRequestHandler streamHandler)
         {
+            if(m_streamHandlers.TryGetValue(handlerKey, out streamHandler))
+                return true;
+
             string bestMatch = null;
 
             lock (m_streamHandlers)
             {
                 foreach (string pattern in m_streamHandlers.Keys)
                 {
-                    if ((handlerKey == pattern)
-                        || (handlerKey.StartsWith(pattern) && (HANDLER_SEPARATORS.IndexOf(handlerKey[pattern.Length]) >= 0)))
+                    if (handlerKey.StartsWith(pattern) && (HANDLER_SEPARATORS.IndexOf(handlerKey[pattern.Length]) >= 0))
                     {
                         if (String.IsNullOrEmpty(bestMatch) || pattern.Length > bestMatch.Length)
                         {
@@ -1040,6 +1014,9 @@ namespace OpenSim.Framework.Servers.HttpServer
 
         private bool TryGetPollServiceHTTPHandler(string handlerKey, out PollServiceEventArgs oServiceEventArgs)
         {
+            if(m_pollHandlers.TryGetValue(handlerKey, out oServiceEventArgs))
+                return true;
+
             string bestMatch = null;
 
             lock (m_pollHandlers)
@@ -1102,24 +1079,20 @@ namespace OpenSim.Framework.Servers.HttpServer
             }
         }
 
-        //        private bool TryGetAgentHandler(OSHttpRequest request, OSHttpResponse response, out IHttpAgentHandler agentHandler)
-        //        {
-        //            agentHandler = null;
-        //
-        //            lock (m_agentHandlers)
-        //            {
-        //                foreach (IHttpAgentHandler handler in m_agentHandlers.Values)
-        //                {
-        //                    if (handler.Match(request, response))
-        //                    {
-        //                        agentHandler = handler;
-        //                        return true;
-        //                    }
-        //                }
-        //            }
-        //
-        //            return false;
-        //        }
+        private bool TryGetSimpleStreamHandler(string uripath, out ISimpleStreamHandler handler)
+        {
+            if(m_simpleStreamHandlers.TryGetValue(uripath, out handler))
+                return true;
+
+            handler = null;
+            if(uripath.Length < 3)
+                return false;
+            int indx = uripath.IndexOf('/', 2);
+            if(indx < 0 || indx == uripath.Length - 1)
+                return false;
+
+            return m_simpleStreamVarPath.TryGetValue(uripath.Substring(0,indx), out handler);
+        }
 
         /// <summary>
         /// Try all the registered xmlrpc handlers when an xmlrpc request is received.
@@ -1127,11 +1100,11 @@ namespace OpenSim.Framework.Servers.HttpServer
         /// </summary>
         /// <param name="request"></param>
         /// <param name="response"></param>
-        private byte[] HandleXmlRpcRequests(OSHttpRequest request, OSHttpResponse response)
+        private void HandleXmlRpcRequests(OSHttpRequest request, OSHttpResponse response)
         {
             String requestBody;
 
-            Stream requestStream = Util.Copy(request.InputStream);
+            Stream requestStream = request.InputStream;
             Stream innerStream = null;
             try
             {
@@ -1143,7 +1116,6 @@ namespace OpenSim.Framework.Servers.HttpServer
 
                 using (StreamReader reader = new StreamReader(requestStream, Encoding.UTF8))
                     requestBody = reader.ReadToEnd();
-
             }
             finally
             {
@@ -1155,9 +1127,6 @@ namespace OpenSim.Framework.Servers.HttpServer
 
             //m_log.Debug(requestBody);
             requestBody = requestBody.Replace("<base64></base64>", "");
-
-            string responseString = String.Empty;
-            XmlRpcRequest xmlRprcRequest = null;
 
             bool gridproxy = false;
             if (requestBody.Contains("encoding=\"utf-8"))
@@ -1172,6 +1141,7 @@ namespace OpenSim.Framework.Servers.HttpServer
                 }
             }
 
+            XmlRpcRequest xmlRprcRequest = null;
             try
             {
                 xmlRprcRequest = (XmlRpcRequest)(new XmlRpcRequestDeserializer()).Deserialize(requestBody);
@@ -1195,129 +1165,117 @@ namespace OpenSim.Framework.Servers.HttpServer
                 }
             }
 
-            if (xmlRprcRequest != null)
+            if(xmlRprcRequest == null)
             {
-                string methodName = xmlRprcRequest.MethodName;
-                if (methodName != null)
+                response.StatusCode = (int)HttpStatusCode.NotFound;
+                response.KeepAlive = false;
+                return;
+            }
+
+            string methodName = xmlRprcRequest.MethodName;
+            if (string.IsNullOrWhiteSpace(methodName))
+            {
+                response.StatusCode = (int)HttpStatusCode.NotFound;
+                response.KeepAlive = false;
+                return;
+            }
+
+            XmlRpcMethod method;
+            bool methodWasFound;
+            bool keepAlive = false;
+
+            lock (m_rpcHandlers)
+            {
+                methodWasFound = m_rpcHandlers.TryGetValue(methodName, out method);
+                if (methodWasFound)
+                    keepAlive = m_rpcHandlersKeepAlive[methodName];
+            }
+
+            XmlRpcResponse xmlRpcResponse;
+            xmlRprcRequest.Params.Add(request.RemoteIPEndPoint); // Param[1]
+            if (methodWasFound)
+            {
+                xmlRprcRequest.Params.Add(request.Url); // Param[2]
+
+                string xff = "X-Forwarded-For";
+                string xfflower = xff.ToLower();
+                foreach (string s in request.Headers.AllKeys)
                 {
-                    xmlRprcRequest.Params.Add(request.RemoteIPEndPoint); // Param[1]
-                    XmlRpcResponse xmlRpcResponse;
-
-                    XmlRpcMethod method;
-                    bool methodWasFound;
-                    bool keepAlive = false;
-                    lock (m_rpcHandlers)
+                    if (s != null && s.Equals(xfflower))
                     {
-                        methodWasFound = m_rpcHandlers.TryGetValue(methodName, out method);
-                        if (methodWasFound)
-                            keepAlive = m_rpcHandlersKeepAlive[methodName];
-                    }
-
-                    if (methodWasFound)
-                    {
-                        xmlRprcRequest.Params.Add(request.Url); // Param[2]
-
-                        string xff = "X-Forwarded-For";
-                        string xfflower = xff.ToLower();
-                        foreach (string s in request.Headers.AllKeys)
-                        {
-                            if (s != null && s.Equals(xfflower))
-                            {
-                                xff = xfflower;
-                                break;
-                            }
-                        }
-                        xmlRprcRequest.Params.Add(request.Headers.Get(xff)); // Param[3]
-
-                        if (gridproxy)
-                            xmlRprcRequest.Params.Add("gridproxy");  // Param[4]
-
-                        // reserve this for
-                        // ... by Fumi.Iseki for DTLNSLMoneyServer
-                        // BUT make its presence possible to detect/parse
-                        string rcn = request.IHttpClientContext.SSLCommonName;
-                        if (!string.IsNullOrWhiteSpace(rcn))
-                        {
-                            rcn = "SSLCN:" + rcn;
-                            xmlRprcRequest.Params.Add(rcn); // Param[4] or Param[5]
-                        }
-
-                        try
-                        {
-                            xmlRpcResponse = method(xmlRprcRequest, request.RemoteIPEndPoint);
-                        }
-                        catch (Exception e)
-                        {
-                            string errorMessage
-                                = String.Format(
-                                    "Requested method [{0}] from {1} threw exception: {2} {3}",
-                                    methodName, request.RemoteIPEndPoint.Address, e.Message, e.StackTrace);
-
-                            m_log.ErrorFormat("[BASE HTTP SERVER]: {0}", errorMessage);
-
-                            // if the registered XmlRpc method threw an exception, we pass a fault-code along
-                            xmlRpcResponse = new XmlRpcResponse();
-
-                            // Code probably set in accordance with http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
-                            xmlRpcResponse.SetFault(-32603, errorMessage);
-                        }
-
-                        // if the method wasn't found, we can't determine KeepAlive state anyway, so lets do it only here
-                        response.KeepAlive = keepAlive;
-                        response.AddHeader("Access-Control-Allow-Origin", "*");
-                    }
-                    else
-                    {
-                        xmlRpcResponse = new XmlRpcResponse();
-
-                        // Code set in accordance with http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
-                        xmlRpcResponse.SetFault(
-                            XmlRpcErrorCodes.SERVER_ERROR_METHOD,
-                            String.Format("Requested method [{0}] not found", methodName));
-                    }
-
-                    response.ContentType = "text/xml";
-                    using (MemoryStream outs = new MemoryStream())
-                    using (XmlTextWriter writer = new XmlTextWriter(outs, UTF8NoBOM))
-                    {
-                        writer.Formatting = Formatting.None;
-                        XmlRpcResponseSerializer.Singleton.Serialize(writer, xmlRpcResponse);
-                        writer.Flush();
-                        outs.Flush();
-                        outs.Position = 0;
-                        using (StreamReader sr = new StreamReader(outs))
-                        {
-                            responseString = sr.ReadToEnd();
-                        }
+                        xff = xfflower;
+                        break;
                     }
                 }
-                else
-                {
-                    //HandleLLSDRequests(request, response);
-                    response.ContentType = "text/plain";
-                    response.StatusCode = 404;
-                    response.StatusDescription = "Not Found";
-                    response.ProtocolVersion = "HTTP/1.0";
-                    responseString = "Not found";
-                    response.KeepAlive = false;
+                xmlRprcRequest.Params.Add(request.Headers.Get(xff)); // Param[3]
 
-                    m_log.ErrorFormat(
-                        "[BASE HTTP SERVER]: Handler not found for http request {0} {1}",
-                        request.HttpMethod, request.Url.PathAndQuery);
+                if (gridproxy)
+                    xmlRprcRequest.Params.Add("gridproxy");  // Param[4]
+
+                // reserve this for
+                // ... by Fumi.Iseki for DTLNSLMoneyServer
+                // BUT make its presence possible to detect/parse
+                string rcn = request.IHttpClientContext.SSLCommonName;
+                if(!string.IsNullOrWhiteSpace(rcn))
+                {
+                    rcn = "SSLCN:" + rcn;
+                    xmlRprcRequest.Params.Add(rcn); // Param[4] or Param[5]
+                }
+
+                try
+                {
+                    xmlRpcResponse = method(xmlRprcRequest, request.RemoteIPEndPoint);
+                }
+                catch(Exception e)
+                {
+                    string errorMessage
+                        = String.Format(
+                            "Requested method [{0}] from {1} threw exception: {2} {3}",
+                            methodName, request.RemoteIPEndPoint.Address, e.Message, e.StackTrace);
+
+                    m_log.ErrorFormat("[BASE HTTP SERVER]: {0}", errorMessage);
+
+                    // if the registered XmlRpc method threw an exception, we pass a fault-code along
+                    xmlRpcResponse = new XmlRpcResponse();
+
+                    // Code probably set in accordance with http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
+                    xmlRpcResponse.SetFault(-32603, errorMessage);
+                }
+                response.AddHeader("Access-Control-Allow-Origin", "*");
+            }
+            else
+            {
+                xmlRpcResponse = new XmlRpcResponse();
+                // Code set in accordance with http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
+                xmlRpcResponse.SetFault(
+                    XmlRpcErrorCodes.SERVER_ERROR_METHOD,
+                    String.Format("Requested method [{0}] not found", methodName));
+            }
+
+            response.KeepAlive = keepAlive;
+            response.ContentType = "text/xml";
+            //string responseString = String.Empty;
+            using (MemoryStream outs = new MemoryStream())
+            {
+                using (XmlTextWriter writer = new XmlTextWriter(outs, UTF8NoBOM))
+                {
+                    writer.Formatting = Formatting.None;
+                    XmlRpcResponseSerializer.Singleton.Serialize(writer, xmlRpcResponse);
+                    writer.Flush();
+                    //outs.Seek(0, SeekOrigin.Begin);
+                    //using (StreamReader sr = new StreamReader(outs))
+                    //    responseString = sr.ReadToEnd();
+                    response.RawBuffer = outs.ToArray();
                 }
             }
 
-            byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-
-            response.ContentLength64 = buffer.Length;
-            response.ContentEncoding = Encoding.UTF8;
-
-            return buffer;
+            //response.RawBuffer = Encoding.UTF8.GetBytes(responseString);
+            response.StatusCode = (int)HttpStatusCode.OK;
         }
 
         // JsonRpc (v2.0 only)
         // Batch requests not yet supported
-        private byte[] HandleJsonRpcRequests(OSHttpRequest request, OSHttpResponse response)
+        private void HandleJsonRpcRequests(OSHttpRequest request, OSHttpResponse response)
         {
             Stream requestStream = request.InputStream;
             JsonRpcResponse jsonRpcResponse = new JsonRpcResponse();
@@ -1393,12 +1351,37 @@ namespace OpenSim.Framework.Servers.HttpServer
                 }
             }
 
-            string responseData = string.Empty;
+            string responseData = jsonRpcResponse.Serialize();
+            response.RawBuffer = Encoding.UTF8.GetBytes(responseData);
+            response.StatusCode = (int)HttpStatusCode.OK;
+        }
 
-            responseData = jsonRpcResponse.Serialize();
+        private void HandleLLSDLogin(OSHttpRequest request, OSHttpResponse response)
+        {
+            if(m_defaultLlsdHandler == null)
+                return;
 
-            byte[] buffer = Encoding.UTF8.GetBytes(responseData);
-            return buffer;
+            response.StatusCode = (int)HttpStatusCode.BadRequest;
+            OSD llsdRequest;
+            try
+            {
+                llsdRequest = OSDParser.DeserializeLLSDXml(request.InputStream);
+            }
+            catch
+            {
+                return;
+            }
+
+            if(llsdRequest == null || !(llsdRequest is OSDMap))
+                return;
+
+            OSD llsdResponse = m_defaultLlsdHandler(llsdRequest, request.RemoteIPEndPoint);
+            if(llsdResponse != null)
+            {
+                response.ContentType = "application/llsd+xml";
+                response.RawBuffer = OSDParser.SerializeLLSDXmlBytes(llsdResponse);
+                response.StatusCode = (int)HttpStatusCode.OK;
+            }
         }
 
         private byte[] HandleLLSDRequests(OSHttpRequest request, OSHttpResponse response)
@@ -1406,69 +1389,35 @@ namespace OpenSim.Framework.Servers.HttpServer
             //m_log.Warn("[BASE HTTP SERVER]: We've figured out it's a LLSD Request");
             bool notfound = false;
 
-            Stream requestStream = request.InputStream;
-
-            string requestBody;
-            Encoding encoding = Encoding.UTF8;
-            using (StreamReader reader = new StreamReader(requestStream, encoding))
-                requestBody = reader.ReadToEnd();
-
             //m_log.DebugFormat("[OGP]: {0}:{1}", request.RawUrl, requestBody);
 
             OSD llsdRequest = null;
             OSD llsdResponse = null;
-
-            bool LegacyLLSDLoginLibOMV = (requestBody.Contains("passwd") && requestBody.Contains("mac") && requestBody.Contains("viewer_digest"));
-
-            if (requestBody.Length == 0)
-            // Get Request
-            {
-                requestBody = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><llsd><map><key>request</key><string>get</string></map></llsd>";
-            }
             try
             {
-                llsdRequest = OSDParser.Deserialize(requestBody);
+                llsdRequest = OSDParser.Deserialize(request.InputStream);
             }
             catch (Exception ex)
             {
                 m_log.Warn("[BASE HTTP SERVER]: Error - " + ex.Message);
             }
 
-            if (llsdRequest != null)// && m_defaultLlsdHandler != null)
+            if (llsdRequest != null)
             {
-                LLSDMethod llsdhandler = null;
-
-                if (TryGetLLSDHandler(request.RawUrl, out llsdhandler) && !LegacyLLSDLoginLibOMV)
+                if (TryGetLLSDHandler(request.RawUrl, out LLSDMethod llsdhandler))
                 {
                     // we found a registered llsd handler to service this request
                     llsdResponse = llsdhandler(request.RawUrl, llsdRequest, request.RemoteIPEndPoint.ToString());
                 }
                 else
-                {
-                    // we didn't find a registered llsd handler to service this request
-                    // check if we have a default llsd handler
-
-                    if (m_defaultLlsdHandler != null)
-                    {
-                        // LibOMV path
-                        llsdResponse = m_defaultLlsdHandler(llsdRequest, request.RemoteIPEndPoint);
-                    }
-                    else
-                    {
-                        // Oops, no handler for this..   give em the failed message
-                        notfound = true;
-                    }
-                }
+                    notfound = true;
             }
             else
-            {
                 notfound = true;
-            }
 
             if (notfound)
             {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
-                response.StatusDescription = "Not found";
                 return null;
             }
 
@@ -1477,10 +1426,7 @@ namespace OpenSim.Framework.Servers.HttpServer
             if (llsdResponse.ToString() == "shutdown404!")
             {
                 response.ContentType = "text/plain";
-                response.StatusCode = 404;
-                response.StatusDescription = "Not Found";
-                response.ProtocolVersion = "HTTP/1.0";
-                buffer = Encoding.UTF8.GetBytes("Not found");
+                response.StatusCode = (int)HttpStatusCode.NotFound;
             }
             else
             {
@@ -1488,6 +1434,7 @@ namespace OpenSim.Framework.Servers.HttpServer
                 buffer = BuildLLSDResponse(request, response, llsdResponse);
             }
 
+            response.StatusCode = (int)HttpStatusCode.OK;
             response.ContentLength64 = buffer.Length;
             response.ContentEncoding = Encoding.UTF8;
 
@@ -1568,13 +1515,6 @@ namespace OpenSim.Framework.Servers.HttpServer
                 }
             }
 
-            // extra kicker to remove the default XMLRPC login case..  just in case..
-            if (path != "/" && bestMatch == "/" && searchquery != "/")
-                return false;
-
-            if (path == "/")
-                return false;
-
             if (String.IsNullOrEmpty(bestMatch))
             {
                 return false;
@@ -1618,10 +1558,6 @@ namespace OpenSim.Framework.Servers.HttpServer
                         bestMatch = pattern;
                     }
                 }
-
-                // extra kicker to remove the default XMLRPC login case..  just in case..
-                if (path == "/")
-                    return false;
 
                 if (String.IsNullOrEmpty(bestMatch))
                 {
@@ -1700,18 +1636,7 @@ namespace OpenSim.Framework.Servers.HttpServer
             //                "[BASE HTTP SERVER]: HandleHTTPRequest for request to {0}, method {1}",
             //                request.RawUrl, request.HttpMethod);
 
-            switch (request.HttpMethod)
-            {
-                case "OPTIONS":
-                    response.AddHeader("Access-Control-Allow-Origin", "*");
-                    response.AddHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS");
-                    response.AddHeader("Access-Control-Allow-Headers", "Content-Type");
-                    response.StatusCode = (int)OSHttpStatusCode.SuccessOk;
-                    return null;
-
-                default:
-                    return HandleContentVerbs(request, response);
-            }
+            return HandleContentVerbs(request, response);
         }
 
         private byte[] HandleContentVerbs(OSHttpRequest request, OSHttpResponse response)
@@ -1732,10 +1657,8 @@ namespace OpenSim.Framework.Servers.HttpServer
 
             byte[] buffer;
 
-            Stream requestStream = request.InputStream;
             string requestBody;
-            Encoding encoding = Encoding.UTF8;
-            using (StreamReader reader = new StreamReader(requestStream, encoding))
+            using(StreamReader reader = new StreamReader(request.InputStream, Encoding.UTF8))
                 requestBody = reader.ReadToEnd();
 
             Hashtable keysvals = new Hashtable();
@@ -1767,52 +1690,24 @@ namespace OpenSim.Framework.Servers.HttpServer
                 headervals[headername] = request.Headers[headername];
             }
 
-            if (headervals.Contains("Host"))
-            {
-                host = (string)headervals["Host"];
-            }
-
             keysvals.Add("headers", headervals);
             keysvals.Add("querystringkeys", querystringkeys);
             keysvals.Add("requestvars", requestVars);
             //            keysvals.Add("form", request.Form);
 
-            if (keysvals.Contains("method"))
+            GenericHTTPMethod requestprocessor;
+            bool foundHandler = TryGetHTTPHandlerPathBased(request.RawUrl, out requestprocessor);
+            if (foundHandler)
             {
-                //                m_log.Debug("[BASE HTTP SERVER]: Contains Method");
-                string method = (string)keysvals["method"];
-                //                m_log.Debug("[BASE HTTP SERVER]: " + requestBody);
-                GenericHTTPMethod requestprocessor;
-                bool foundHandler = TryGetHTTPHandler(method, out requestprocessor);
-                if (foundHandler)
-                {
-                    Hashtable responsedata1 = requestprocessor(keysvals);
-                    buffer = DoHTTPGruntWork(responsedata1, response);
+                Hashtable responsedata2 = requestprocessor(keysvals);
+                buffer = DoHTTPGruntWork(responsedata2, response);
 
-                    //SendHTML500(response);
-                }
-                else
-                {
-                    //                    m_log.Warn("[BASE HTTP SERVER]: Handler Not Found");
-                    buffer = SendHTML404(response, host);
-                }
+                //SendHTML500(response);
             }
             else
             {
-                GenericHTTPMethod requestprocessor;
-                bool foundHandler = TryGetHTTPHandlerPathBased(request.RawUrl, out requestprocessor);
-                if (foundHandler)
-                {
-                    Hashtable responsedata2 = requestprocessor(keysvals);
-                    buffer = DoHTTPGruntWork(responsedata2, response);
-
-                    //SendHTML500(response);
-                }
-                else
-                {
-                    //                    m_log.Warn("[BASE HTTP SERVER]: Handler Not Found2");
-                    buffer = SendHTML404(response, host);
-                }
+//                    m_log.Warn("[BASE HTTP SERVER]: Handler Not Found2");
+                buffer = SendHTML404(response);
             }
 
             return buffer;
@@ -1951,9 +1846,9 @@ namespace OpenSim.Framework.Servers.HttpServer
 
             response.StatusCode = responsecode;
 
-            if (responsecode == (int)OSHttpStatusCode.RedirectMovedPermanently)
+            if (responsecode == (int)HttpStatusCode.Moved)
             {
-                response.RedirectLocation = (string)responsedata["str_redirect_location"];
+                response.AddHeader("Location:", (string)responsedata["str_redirect_location"]);
                 response.StatusCode = responsecode;
             }
 
@@ -1995,28 +1890,12 @@ namespace OpenSim.Framework.Servers.HttpServer
             return buffer;
         }
 
-        public byte[] SendHTML404(OSHttpResponse response, string host)
+        public byte[] SendHTML404(OSHttpResponse response)
         {
-            // I know this statuscode is dumb, but the client doesn't respond to 404s and 500s
             response.StatusCode = 404;
-            response.AddHeader("Content-type", "text/html");
+            response.ContentType = "text/html";
 
-            string responseString = GetHTTP404(host);
-            byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-
-            response.ContentLength64 = buffer.Length;
-            response.ContentEncoding = Encoding.UTF8;
-
-            return buffer;
-        }
-
-        public byte[] SendHTML500(OSHttpResponse response)
-        {
-            // I know this statuscode is dumb, but the client doesn't respond to 404s and 500s
-            response.StatusCode = (int)OSHttpStatusCode.SuccessOk;
-            response.AddHeader("Content-type", "text/html");
-
-            string responseString = GetHTTP500();
+            string responseString = GetHTTP404();
             byte[] buffer = Encoding.UTF8.GetBytes(responseString);
 
             response.ContentLength64 = buffer.Length;
@@ -2049,32 +1928,32 @@ namespace OpenSim.Framework.Servers.HttpServer
                 NotSocketErrors = 0;
                 if (!m_ssl)
                 {
-                    //m_httpListener.Prefixes.Add("http://+:" + m_port + "/");
-                    //m_httpListener.Prefixes.Add("http://10.1.1.5:" + m_port + "/");
-                    m_httpListener2 = CoolHTTPListener.Create(m_listenIPAddress, (int)m_port);
-                    m_httpListener2.ExceptionThrown += httpServerException;
-                    m_httpListener2.LogWriter = httpserverlog;
-
+                    m_httpListener = tinyHTTPListener.Create(m_listenIPAddress, (int)m_port);
+                    m_httpListener.ExceptionThrown += httpServerException;
+                    if (DebugLevel > 0)
+                    {
+                        m_httpListener.LogWriter = httpserverlog;
+                        httpserverlog.DebugLevel = 1;
+                    }
                     // Uncomment this line in addition to those in HttpServerLogWriter
                     // if you want more detailed trace information from the HttpServer
-                    //m_httpListener2.UseTraceLogs = true;
-
                     //m_httpListener2.DisconnectHandler = httpServerDisconnectMonitor;
                 }
                 else
                 {
-                    //m_httpListener.Prefixes.Add("https://+:" + (m_sslport) + "/");
-                    //m_httpListener.Prefixes.Add("http://+:" + m_port + "/");
-                    m_httpListener2 = CoolHTTPListener.Create(IPAddress.Any, (int)m_port, m_cert);
-                    if (m_certificateValidationCallback != null)
-                        m_httpListener2.CertificateValidationCallback = m_certificateValidationCallback;
-                    m_httpListener2.ExceptionThrown += httpServerException;
-                    m_httpListener2.LogWriter = httpserverlog;
+                    m_httpListener = tinyHTTPListener.Create(IPAddress.Any, (int)m_port, m_cert);
+                    if(m_certificateValidationCallback != null)
+                        m_httpListener.CertificateValidationCallback = m_certificateValidationCallback;
+                    m_httpListener.ExceptionThrown += httpServerException;
+                    if (DebugLevel > 0)
+                    {
+                        m_httpListener.LogWriter = httpserverlog;
+                        httpserverlog.DebugLevel = 1;
+                    }
                 }
 
-                m_httpListener2.RequestReceived += OnRequest;
-                //m_httpListener.Start();
-                m_httpListener2.Start(64);
+                m_httpListener.RequestReceived += OnRequest;
+                m_httpListener.Start(64);
 
                 lock (m_generalLock)
                 {
@@ -2087,13 +1966,6 @@ namespace OpenSim.Framework.Servers.HttpServer
                 }
 
                 HTTPDRunning = true;
-
-                //HttpListenerContext context;
-                //while (true)
-                //{
-                //    context = m_httpListener.GetContext();
-                //    ThreadPool.UnsafeQueueUserWorkItem(new WaitCallback(HandleRequest), context);
-                // }
             }
             catch (Exception e)
             {
@@ -2153,12 +2025,12 @@ namespace OpenSim.Framework.Servers.HttpServer
                         m_pollServiceManager.Stop();
                 }
 
-                m_httpListener2.ExceptionThrown -= httpServerException;
+                m_httpListener.ExceptionThrown -= httpServerException;
                 //m_httpListener2.DisconnectHandler = null;
 
-                m_httpListener2.LogWriter = null;
-                m_httpListener2.RequestReceived -= OnRequest;
-                m_httpListener2.Stop();
+                m_httpListener.LogWriter = null;
+                m_httpListener.RequestReceived -= OnRequest;
+                m_httpListener.Stop();
             }
             catch (NullReferenceException)
             {
@@ -2168,12 +2040,26 @@ namespace OpenSim.Framework.Servers.HttpServer
 
         public void RemoveStreamHandler(string httpMethod, string path)
         {
+            if (m_streamHandlers.TryRemove(path, out IRequestHandler dummy))
+                return;
+
             string handlerKey = GetHandlerKey(httpMethod, path);
 
             //m_log.DebugFormat("[BASE HTTP SERVER]: Removing handler key {0}", handlerKey);
 
-            lock (m_streamHandlers)
-                m_streamHandlers.Remove(handlerKey);
+            m_streamHandlers.TryRemove(handlerKey, out dummy);
+        }
+
+        public void RemoveStreamHandler(string path)
+        {
+            m_streamHandlers.TryRemove(path, out IRequestHandler dummy);
+        }
+
+        public void RemoveSimpleStreamHandler(string path)
+        {
+            if(m_simpleStreamHandlers.TryRemove(path, out ISimpleStreamHandler dummy))
+                return;
+            m_simpleStreamVarPath.TryRemove(path, out ISimpleStreamHandler dummy2);
         }
 
         public void RemoveHTTPHandler(string httpMethod, string path)
@@ -2193,8 +2079,12 @@ namespace OpenSim.Framework.Servers.HttpServer
 
         public void RemovePollServiceHTTPHandler(string httpMethod, string path)
         {
-            lock (m_pollHandlers)
-                m_pollHandlers.Remove(path);
+            m_pollHandlers.TryRemove(path, out PollServiceEventArgs dummy);
+        }
+
+        public void RemovePollServiceHTTPHandler(string path)
+        {
+            m_pollHandlers.TryRemove(path, out PollServiceEventArgs dummy);
         }
 
         //        public bool RemoveAgentHandler(string agent, IHttpAgentHandler handler)
@@ -2241,11 +2131,11 @@ namespace OpenSim.Framework.Servers.HttpServer
             return false;
         }
 
-        public string GetHTTP404(string host)
+        public string GetHTTP404()
         {
             string file = Path.Combine(".", "http_404.html");
             if (!File.Exists(file))
-                return getDefaultHTTP404(host);
+                return getDefaultHTTP404();
 
             StreamReader sr = File.OpenText(file);
             string result = sr.ReadToEnd();
@@ -2253,26 +2143,10 @@ namespace OpenSim.Framework.Servers.HttpServer
             return result;
         }
 
-        public string GetHTTP500()
-        {
-            string file = Path.Combine(".", "http_500.html");
-            if (!File.Exists(file))
-                return getDefaultHTTP500();
-            string result;
-            using (StreamReader sr = File.OpenText(file))
-                result = sr.ReadToEnd();
-            return result;
-        }
-
         // Fallback HTTP responses in case the HTTP error response files don't exist
-        private static string getDefaultHTTP404(string host)
+        private static string getDefaultHTTP404()
         {
-            return "<HTML><HEAD><TITLE>404 Page not found</TITLE><BODY><BR /><H1>Ooops!</H1><P>The page you requested has been obsconded with by knomes. Find hippos quick!</P><P>If you are trying to log-in, your link parameters should have: &quot;-loginpage http://" + host + "/?method=login -loginuri http://" + host + "/&quot; in your link </P></BODY></HTML>";
-        }
-
-        private static string getDefaultHTTP500()
-        {
-            return "<HTML><HEAD><TITLE>500 Internal Server Error</TITLE><BODY><BR /><H1>Ooops!</H1><P>The server you requested is overun by knomes! Find hippos quick!</P></BODY></HTML>";
+            return "<HTML><HEAD><TITLE>404 Page not found</TITLE><BODY><BR /><H1>Ooops!</H1><P>The page you requested has been obsconded with by knomes. Find hippos quick!</P></BODY></HTML>";
         }
     }
 
@@ -2303,13 +2177,17 @@ namespace OpenSim.Framework.Servers.HttpServer
     ///
     /// You may also be able to get additional trace information from HttpServer if you uncomment the UseTraceLogs
     /// property in StartHttp() for the HttpListener
+    /// 
     public class HttpServerLogWriter : ILogWriter
     {
-        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public int DebugLevel {get; set;} = (int)LogPrio.Error;
 
         public void Write(object source, LogPrio priority, string message)
         {
-            /*
+            if((int)priority < DebugLevel)
+                return;
+
             switch (priority)
             {
                 case LogPrio.Trace:
@@ -2333,9 +2211,70 @@ namespace OpenSim.Framework.Servers.HttpServer
                 default:
                     break;
             }
-            */
-
             return;
+        }
+    }
+
+    public class IndexPHPHandler : SimpleStreamHandler
+    {
+        BaseHttpServer m_server;
+
+        public IndexPHPHandler(BaseHttpServer server)
+            : base("/index.php")
+        {
+            m_server = server;
+        }
+
+        protected override void ProcessRequest(IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
+        {
+            httpResponse.KeepAlive = false;
+            if (m_server == null || !m_server.HTTPDRunning)
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.NotFound;
+                return;
+            }
+
+            if (httpRequest.QueryString.Count == 0)
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.Redirect;
+                httpResponse.AddHeader("Location", "http://opensimulator.org");
+                return;
+            }
+            if (httpRequest.QueryFlags.Contains("about"))
+            {
+
+                httpResponse.StatusCode = (int)HttpStatusCode.Redirect;
+                httpResponse.AddHeader("Location", "http://opensimulator.org/wiki/0.9.2.0_Release");
+                return;
+            }
+            if (!httpRequest.QueryAsDictionary.TryGetValue("method", out string methods) || string.IsNullOrWhiteSpace(methods))
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.NotFound; ;
+                return;
+            }
+
+            string[] splited = methods.Split(new char[] { ',' });
+            string method = splited[0];
+            if (string.IsNullOrWhiteSpace(method))
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.NotFound;
+                return;
+            }
+
+            SimpleStreamMethod sh = m_server.TryGetIndexPHPMethodHandler(method);
+            if (sh == null)
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.NotFound;
+                return;
+            }
+            try
+            {
+                sh?.Invoke(httpRequest, httpResponse);
+            }
+            catch
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
+            }
         }
     }
 }

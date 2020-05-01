@@ -26,43 +26,58 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Threading;
-using HttpServer;
 
 namespace OpenSim.Framework.Servers.HttpServer
 {
     /// <summary>
-    /// OSHttpRequestQueues are used to hand over incoming HTTP
-    /// requests to OSHttpRequestPump objects.
+    /// simple Base streamed request handler
+    /// for well defined simple uri paths, any http method
     /// </summary>
-    public class OSHttpRequestQueue : Queue<OSHttpRequest>
+    public abstract class SimpleBaseRequestHandler
     {
-        private object _syncObject = new object();
+        public int RequestsReceived { get; protected set; }
 
-        new public void Enqueue(OSHttpRequest req)
+        public int RequestsHandled { get; protected set; }
+
+        private readonly string m_path;
+
+        public string Name { get; private set; }
+
+        protected SimpleBaseRequestHandler(string path)
         {
-            lock (_syncObject)
-            {
-                base.Enqueue(req);
-                Monitor.Pulse(_syncObject);
-            }
+            Name = null;
+            m_path = path;
         }
 
-        new public OSHttpRequest Dequeue()
+        protected SimpleBaseRequestHandler(string path, string name)
         {
-            OSHttpRequest req = null;
+            Name = name;
+            m_path = path;
+        }
 
-            lock (_syncObject)
+        public string Path
+        {
+            get { return m_path; }
+        }
+
+        public string GetParam(string path)
+        {
+            if (CheckParam(path))
             {
-                while (null == req)
-                {
-                    Monitor.Wait(_syncObject);
-                    if (0 != this.Count) req = base.Dequeue();
-                }
+                return path.Substring(m_path.Length);
             }
 
-            return req;
+            return string.Empty;
+        }
+
+        protected bool CheckParam(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return false;
+            }
+
+            return path.StartsWith(Path);
         }
     }
 }

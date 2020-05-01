@@ -25,18 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Capabilities;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Services.Interfaces;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace OpenSim.Capabilities.Handlers
 {
@@ -59,12 +60,20 @@ namespace OpenSim.Capabilities.Handlers
 
         public string FetchInventoryDescendentsRequest(string request, string path, string param, IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
+            using (MemoryStream ms = new MemoryStream(Utils.StringToBytes(request), false))
+            {
+                return FetchInventoryDescendentsRequest(ms, path, param, httpRequest, httpResponse);
+            }
+        }
+
+        public string FetchInventoryDescendentsRequest(Stream request, string path, string param, IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
+        {
             //m_log.DebugFormat("[XXX]: FetchInventoryDescendentsRequest in {0}, {1}", (m_Scene == null) ? "none" : m_Scene.Name, request);
 
             ArrayList foldersrequested = null;
             try
             {
-                Hashtable hash = (Hashtable)LLSD.LLSDDeserialize(Utils.StringToBytes(request));
+                Hashtable hash = (Hashtable)LLSD.LLSDDeserialize(request);
                 foldersrequested = (ArrayList)hash["folders"];
                 hash = null;
             }

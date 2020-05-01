@@ -1504,6 +1504,8 @@ namespace OpenSim.Region.Framework.Scenes
             // recorded, which stops the input from being processed.
             MovementFlag = 0;
 
+            m_scene.AuthenticateHandler.UpdateAgentChildStatus(ControllingClient.CircuitCode, false);
+
             m_scene.EventManager.TriggerOnMakeRootAgent(this);
             //m_log.DebugFormat("[MakeRootAgent] TriggerOnMakeRootAgent and done: {0}ms", Util.EnvironmentTickCountSubtract(ts));
 
@@ -1662,6 +1664,8 @@ namespace OpenSim.Region.Framework.Scenes
                         SendKillTo(p);
                     }
                 });
+            m_scene.AuthenticateHandler.UpdateAgentChildStatus(ControllingClient.CircuitCode, true);
+
             m_scene.EventManager.TriggerOnMakeChildAgent(this);
         }
 

@@ -25,11 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using log4net;
+using System;
+using System.IO;
+using System.IO.Compression;
+using System.Reflection;
+
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
-using System;
-using System.Reflection;
+using OpenSim.Framework.Servers.HttpServer;
+
+using log4net;
 
 namespace OpenSim.Server.Handlers.Simulation
 {
@@ -51,6 +56,7 @@ namespace OpenSim.Server.Handlers.Simulation
 
             uri = uri.Trim(new char[] { '/' });
             string[] parts = uri.Split('/');
+
             if (parts.Length <= 1)
             {
                 return false;
@@ -62,6 +68,7 @@ namespace OpenSim.Server.Handlers.Simulation
 
                 if (parts.Length >= 3)
                     UUID.TryParse(parts[2], out regionID);
+                    
                 if (parts.Length >= 4)
                     action = parts[3];
 
@@ -96,5 +103,28 @@ namespace OpenSim.Server.Handlers.Simulation
             }
         }
 
+        public static OSDMap DeserializeOSMap(IOSHttpRequest httpRequest)
+        {
+            Stream inputStream = httpRequest.InputStream;
+            Stream innerStream = null;
+            try
+            {
+                if ((httpRequest.ContentType == "application/x-gzip" || httpRequest.Headers["Content-Encoding"] == "gzip") || (httpRequest.Headers["X-Content-Encoding"] == "gzip"))
+                {
+                    innerStream = inputStream;
+                    inputStream = new GZipStream(innerStream, CompressionMode.Decompress);
+                }
+                return (OSDMap)OSDParser.DeserializeJson(inputStream);
+            }
+            catch
+            {
+                return null;
+            }
+            finally
+            {
+                if (innerStream != null)
+                    innerStream.Dispose();
+            }
+        }
     }
 }

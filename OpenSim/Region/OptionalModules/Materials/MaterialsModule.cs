@@ -25,6 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Reflection;
+using System.Text;
 using Ionic.Zlib;
 using log4net;
 using Mono.Addins;
@@ -32,14 +38,10 @@ using Nini.Config;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using OpenSim.Framework;
-using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
+
 using OpenSimAssetType = OpenSim.Framework.SLUtil.OpenSimAssetType;
 
 namespace OpenSim.Region.OptionalModules.Materials
@@ -50,7 +52,7 @@ namespace OpenSim.Region.OptionalModules.Materials
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public string Name { get { return "MaterialsModule"; } }
-
+        
         public Type ReplaceableInterface { get { return null; } }
 
         IAssetCache m_cache;
@@ -221,35 +223,33 @@ namespace OpenSim.Region.OptionalModules.Materials
             }
         }
 
-        private void OnRegisterCaps(OpenMetaverse.UUID agentID, OpenSim.Framework.Capabilities.Caps caps)
+        private void OnRegisterCaps(UUID agentID, OpenSim.Framework.Capabilities.Caps caps)
         {
-            string capsBase = "/CAPS/" + caps.CapsObjectPath + "/";
+            caps.RegisterSimpleHandler("RenderMaterials", 
+                new SimpleStreamHandler("/" + UUID.Random(),
+                    (httpRequest, httpResponse)
+                        => preprocess(httpRequest, httpResponse,agentID)
+                ));
+        }
 
-            IRequestHandler renderMaterialsPostHandler
-                = new RestStreamHandler("POST", capsBase,
-                    (request, path, param, httpRequest, httpResponse)
-                        => RenderMaterialsPostCap(request, agentID),
-                    "RenderMaterials", null);
-            caps.RegisterHandler("RenderMaterials", renderMaterialsPostHandler);
-
-            // OpenSimulator CAPs infrastructure seems to be somewhat hostile towards any CAP that requires both GET
-            // and POST handlers, (at least at the time this was originally written), so we first set up a POST
-            // handler normally and then add a GET handler via MainServer
-
-            IRequestHandler renderMaterialsGetHandler
-                = new RestStreamHandler("GET", capsBase,
-                    (request, path, param, httpRequest, httpResponse)
-                        => RenderMaterialsGetCap(request),
-                    "RenderMaterials", null);
-            MainServer.Instance.AddStreamHandler(renderMaterialsGetHandler);
-
-            // materials viewer seems to use either POST or PUT, so assign POST handler for PUT as well
-            IRequestHandler renderMaterialsPutHandler
-                = new RestStreamHandler("PUT", capsBase,
-                    (request, path, param, httpRequest, httpResponse)
-                        => RenderMaterialsPutCap(request, agentID),
-                    "RenderMaterials", null);
-            MainServer.Instance.AddStreamHandler(renderMaterialsPutHandler);
+        private void preprocess(IOSHttpRequest request, IOSHttpResponse response, UUID agentID)
+        {
+            switch (request.HttpMethod)
+            {
+                case "GET":
+                    RenderMaterialsGetCap(request, response);
+                    break;
+                case "PUT":
+                    RenderMaterialsPutCap(request, response, agentID);
+                    break;
+                case "POST":
+                    RenderMaterialsPostCap(request, response, agentID);
+                    break;
+                default:
+                    response.StatusCode = (int)HttpStatusCode.NotFound;
+                    return;
+            }
+            response.StatusCode = (int)HttpStatusCode.OK;
         }
 
         private void OnSimulatorFeaturesRequest(UUID agentID, ref OSDMap features)
@@ -475,10 +475,18 @@ namespace OpenSim.Region.OptionalModules.Materials
             }
         }
 
-        public string RenderMaterialsPostCap(string request, UUID agentID)
+        public void RenderMaterialsPostCap(IOSHttpRequest request, IOSHttpResponse response, UUID agentID)
         {
-            OSDMap req = (OSDMap)OSDParser.DeserializeLLSDXml(request);
-            OSDMap resp = new OSDMap();
+            OSDMap req;
+            try
+            {
+                req = (OSDMap)OSDParser.DeserializeLLSDXml(request.InputStream);
+            }
+            catch
+            {
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return;
+            }
 
             OSDArray respArr = new OSDArray();
             OSD tmpOSD;
@@ -532,26 +540,34 @@ namespace OpenSim.Region.OptionalModules.Materials
                 catch (Exception e)
                 {
                     m_log.Warn("[Materials]: exception decoding zipped CAP payload ", e);
-                    //return "";
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return;
                 }
             }
 
+            OSDMap resp = new OSDMap();
             resp["Zipped"] = ZCompressOSD(respArr, false);
-            string response = OSDParser.SerializeLLSDXmlString(resp);
+            response.RawBuffer = Encoding.UTF8.GetBytes(OSDParser.SerializeLLSDXmlString(resp));
 
             //m_log.Debug("[Materials]: cap request: " + request);
             //m_log.Debug("[Materials]: cap request (zipped portion): " + ZippedOsdBytesToString(req["Zipped"].AsBinary()));
             //m_log.Debug("[Materials]: cap response: " + response);
-            return response;
         }
 
-        public string RenderMaterialsPutCap(string request, UUID agentID)
+        public void RenderMaterialsPutCap(IOSHttpRequest request, IOSHttpResponse response, UUID agentID)
         {
-            OSDMap req = (OSDMap)OSDParser.DeserializeLLSDXml(request);
-            OSDMap resp = new OSDMap();
+            OSDMap req;
+            try
+            {
+                 req = (OSDMap)OSDParser.DeserializeLLSDXml(request.InputStream);
+            }
+            catch
+            {
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return;
+            }
 
             OSDMap materialsFromViewer = null;
-
             OSDArray respArr = new OSDArray();
 
             OSD tmpOSD;
@@ -703,6 +719,8 @@ namespace OpenSim.Region.OptionalModules.Materials
                             catch (Exception e)
                             {
                                 m_log.Warn("[Materials]: exception processing received material ", e);
+                                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                                return;
                             }
                         }
                     }
@@ -710,17 +728,19 @@ namespace OpenSim.Region.OptionalModules.Materials
                 catch (Exception e)
                 {
                     m_log.Warn("[Materials]: exception decoding zipped CAP payload ", e);
-                    //return "";
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return;
                 }
             }
 
+            OSDMap resp = new OSDMap();
             resp["Zipped"] = ZCompressOSD(respArr, false);
-            string response = OSDParser.SerializeLLSDXmlString(resp);
+            response.RawBuffer = Encoding.UTF8.GetBytes(OSDParser.SerializeLLSDXmlString(resp));
 
             //m_log.Debug("[Materials]: cap request: " + request);
             //m_log.Debug("[Materials]: cap request (zipped portion): " + ZippedOsdBytesToString(req["Zipped"].AsBinary()));
             //m_log.Debug("[Materials]: cap response: " + response);
-            return response;
+
         }
 
         private AssetBase MakeAsset(FaceMaterial fm, bool local)
@@ -736,7 +756,7 @@ namespace OpenSim.Region.OptionalModules.Materials
             return asset;
         }
 
-        public string RenderMaterialsGetCap(string request)
+        public void RenderMaterialsGetCap(IOSHttpRequest request, IOSHttpResponse response)
         {
             OSDMap resp = new OSDMap();
             OSDArray allOsd = new OSDArray();
@@ -758,7 +778,7 @@ namespace OpenSim.Region.OptionalModules.Materials
             */
             resp["Zipped"] = ZCompressOSD(allOsd, false);
 
-            return OSDParser.SerializeLLSDXmlString(resp);
+            response.RawBuffer = Encoding.UTF8.GetBytes(OSDParser.SerializeLLSDXmlString(resp));
         }
 
         private static string ZippedOsdBytesToString(byte[] bytes)

@@ -250,8 +250,12 @@ namespace OpenSim.Region.OptionalModules.World.MoneyModule
             string mmodule = startupConfig.GetString("economymodule", "");
             if (String.IsNullOrEmpty(mmodule))
             {
-                if (economyConfig != null)
+                if(economyConfig != null)
+                {
                     mmodule = economyConfig.GetString("economymodule", "");
+                    if (String.IsNullOrEmpty(mmodule))
+                        mmodule = economyConfig.GetString("EconomyModule", "");
+                }
             }
 
             if (!String.IsNullOrEmpty(mmodule) && mmodule != Name)
