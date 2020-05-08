@@ -97,18 +97,26 @@ namespace OpenSim.Tests.Common
                 Events.Clear();
         }
 
-        public bool Enqueue(OSD o, UUID avatarID)
+        public bool Enqueue(string o, UUID avatarID)
         {
             AddEvent(avatarID, "Enqueue", o);
             return true;
         }
+        public bool Enqueue(byte[] o, UUID avatarID)
+        {
+            return true;
+        }
+        public bool Enqueue(OSD o, UUID avatarID)
+        {
+            return true;
+        }
         /*
-                public void DisableSimulator(ulong handle, UUID avatarID)
-                {
-                    AddEvent(avatarID, "DisableSimulator", handle);
-                }
-        */
-        public void EnableSimulator(ulong handle, IPEndPoint endPoint, UUID avatarID, int regionSizeX, int regionSizeY)
+                                public void DisableSimulator(ulong handle, UUID avatarID)
+                                {
+                                    AddEvent(avatarID, "DisableSimulator", handle);
+                                }
+                        */
+        public void EnableSimulator (ulong handle, IPEndPoint endPoint, UUID avatarID, int regionSizeX, int regionSizeY)
         {
             AddEvent(avatarID, "EnableSimulator", handle);
         }
@@ -141,9 +149,19 @@ namespace OpenSim.Tests.Common
                 timeStamp, offline, parentEstateID, position, ttl, transactionID, fromGroup, binaryBucket);
         }
 
-        public void ChatterBoxSessionAgentListUpdates(UUID sessionID, UUID fromAgent, UUID toAgent, bool canVoiceChat, bool isModerator, bool textMute, bool isEnterorLeave)
+        public void ChatterBoxSessionStartReply(UUID sessionID, string sessionName, int type,
+                                bool voiceEnabled, bool voiceModerated, UUID tmpSessionID,
+                                bool sucess, string error,
+                                UUID toAgent)
         {
-            AddEvent(toAgent, "ChatterBoxSessionAgentListUpdates", sessionID, fromAgent, canVoiceChat, isModerator, textMute, isEnterorLeave);
+            AddEvent(toAgent, "ChatterBoxSessionStartReply", sessionID, sessionName, type,
+                                voiceEnabled, voiceModerated, tmpSessionID,
+                                sucess, error);
+        }
+
+        public void ChatterBoxSessionAgentListUpdates (UUID sessionID, UUID toAgent, List<GroupChatListAgentUpdateData> updates)
+        {
+            AddEvent(toAgent, "ChatterBoxSessionAgentListUpdates", sessionID, toAgent, updates);
         }
 
         public void ChatterBoxForceClose(UUID toAgent, UUID sessionID, string reason)
@@ -167,15 +185,19 @@ namespace OpenSim.Tests.Common
             throw new System.NotImplementedException();
         }
 
-        public OSD BuildEvent(string eventName, OSD eventBody)
+        public byte[] BuildEvent(string eventName, OSD eventBody)
         {
-            Console.WriteLine("TWO");
+            Console.WriteLine("TWOoo");
             throw new System.NotImplementedException();
         }
 
         public void partPhysicsProperties(uint localID, byte physhapetype, float density, float friction, float bounce, float gravmod, UUID avatarID)
         {
             AddEvent(avatarID, "partPhysicsProperties", localID, physhapetype, density, friction, bounce, gravmod);
+        }
+
+        public void WindlightRefreshEvent(int interpolate, UUID avatarID)
+        {
         }
 
         public StringBuilder StartEvent(string eventName)
@@ -186,6 +208,10 @@ namespace OpenSim.Tests.Common
         public string EndEvent(StringBuilder sb)
         {
             return "";
+        }
+        public byte[] EndEventToBytes(StringBuilder sb)
+        {
+            return new byte[0];
         }
     }
 }

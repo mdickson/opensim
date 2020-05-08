@@ -203,7 +203,7 @@ namespace OpenSim.Region.Framework.Scenes
                 addFromAllowedDrop = (part.ParentGroup.RootPart.GetEffectiveObjectFlags() & (uint)PrimFlags.AllowInventoryDrop) != 0;
 
             part.Inventory.AddInventoryItem(taskItem, addFromAllowedDrop);
-            part.ParentGroup.InvalidateEffectivePerms();
+            part.ParentGroup.InvalidateDeepEffectivePerms();
             return true;
 
         }

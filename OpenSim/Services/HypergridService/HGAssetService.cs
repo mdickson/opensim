@@ -98,9 +98,6 @@ namespace OpenSim.Services.HypergridService
                     m_log.ErrorFormat("[HGASSETS]: Failed to load backing service {0}", str);
                 }
             }
-
-
-
         }
 
         #region IAssetService

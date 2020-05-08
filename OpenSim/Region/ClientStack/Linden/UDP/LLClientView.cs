@@ -6225,7 +6225,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                     }
                     LLSDxmlEncode.AddEndArray(sb);
                     OSDllsdxml ev = new OSDllsdxml(eq.EndEvent(sb));
-                    eq.Enqueue(ev, AgentId);
+                    eq.Enqueue(eq.EndEvent(sb), AgentId);
                 }
             }
         }
@@ -6645,8 +6645,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             LLSDxmlEncode.AddArrayAndMap("RegionAllowAccessBlock", sb);
             LLSDxmlEncode.AddElem("RegionAllowAccessOverride", accessovr, sb);
             LLSDxmlEncode.AddEndMapAndArray(sb);
-            OSDllsdxml ev = new OSDllsdxml(eq.EndEvent(sb));
-            eq.Enqueue(ev, AgentId);
+            eq.Enqueue(eq.EndEventToBytes(sb), AgentId);
 
         }
 

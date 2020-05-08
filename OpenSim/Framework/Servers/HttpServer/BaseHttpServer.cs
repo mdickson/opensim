@@ -422,6 +422,16 @@ namespace OpenSim.Framework.Servers.HttpServer
             }
         }
 
+        public bool TryGetXmlRPCHandler(string method, out XmlRpcMethod handler)
+        {
+            lock (m_rpcHandlers)
+            {
+                if(m_rpcHandlers.TryGetValue(method, out handler))
+                    return true;
+            }
+            return false;
+        }
+
         public List<string> GetXmlRpcHandlerKeys()
         {
             lock (m_rpcHandlers)
@@ -765,13 +775,6 @@ namespace OpenSim.Framework.Servers.HttpServer
                         case "application/xml":
                         case "application/json":
                         default:
-                            //m_log.Info("[Debug BASE HTTP SERVER]: in default handler");
-                            // Point of note..  the DoWeHaveA methods check for an EXACT path
-                            //                        if (request.RawUrl.Contains("/CAPS/EQG"))
-                            //                        {
-                            //                            int i = 1;
-                            //                        }
-                            //m_log.Info("[Debug BASE HTTP SERVER]: Checking for LLSD Handler");
                             if (DoWeHaveALLSDHandler(request.RawUrl))
                             {
                                 if (DebugLevel >= 3)
@@ -1100,7 +1103,7 @@ namespace OpenSim.Framework.Servers.HttpServer
         /// </summary>
         /// <param name="request"></param>
         /// <param name="response"></param>
-        private void HandleXmlRpcRequests(OSHttpRequest request, OSHttpResponse response)
+        public void HandleXmlRpcRequests(OSHttpRequest request, OSHttpResponse response)
         {
             String requestBody;
 
@@ -1254,7 +1257,7 @@ namespace OpenSim.Framework.Servers.HttpServer
 
             response.KeepAlive = keepAlive;
             response.ContentType = "text/xml";
-            //string responseString = String.Empty;
+            string responseString = String.Empty;
             using (MemoryStream outs = new MemoryStream())
             {
                 using (XmlTextWriter writer = new XmlTextWriter(outs, UTF8NoBOM))
@@ -1262,14 +1265,13 @@ namespace OpenSim.Framework.Servers.HttpServer
                     writer.Formatting = Formatting.None;
                     XmlRpcResponseSerializer.Singleton.Serialize(writer, xmlRpcResponse);
                     writer.Flush();
-                    //outs.Seek(0, SeekOrigin.Begin);
-                    //using (StreamReader sr = new StreamReader(outs))
-                    //    responseString = sr.ReadToEnd();
-                    response.RawBuffer = outs.ToArray();
+                    outs.Seek(0, SeekOrigin.Begin);
+                    using (StreamReader sr = new StreamReader(outs))
+                        responseString = sr.ReadToEnd();
                 }
             }
 
-            //response.RawBuffer = Encoding.UTF8.GetBytes(responseString);
+            response.RawBuffer = Util.UTF8NBGetbytes(responseString);
             response.StatusCode = (int)HttpStatusCode.OK;
         }
 
