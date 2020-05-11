@@ -256,7 +256,7 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
 
                 m_UrlMap[url] = urlData;
 
-                string uri = "/lslhttp/" + urlcode.ToString() + "/";
+                string uri = "/lslhttp/" + urlcode.ToString();
 
                 PollServiceEventArgs args
                     = new PollServiceEventArgs(HttpRequestHandler, uri, HasEvents, GetEvents, NoEvents, Drop, urlcode, 25000);
@@ -314,7 +314,7 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
 
                 m_UrlMap[url] = urlData;
 
-                string uri = "/lslhttps/" + urlcode.ToString() + "/";
+                string uri = "/lslhttps/" + urlcode.ToString();
 
                 PollServiceEventArgs args
                     = new PollServiceEventArgs(HttpRequestHandler, uri, HasEvents, GetEvents, NoEvents, Drop, urlcode, 25000);
