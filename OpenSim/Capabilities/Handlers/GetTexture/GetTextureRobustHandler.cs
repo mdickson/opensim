@@ -25,19 +25,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Specialized;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Reflection;
+using System.IO;
+using System.Net;
+using System.Web;
 using log4net;
 using OpenMetaverse;
 using OpenMetaverse.Imaging;
 using OpenSim.Framework;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Services.Interfaces;
-using System;
-using System.Collections.Specialized;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Reflection;
-using System.Web;
 
 namespace OpenSim.Capabilities.Handlers
 {
@@ -130,8 +131,8 @@ namespace OpenSim.Capabilities.Handlers
             {
                 string textureUrl = m_RedirectURL + "?texture_id=" + textureID.ToString();
                 m_log.Debug("[GETTEXTURE]: Redirecting texture request to " + textureUrl);
-                httpResponse.StatusCode = (int)OSHttpStatusCode.RedirectMovedPermanently;
-                httpResponse.RedirectLocation = textureUrl;
+                httpResponse.StatusCode = (int)HttpStatusCode.Moved;
+                httpResponse.AddHeader("Location:", textureUrl);
                 return true;
             }
 
@@ -232,8 +233,9 @@ namespace OpenSim.Capabilities.Handlers
                         response.ContentLength = len;
                         response.ContentType = texture.Metadata.ContentType;
                         response.AddHeader("Content-Range", String.Format("bytes {0}-{1}/{2}", start, end, texture.Data.Length));
-
-                        response.Body.Write(texture.Data, start, len);
+                        response.RawBuffer = texture.Data;
+                        response.RawBufferStart = start;
+                        response.RawBufferLen = len;
                     }
                 }
                 else
@@ -251,7 +253,9 @@ namespace OpenSim.Capabilities.Handlers
                     response.ContentType = texture.Metadata.ContentType;
                 else
                     response.ContentType = "image/" + format;
-                response.Body.Write(texture.Data, 0, texture.Data.Length);
+                response.RawBuffer = texture.Data;
+                response.RawBufferStart = 0;
+                response.RawBufferLen = texture.Data.Length;
             }
 
             //            if (response.StatusCode < 200 || response.StatusCode > 299)

@@ -41,6 +41,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 using System.Text;
+
 using Caps = OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Region.ClientStack.Linden
@@ -61,13 +62,6 @@ namespace OpenSim.Region.ClientStack.Linden
         /// Debug level.
         /// </value>
         public int DebugLevel { get; set; }
-
-        // Viewer post requests timeout in 60 secs
-        // https://bitbucket.org/lindenlab/viewer-release/src/421c20423df93d650cc305dc115922bb30040999/indra/llmessage/llhttpclient.cpp?at=default#cl-44
-        //
-        private const int VIEWER_TIMEOUT = 60 * 1000;
-        // Just to be safe, we work on a 10 sec shorter cycle
-        private const int SERVER_EQ_TIME_NO_EVENTS = VIEWER_TIMEOUT - (10 * 1000);
 
         protected Scene m_scene;
 
@@ -358,9 +352,9 @@ namespace OpenSim.Region.ClientStack.Linden
                 }
             }
 
-            caps.RegisterPollHandler(
-                "EventQueueGet",
-                    new PollServiceEventArgs(null, GenerateEqgCapPath(eventQueueGetUUID), HasEvents, GetEvents, NoEvents, Drop, agentID, SERVER_EQ_TIME_NO_EVENTS));
+        caps.RegisterPollHandler(
+            "EventQueueGet",
+                new PollServiceEventArgs(null, GenerateEqgCapPath(eventQueueGetUUID), HasEvents, GetEvents, NoEvents, Drop, agentID, int.MaxValue));
         }
 
         public bool HasEvents(UUID requestID, UUID agentID)
@@ -393,7 +387,7 @@ namespace OpenSim.Region.ClientStack.Linden
         }
         public void Drop(UUID requestID, UUID pAgentId)
         {
-            // do nothing for now, hope client close will do it
+            // do nothing, in last case http server will do it
         }
 
         public Hashtable GetEvents(UUID requestID, UUID pAgentId)
@@ -461,7 +455,7 @@ namespace OpenSim.Region.ClientStack.Linden
             responsedata["content_type"] = "application/xml";
             //string tt = OSDParser.SerializeLLSDXmlString(events);
             responsedata["bin_response_data"] = Encoding.UTF8.GetBytes(OSDParser.SerializeLLSDXmlString(events));
-
+            responsedata["keepaliveTimeout"] = 60;
             //m_log.DebugFormat("[EVENTQUEUE]: sending response for {0} in region {1}: {2}", pAgentId, m_scene.RegionInfo.RegionName, responsedata["str_response_string"]);
             return responsedata;
         }
@@ -473,7 +467,6 @@ namespace OpenSim.Region.ClientStack.Linden
             responsedata["content_type"] = "text/plain";
             responsedata["str_response_string"] = "<llsd></llsd>";
             responsedata["error_status_text"] = "<llsd></llsd>";
-            responsedata["http_protocol_version"] = "HTTP/1.0";
             responsedata["keepalive"] = false;
             return responsedata;
         }

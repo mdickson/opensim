@@ -25,6 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Reflection;
+using System.Text;
+using System.Threading;
 using log4net;
 using Mono.Addins;
 using Nini.Config;
@@ -35,12 +42,7 @@ using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
+
 using Caps = OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Region.ClientStack.Linden
@@ -55,7 +57,7 @@ namespace OpenSim.Region.ClientStack.Linden
         {
             public PollServiceInventoryEventArgs thepoll;
             public UUID reqID;
-            public Hashtable request;
+            public OSHttpRequest request;
         }
 
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -330,11 +332,14 @@ namespace OpenSim.Region.ClientStack.Linden
                 response["int_response_code"] = 200;
                 response["content_type"] = "text/plain";
 
-                response["bin_response_data"] = System.Text.Encoding.UTF8.GetBytes(
+                response["bin_response_data"] = Encoding.UTF8.GetBytes(
                         m_webFetchHandler.FetchInventoryDescendentsRequest(
-                                    requestinfo.request["body"].ToString(),
+                                    requestinfo.request.InputStream,
                                     String.Empty, String.Empty, null, null)
                         );
+
+                requestinfo.request.InputStream.Dispose();
+
                 lock (responses)
                 {
                     lock (dropedResponses)
@@ -342,7 +347,6 @@ namespace OpenSim.Region.ClientStack.Linden
                         if (dropedResponses.Contains(requestID))
                         {
                             dropedResponses.Remove(requestID);
-                            requestinfo.request.Clear();
                             WebFetchInvDescModule.ProcessedRequestsCount++;
                             return;
                         }
@@ -352,7 +356,6 @@ namespace OpenSim.Region.ClientStack.Linden
                         m_log.WarnFormat("[FETCH INVENTORY DESCENDENTS2 MODULE]: Caught in the act of loosing responses! Please report this on mantis #7054");
                     responses[requestID] = response;
                 }
-                requestinfo.request.Clear();
                 WebFetchInvDescModule.ProcessedRequestsCount++;
             }
         }

@@ -25,6 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Globalization;
+using System.Net;
+using System.Text;
 using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
@@ -32,10 +36,6 @@ using OpenSim.Framework;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using System;
-using System.Collections;
-using System.Globalization;
-using System.Text;
 using Caps = OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Region.ClientStack.Linden
@@ -123,38 +123,33 @@ namespace OpenSim.Region.ClientStack.Linden
 
         public void RegisterCaps(UUID agentID, Caps caps)
         {
-            string capUrl = "/CAPS/" + UUID.Random() + "/";
-
-            caps.RegisterHandler(
-                "EstateAccess",
-                new RestHTTPHandler(
-                    "GET",
-                    capUrl,
-                    httpMethod => ProcessGetRequest(httpMethod, agentID, caps),
-                    "EstateAccessGet",
-                    agentID.ToString())); ;
+            caps.RegisterSimpleHandler("EstateAccess",
+                new SimpleStreamHandler("/" + UUID.Random() + "/",
+                delegate(IOSHttpRequest request, IOSHttpResponse response)
+                {
+                    ProcessRequest(request, response, agentID);
+                }));
         }
 
-        public Hashtable ProcessGetRequest(Hashtable request, UUID AgentId, Caps cap)
+        public void ProcessRequest(IOSHttpRequest request, IOSHttpResponse response, UUID AgentId)
         {
-            Hashtable responsedata = new Hashtable();
-            responsedata["int_response_code"] = 200; //501; //410; //404;
-            responsedata["content_type"] = "text/plain";
-
-            ScenePresence avatar;
-            if (!m_scene.TryGetScenePresence(AgentId, out avatar))
+            if(request.HttpMethod != "GET")
             {
-                responsedata["str_response_string"] = "<llsd><array /></llsd>"; ;
-                responsedata["keepalive"] = false;
-                return responsedata;
+                response.StatusCode = (int)HttpStatusCode.NotFound;
+                return;
             }
 
-            if (m_scene.RegionInfo == null
-                || m_scene.RegionInfo.EstateSettings == null
-                || !m_scene.Permissions.CanIssueEstateCommand(AgentId, false))
+            ScenePresence avatar;
+            if (!m_scene.TryGetScenePresence(AgentId, out avatar) || m_scene.RegionInfo == null || m_scene.RegionInfo.EstateSettings == null)
             {
-                responsedata["str_response_string"] = "<llsd><array /></llsd>"; ;
-                return responsedata;
+                response.StatusCode = (int)HttpStatusCode.Gone;
+                return;
+            }
+
+            if (!m_scene.Permissions.CanIssueEstateCommand(AgentId, false))
+            {
+                response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                return;
             }
 
             EstateSettings regionSettings = m_scene.RegionInfo.EstateSettings;
@@ -239,9 +234,9 @@ namespace OpenSim.Region.ClientStack.Linden
                 LLSDxmlEncode.AddEmptyArray("Managers", sb);
 
             LLSDxmlEncode.AddEndMap(sb);
-            responsedata["str_response_string"] = LLSDxmlEncode.End(sb);
 
-            return responsedata;
+            response.RawBuffer = Util.UTF8.GetBytes(LLSDxmlEncode.End(sb));
+            response.StatusCode = (int)HttpStatusCode.OK;
         }
     }
 }

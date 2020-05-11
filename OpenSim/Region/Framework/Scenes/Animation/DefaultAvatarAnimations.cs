@@ -37,8 +37,8 @@ namespace OpenSim.Region.Framework.Scenes.Animation
 
         public static readonly string DefaultAnimationsPath = "data/avataranimations.xml";
 
-        public static Dictionary<string, UUID> AnimsUUID = new Dictionary<string, UUID>();
-        public static Dictionary<UUID, string> AnimsNames = new Dictionary<UUID, string>();
+        public static Dictionary<string, UUID> AnimsUUIDbyName = new Dictionary<string, UUID>();
+        public static Dictionary<UUID, string> AnimsNamesbyUUID = new Dictionary<UUID, string>();
         public static Dictionary<UUID, string> AnimStateNames = new Dictionary<UUID, string>();
 
         static DefaultAvatarAnimations()
@@ -64,16 +64,19 @@ namespace OpenSim.Region.Framework.Scenes.Animation
                 {
                     if (nod.Attributes["name"] != null)
                     {
-                        string name = nod.Attributes["name"].Value;
-                        UUID id = (UUID)nod.InnerText;
-                        string animState = (string)nod.Attributes["state"].Value;
+                        if (nod.Attributes["name"] != null)
+                        {
+                            string name = nod.Attributes["name"].Value;
+                            UUID id = (UUID)nod.InnerText;
+                            string animState = (string)nod.Attributes["state"].Value;
 
-                        AnimsUUID.Add(name, id);
-                        AnimsNames.Add(id, name);
-                        if (animState != "")
-                            AnimStateNames.Add(id, animState);
+                            AnimsUUIDbyName.Add(name, id);
+                            AnimsNamesbyUUID.Add(id, name);
+                            if (animState != "")
+                                AnimStateNames.Add(id, animState);
 
-                        //                            m_log.DebugFormat("[AVATAR ANIMATIONS]: Loaded {0} {1} {2}", id, name, animState);
+//                            m_log.DebugFormat("[AVATAR ANIMATIONS]: Loaded {0} {1} {2}", id, name, animState);
+                        }
                     }
                 }
                 //                }
@@ -89,15 +92,20 @@ namespace OpenSim.Region.Framework.Scenes.Animation
         /// <returns></returns>
         public static UUID GetDefaultAnimation(string name)
         {
-            //            m_log.DebugFormat(
-            //                "[AVATAR ANIMATIONS]: Looking for default avatar animation with name {0}", name);
-
-            if (AnimsUUID.ContainsKey(name))
+//            m_log.DebugFormat(
+//                "[AVATAR ANIMATIONS]: Looking for default avatar animation with name {0}", name);
+            UUID id;
+            if (AnimsUUIDbyName.TryGetValue(name, out id))
             {
                 //                m_log.DebugFormat(
                 //                    "[AVATAR ANIMATIONS]: Found {0} {1} in GetDefaultAvatarAnimation()", AnimsUUID[name], name);
 
-                return AnimsUUID[name];
+                return id;
+            }
+            if(UUID.TryParse(name, out id))
+            {
+                if(AnimsNamesbyUUID.ContainsKey(id))
+                    return id;
             }
 
             return UUID.Zero;
@@ -109,24 +117,10 @@ namespace OpenSim.Region.Framework.Scenes.Animation
         /// </summary>
         public static string GetDefaultAnimationName(UUID uuid)
         {
-            string ret = "unknown";
-            if (AnimsUUID.ContainsValue(uuid))
-            {
-                foreach (KeyValuePair<string, UUID> kvp in AnimsUUID)
-                {
-                    if (kvp.Value == uuid)
-                    {
-                        ret = kvp.Key;
-                        break;
-                    }
-                }
-            }
+            if(AnimsNamesbyUUID.TryGetValue(uuid, out string ret))
+                return ret;
             else
-            {
-                ret = uuid.ToString();
-            }
-
-            return ret;
+                return uuid.ToString();
         }
     }
 }

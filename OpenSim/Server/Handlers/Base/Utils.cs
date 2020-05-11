@@ -25,9 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenMetaverse;
-using OpenSim.Framework.Servers.HttpServer;
 using System;
+using System.IO;
+using System.IO.Compression;
+
+using OpenSim.Framework.Servers.HttpServer;
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 
 namespace OpenSim.Server.Handlers.Base
 {
@@ -88,5 +92,28 @@ namespace OpenSim.Server.Handlers.Base
             return false;
         }
 
+        public static OSDMap DeserializeOSMap(IOSHttpRequest httpRequest)
+        {
+            Stream inputStream = httpRequest.InputStream;
+            Stream innerStream = null;
+            try
+            {
+                if ((httpRequest.ContentType == "application/x-gzip" || httpRequest.Headers["Content-Encoding"] == "gzip") || (httpRequest.Headers["X-Content-Encoding"] == "gzip"))
+                {
+                    innerStream = inputStream;
+                    inputStream = new GZipStream(innerStream, CompressionMode.Decompress);
+                }
+                return (OSDMap)OSDParser.DeserializeJson(inputStream);
+            }
+            catch
+            {
+                return null;
+            }
+            finally
+            {
+                if (innerStream != null)
+                    innerStream.Dispose();
+            }
+        }
     }
 }
