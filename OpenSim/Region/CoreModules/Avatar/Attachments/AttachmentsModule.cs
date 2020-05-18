@@ -874,7 +874,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Attachments
 
                 m_scene.DeleteSceneObject(so, false, false);
                 so.RemoveScriptInstances(true);
-                so.Clear();
+                so.Dispose();
 
                 return;
             }
@@ -1212,7 +1212,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Attachments
 
             // Now, remove the scripts
             so.RemoveScriptInstances(true);
-            so.Clear();
+            so.Dispose();
         }
 
         protected SceneObjectGroup RezSingleAttachmentFromInventoryInternal(

@@ -401,13 +401,7 @@ namespace OpenSim.Framework.Serialization.External
         /// <returns></returns>
         public static string SanitizeXml(string xmlData)
         {
-            string fixedData = xmlData;
-            if (fixedData != null)
-                // Loop, because it may contain multiple
-                while (fixedData.Contains("xmlns:xmlns:"))
-                    fixedData = fixedData.Replace("xmlns:xmlns:", "xmlns:");
-            return fixedData;
+            return xmlData.Replace("xmlns:xmlns:", "xmlns:");
         }
-
     }
 }

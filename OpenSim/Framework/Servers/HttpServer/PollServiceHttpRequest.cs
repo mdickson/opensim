@@ -44,8 +44,8 @@ namespace OpenSim.Framework.Servers.HttpServer
         public readonly IHttpRequest Request;
         public readonly int RequestTime;
         public readonly UUID RequestID;
-        public PollServiceHttpRequest(
-            PollServiceEventArgs pPollServiceArgs, IHttpRequest pRequest)
+
+        public PollServiceHttpRequest(PollServiceEventArgs pPollServiceArgs, IHttpRequest pRequest)
         {
             PollServiceArgs = pPollServiceArgs;
             Request = pRequest;
@@ -57,6 +57,18 @@ namespace OpenSim.Framework.Servers.HttpServer
         {
             if (Request.Body.CanRead)
                 Request.Body.Dispose();
+
+            if(responsedata.Contains("h"))
+            {
+                OSHttpResponse r = (OSHttpResponse)responsedata["h"];
+                try
+                {
+                    r.Send();
+                }
+                catch { }
+                PollServiceArgs.RequestsHandled++;
+                return;
+            }
 
             OSHttpResponse response = new OSHttpResponse(new HttpResponse(Request));
 
@@ -102,7 +114,6 @@ namespace OpenSim.Framework.Servers.HttpServer
                 SendNoContentError(response);
                 return;
             }
-
 
             response.StatusCode = responsecode;
             if (responsecode == (int)HttpStatusCode.Moved)

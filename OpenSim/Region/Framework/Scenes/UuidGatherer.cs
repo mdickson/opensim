@@ -295,6 +295,33 @@ namespace OpenSim.Region.Framework.Scenes
             possibleNotAssetCount = 0;
         }
 
+        public bool AddGathered(UUID uuid, sbyte type)
+        {
+            if (uuid == UUID.Zero)
+                return false;
+
+            if (ToSkip.Contains(uuid))
+                return false;
+
+            if (FailedUUIDs.Contains(uuid))
+            {
+                if (UncertainAssetsUUIDs.Contains(uuid))
+                    possibleNotAssetCount++;
+                else
+                    ErrorCount++;
+                return false;
+            }
+            if (GatheredUuids.ContainsKey(uuid))
+                return false;
+            if (m_assetUuidsToInspect.Contains(uuid))
+                return false;
+
+            //            m_log.DebugFormat("[UUID GATHERER]: Adding asset {0} for inspection", uuid);
+
+            GatheredUuids[uuid] = type; 
+            return true;
+        }
+
         /// <summary>
         /// Adds the asset uuid for inspection during the gathering process.
         /// </summary>
@@ -344,12 +371,12 @@ namespace OpenSim.Region.Framework.Scenes
                 return;
 
             SceneObjectPart[] parts = sceneObject.Parts;
-            for (int i = 0; i < parts.Length; i++)
+            for (int i = 0; i < parts.Length; ++i)
             {
                 SceneObjectPart part = parts[i];
 
-                //                m_log.DebugFormat(
-                //                    "[UUID GATHERER]: Getting part {0}, {1} for object {2}", part.Name, part.UUID, sceneObject.UUID);
+                // m_log.DebugFormat(
+                // "[UUID GATHERER]: Getting part {0}, {1} for object {2}", part.Name, part.UUID, sceneObject.UUID);
 
                 try
                 {
@@ -399,25 +426,15 @@ namespace OpenSim.Region.Framework.Scenes
                         }
                     }
 
-                    TaskInventoryDictionary taskDictionary = (TaskInventoryDictionary)part.TaskInventory.Clone();
-
+                    List<TaskInventoryItem> items = part.TaskInventory.GetItems();
                     // Now analyze this prim's inventory items to preserve all the uuids that they reference
-                    foreach (TaskInventoryItem tii in taskDictionary.Values)
+                    for(int j = 0; j < items.Count; ++j)
                     {
-                        //                        m_log.DebugFormat(
-                        //                            "[ARCHIVER]: Analysing item {0} asset type {1} in {2} {3}",
-                        //                            tii.Name, tii.Type, part.Name, part.UUID);
+                        TaskInventoryItem tii = items[j];
+                        items[j] = null; // gc is stupid
                         AddForInspection(tii.AssetID, (sbyte)tii.Type);
                     }
 
-                    // FIXME: We need to make gathering modular but we cannot yet, since gatherers are not guaranteed
-                    // to be called with scene objects that are in a scene (e.g. in the case of hg asset mapping and
-                    // inventory transfer.  There needs to be a way for a module to register a method without assuming a
-                    // Scene.EventManager is present.
-                    //                    part.ParentGroup.Scene.EventManager.TriggerGatherUuids(part, assetUuids);
-
-
-                    // still needed to retrieve textures used as materials for any parts containing legacy materials stored in DynAttrs
                     RecordMaterialsUuids(part);
                 }
                 catch (Exception e)
@@ -425,6 +442,8 @@ namespace OpenSim.Region.Framework.Scenes
                     m_log.ErrorFormat("[UUID GATHERER]: Failed to get part - {0}", e);
                 }
             }
+            if(sceneObject.TemporaryInstance)
+                sceneObject.Dispose();
         }
 
         /// <summary>
@@ -787,15 +806,40 @@ namespace OpenSim.Region.Framework.Scenes
             if (CoalescedSceneObjectsSerializer.TryFromXml(xml, out coa))
             {
                 foreach (SceneObjectGroup sog in coa.Objects)
+                {
+                    sog.TemporaryInstance = true;
                     AddForInspection(sog);
+                }
             }
             else
             {
                 SceneObjectGroup sog = SceneObjectSerializer.FromOriginalXmlFormat(xml);
-
                 if (null != sog)
+                {
+                    sog.TemporaryInstance = true;
                     AddForInspection(sog);
+                }
             }
+
+            /*
+            if (CoalescedSceneObjectsSerializer.TryFromXmlData(sceneObjectAsset.Data, out CoalescedSceneObjects coa))
+            {
+                foreach (SceneObjectGroup sog in coa.Objects)
+                {
+                    sog.TemporaryInstance = true;
+                    AddForInspection(sog);
+                }
+            }
+            else
+            {
+                SceneObjectGroup sog = SceneObjectSerializer.FromOriginalXmlData(sceneObjectAsset.Data);
+                if (null != sog)
+                {
+                    sog.TemporaryInstance = true;
+                    AddForInspection(sog);
+                }
+            }
+            */
         }
 
         /// <summary>

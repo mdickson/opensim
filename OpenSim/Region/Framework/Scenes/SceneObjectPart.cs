@@ -94,7 +94,7 @@ namespace OpenSim.Region.Framework.Scenes
 
     #endregion Enumerations
 
-    public class SceneObjectPart : ISceneEntity
+    public class SceneObjectPart : ISceneEntity, IDisposable
     {
         /// <value>
         /// Denote all sides of the prim
@@ -453,6 +453,40 @@ namespace OpenSim.Region.Framework.Scenes
             PseudoCRC = (int)DateTime.UtcNow.Ticks; // random could be as good
             TrimPermissions();
             AggregateInnerPerms();
+        }
+
+        ~SceneObjectPart()
+        {
+            Dispose(false);
+        }
+
+        private bool disposed = false;
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (!disposed)
+            {
+                if (KeyframeMotion != null)
+                {
+                    KeyframeMotion.Delete();
+                    KeyframeMotion = null;
+                }
+                if (PhysActor != null)
+                    RemoveFromPhysics();
+
+                if (m_inventory != null)
+                {
+                    m_inventory.Dispose();
+                    m_inventory = null;
+                }
+                disposed = true;
+            }
         }
 
         #endregion Constructors

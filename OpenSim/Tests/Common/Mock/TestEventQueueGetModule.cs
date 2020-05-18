@@ -205,6 +205,11 @@ namespace OpenSim.Tests.Common
             return null;
         }
 
+        public StringBuilder StartEvent(string eventName, int cap)
+        {
+            return null;
+        }
+
         public string EndEvent(StringBuilder sb)
         {
             return "";
