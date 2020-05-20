@@ -25,11 +25,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenSim.Region.ScriptEngine.Shared;
-using OpenSim.Region.ScriptEngine.Shared.Api;
 using System;
 using System.IO;
 using System.Xml;
+using OpenSim.Framework;
+using OpenSim.Region.ScriptEngine.Shared;
+using OpenSim.Region.ScriptEngine.Shared.Api;
+using log4net;
+
+using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
+using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
+using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
 
 namespace OpenSim.Region.ScriptEngine.Yengine
@@ -106,6 +112,14 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 scriptStateN.AppendChild(doGblInitN);
                 m_RunOnePhase = "GetExecutionState D";
                 CheckRunLockInvariants(true);
+
+                if(m_XMRLSLApi != null)
+                {
+                    double scriptTime = Util.GetTimeStampMS() - m_XMRLSLApi.getLSLTimer();
+                    XmlElement scriptTimeN = doc.CreateElement("", "scrpTime", "");
+                    scriptTimeN.AppendChild(doc.CreateTextNode(scriptTime.ToString()));
+                    scriptStateN.AppendChild(scriptTimeN);
+                }
 
                 if (m_minEventDelay != 0.0)
                 {

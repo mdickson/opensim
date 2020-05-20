@@ -3043,10 +3043,10 @@ namespace OpenSim.Region.Framework.Scenes
             {
                 // We are close enough to the target
                 Velocity = Vector3.Zero;
-                AbsolutePosition = m_moveToPositionTarget;
                 if (Flying)
                 {
                     if (LandAtTarget)
+                    {
                         Flying = false;
 
                     // A horrible hack to stop the avatar dead in its tracks rather than having them overshoot
@@ -3054,9 +3054,15 @@ namespace OpenSim.Region.Framework.Scenes
                     // We really need to be more subtle (slow the avatar as it approaches the target) or at
                     // least be able to set collision status once, rather than 5 times to give it enough
                     // weighting so that that PhysicsActor thinks it really is colliding.
-                    for (int i = 0; i < 5; i++)
-                        IsColliding = true;
+                        for (int i = 0; i < 5; i++)
+                            IsColliding = true;
+                    }
                 }
+                else
+                    m_moveToPositionTarget.Z = AbsolutePosition.Z;
+
+                AbsolutePosition = m_moveToPositionTarget;
+
                 ResetMoveToTarget();
                 return false;
             }
@@ -3077,6 +3083,8 @@ namespace OpenSim.Region.Framework.Scenes
                 Quaternion rot = new Quaternion(0, 0, (float)Math.Sin(angle), (float)Math.Cos(angle));
                 Rotation = rot;
                 LocalVectorToTarget3D = LocalVectorToTarget3D * Quaternion.Inverse(rot); // change to avatar coords
+                if(!Flying)
+                    LocalVectorToTarget3D.Z = 0;
                 LocalVectorToTarget3D.Normalize();
 
                 // update avatar movement flags. the avatar coordinate system is as follows:
@@ -3162,8 +3170,9 @@ namespace OpenSim.Region.Framework.Scenes
 
         public void MoveToTargetHandle(Vector3 pos, bool noFly, bool landAtTarget)
         {
-            MoveToTarget(pos, noFly, landAtTarget);
+            MoveToTarget(pos, noFly, landAtTarget, false);
         }
+
         /// <summary>
         /// Move to the given target over time.
         /// </summary>
@@ -3176,8 +3185,8 @@ namespace OpenSim.Region.Framework.Scenes
         /// <param name="landAtTarget">
         /// If true and the avatar starts flying during the move then land at the target.
         /// </param>
-        public void MoveToTarget(Vector3 pos, bool noFly, bool landAtTarget, float tau = -1f)
-        {
+        public void MoveToTarget(Vector3 pos, bool noFly, bool landAtTarget, bool running, float tau = -1f)
+        { 
             m_delayedStop = -1;
 
             if (SitGround || IsSatOnObject)
@@ -3214,35 +3223,41 @@ namespace OpenSim.Region.Framework.Scenes
             //                "[SCENE PRESENCE]: Avatar {0} set move to target {1} (terrain height {2}) in {3}",
             //                Name, pos, terrainHeight, m_scene.RegionInfo.RegionName);
 
-            terrainHeight += Appearance.AvatarHeight; // so 1.5 * AvatarHeight above ground at target
-            bool shouldfly = Flying;
-            if (noFly)
-                shouldfly = false;
-            else if (pos.Z > terrainHeight || Flying)
-                shouldfly = true;
+            bool shouldfly = true;
+            if(IsNPC)
+            {
+                if (!Flying)
+                    shouldfly = noFly ? false : (pos.Z > terrainHeight + Appearance.AvatarHeight);
+                LandAtTarget = landAtTarget & shouldfly;
+            }
+            else
+            {   
+                // we have no control on viewer fly state
+                shouldfly = Flying || (pos.Z > terrainHeight + Appearance.AvatarHeight);
+                LandAtTarget = false;
+            }
 
-            Vector3 localVectorToTarget3D = pos - AbsolutePosition;
-
-            //            m_log.DebugFormat("[SCENE PRESENCE]: Local vector to target is {0},[1}", localVectorToTarget3D.X,localVectorToTarget3D.Y);
+            // m_log.DebugFormat("[SCENE PRESENCE]: Local vector to target is {0},[1}", localVectorToTarget3D.X,localVectorToTarget3D.Y);
 
             m_movingToTarget = true;
-            LandAtTarget = landAtTarget;
             m_moveToPositionTarget = pos;
             if (tau > 0)
             {
                 if (tau < Scene.FrameTime)
                     tau = Scene.FrameTime;
+                Vector3 localVectorToTarget3D = pos - AbsolutePosition;
+                if (!shouldfly)
+                    localVectorToTarget3D.Z = 0;
                 m_moveToSpeed = localVectorToTarget3D.Length() / tau;
                 if (m_moveToSpeed < 0.5f) //to tune
                     m_moveToSpeed = 0.5f;
                 else if (m_moveToSpeed > 50f)
                     m_moveToSpeed = 50f;
-
-                SetAlwaysRun = false;
             }
             else
                 m_moveToSpeed = 4.096f * m_speedModifier;
 
+            SetAlwaysRun = running;
             Flying = shouldfly;
 
             Vector3 control = Vector3.Zero;
