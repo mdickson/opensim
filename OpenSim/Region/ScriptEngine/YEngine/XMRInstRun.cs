@@ -299,8 +299,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 CheckRunLockInvariants(true);
                 Exception e = null;
 
-                // Maybe it has been Disposed()
-                if (m_Part == null)
+                 // Maybe it has been Disposed()
+                if(m_Part == null || m_Part.Inventory == null)
                 {
                     m_RunOnePhase = "runone saw it disposed";
                     return XMRInstState.DISPOSED;
@@ -524,6 +524,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             ScriptEventCode curevent = eventCode;
             eventCode = ScriptEventCode.None;
             stackFrames = null;
+
+            if(m_Part == null || m_Part.Inventory == null)
+            {
+                //we are gone and don't know it still
+                m_SleepUntil = DateTime.MaxValue;
+                return;
+            }
 
             if (e is ScriptDeleteException)
             {
