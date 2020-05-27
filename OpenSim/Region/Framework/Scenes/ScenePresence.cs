@@ -1179,6 +1179,7 @@ namespace OpenSim.Region.Framework.Scenes
             // Check to see if Dispose has already been called.
             if (!disposed)
             {
+                disposed = true;
                 IsDeleted = true;
                 if (m_updateAgentReceivedAfterTransferEvent != null)
                 {
@@ -1205,9 +1206,6 @@ namespace OpenSim.Region.Framework.Scenes
 
                 scriptedcontrols.Clear();
                 ControllingClient = null;
-                LifecycleState = ScenePresenceState.Removed;
-
-                disposed = true;
             }
         }
 
