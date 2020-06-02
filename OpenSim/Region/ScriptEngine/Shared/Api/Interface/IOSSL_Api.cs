@@ -333,13 +333,14 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         /// <returns>TRUE if the key belongs to an npc in the scene.  FALSE otherwise.</returns>
         LSL_Integer osIsNpc(LSL_Key npc);
 
-        key osNpcCreate(string user, string name, vector position, string notecard);
-        key osNpcCreate(string user, string name, vector position, string notecard, int options);
-        LSL_Key osNpcSaveAppearance(key npc, string notecard);
-        void osNpcLoadAppearance(key npc, string notecard);
-        vector osNpcGetPos(key npc);
-        void osNpcMoveTo(key npc, vector position);
-        void osNpcMoveToTarget(key npc, vector target, int options);
+        key     osNpcCreate(string user, string name, vector position, string notecard);
+        key     osNpcCreate(string user, string name, vector position, string notecard, int options);
+        LSL_Key osNpcSaveAppearance(key npc, LSL_String notecard);
+        LSL_Key osNpcSaveAppearance(key npc, LSL_String notecard, LSL_Integer includeHuds);
+        void    osNpcLoadAppearance(key npc, string notecard);
+        vector  osNpcGetPos(key npc);
+        void    osNpcMoveTo(key npc, vector position);
+        void    osNpcMoveToTarget(key npc, vector target, int options);
 
         /// <summary>
         /// Get the owner of the NPC
@@ -348,9 +349,10 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         /// <returns>
         /// The owner of the NPC for an owned NPC.  The NPC's agent id for an unowned NPC.  UUID.Zero if the key is not an npc.
         /// </returns>
-        LSL_Key osNpcGetOwner(key npc);
+        LSL_Key  osNpcGetOwner(key npc);
 
         rotation osNpcGetRot(key npc);
+
         void osNpcSetRot(LSL_Key npc, rotation rot);
         void osNpcStopMoveToTarget(LSL_Key npc);
         void osNpcSetProfileAbout(LSL_Key npc, string about);
@@ -367,8 +369,10 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         void osNpcTouch(LSL_Key npcLSL_Key, LSL_Key object_key, LSL_Integer link_num);
         void osNpcWhisper(key npc, int channel, string message);
 
-        LSL_Key osOwnerSaveAppearance(string notecard);
-        LSL_Key osAgentSaveAppearance(key agentId, string notecard);
+        LSL_Key osOwnerSaveAppearance(LSL_String notecard);
+        LSL_Key osOwnerSaveAppearance(LSL_String notecard, LSL_Integer includeHuds);
+        LSL_Key osAgentSaveAppearance(key agentId, LSL_String notecard);
+        LSL_Key osAgentSaveAppearance(key agentId, LSL_String notecard, LSL_Integer includeHuds);
 
         key osGetGender(LSL_Key rawAvatarId);
         key osGetMapTexture();
