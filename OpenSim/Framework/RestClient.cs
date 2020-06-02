@@ -34,6 +34,7 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace OpenSim.Framework
@@ -116,8 +117,7 @@ namespace OpenSim.Framework
         /// <summary>
         /// Default Buffer size of a block requested from the web-server
         /// </summary>
-        private const int BufferSize = 4096; // Read blocks of 4 KB.
-
+        private const int BufferSize = 4 * 4096; // Read blocks of 4 * 4 KB.
 
         /// <summary>
         /// if an exception occours during async processing, we need to save it, so it can be
@@ -180,10 +180,7 @@ namespace OpenSim.Framework
         /// <param name="element">path entry</param>
         public void AddResourcePath(string element)
         {
-            if (isSlashed(element))
-                _pathElements.Add(element.Substring(0, element.Length - 1));
-            else
-                _pathElements.Add(element);
+            _pathElements.Add(Util.TrimEndSlash(element));
         }
 
         /// <summary>
@@ -234,16 +231,6 @@ namespace OpenSim.Framework
         {
             get { return _method; }
             set { _method = value; }
-        }
-
-        /// <summary>
-        /// True if string contains a trailing slash '/'
-        /// </summary>
-        /// <param name="s">string to be examined</param>
-        /// <returns>true if slash is present</returns>
-        private static bool isSlashed(string s)
-        {
-            return s.Substring(s.Length - 1, 1) == "/";
         }
 
         /// <summary>
@@ -337,10 +324,9 @@ namespace OpenSim.Framework
         {
             lock (_lock)
             {
-                _request = (HttpWebRequest)WebRequest.Create(buildUri());
-                _request.KeepAlive = false;
+                _request = (HttpWebRequest) WebRequest.Create(buildUri());
                 _request.ContentType = "application/xml";
-                _request.Timeout = 200000;
+                _request.Timeout = 90000;
                 _request.Method = RequestMethod;
                 _asyncException = null;
                 if (auth != null)
@@ -349,8 +335,6 @@ namespace OpenSim.Framework
                 int reqnum = WebUtil.RequestNumber++;
                 if (WebUtil.DebugLevel >= 3)
                     m_log.DebugFormat("[LOGHTTP]: HTTP OUT {0} REST {1} to {2}", reqnum, _request.Method, _request.RequestUri);
-
-                //                IAsyncResult responseAsyncResult = _request.BeginGetResponse(new AsyncCallback(ResponseIsReadyDelegate), _request);
 
                 try
                 {
@@ -364,12 +348,6 @@ namespace OpenSim.Framework
                                 _resource.Write(_readbuf, 0, length);
                                 length = src.Read(_readbuf, 0, BufferSize);
                             }
-
-                            // TODO! Implement timeout, without killing the server
-                            // this line implements the timeout, if there is a timeout, the callback fires and the request becomes aborted
-                            //ThreadPool.RegisterWaitForSingleObject(responseAsyncResult.AsyncWaitHandle, new WaitOrTimerCallback(TimeoutCallback), _request, DefaultTimeout, true);
-
-                            //                _allDone.WaitOne();
                         }
                     }
                 }
@@ -390,7 +368,6 @@ namespace OpenSim.Framework
                     return null;
                 }
 
-
                 if (_asyncException != null)
                     throw _asyncException;
 
@@ -407,81 +384,53 @@ namespace OpenSim.Framework
             }
         }
 
-        public Stream Request(Stream src, IServiceAuth auth)
+        // just post data, ignoring result
+        public async Task AsyncPOSTRequest(byte[] src, IServiceAuth auth)
         {
             _request = (HttpWebRequest)WebRequest.Create(buildUri());
-            _request.KeepAlive = false;
             _request.ContentType = "application/xml";
             _request.Timeout = 90000;
-            _request.Method = RequestMethod;
+            _request.Method = "POST";
             _asyncException = null;
             _request.ContentLength = src.Length;
             if (auth != null)
                 auth.AddAuthorization(_request.Headers);
 
-            src.Seek(0, SeekOrigin.Begin);
-
             int reqnum = WebUtil.RequestNumber++;
-            if (WebUtil.DebugLevel >= 3)
-                m_log.DebugFormat("[LOGHTTP]: HTTP OUT {0} REST {1} to {2}", reqnum, _request.Method, _request.RequestUri);
-            if (WebUtil.DebugLevel >= 5)
-                WebUtil.LogOutgoingDetail(string.Format("SEND {0}: ", reqnum), src);
-
-
             try
             {
                 using (Stream dst = _request.GetRequestStream())
                 {
-                    //                    m_log.Debug("[REST]: GetRequestStream is ok");
-
-                    byte[] buf = new byte[1024];
-                    int length = src.Read(buf, 0, 1024);
-                    //                    m_log.Debug("[REST]: First Read is ok");
-                    while (length > 0)
-                    {
-                        dst.Write(buf, 0, length);
-                        length = src.Read(buf, 0, 1024);
-                    }
+                    await dst.WriteAsync(src, 0, src.Length).ConfigureAwait(false);
                 }
 
-                _response = (HttpWebResponse)_request.GetResponse();
+                using(HttpWebResponse response = (HttpWebResponse)await _request.GetResponseAsync().ConfigureAwait(false))
+                {
+                    if (WebUtil.DebugLevel >= 5)
+                    {
+                        using (Stream responseStream = response.GetResponseStream())
+                        {
+                            using (StreamReader reader = new StreamReader(responseStream))
+                            {
+                                string responseStr = await reader.ReadToEndAsync().ConfigureAwait(false);
+                                WebUtil.LogResponseDetail(reqnum, responseStr);
+                            }
+                        }
+                    }
+                }
             }
             catch (WebException e)
             {
-                m_log.WarnFormat("[REST]: Request {0} {1} failed with status {2} and message {3}",
-                                  RequestMethod, _request.RequestUri, e.Status, e.Message);
-                return null;
+                m_log.WarnFormat("[REST]: AsyncPOST {0} failed with status {1} and message {2}",
+                                  _request.RequestUri, e.Status, e.Message);
+                return;
             }
             catch (Exception e)
             {
-                m_log.WarnFormat(
-                    "[REST]: Request {0} {1} failed with exception {2} {3}",
-                    RequestMethod, _request.RequestUri, e.Message, e.StackTrace);
-                return null;
+                m_log.WarnFormat("[REST]: AsyncPOST {0} failed with exception {1} {2}",
+                                _request.RequestUri, e.Message, e.StackTrace);
+                return;
             }
-
-            if (WebUtil.DebugLevel >= 5)
-            {
-                using (Stream responseStream = _response.GetResponseStream())
-                {
-                    using (StreamReader reader = new StreamReader(responseStream))
-                    {
-                        string responseStr = reader.ReadToEnd();
-                        WebUtil.LogResponseDetail(reqnum, responseStr);
-                    }
-                }
-            }
-
-            if (_response != null)
-                _response.Close();
-
-            //            IAsyncResult responseAsyncResult = _request.BeginGetResponse(new AsyncCallback(ResponseIsReadyDelegate), _request);
-
-            // TODO! Implement timeout, without killing the server
-            // this line implements the timeout, if there is a timeout, the callback fires and the request becomes aborted
-            //ThreadPool.RegisterWaitForSingleObject(responseAsyncResult.AsyncWaitHandle, new WaitOrTimerCallback(TimeoutCallback), _request, DefaultTimeout, true);
-
-            return null;
         }
 
         #region Async Invocation

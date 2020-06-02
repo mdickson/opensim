@@ -39,7 +39,7 @@ using PermissionMask = OpenSim.Framework.PermissionMask;
 
 namespace OpenSim.Region.Framework.Scenes
 {
-    public class SceneObjectPartInventory : IEntityInventory
+    public class SceneObjectPartInventory : IEntityInventory , IDisposable
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -119,6 +119,32 @@ namespace OpenSim.Region.Framework.Scenes
         public SceneObjectPartInventory(SceneObjectPart part)
         {
             m_part = part;
+        }
+
+        ~SceneObjectPartInventory()
+        {
+            Dispose(false);
+        }
+
+        private bool disposed = false;
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (!disposed)
+            {
+                if (m_items != null)
+                {
+                    m_items.Dispose();
+                    m_items = null;
+                }
+                disposed = true;
+            }
         }
 
         /// <summary>
@@ -778,7 +804,7 @@ namespace OpenSim.Region.Framework.Scenes
             m_items.LockItemsForRead(true);
             if (m_scripts == null || m_scripts.Count == 0)
             {
-                m_items.LockItemsForWrite(false);
+                m_items.LockItemsForRead(false);
                 return;
             }
 

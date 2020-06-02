@@ -105,13 +105,7 @@ namespace OpenSim.Tests.Common
             }
         }
 
-        public Stream InputStream
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public Stream InputStream { get; set;}
 
         public bool IsSecured
         {
@@ -187,6 +181,7 @@ namespace OpenSim.Tests.Common
 
         public Uri Url { get; set; }
         public string UriPath { get;}
+        public double ArrivalTS { get; }
 
         public string UserAgent
         {

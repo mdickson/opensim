@@ -101,7 +101,7 @@ namespace OpenSim.Region.Framework.Scenes
     /// A scene object group is conceptually an object in the scene.  The object is constituted of SceneObjectParts
     /// (often known as prims), one of which is considered the root part.
     /// </summary>
-    public partial class SceneObjectGroup : EntityBase, ISceneObject
+    public partial class SceneObjectGroup : EntityBase, ISceneObject, IDisposable
     {
         // Axis selection bitmask used by SetAxisRotation()
         // Just happen to be the same bits used by llSetStatus() and defined in ScriptBaseClass.
@@ -189,6 +189,8 @@ namespace OpenSim.Region.Framework.Scenes
 
             get { return m_hasGroupChanged; }
         }
+
+        public bool TemporaryInstance = false;
 
         private bool m_groupContainsForeignPrims = false;
 
@@ -902,7 +904,7 @@ namespace OpenSim.Region.Framework.Scenes
                 avsToCrossFar.Clear();
                 avsToCross.Clear();
                 sog.RemoveScriptInstances(true);
-                sog.Clear();
+                sog.Dispose();
                 return sog;
             }
             else
@@ -1357,6 +1359,42 @@ namespace OpenSim.Region.Framework.Scenes
             : this(ownerID, pos, Quaternion.Identity, shape)
         {
         }
+
+        ~SceneObjectGroup()
+        {
+            Dispose(false);
+        }
+
+        private bool disposed = false;
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (!disposed)
+            {
+                IsDeleted = true;
+
+                SceneObjectPart[] parts = m_parts.GetArray();
+                for(int i= 0; i < parts.Length; ++i)
+                    parts[i].Dispose();
+
+                m_parts.Clear();
+                m_sittingAvatars.Clear();
+                //            m_rootPart = null;
+
+                m_targets.Clear();
+                m_partsNameToLinkMap.Clear();
+
+                disposed = true;
+            }
+        }
+
+
 
         public void LoadScriptState(XmlDocument doc)
         {
@@ -2408,7 +2446,7 @@ namespace OpenSim.Region.Framework.Scenes
                             }
                         });
 
-                        backup_group.Clear();
+                        backup_group.Dispose();
                         backup_group = null;
                     }
                 }
@@ -2638,7 +2676,7 @@ namespace OpenSim.Region.Framework.Scenes
                     ScenePresence avatar = m_scene.GetScenePresence(AttachedAvatar);
 
                     if (avatar != null && !avatar.IsSatOnObject)
-                        avatar.MoveToTarget(target, false, false, tau);
+                        avatar.MoveToTarget(target, false, false, false, tau);
                 }
                 else
                 {
@@ -3254,9 +3292,8 @@ namespace OpenSim.Region.Framework.Scenes
 
             // Now that we've aquired all of the old SOG's parts, remove the old SOG from the scene.
             m_scene.UnlinkSceneObject(objectGroup, true);
-            objectGroup.IsDeleted = true;
-
-            objectGroup.m_parts.Clear();
+            objectGroup.m_parts.Clear(); // do not dispose the parts moved to new group
+            objectGroup.Dispose();
 
             // Can't do this yet since backup still makes use of the root part without any synchronization
             //            objectGroup.m_rootPart = null;
@@ -5273,18 +5310,7 @@ namespace OpenSim.Region.Framework.Scenes
             InvalidateEffectivePerms();
         }
 
-        // clear some references to easy cg
-        public void Clear()
-        {
-            m_parts.Clear();
-            m_sittingAvatars.Clear();
-            //            m_rootPart = null;
-
-            m_targets.Clear();
-            m_partsNameToLinkMap.Clear();
-        }
-
-        private Dictionary<string, int> m_partsNameToLinkMap = new Dictionary<string, int>();
+        private Dictionary<string,int> m_partsNameToLinkMap = new Dictionary<string, int>();
         private string GetLinkNumber_lastname;
         private int GetLinkNumber_lastnumber;
 

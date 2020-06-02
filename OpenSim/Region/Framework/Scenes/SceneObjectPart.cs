@@ -94,7 +94,7 @@ namespace OpenSim.Region.Framework.Scenes
 
     #endregion Enumerations
 
-    public class SceneObjectPart : ISceneEntity
+    public class SceneObjectPart : ISceneEntity, IDisposable
     {
         /// <value>
         /// Denote all sides of the prim
@@ -411,10 +411,6 @@ namespace OpenSim.Region.Framework.Scenes
             Rezzed = DateTime.UtcNow;
             Description = String.Empty;
             PseudoCRC = (int)DateTime.UtcNow.Ticks; // random could be as good; fallbak if not on region db
-
-            // Prims currently only contain a single folder (Contents).  From looking at the Second Life protocol,
-            // this appears to have the same UUID (!) as the prim.  If this isn't the case, one can't drag items from
-            // the prim into an agent inventory (Linden client reports that the "Object not found for drop" in its log
             m_inventory = new SceneObjectPartInventory(this);
             LastColSoundSentTime = Util.EnvironmentTickCount();
         }
@@ -450,9 +446,42 @@ namespace OpenSim.Region.Framework.Scenes
             APIDActive = false;
             Flags = 0;
             CreateSelected = true;
-            PseudoCRC = (int)DateTime.UtcNow.Ticks; // random could be as good
             TrimPermissions();
             AggregateInnerPerms();
+        }
+
+        ~SceneObjectPart()
+        {
+            Dispose(false);
+        }
+
+        private bool disposed = false;
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (!disposed)
+            {
+                if (KeyframeMotion != null)
+                {
+                    KeyframeMotion.Delete();
+                    KeyframeMotion = null;
+                }
+                if (PhysActor != null)
+                    RemoveFromPhysics();
+
+                if (m_inventory != null)
+                {
+                    m_inventory.Dispose();
+                    m_inventory = null;
+                }
+                disposed = true;
+            }
         }
 
         #endregion Constructors

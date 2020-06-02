@@ -235,6 +235,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Attachments
                 ct.AddRow("Item ID", attachmentObject.UUID);
                 ct.AddRow("From Item ID", attachmentObject.FromItemID);
                 ct.AddRow("Attach Point", ((AttachmentPoint)attachmentObject.AttachmentPoint));
+                ct.AddRow("Prims", attachmentObject.PrimCount);
                 ct.AddRow("Position", attachmentObject.RootPart.AttachedPos + "\n\n");
             }
 
@@ -874,7 +875,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Attachments
 
                 m_scene.DeleteSceneObject(so, false, false);
                 so.RemoveScriptInstances(true);
-                so.Clear();
+                so.Dispose();
 
                 return;
             }
@@ -1212,7 +1213,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Attachments
 
             // Now, remove the scripts
             so.RemoveScriptInstances(true);
-            so.Clear();
+            so.Dispose();
         }
 
         protected SceneObjectGroup RezSingleAttachmentFromInventoryInternal(

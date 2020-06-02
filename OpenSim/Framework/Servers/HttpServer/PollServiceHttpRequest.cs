@@ -41,42 +41,16 @@ namespace OpenSim.Framework.Servers.HttpServer
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public readonly PollServiceEventArgs PollServiceArgs;
-        public readonly IHttpClientContext HttpContext;
         public readonly IHttpRequest Request;
         public readonly int RequestTime;
         public readonly UUID RequestID;
-        public int contextHash;
 
-        /*
-                private void GenContextHash()
-                {
-
-                    Random rnd = new Random();
-                    contextHash = 0;
-                    if (Request.Headers["remote_addr"] != null)
-                        contextHash = (Request.Headers["remote_addr"]).GetHashCode() << 16;
-                    else
-                        contextHash = rnd.Next() << 16;
-                    if (Request.Headers["remote_port"] != null)
-                    {
-                        string[] strPorts = Request.Headers["remote_port"].Split(new char[] { ',' });
-                        contextHash += Int32.Parse(strPorts[0]);
-                    }
-                    else
-                        contextHash += rnd.Next() & 0xffff;
-
-                }
-        */
-        public PollServiceHttpRequest(
-            PollServiceEventArgs pPollServiceArgs, IHttpClientContext pHttpContext, IHttpRequest pRequest)
+        public PollServiceHttpRequest(PollServiceEventArgs pPollServiceArgs, IHttpRequest pRequest)
         {
             PollServiceArgs = pPollServiceArgs;
-            HttpContext = pHttpContext;
             Request = pRequest;
             RequestTime = System.Environment.TickCount;
             RequestID = UUID.Random();
-            //            GenContextHash();
-            contextHash = HttpContext.contextID;
         }
 
         internal void DoHTTPGruntWork(Hashtable responsedata)
@@ -84,8 +58,19 @@ namespace OpenSim.Framework.Servers.HttpServer
             if (Request.Body.CanRead)
                 Request.Body.Dispose();
 
-            OSHttpResponse response
-                = new OSHttpResponse(new HttpResponse(HttpContext, Request));
+            if(responsedata.Contains("h"))
+            {
+                OSHttpResponse r = (OSHttpResponse)responsedata["h"];
+                try
+                {
+                    r.Send();
+                }
+                catch { }
+                PollServiceArgs.RequestsHandled++;
+                return;
+            }
+
+            OSHttpResponse response = new OSHttpResponse(new HttpResponse(Request));
 
             if (responsedata == null)
             {
@@ -129,7 +114,6 @@ namespace OpenSim.Framework.Servers.HttpServer
                 SendNoContentError(response);
                 return;
             }
-
 
             response.StatusCode = responsecode;
             if (responsecode == (int)HttpStatusCode.Moved)
@@ -176,10 +160,10 @@ namespace OpenSim.Framework.Servers.HttpServer
 
             if (buffer == null)
             {
-                if (!(contentType.Contains("image")
+                if (contentType != null && (!(contentType.Contains("image")
                     || contentType.Contains("x-shockwave-flash")
                     || contentType.Contains("application/x-oar")
-                    || contentType.Contains("application/vnd.ll.mesh")))
+                    || contentType.Contains("application/vnd.ll.mesh"))))
                 {
                     // Text
                     buffer = Encoding.UTF8.GetBytes(responseString);
@@ -247,8 +231,7 @@ namespace OpenSim.Framework.Servers.HttpServer
 
         internal void DoHTTPstop()
         {
-            OSHttpResponse response
-                = new OSHttpResponse(new HttpResponse(HttpContext, Request));
+            OSHttpResponse response = new OSHttpResponse(new HttpResponse(Request));
 
             if (Request.Body.CanRead)
                 Request.Body.Dispose();

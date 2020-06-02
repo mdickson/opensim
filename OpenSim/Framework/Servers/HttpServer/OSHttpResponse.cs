@@ -275,6 +275,10 @@ namespace OpenSim.Framework.Servers.HttpServer
             }
         }
 
+        public double RequestTS
+        {
+            get {return _httpResponse.RequestTS; }
+        }
 
         /// <summary>
         /// HTTP status description.
@@ -309,8 +313,7 @@ namespace OpenSim.Framework.Servers.HttpServer
         /// replying</param>
         public OSHttpResponse(OSHttpRequest req)
         {
-            _httpResponse = new HttpResponse(req.IHttpClientContext, req.IHttpRequest);
-
+            _httpResponse = new HttpResponse(req.IHttpRequest);
         }
 
         public OSHttpResponse(HttpResponse resp)
