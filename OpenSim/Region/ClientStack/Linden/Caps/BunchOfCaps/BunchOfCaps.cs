@@ -459,6 +459,8 @@ namespace OpenSim.Region.ClientStack.Linden
                 string cstr = c.AsString();
                 if (cstr.Equals("ObjectAnimation"))
                     m_HostCapsObj.Flags |= Caps.CapsFlags.ObjectAnim;
+                else if (cstr.Equals("EnvironmentSettings"))
+                    m_HostCapsObj.Flags |= Caps.CapsFlags.WLEnv;
                 else if (cstr.Equals("ExtEnvironment"))
                     m_HostCapsObj.Flags |= Caps.CapsFlags.AdvEnv;
                 validCaps.Add(cstr);
@@ -468,6 +470,8 @@ namespace OpenSim.Region.ClientStack.Linden
             httpResponse.RawBuffer = Util.UTF8NBGetbytes(result);
             httpResponse.StatusCode = (int)HttpStatusCode.OK;
             //m_log.DebugFormat("[CAPS] CapsRequest {0}", result);
+
+            m_HostCapsObj.Flags |= Caps.CapsFlags.SentSeeds;
         }
 
         /// <summary>

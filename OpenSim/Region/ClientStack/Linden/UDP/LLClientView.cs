@@ -13824,6 +13824,10 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         m_SupportObjectAnimations = true;
                         ret |= 0x2000;
                     }
+                    if ((cap.Flags & Caps.CapsFlags.WLEnv) != 0)
+                        ret |= 0x4000;
+                    if ((cap.Flags & Caps.CapsFlags.AdvEnv) != 0)
+                        ret |= 0x8000;
                 }
             }
 
