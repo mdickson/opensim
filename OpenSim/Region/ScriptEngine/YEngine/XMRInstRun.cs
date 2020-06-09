@@ -299,8 +299,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 CheckRunLockInvariants(true);
                 Exception e = null;
 
-                // Maybe it has been Disposed()
-                if (m_Part == null)
+                 // Maybe it has been Disposed()
+                if(m_Part == null || m_Part.Inventory == null)
                 {
                     m_RunOnePhase = "runone saw it disposed";
                     return XMRInstState.DISPOSED;
@@ -524,6 +524,13 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             ScriptEventCode curevent = eventCode;
             eventCode = ScriptEventCode.None;
             stackFrames = null;
+
+            if(m_Part == null || m_Part.Inventory == null)
+            {
+                //we are gone and don't know it still
+                m_SleepUntil = DateTime.MaxValue;
+                return;
+            }
 
             if (e is ScriptDeleteException)
             {
@@ -865,6 +872,9 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             ReleaseControlsOrPermissions(true);
             m_Part.CollisionSound = UUID.Zero;
 
+            if (m_XMRLSLApi != null)
+                m_XMRLSLApi.llResetTime();
+
             m_RunOnePhase = "ResetLocked: removing script";
             IUrlModule urlModule = m_Engine.World.RequestModuleInterface<IUrlModule>();
             if (urlModule != null)
@@ -1001,6 +1011,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             lock (m_QueueLock)
             {
+                m_SuspendCount = 0;
                 m_Suspended = false;
                 m_DetachQuantum = 0;
                 m_DetachReady.Set();
@@ -1022,6 +1033,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
         {
             lock (m_QueueLock)
             {
+                m_SuspendCount = 1;
                 m_Suspended = true;
             }
         }

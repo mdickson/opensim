@@ -295,6 +295,33 @@ namespace OpenSim.Region.Framework.Scenes
             possibleNotAssetCount = 0;
         }
 
+        public bool AddGathered(UUID uuid, sbyte type)
+        {
+            if (uuid == UUID.Zero)
+                return false;
+
+            if (ToSkip.Contains(uuid))
+                return false;
+
+            if (FailedUUIDs.Contains(uuid))
+            {
+                if (UncertainAssetsUUIDs.Contains(uuid))
+                    possibleNotAssetCount++;
+                else
+                    ErrorCount++;
+                return false;
+            }
+            if (GatheredUuids.ContainsKey(uuid))
+                return false;
+            if (m_assetUuidsToInspect.Contains(uuid))
+                return false;
+
+            //            m_log.DebugFormat("[UUID GATHERER]: Adding asset {0} for inspection", uuid);
+
+            GatheredUuids[uuid] = type; 
+            return true;
+        }
+
         /// <summary>
         /// Adds the asset uuid for inspection during the gathering process.
         /// </summary>
@@ -344,12 +371,12 @@ namespace OpenSim.Region.Framework.Scenes
                 return;
 
             SceneObjectPart[] parts = sceneObject.Parts;
-            for (int i = 0; i < parts.Length; i++)
+            for (int i = 0; i < parts.Length; ++i)
             {
                 SceneObjectPart part = parts[i];
 
-                //                m_log.DebugFormat(
-                //                    "[UUID GATHERER]: Getting part {0}, {1} for object {2}", part.Name, part.UUID, sceneObject.UUID);
+                // m_log.DebugFormat(
+                // "[UUID GATHERER]: Getting part {0}, {1} for object {2}", part.Name, part.UUID, sceneObject.UUID);
 
                 try
                 {
@@ -363,10 +390,13 @@ namespace OpenSim.Region.Framework.Scenes
                         if (textureEntry.FaceTextures != null)
                         {
                             // Loop through the rest of the texture faces (a non-null face means the face is different from DefaultTexture)
+                            int nsides = part.GetNumberOfSides();
                             foreach (Primitive.TextureEntryFace texture in textureEntry.FaceTextures)
                             {
                                 if (texture != null)
                                     RecordTextureEntryAssetUuids(texture);
+                                if(--nsides <= 0)
+                                    break;
                             }
                         }
                     }
@@ -399,25 +429,27 @@ namespace OpenSim.Region.Framework.Scenes
                         }
                     }
 
-                    TaskInventoryDictionary taskDictionary = (TaskInventoryDictionary)part.TaskInventory.Clone();
-
+                    List<TaskInventoryItem> items = part.TaskInventory.GetItems();
                     // Now analyze this prim's inventory items to preserve all the uuids that they reference
-                    foreach (TaskInventoryItem tii in taskDictionary.Values)
+                    for(int j = 0; j < items.Count; ++j)
                     {
-                        //                        m_log.DebugFormat(
-                        //                            "[ARCHIVER]: Analysing item {0} asset type {1} in {2} {3}",
-                        //                            tii.Name, tii.Type, part.Name, part.UUID);
+                        TaskInventoryItem tii = items[j];
                         AddForInspection(tii.AssetID, (sbyte)tii.Type);
                     }
 
-                    // FIXME: We need to make gathering modular but we cannot yet, since gatherers are not guaranteed
-                    // to be called with scene objects that are in a scene (e.g. in the case of hg asset mapping and
-                    // inventory transfer.  There needs to be a way for a module to register a method without assuming a
-                    // Scene.EventManager is present.
-                    //                    part.ParentGroup.Scene.EventManager.TriggerGatherUuids(part, assetUuids);
+                    if(part.Animations != null && part.Animations.Count > 0)
+                    {
+                        foreach(UUID id in part.Animations.Keys)
+                        {
+                            if(id != UUID.Zero &&
+                                !ToSkip.Contains(id) &&
+                                !FailedUUIDs.Contains(id))
+                            {
+                                GatheredUuids[id] = (sbyte)AssetType.Animation;
+                            }
+                        }
+                    }
 
-
-                    // still needed to retrieve textures used as materials for any parts containing legacy materials stored in DynAttrs
                     RecordMaterialsUuids(part);
                 }
                 catch (Exception e)
@@ -425,6 +457,8 @@ namespace OpenSim.Region.Framework.Scenes
                     m_log.ErrorFormat("[UUID GATHERER]: Failed to get part - {0}", e);
                 }
             }
+            if(sceneObject.TemporaryInstance)
+                sceneObject.Dispose();
         }
 
         /// <summary>
@@ -501,7 +535,6 @@ namespace OpenSim.Region.Framework.Scenes
                 return;
             }
 
-            // avoid infinite loops
             if (GatheredUuids.ContainsKey(assetUuid))
                 return;
 
@@ -570,6 +603,10 @@ namespace OpenSim.Region.Framework.Scenes
                 {
                     RecordSceneObjectAssetUuids(assetBase);
                 }
+                else if ((sbyte)AssetType.Settings == assetType)
+                {
+                    RecordEmbeddedAssetDataUuids(assetBase); // BAD to do
+                }
             }
             catch (Exception e)
             {
@@ -629,7 +666,13 @@ namespace OpenSim.Region.Framework.Scenes
         /// </summary>
         private void RecordTextureEntryAssetUuids(Primitive.TextureEntryFace texture)
         {
-            GatheredUuids[texture.TextureID] = (sbyte)AssetType.Texture;
+            UUID teid = texture.TextureID;
+            if (teid != UUID.Zero &&
+                !ToSkip.Contains(teid) &&
+                !FailedUUIDs.Contains(teid))
+            {
+                GatheredUuids[teid] = (sbyte)AssetType.Texture;
+            }
 
             if (texture.MaterialID != UUID.Zero)
                 AddForInspection(texture.MaterialID);
@@ -756,22 +799,178 @@ namespace OpenSim.Region.Framework.Scenes
             }
         }
 
+        private static byte[] wearableSeps = new byte[]{(byte)' ', (byte)'\t'};
         /// <summary>
         /// Record the uuids referenced by the given wearable asset
         /// </summary>
-        /// <param name="assetBase"></param>
-        private void RecordWearableAssetUuids(AssetBase assetBase)
+        /// <param name="asset"></param>
+        private void RecordWearableAssetUuids(AssetBase asset)
         {
-            //m_log.Debug(new System.Text.ASCIIEncoding().GetString(bodypartAsset.Data));
-            AssetWearable wearableAsset = new AssetBodypart(assetBase.FullID, assetBase.Data);
-            wearableAsset.Decode();
+            if (asset.Data == null || asset.Data.Length < 64)
+                return;
+            try
+            {
+                osUTF8 ostmp = new osUTF8(asset.Data);
+                if (!ostmp.SkipLine()) // version
+                    return;
+                if (!ostmp.SkipLine()) // name
+                    return;
+                if (!ostmp.SkipLine()) // description
+                    return;
+                if (!ostmp.SkipLine())
+                    return;
 
-            //m_log.DebugFormat(
-            //    "[ARCHIVER]: Wearable asset {0} references {1} assets", wearableAssetUuid, wearableAsset.Textures.Count);
-
-            foreach (UUID uuid in wearableAsset.Textures.Values)
-                GatheredUuids[uuid] = (sbyte)AssetType.Texture;
+                while (ostmp.ReadLine(out osUTF8 line))
+                {
+                    line.SelfTrim(wearableSeps);
+                    osUTF8[] parts = line.Split(wearableSeps);
+                    if(parts[0].Length == 0)
+                        continue;
+                    parts[0].SelfTrim(wearableSeps);
+                    if (parts[0].ToString() == "parameters")
+                    {
+                        if (parts[1].Length == 0)
+                            return;
+                        parts[1].SelfTrim(wearableSeps);
+                        if (!osUTF8.TryParseInt(parts[1], out int count) || count == 0)
+                            return;
+                        for (int i = 0; i < count; ++i)
+                        {
+                            if (!ostmp.SkipLine())
+                                return;
+                        }
+                    }
+                    else if (parts[0].ToString() == "textures")
+                    {
+                        if(parts[1].Length == 0)
+                            return;
+                        parts[1].SelfTrim(wearableSeps);
+                        if (!osUTF8.TryParseInt(parts[1], out int count) || count == 0)
+                            return;
+                        for(int i = 0; i < count; ++i)
+                        {
+                            if(!ostmp.ReadLine(out osUTF8 texline))
+                                return;
+                            texline.SelfTrim(wearableSeps);
+                            osUTF8[] texparts = texline.Split(wearableSeps);
+                            if(texparts.Length <2 || texparts[1].Length < 36)
+                                continue;
+                            texparts[1].SelfTrim(wearableSeps);
+                            if (UUID.TryParse(texparts[1].ToString(), out UUID id) && id != UUID.Zero)
+                                GatheredUuids[id] = (sbyte)AssetType.Texture;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+            }
         }
+
+        private int getxmlNode(ref osUTF8 data, out osUTF8 h)
+        {
+            h = data;
+            int st = -1;
+            while ((st = data.IndexOf('<')) >= 0)
+            {
+                if (st > 0 && data[st - 1] == (byte)'\\')
+                    data.osUTF8SubStringSelf(st + 1);
+                break;
+            }
+            if (st < 0)
+                return -1;
+            ++st;
+            int ed = -1;
+            while ((ed = data.IndexOf('>')) >= 0)
+            {
+                if (data[st - 1] == (byte)'\\')
+                    data.osUTF8SubStringSelf(st + 1);
+                break;
+            }
+            if (ed < 0)
+                return -1;
+
+            h = data.osUTF8SubString(st, ed - st);
+            h.SelfTrim();
+            ++ed;
+            data.osUTF8SubStringSelf(ed);
+            return ed;
+        }
+
+        private bool TryGetxmlUUIDValue(ref osUTF8 data, out UUID id)
+        {
+            id = UUID.Zero;
+            if(getxmlNode(ref data, out osUTF8 h) < 0)
+                return false;
+
+            if (h.StartsWith(UUIDB))
+            {
+                if (h.EndsWith((byte)'/'))
+                    return true;
+                int indx = data.IndexOf((byte)'<');
+                if (indx < 0)
+                    return false;
+
+                osUTF8 tmp = data.osUTF8SubString(0, indx);
+                data.osUTF8SubStringSelf(indx + 1);
+
+                return osUTF8.TryParseUUID(tmp, out id);
+            }
+
+            if (h.StartsWith(uuidB))
+            {
+                if (h.EndsWith((byte)'/'))
+                    return true;
+                int indx = data.IndexOf((byte)'<');
+                if (indx < 0)
+                    return false;
+
+                osUTF8 tmp = data.osUTF8SubString(0, indx);
+                data.osUTF8SubStringSelf(indx + 1);
+
+                return osUTF8.TryParseUUID(tmp, out id);
+            }
+
+            return false;
+        }
+
+        private bool TryGetXMLBinary(ref osUTF8 data, out byte[] te)
+        {
+            te = null;
+            int indx = data.IndexOf((byte)'<');
+            if(indx <= 0)
+                return false;
+
+            osUTF8 tmp = data.osUTF8SubString(0, indx);
+            data.osUTF8SubStringSelf(indx + 1);
+
+            tmp.SelfTrim();
+            if(tmp.Length == 0)
+                return false;
+            try
+            {
+                te = Convert.FromBase64String(tmp.ToString()); // need to replace
+                return true;
+            }
+            catch { }
+
+            return false;
+        }
+
+
+        // bad ugly and ulgy
+        private static osUTF8 UUIDB = new osUTF8("UUID");
+        private static osUTF8 uuidB = new osUTF8("uuid");
+        private static osUTF8 SOPAnimsB = new osUTF8("SOPAnims");
+        private static osUTF8 CollisionSoundB = new osUTF8("CollisionSound");
+        private static osUTF8 SoundIDB = new osUTF8("SoundID");
+        private static osUTF8 SculptTextureB = new osUTF8("SculptTexture");
+        private static osUTF8 ExtraParamsB = new osUTF8("ExtraParams");
+        private static osUTF8 ParticleSystemB = new osUTF8("ParticleSystem");
+        private static osUTF8 TextureEntryB = new osUTF8("TextureEntry");
+        private static osUTF8 TaskInventoryB = new osUTF8("TaskInventory");
+        private static osUTF8 endTaskInventoryB = new osUTF8("/TaskInventory");
+        private static osUTF8 AssetIDB = new osUTF8("AssetID");
 
         /// <summary>
         /// Get all the asset uuids associated with a given object.  This includes both those directly associated with
@@ -781,20 +980,169 @@ namespace OpenSim.Region.Framework.Scenes
         /// <param name="sceneObjectAsset"></param>
         private void RecordSceneObjectAssetUuids(AssetBase sceneObjectAsset)
         {
-            string xml = Utils.BytesToString(sceneObjectAsset.Data);
+            osUTF8 data = new osUTF8(sceneObjectAsset.Data);
 
-            CoalescedSceneObjects coa;
-            if (CoalescedSceneObjectsSerializer.TryFromXml(xml, out coa))
+            int next;
+            osUTF8 nodeName;
+            while ((next = getxmlNode(ref data, out nodeName)) > 0)
             {
-                foreach (SceneObjectGroup sog in coa.Objects)
-                    AddForInspection(sog);
-            }
-            else
-            {
-                SceneObjectGroup sog = SceneObjectSerializer.FromOriginalXmlFormat(xml);
+                if (nodeName.StartsWith((byte)'/'))
+                    continue;
+                if (nodeName.StartsWith(SOPAnimsB))
+                {
+                    if (nodeName.EndsWith((byte)'/'))
+                        continue;
 
-                if (null != sog)
-                    AddForInspection(sog);
+                    if (TryGetXMLBinary(ref data, out byte[] abytes) && abytes != null && abytes.Length > 16)
+                    {
+                        try
+                        {
+                            int count = Utils.BytesToUInt16(abytes, 0);
+                            if (count  >0)
+                            {
+                                int pos = 2;
+                                while (--count >= 0)
+                                {
+                                    UUID id = new UUID(abytes, pos);
+                                    if (id == UUID.Zero)
+                                        break;
+                                    if (!ToSkip.Contains(id) &&
+                                        !FailedUUIDs.Contains(id))
+                                    {
+                                        GatheredUuids[id] = (sbyte)AssetType.Animation;
+                                    }
+                                    pos += 16;
+                                    int strlen = data[pos++];
+                                    pos += strlen;
+                                }
+                            }
+                            abytes = null;
+                        }
+                        catch { }
+                    }
+                }
+                else if (nodeName.StartsWith(CollisionSoundB))
+                {
+                    if (!nodeName.EndsWith((byte)'d'))
+                        continue;
+                    if (TryGetxmlUUIDValue(ref data, out UUID id) && id != UUID.Zero)
+                        GatheredUuids[id] = (sbyte)AssetType.Sound;
+                }
+                else if (nodeName.StartsWith(SoundIDB))
+                {
+                    if (nodeName.EndsWith((byte)'/'))
+                        continue;
+                    if (TryGetxmlUUIDValue(ref data, out UUID id) && id != UUID.Zero)
+                        GatheredUuids[id] = (sbyte)AssetType.Sound;
+                }
+                else if (nodeName.StartsWith(SculptTextureB))
+                {
+                    if (nodeName.EndsWith((byte)'/'))
+                        continue;
+                    if (TryGetxmlUUIDValue(ref data, out UUID id) && id != UUID.Zero)
+                        GatheredUuids[id] = (sbyte)AssetType.Texture; // can be mesh but no prob
+                }
+                else if (nodeName.StartsWith(ExtraParamsB))
+                {
+                    if (nodeName.EndsWith((byte)'/'))
+                        continue;
+
+                    if (TryGetXMLBinary(ref data, out byte[] exbytes) && exbytes != null && exbytes.Length > 16)
+                    {
+                        try
+                        {
+                            PrimitiveBaseShape ps = new PrimitiveBaseShape();
+                            ps.ReadInExtraParamsBytes(exbytes);
+                            UUID teid = ps.ProjectionTextureUUID;
+                            if (teid != UUID.Zero &&
+                                !ToSkip.Contains(teid) &&
+                                !FailedUUIDs.Contains(teid))
+                            {
+                                GatheredUuids[teid] = (sbyte)AssetType.Texture;
+                            }
+                            /* multiple store
+                            teid = ps.SculptTexture; //??
+                            if (teid != UUID.Zero &&
+                                !ToSkip.Contains(teid) &&
+                                !FailedUUIDs.Contains(teid))
+                            {
+                                GatheredUuids[teid] = (sbyte)AssetType.Texture;
+                            }
+                            */
+                            ps = null;
+                            exbytes = null;
+                        }
+                        catch { }
+                    }
+                }
+                else if (nodeName.StartsWith(ParticleSystemB))
+                {
+                    if (nodeName.EndsWith((byte)'/'))
+                        continue;
+
+                    if (TryGetXMLBinary(ref data, out byte[] psbytes) && psbytes != null && psbytes.Length > 16)
+                    {
+                        try
+                        {
+                            Primitive.ParticleSystem ps = new Primitive.ParticleSystem(psbytes, 0);
+                            UUID teid = ps.Texture;
+                            if (teid != UUID.Zero &&
+                                !ToSkip.Contains(teid) &&
+                                !FailedUUIDs.Contains(teid))
+                            {
+                                GatheredUuids[teid] = (sbyte)AssetType.Texture;
+                            }
+                            psbytes = null;
+                        }
+                        catch { }
+                    }
+                }
+                else if (nodeName.StartsWith(TextureEntryB))
+                {
+                    if (nodeName.EndsWith((byte)'/'))
+                        continue;
+
+                    if (TryGetXMLBinary(ref data, out byte[] tebytes) && tebytes != null && tebytes.Length > 16)
+                    {
+                        try
+                        {
+                            Primitive.TextureEntry te = new Primitive.TextureEntry(tebytes, 0, tebytes.Length);
+                            if (te != null)
+                            {
+                                // Get the prim's default texture.  This will be used for faces which don't have their own texture
+                                if (te.DefaultTexture != null)
+                                    RecordTextureEntryAssetUuids(te.DefaultTexture);
+
+                                if (te.FaceTextures != null)
+                                {
+                                    // Loop through the rest of the texture faces (a non-null face means the face is different from DefaultTexture)
+                                    foreach (Primitive.TextureEntryFace texture in te.FaceTextures)
+                                    {
+                                        if (texture != null)
+                                            RecordTextureEntryAssetUuids(texture);
+                                    }
+                                }
+                            }
+                            te = null;
+                        }
+                        catch { }
+                    }
+                }
+                else if (nodeName.StartsWith(TaskInventoryB))
+                {
+                    if (nodeName.EndsWith((byte)'/'))
+                        continue;
+                    while ((next = getxmlNode(ref data, out nodeName)) > 0)
+                    {
+                        if (nodeName.StartsWith(AssetIDB))
+                        {
+                            if (TryGetxmlUUIDValue(ref data, out UUID id) && id != UUID.Zero)
+                                AddForInspection(id);
+                        }
+                        else if (nodeName.StartsWith(endTaskInventoryB))
+                            break;
+                    }
+                }
             }
         }
 
@@ -804,35 +1152,57 @@ namespace OpenSim.Region.Framework.Scenes
         /// <param name="gestureAsset"></param>
         private void RecordGestureAssetUuids(AssetBase gestureAsset)
         {
-            using (MemoryStream ms = new MemoryStream(gestureAsset.Data))
-            using (StreamReader sr = new StreamReader(ms))
+            osUTF8 osdata = new osUTF8(gestureAsset.Data);
+
+            if (!osdata.SkipLine()) // version
+                return;
+            if (!osdata.SkipLine()) // key
+                return;
+            if (!osdata.SkipLine()) // mask
+                return;
+            if (!osdata.SkipLine()) // trigger
+                return;
+            if (!osdata.SkipLine()) // replace
+                return;
+
+            if (!osdata.ReadLine(out osUTF8 line))
+                return;
+
+            if(!osUTF8.TryParseInt(line, out int scount) || scount == 0)
+                return;
+
+            for(int i = 0; i < scount; ++i)
             {
-                sr.ReadLine(); // Unknown (Version?)
-                sr.ReadLine(); // Unknown
-                sr.ReadLine(); // Unknown
-                sr.ReadLine(); // Name
-                sr.ReadLine(); // Comment ?
-                int count = Convert.ToInt32(sr.ReadLine()); // Item count
+                if (!osdata.ReadLine(out osUTF8 typeline)) // type
+                    return;
+                typeline.SelfTrim();
+                if (!osUTF8.TryParseInt(typeline, out int type))
+                    return;
 
-                for (int i = 0; i < count; i++)
+                osUTF8 id;
+                UUID uid;
+                switch(type)
                 {
-                    string type = sr.ReadLine();
-                    if (type == null)
+                    case 0: // animation
+                    case 1: // sound
+                        if (!osdata.SkipLine()) // name
+                            return;
+                        if (!osdata.ReadLine(out id)) // uuid
+                            return;
+                        if (osUTF8.TryParseUUID(id, out uid) && uid != UUID.Zero)
+                            GatheredUuids[uid] = type == 0 ? (sbyte)AssetType.Animation : (sbyte)AssetType.Sound;
+                        if (!osdata.SkipLine()) // flags 
+                            return;
                         break;
-                    string name = sr.ReadLine();
-                    if (name == null)
+                    case 2: // chat
+                    case 3: // wait
+                        if (!osdata.SkipLine()) // chat text or wait time
+                            return;
+                        if (!osdata.SkipLine()) // flags 
+                            return;
                         break;
-                    string id = sr.ReadLine();
-                    if (id == null)
-                        break;
-                    string unknown = sr.ReadLine();
-                    if (unknown == null)
-                        break;
-
-                    // If it can be parsed as a UUID, it is an asset ID
-                    UUID uuid;
-                    if (UUID.TryParse(id, out uuid))
-                        GatheredUuids[uuid] = (sbyte)AssetType.Animation;    // the asset is either an Animation or a Sound, but this distinction isn't important
+                    default:
+                        return; // no idea
                 }
             }
         }
@@ -842,24 +1212,25 @@ namespace OpenSim.Region.Framework.Scenes
         /// </summary>
         private void RecordMaterialAssetUuids(AssetBase materialAsset)
         {
-            OSDMap mat;
-            try
+            osUTF8 data = new osUTF8(materialAsset.Data);
+            int next;
+            while ((next = getxmlNode(ref data, out osUTF8 header)) > 0)
             {
-                mat = (OSDMap)OSDParser.DeserializeLLSDXml(materialAsset.Data);
+                if (header.StartsWith((byte)'/'))
+                    continue;
+                if (header.StartsWith(uuidB))
+                {
+                    if(header.EndsWith((byte)'/'))
+                        continue;
+                    int indx = data.IndexOf((byte)'<');
+                    if(indx < 0)
+                        continue;
+                    osUTF8 tmp = data.osUTF8SubString(0, indx);
+                    if(osUTF8.TryParseUUID(tmp, out UUID id) && id != UUID.Zero)
+                        GatheredUuids[id] = (sbyte)AssetType.Texture;
+                    data.osUTF8SubStringSelf(indx + 1);
+                }
             }
-            catch (Exception e)
-            {
-                m_log.WarnFormat("[Materials]: cannot decode material asset {0}: {1}", materialAsset.ID, e.Message);
-                return;
-            }
-
-            UUID normMap = mat["NormMap"].AsUUID();
-            if (normMap != UUID.Zero)
-                GatheredUuids[normMap] = (sbyte)AssetType.Texture;
-
-            UUID specMap = mat["SpecMap"].AsUUID();
-            if (specMap != UUID.Zero)
-                GatheredUuids[specMap] = (sbyte)AssetType.Texture;
         }
     }
 

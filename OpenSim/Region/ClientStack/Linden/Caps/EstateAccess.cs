@@ -124,7 +124,7 @@ namespace OpenSim.Region.ClientStack.Linden
         public void RegisterCaps(UUID agentID, Caps caps)
         {
             caps.RegisterSimpleHandler("EstateAccess",
-                new SimpleStreamHandler("/" + UUID.Random() + "/",
+                new SimpleStreamHandler("/" + UUID.Random(),
                 delegate(IOSHttpRequest request, IOSHttpResponse response)
                 {
                     ProcessRequest(request, response, agentID);

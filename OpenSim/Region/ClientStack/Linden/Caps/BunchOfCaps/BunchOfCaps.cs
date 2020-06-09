@@ -281,7 +281,7 @@ namespace OpenSim.Region.ClientStack.Linden
         public void RegisterHandlers()
         {
             // this path is also defined elsewhere so keeping it
-            string seedcapsBase = "/CAPS/" + m_HostCapsObj.CapsObjectPath + "0000/";
+            string seedcapsBase = "/CAPS/" + m_HostCapsObj.CapsObjectPath + "0000";
 
             m_HostCapsObj.RegisterSimpleHandler("SEED", new SimpleStreamHandler(seedcapsBase, SeedCapRequest));
             // m_log.DebugFormat(
@@ -386,7 +386,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 if (m_DisplayNames != null)
                 {
                     m_HostCapsObj.RegisterSimpleHandler("GetDisplayNames",
-                        new SimpleStreamHandler(GetNewCapPath() +"/", GetDisplayNames));
+                        new SimpleStreamHandler(GetNewCapPath(), GetDisplayNames));
 
                     if (m_AllowSetDisplayName)
                     {

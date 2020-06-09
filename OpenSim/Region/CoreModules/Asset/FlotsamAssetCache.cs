@@ -73,7 +73,7 @@ namespace OpenSim.Region.CoreModules.Asset
         private ulong m_MemoryHits;
         private ulong m_weakRefHits;
 
-        private HashSet<string> m_CurrentlyWriting = new HashSet<string>();
+        private static HashSet<string> m_CurrentlyWriting = new HashSet<string>();
 
         private bool m_FileCacheEnabled = true;
 
@@ -167,8 +167,7 @@ namespace OpenSim.Region.CoreModules.Asset
                         m_HitRateDisplay = (ulong)assetConfig.GetLong("HitRateDisplay", (long)m_HitRateDisplay);
 
                         m_FileExpiration = TimeSpan.FromHours(assetConfig.GetDouble("FileCacheTimeout", m_DefaultFileExpiration));
-                        m_FileExpirationCleanupTimer
-                            = TimeSpan.FromHours(
+                        m_FileExpirationCleanupTimer = TimeSpan.FromHours(
                                 assetConfig.GetDouble("FileCleanupTimer", m_FileExpirationCleanupTimer.TotalHours));
 
                         m_CacheDirectoryTiers = assetConfig.GetInt("CacheDirectoryTiers", m_CacheDirectoryTiers);
@@ -628,8 +627,12 @@ namespace OpenSim.Region.CoreModules.Asset
 
         private void CleanupExpiredFiles(object source, ElapsedEventArgs e)
         {
+            long heap = 0;
             if (m_LogLevel >= 2)
-                m_log.DebugFormat("[FLOTSAM ASSET CACHE]: Checking for expired files older then {0}.", m_FileExpiration);
+            {
+                m_log.DebugFormat("[FLOTSAM ASSET CACHE]: Start automatic Check for expired files older then {0}.", m_FileExpiration);
+                heap = GC.GetTotalMemory(false);
+            }
 
             lock (timerLock)
             {
@@ -655,6 +658,13 @@ namespace OpenSim.Region.CoreModules.Asset
                 if (m_timerRunning)
                     m_CacheCleanTimer.Start();
                 m_cleanupRunning = false;
+            }
+            if (m_LogLevel >= 2)
+            {
+                heap = GC.GetTotalMemory(false) - heap;
+                double fheap = Math.Round((double)(heap / (1024 * 1024)),3);
+                m_log.DebugFormat("[FLOTSAM ASSET CACHE]: Finished automatic Check for expired files heap delta: {0}MB.", fheap);
+                heap = GC.GetTotalMemory(false);
             }
         }
 
@@ -746,7 +756,7 @@ namespace OpenSim.Region.CoreModules.Asset
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="asset"></param>
-        private void WriteFileCache(string filename, AssetBase asset, bool replace)
+        private static void WriteFileCache(string filename, AssetBase asset, bool replace)
         {
              // Make sure the target cache directory exists
             string directory = Path.GetDirectoryName(filename);
@@ -789,9 +799,6 @@ namespace OpenSim.Region.CoreModules.Asset
                         File.Delete(filename);
                         
                     File.Move(tempname, filename);
-
-                    if (m_LogLevel >= 2)
-                        m_log.DebugFormat("[FLOTSAM ASSET CACHE]: Cache Stored :: {0}", asset.ID);
                 }
                 catch (IOException)
                 {
@@ -868,71 +875,67 @@ namespace OpenSim.Region.CoreModules.Asset
         /// to update the access time of all assets present in the scene or referenced by assets
         /// in the scene.
         /// </summary>
-        /// <param name="storeUncached">
+        /// <param name="tryGetUncached">
         /// If true, then assets scanned which are not found in cache are added to the cache.
         /// </param>
         /// <returns>Number of distinct asset references found in the scene.</returns>
-        private int TouchAllSceneAssets(bool storeUncached)
+        private int TouchAllSceneAssets(bool tryGetUncached)
         {
             UuidGatherer gatherer = new UuidGatherer(m_AssetService);
 
-            Dictionary<UUID, bool> assetsFound = new Dictionary<UUID, bool>();
-
+            int cooldown = 0;
             foreach (Scene s in m_Scenes)
             {
                 StampRegionStatusFile(s.RegionInfo.RegionID);
+                gatherer.AddGathered(s.RegionInfo.RegionSettings.TerrainTexture1, (sbyte)AssetType.Texture);
+                gatherer.AddGathered(s.RegionInfo.RegionSettings.TerrainTexture2, (sbyte)AssetType.Texture);
+                gatherer.AddGathered(s.RegionInfo.RegionSettings.TerrainTexture3, (sbyte)AssetType.Texture);
+                gatherer.AddGathered(s.RegionInfo.RegionSettings.TerrainTexture4, (sbyte)AssetType.Texture);
+                gatherer.AddGathered(s.RegionInfo.RegionSettings.TerrainImageID, (sbyte)AssetType.Texture);
 
                 s.ForEachSOG(delegate (SceneObjectGroup e)
                 {
-                    if (!m_timerRunning && !storeUncached)
+                    if(!m_timerRunning && !tryGetUncached)
                         return;
 
                     gatherer.AddForInspection(e);
                     gatherer.GatherAll();
 
-                    if (!m_timerRunning && !storeUncached)
-                        return;
-
-                    foreach (UUID assetID in gatherer.GatheredUuids.Keys)
+                    if (++cooldown > 100)
                     {
-                        if (!assetsFound.ContainsKey(assetID))
-                        {
-                            string filename = GetFileName(assetID.ToString());
-
-                            if (File.Exists(filename))
-                            {
-                                UpdateFileLastAccessTime(filename);
-                                assetsFound[assetID] = true;
-                            }
-                            else if (storeUncached)
-                            {
-                                AssetBase cachedAsset = m_AssetService.Get(assetID.ToString());
-                                if (cachedAsset == null && gatherer.GatheredUuids[assetID] != (sbyte)AssetType.Unknown)
-                                    assetsFound[assetID] = false;
-                                else
-                                    assetsFound[assetID] = true;
-                            }
-                        }
-                        else if (!assetsFound[assetID])
-                        {
-                            m_log.DebugFormat(
-                                "[FLOTSAM ASSET CACHE]: Could not find asset {0}, type {1} referenced by object {2} at {3} in scene {4} when pre-caching all scene assets",
-                                assetID, gatherer.GatheredUuids[assetID], e.Name, e.AbsolutePosition, s.Name);
-                        }
-                    }
-
-                    gatherer.GatheredUuids.Clear();
-                    if (!m_timerRunning && !storeUncached)
-                        return;
-
-                    if (!storeUncached)
                         Thread.Sleep(50);
+                        cooldown = 0;
+                    }
                 });
-                if (!m_timerRunning && !storeUncached)
+                if(!m_timerRunning && !tryGetUncached)
                     break;
             }
 
-            return assetsFound.Count;
+            gatherer.GatherAll();
+
+            cooldown = 0;
+            // windows does not update access time :(
+            foreach(UUID id in gatherer.GatheredUuids.Keys)
+            {
+                string idstr = id.ToString();
+                if(!UpdateFileLastAccessTime(GetFileName(idstr)) && tryGetUncached)
+                {
+                    cooldown += 50;
+                    m_AssetService.Get(idstr);
+                }
+                if (++cooldown > 1000)
+                {
+                    Thread.Sleep(50);
+                    cooldown = 0;
+                }
+            }
+
+            int count = gatherer.GatheredUuids.Count;
+            gatherer.GatheredUuids.Clear();
+            gatherer.FailedUUIDs.Clear();
+            gatherer.UncertainAssetsUUIDs.Clear();
+
+            return count;
         }
 
         /// <summary>
@@ -1177,7 +1180,11 @@ namespace OpenSim.Region.CoreModules.Asset
                             con.Output("{0} is not a valid date & time", cmd);
                             break;
                         }
-
+                        if (expirationDate >= DateTime.Now)
+                        {
+                            con.Output("{0} date & time must be in past", cmd);
+                            break;
+                        }
                         if (m_FileCacheEnabled)
                             CleanExpiredFiles(m_CacheDirectory, expirationDate);
                         else
