@@ -260,7 +260,6 @@ namespace OpenSim.Region.Framework.Scenes
                 return;
 
             bool oldgprSelect = part.ParentGroup.IsSelected;
-            bool oldSelect = part.IsSelected;
             part.IsSelected = false;
  
             if (oldgprSelect != part.ParentGroup.IsSelected)
@@ -270,7 +269,7 @@ namespace OpenSim.Region.Framework.Scenes
             }
 
             // restore targetOmega
-            if (oldSelect && part.AngularVelocity != Vector3.Zero)
+            if (part.AngularVelocity != Vector3.Zero)
                 part.ScheduleTerseUpdate();
         }
 

@@ -2520,7 +2520,7 @@ namespace OpenSim.Region.Framework.Scenes
         /// <param name="RayEndIsIntersection"></param>
         public virtual void AddNewPrim(UUID ownerID, UUID groupID, Vector3 RayEnd, Quaternion rot, PrimitiveBaseShape shape,
                                        byte bypassRaycast, Vector3 RayStart, UUID RayTargetID,
-                                       byte RayEndIsIntersection)
+                                       byte RayEndIsIntersection, uint addFlags)
         {
             Vector3 pos = GetNewRezLocation(RayStart, RayEnd, RayTargetID, rot, bypassRaycast, RayEndIsIntersection, true, new Vector3(0.5f, 0.5f, 0.5f), false);
 
@@ -2529,7 +2529,7 @@ namespace OpenSim.Region.Framework.Scenes
                 // rez ON the ground, not IN the ground
                 // pos.Z += 0.25F; The rez point should now be correct so that its not in the ground
 
-                AddNewPrim(ownerID, groupID, pos, rot, shape);
+                AddNewPrim(ownerID, groupID, pos, rot, shape, addFlags);
             }
             else
             {
@@ -2539,8 +2539,8 @@ namespace OpenSim.Region.Framework.Scenes
             }
         }
 
-        public virtual SceneObjectGroup AddNewPrim(
-            UUID ownerID, UUID groupID, Vector3 pos, Quaternion rot, PrimitiveBaseShape shape)
+        public virtual SceneObjectGroup AddNewPrim(UUID ownerID, UUID groupID,
+            Vector3 pos, Quaternion rot, PrimitiveBaseShape shape, uint addFlags = 0)
         {
             //m_log.DebugFormat(
             //    "[SCENE]: Scene.AddNewPrim() pcode {0} called for {1} in {2}", shape.PCode, ownerID, RegionInfo.RegionName);
@@ -2575,7 +2575,13 @@ namespace OpenSim.Region.Framework.Scenes
             if (UserManagementModule != null)
                 sceneObject.RootPart.CreatorIdentification = UserManagementModule.GetUserUUI(ownerID);
 
-            sceneObject.InvalidateDeepEffectivePerms(); ;
+            if((addFlags & (uint)PrimFlags.CreateSelected) != 0)
+            {
+                sceneObject.IsSelected = true;
+                sceneObject.RootPart.CreateSelected = true;
+            }
+
+            sceneObject.InvalidateDeepEffectivePerms();;
             sceneObject.ScheduleGroupForFullAnimUpdate();
 
             return sceneObject;
@@ -4105,10 +4111,6 @@ namespace OpenSim.Region.Framework.Scenes
                     if (cache != null)
                         //                        cache.Remove(acd.firstname + " " + acd.lastname);
                         cache.Remove(acd.AgentID);
-
-                    // Remove any preexisting circuit - we don't want duplicates
-                    // This is a stab at preventing avatar "ghosting"
-                    m_authenticateHandler.RemoveCircuit(acd.AgentID);
                 }
 
                 m_authenticateHandler.AddNewCircuit(acd.circuitcode, acd);
@@ -4471,7 +4473,7 @@ namespace OpenSim.Region.Framework.Scenes
         /// <returns>True if we successfully changed it.  False if we did not</returns>
         public bool ChangeCircuitCode(uint oldcc, uint newcc)
         {
-            return m_authenticateHandler.TryChangeCiruitCode(oldcc, newcc);
+            return m_authenticateHandler.TryChangeCircuitCode(oldcc, newcc);
         }
 
         //        /// <summary>
@@ -4782,8 +4784,10 @@ namespace OpenSim.Region.Framework.Scenes
                     // and since they don't get cleaned up they will stick
                     // around until region restart. So, if there is no SP,
                     // remove the client as well.
-                    IClientAPI client = null;
-                    if (m_clientManager.TryGetValue(agentID, out client))
+                    if (m_authenticateHandler != null)
+                        m_authenticateHandler.RemoveCircuit(agentID);
+
+                    if (m_clientManager.TryGetValue(agentID, out IClientAPI client))
                     {
                         m_clientManager.Remove(agentID);
                         if (CapsModule != null)

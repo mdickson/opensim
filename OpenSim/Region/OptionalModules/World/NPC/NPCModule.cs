@@ -196,42 +196,20 @@ namespace OpenSim.Region.OptionalModules.World.NPC
             AvatarAppearance npcAppearance = new AvatarAppearance(appearance, true);
             acd.Appearance = npcAppearance;
 
-            /*
-            for (int i = 0;
-                    i < acd.Appearance.Texture.FaceTextures.Length; i++)
-            {
-                m_log.DebugFormat(
-                        "[NPC MODULE]: NPC avatar {0} has texture id {1} : {2}",
-                        acd.AgentID, i,
-                        acd.Appearance.Texture.FaceTextures[i]);
-            }
-            */
-
-            //            ManualResetEvent ev = new ManualResetEvent(false);
-
-            //            Util.FireAndForget(delegate(object x) {
             lock (m_avatars)
             {
                 scene.AuthenticateHandler.AddNewCircuit(npcAvatar.CircuitCode, acd);
                 scene.AddNewAgent(npcAvatar, PresenceType.Npc);
 
-                ScenePresence sp;
-                if (scene.TryGetScenePresence(npcAvatar.AgentId, out sp))
+                if (scene.TryGetScenePresence(npcAvatar.AgentId, out ScenePresence sp))
                 {
                     npcAvatar.Born = born;
                     npcAvatar.ActiveGroupId = groupID;
                     sp.CompleteMovement(npcAvatar, false);
                     sp.Grouptitle = groupTitle;
                     m_avatars.Add(npcAvatar.AgentId, npcAvatar);
-                    //                        m_log.DebugFormat("[NPC MODULE]: Created NPC {0} {1}", npcAvatar.AgentId, sp.Name);
                 }
             }
-            //                ev.Set();
-            //            });
-
-            //            ev.WaitOne();
-
-            //            m_log.DebugFormat("[NPC MODULE]: Created NPC with id {0}", npcAvatar.AgentId);
 
             return npcAvatar.AgentId;
         }
