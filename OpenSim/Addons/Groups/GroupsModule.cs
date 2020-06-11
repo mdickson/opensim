@@ -1335,7 +1335,7 @@ namespace OpenSim.Groups
 
         public List<DirGroupsReplyData> FindGroups(IClientAPI remoteClient, string query)
         {
-            return m_groupData.FindGroups(GetRequestingAgentID(remoteClient), query);
+            return m_groupData.FindGroups(remoteClient.AgentId.ToString(), query);
         }
 
         #endregion
