@@ -183,7 +183,7 @@ namespace OpenSim.Region.CoreModules.World.Estate
                 flags |= RegionFlags.ResetHomeOnTeleport;
 
             if (Scene.RegionInfo.EstateSettings.AllowEnviromentOverride)
-                flags |= RegionFlags.AllowEnviromentOverride;
+                flags |= RegionFlags.AllowEnvironmentOverride;
 
             // TODO: SkipUpdateInterestList
 
@@ -1707,7 +1707,7 @@ namespace OpenSim.Region.CoreModules.World.Estate
                 flags |= RegionFlags.AllowParcelAccessOverride;
 
             if(Scene.RegionInfo.EstateSettings.AllowEnviromentOverride)
-                flags |= RegionFlags.AllowEnviromentOverride;
+                flags |= RegionFlags.AllowEnvironmentOverride;
             if (Scene.RegionInfo.EstateSettings.PublicAccess) //??
                 flags |= (RegionFlags.PublicAllowed | RegionFlags.ExternallyVisible);
 

@@ -4529,7 +4529,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
             // no AppearanceData
             data[pos++] = 0;
-            // no AppearanceHover
+            // AppearanceHover vector 3
             data[pos++] = 1;
             Utils.FloatToBytesSafepos(0, data, pos); pos += 4;
             Utils.FloatToBytesSafepos(0, data, pos); pos += 4;
@@ -9314,8 +9314,12 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 if (addPacket.AgentData.SessionID != SessionId || addPacket.AgentData.AgentID != AgentId)
                     return;
 
+                ObjectAddPacket.ObjectDataBlock datablk = addPacket.ObjectData;
                 PrimitiveBaseShape shape = GetShapeFromAddPacket(addPacket);
-                OnAddPrim?.Invoke(AgentId, addPacket.AgentData.GroupID, addPacket.ObjectData.RayEnd, addPacket.ObjectData.Rotation, shape, addPacket.ObjectData.BypassRaycast, addPacket.ObjectData.RayStart, addPacket.ObjectData.RayTargetID, addPacket.ObjectData.RayEndIsIntersection);
+                OnAddPrim?.Invoke(AgentId, addPacket.AgentData.GroupID, datablk.RayEnd,
+                    datablk.Rotation, shape,
+                    datablk.BypassRaycast, datablk.RayStart, datablk.RayTargetID, datablk.RayEndIsIntersection,
+                    datablk.AddFlags);
         }
 
         private void HandleObjectShape(Packet Pack)
@@ -13820,6 +13824,10 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         m_SupportObjectAnimations = true;
                         ret |= 0x2000;
                     }
+                    if ((cap.Flags & Caps.CapsFlags.WLEnv) != 0)
+                        ret |= 0x4000;
+                    if ((cap.Flags & Caps.CapsFlags.AdvEnv) != 0)
+                        ret |= 0x8000;
                 }
             }
 

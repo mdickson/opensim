@@ -3246,7 +3246,7 @@ namespace OpenSim.Region.Framework.Scenes
 
                 linkPart.SetParent(this);
 
-                linkPart.CreateSelected = true;
+                //linkPart.CreateSelected = true;
 
                 linkPart.UpdatePrimFlags(grpusephys, grptemporary, (IsPhantom || (linkPart.Flags & PrimFlags.Phantom) != 0), linkPart.VolumeDetectActive || RootPart.VolumeDetectActive, true);
 
