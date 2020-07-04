@@ -108,9 +108,6 @@ namespace OpenSim.Region.Framework.Interfaces
 
         void StoreRegionSettings(RegionSettings rs);
         RegionSettings LoadRegionSettings(UUID regionUUID);
-        RegionLightShareData LoadRegionWindlightSettings(UUID regionUUID);
-        void StoreRegionWindlightSettings(RegionLightShareData wl);
-        void RemoveRegionWindlightSettings(UUID regionID);
 
         /// <summary>
         /// Load Environment settings from region storage

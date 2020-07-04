@@ -118,10 +118,6 @@ namespace OpenSim.Region.CoreModules.World.Estate
 
         public void RegionLoaded(Scene scene)
         {
-            // Sets up the sun module based no the saved Estate and Region Settings
-            // DO NOT REMOVE or the sun will stop working
-            scene.TriggerEstateSunUpdate();
-
             UserManager = scene.RequestModuleInterface<IUserManagement>();
 
             scene.RegionInfo.EstateSettings.DoDenyMinors = !m_ignoreEstateMinorAccessControl;
@@ -167,8 +163,9 @@ namespace OpenSim.Region.CoreModules.World.Estate
             if (Scene.RegionInfo.RegionSettings.Casino)
                 flags |= (RegionFlags)(1 << 10);
 
-            if (Scene.RegionInfo.RegionSettings.FixedSun)
-                flags |= RegionFlags.SunFixed;
+//            if (Scene.RegionInfo.RegionSettings.FixedSun)
+//                flags |= RegionFlags.SunFixed;
+
             if (Scene.RegionInfo.RegionSettings.Sandbox)
                 flags |= RegionFlags.Sandbox;
             if (Scene.RegionInfo.EstateSettings.AllowVoice)
@@ -182,14 +179,13 @@ namespace OpenSim.Region.CoreModules.World.Estate
             if (Scene.RegionInfo.EstateSettings.ResetHomeOnTeleport)
                 flags |= RegionFlags.ResetHomeOnTeleport;
 
-            if (Scene.RegionInfo.EstateSettings.AllowEnviromentOverride)
+            if (Scene.RegionInfo.EstateSettings.AllowEnvironmentOverride)
                 flags |= RegionFlags.AllowEnvironmentOverride;
 
             // TODO: SkipUpdateInterestList
 
             // Omitted
             //
-            // Omitted: NullLayer (what is that?)
             // Omitted: SkipAgentAction (what does it do?)
 
             return (uint)flags;
@@ -427,10 +423,6 @@ namespace OpenSim.Region.CoreModules.World.Estate
 
         private void sendDetailedEstateData(IClientAPI remote_client, UUID invoice)
         {
-            uint sun = 0;
-
-            if (Scene.RegionInfo.EstateSettings.FixedSun)
-                sun = (uint)(Scene.RegionInfo.EstateSettings.SunPosition * 1024.0) + 0x1800;
             UUID estateOwner;
             estateOwner = Scene.RegionInfo.EstateSettings.EstateOwner;
 
@@ -442,7 +434,7 @@ namespace OpenSim.Region.CoreModules.World.Estate
                     Scene.RegionInfo.EstateSettings.EstateID,
                     Scene.RegionInfo.EstateSettings.ParentEstateID,
                     GetEstateFlags(),
-                    sun,
+                    0,
                     Scene.RegionInfo.RegionSettings.Covenant,
                     (uint)Scene.RegionInfo.RegionSettings.CovenantChangedDateTime,
                     Scene.RegionInfo.EstateSettings.AbuseEmail,
@@ -597,14 +589,12 @@ namespace OpenSim.Region.CoreModules.World.Estate
             Scene.RegionInfo.RegionSettings.TerrainLowerLimit = TerrainLowerLimit;
 
             // Time of day / fixed sun
-            Scene.RegionInfo.RegionSettings.UseEstateSun = UseEstateSun;
-            Scene.RegionInfo.RegionSettings.FixedSun = UseFixedSun;
-            Scene.RegionInfo.RegionSettings.SunPosition = SunHour;
+            //Scene.RegionInfo.RegionSettings.UseEstateSun = UseEstateSun;
+            //Scene.RegionInfo.RegionSettings.FixedSun = UseFixedSun;
+            //Scene.RegionInfo.RegionSettings.SunPosition = SunHour;
 
             if (Scene.PhysicsEnabled && Scene.PhysicsScene != null && lastwaterlevel != WaterHeight)
                 Scene.PhysicsScene.SetWaterLevel(WaterHeight);
-
-            Scene.TriggerEstateSunUpdate();
 
             //m_log.Debug("[ESTATE]: UFS: " + UseFixedSun.ToString());
             //m_log.Debug("[ESTATE]: SunHour: " + SunHour.ToString());
@@ -1415,10 +1405,10 @@ namespace OpenSim.Region.CoreModules.World.Estate
             args.redirectGridY = Scene.RegionInfo.EstateSettings.RedirectGridY;
             args.regionFlags = GetRegionFlags();
             args.simAccess = Scene.RegionInfo.AccessLevel;
-            args.sunHour = (float)Scene.RegionInfo.RegionSettings.SunPosition;
+            args.sunHour = 0;
             args.terrainLowerLimit = (float)Scene.RegionInfo.RegionSettings.TerrainLowerLimit;
             args.terrainRaiseLimit = (float)Scene.RegionInfo.RegionSettings.TerrainRaiseLimit;
-            args.useEstateSun = Scene.RegionInfo.RegionSettings.UseEstateSun;
+            args.useEstateSun = false;
             args.waterHeight = (float)Scene.RegionInfo.RegionSettings.WaterHeight;
             args.simName = Scene.RegionInfo.RegionName;
             args.regionType = Scene.RegionInfo.RegionType;
@@ -1528,27 +1518,12 @@ namespace OpenSim.Region.CoreModules.World.Estate
 
         public void handleEstateChangeInfo(IClientAPI remoteClient, UUID invoice, UUID senderID, UInt32 parms1, UInt32 parms2)
         {
-            if (parms2 == 0)
-            {
-                Scene.RegionInfo.EstateSettings.UseGlobalTime = true;
-                Scene.RegionInfo.EstateSettings.SunPosition = 0.0;
-            }
-            else
-            {
-                Scene.RegionInfo.EstateSettings.UseGlobalTime = false;
-                Scene.RegionInfo.EstateSettings.SunPosition = (parms2 - 0x1800) / 1024.0;
-                // Warning: FixedSun should be set to True, otherwise this sun position won't be used.
-            }
+            bool lastallowEnvOvr = Scene.RegionInfo.EstateSettings.AllowEnvironmentOverride;
 
             if ((parms1 & 0x00008000) != 0)
                 Scene.RegionInfo.EstateSettings.PublicAccess = true;
             else
                 Scene.RegionInfo.EstateSettings.PublicAccess = false;
-
-            if ((parms1 & 0x00000010) != 0)
-                Scene.RegionInfo.EstateSettings.FixedSun = true;
-            else
-                Scene.RegionInfo.EstateSettings.FixedSun = false;
 
             // taxfree is now !AllowAccessOverride (note the negate)
             if ((parms1 & 0x00000020) != 0)
@@ -1557,9 +1532,9 @@ namespace OpenSim.Region.CoreModules.World.Estate
                 Scene.RegionInfo.EstateSettings.TaxFree = true;
 
             if ((parms1 & 0x00000200) != 0)
-                Scene.RegionInfo.EstateSettings.AllowEnviromentOverride = true;
+                Scene.RegionInfo.EstateSettings.AllowEnvironmentOverride = true;
             else
-                Scene.RegionInfo.EstateSettings.AllowEnviromentOverride = false;
+                Scene.RegionInfo.EstateSettings.AllowEnvironmentOverride = false;
 
             if ((parms1 & 0x00100000) != 0)
                 Scene.RegionInfo.EstateSettings.AllowDirectTeleport = true;
@@ -1594,35 +1569,27 @@ namespace OpenSim.Region.CoreModules.World.Estate
                 Scene.RegionInfo.EstateSettings.DenyMinors = false;
 
             Scene.EstateDataService.StoreEstateSettings(Scene.RegionInfo.EstateSettings);
-            TriggerEstateInfoChange();
 
-            Scene.TriggerEstateSunUpdate();
+            if (lastallowEnvOvr && Scene.LandChannel != null && !Scene.RegionInfo.EstateSettings.AllowEnvironmentOverride)
+            {
+                Scene.ClearAllParcelEnvironments();
+            }
+
+            TriggerEstateInfoChange();
 
             sendDetailedEstateData(remoteClient, invoice);
         }
 
         public bool handleEstateChangeInfoCap(string estateName, UUID invoice,
-            int sunHour, bool sunFixed,
             bool externallyVisible,
             bool allowDirectTeleport,
             bool denyAnonymous, bool denyAgeUnverified,
             bool alloVoiceChat, bool overridePublicAccess,
-            bool allowEnviromentOverride)
+            bool allowEnvironmentOverride)
         {
-            if (sunHour == 0)
-            {
-                Scene.RegionInfo.EstateSettings.UseGlobalTime = true;
-                Scene.RegionInfo.EstateSettings.SunPosition = 0.0;
-            }
-            else
-            {
-                Scene.RegionInfo.EstateSettings.UseGlobalTime = false;
-                Scene.RegionInfo.EstateSettings.SunPosition = (sunHour - 0x1800) / 1024.0;
-                // Warning: FixedSun should be set to True, otherwise this sun position won't be used.
-            }
+            bool lastallowEnvOvr = Scene.RegionInfo.EstateSettings.AllowEnvironmentOverride;
 
             Scene.RegionInfo.EstateSettings.PublicAccess = externallyVisible;
-            Scene.RegionInfo.EstateSettings.FixedSun = sunFixed;
             Scene.RegionInfo.EstateSettings.AllowDirectTeleport = allowDirectTeleport;
 
             Scene.RegionInfo.EstateSettings.DenyAnonymous = denyAnonymous;
@@ -1631,12 +1598,13 @@ namespace OpenSim.Region.CoreModules.World.Estate
             // taxfree is now !AllowAccessOverride
             Scene.RegionInfo.EstateSettings.TaxFree = overridePublicAccess;
             Scene.RegionInfo.EstateSettings.DenyMinors = denyAgeUnverified;
-            Scene.RegionInfo.EstateSettings.AllowEnviromentOverride = allowEnviromentOverride;
+            Scene.RegionInfo.EstateSettings.AllowEnvironmentOverride = allowEnvironmentOverride;
 
             Scene.EstateDataService.StoreEstateSettings(Scene.RegionInfo.EstateSettings);
-            TriggerEstateInfoChange();
+            if(lastallowEnvOvr && !allowEnvironmentOverride)
+                Scene.ClearAllParcelEnvironments();
 
-            Scene.TriggerEstateSunUpdate();
+            TriggerEstateInfoChange();
 
             return true;
         }
@@ -1653,8 +1621,10 @@ namespace OpenSim.Region.CoreModules.World.Estate
                     Scene.RegionInfo.RegionSettings.UseEstateSun,
                     Scene.RegionInfo.RegionSettings.FixedSun,
                     (float)Scene.RegionInfo.RegionSettings.SunPosition,
-                    Scene.RegionInfo.EstateSettings.UseGlobalTime,
-                    Scene.RegionInfo.EstateSettings.FixedSun,
+                    //Scene.RegionInfo.EstateSettings.UseGlobalTime,
+                    false,
+                    //Scene.RegionInfo.EstateSettings.FixedSun,
+                    false,
                     (float)Scene.RegionInfo.EstateSettings.SunPosition);
 
             //            sendRegionInfoPacketToAll(); already done by setRegionTerrainSettings
@@ -1690,7 +1660,6 @@ namespace OpenSim.Region.CoreModules.World.Estate
             client.OnLandStatRequest += HandleLandStatRequest;
         }
 
-
         public uint GetEstateFlags()
         {
             RegionFlags flags = RegionFlags.None;
@@ -1701,13 +1670,11 @@ namespace OpenSim.Region.CoreModules.World.Estate
                 flags |= RegionFlags.AllowSetHome;
             if (Scene.RegionInfo.EstateSettings.ResetHomeOnTeleport)
                 flags |= RegionFlags.ResetHomeOnTeleport;
-            if (Scene.RegionInfo.EstateSettings.FixedSun)
-                flags |= RegionFlags.SunFixed;
+            //if (Scene.RegionInfo.EstateSettings.FixedSun)
+            //    flags |= RegionFlags.SunFixed;
             if (!Scene.RegionInfo.EstateSettings.TaxFree) // this is now wrong means !ALLOW_ACCESS_OVERRIDE
                 flags |= RegionFlags.AllowParcelAccessOverride;
 
-            if(Scene.RegionInfo.EstateSettings.AllowEnviromentOverride)
-                flags |= RegionFlags.AllowEnvironmentOverride;
             if (Scene.RegionInfo.EstateSettings.PublicAccess) //??
                 flags |= (RegionFlags.PublicAllowed | RegionFlags.ExternallyVisible);
 
@@ -1731,9 +1698,11 @@ namespace OpenSim.Region.CoreModules.World.Estate
             if (Scene.RegionInfo.EstateSettings.AllowVoice)
                 flags |= RegionFlags.AllowVoice;
 
-
             if (Scene.RegionInfo.EstateSettings.DenyMinors)
                 flags |= RegionFlags.DenyAgeUnverified;
+
+            if (Scene.RegionInfo.EstateSettings.AllowEnvironmentOverride)
+                flags |= RegionFlags.AllowEnvironmentOverride;
 
             return (uint)flags;
         }
