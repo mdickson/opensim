@@ -687,6 +687,12 @@ namespace OpenSim.Region.CoreModules.Asset
                     if (File.GetLastAccessTime(file) < purgeLine)
                     {
                         File.Delete(file);
+                        string id = Path.GetFileName(file);
+                        if(!String.IsNullOrEmpty(id))
+                        {
+                            lock (weakAssetReferencesLock)
+                                weakAssetReferences.Remove(id);
+                        }
                     }
                 }
 
