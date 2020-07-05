@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>14.0.23107.0</ProductVersion>
+    <ProjectGuid>{87C4E6E3-0000-0000-0000-000000000000}</ProjectGuid>
+    <ApplicationIcon />
+    <AssemblyKeyContainerName />
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <TargetFramework>net461</TargetFramework>
+    <AppDesignerFolder />
+    <StartupObject />
+    <StartArguments />
+    <FileUpgradeFlags />
+    <RemoveIntegerChecks>False</RemoveIntegerChecks>
+    <ConfigurationOverrideFile />
+    <OutputPath>..\..\..\bin\</OutputPath>
+    <NoStdLib>False</NoStdLib>
+    <FileAlignment>4096</FileAlignment>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <DocumentationFile />
+    <NoWarn />
+    <BaseAddress>285212672</BaseAddress>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <PreBuildEvent />
+    <PostBuildEvent />
+    <PreBuildEvent />
+    <PostBuildEvent />
+    <PreBuildEvent />
+    <PostBuildEvent />
+    <PreBuildEvent />
+    <PostBuildEvent />
+    <PreBuildEvent />
+    <PostBuildEvent />
+    <PreBuildEvent />
+    <PostBuildEvent />
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.Addins">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Nini">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenMetaverse.Types">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="XMLRPC">
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\OpenSim\Framework\OpenSim.Framework.csproj" />
+    <ProjectReference Include="..\..\..\OpenSim\Region\Framework\OpenSim.Region.Framework.csproj" />
+    <ProjectReference Include="..\..\..\OpenSim\Services\Interfaces\OpenSim.Services.Interfaces.csproj" />
+  </ItemGroup>
+</Project>
