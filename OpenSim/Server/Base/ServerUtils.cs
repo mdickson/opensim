@@ -37,6 +37,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -346,7 +347,7 @@ namespace OpenSim.Server.Base
                 if (String.IsNullOrWhiteSpace(elems[0]))
                     continue;
 
-                name = System.Web.HttpUtility.UrlDecode(elems[0]);
+                name = HttpUtility.UrlDecode(elems[0]);
 
                 if (name.EndsWith("[]"))
                 {
@@ -360,7 +361,7 @@ namespace OpenSim.Server.Base
 
                         List<string> l = (List<string>)result[name];
                         if (elems.Length > 1 && !String.IsNullOrWhiteSpace(elems[1]))
-                            l.Add(System.Web.HttpUtility.UrlDecode(elems[1]));
+                            l.Add(HttpUtility.UrlDecode(elems[1]));
                         else
                             l.Add(String.Empty);
                     }
@@ -368,7 +369,7 @@ namespace OpenSim.Server.Base
                     {
                         List<string> newList = new List<string>();
                         if (elems.Length > 1 && !String.IsNullOrWhiteSpace(elems[1]))
-                            newList.Add(System.Web.HttpUtility.UrlDecode(elems[1]));
+                            newList.Add(HttpUtility.UrlDecode(elems[1]));
                         else
                             newList.Add(String.Empty);
                         result[name] = newList;
@@ -379,7 +380,7 @@ namespace OpenSim.Server.Base
                     if (!result.ContainsKey(name))
                     {
                         if (elems.Length > 1 && !String.IsNullOrWhiteSpace(elems[1]))
-                            result[name] = System.Web.HttpUtility.UrlDecode(elems[1]);
+                            result[name] = HttpUtility.UrlDecode(elems[1]);
                         else
                             result[name] = String.Empty;
                     }
@@ -403,14 +404,14 @@ namespace OpenSim.Server.Base
                 {
                     List<string> l = (List<String>)kvp.Value;
                     int llen = l.Count;
-                    string nkey = System.Web.HttpUtility.UrlEncode(kvp.Key);
+                    string nkey = HttpUtility.UrlEncode(kvp.Key);
                     for (int i = 0; i < llen; ++i)
                     {
                         if (sb.Length != 0)
                             sb.Append("&");
                         sb.Append(nkey);
                         sb.Append("[]=");
-                        sb.Append(System.Web.HttpUtility.UrlEncode(l[i]));
+                        sb.Append(HttpUtility.UrlEncode(l[i]));
                     }
                 }
                 else if (kvp.Value is Dictionary<string, object>)
@@ -435,21 +436,21 @@ namespace OpenSim.Server.Base
                     }
                     if (sb.Length != 0)
                         sb.Append("&");
-                    sb.Append(System.Web.HttpUtility.UrlEncode(kvp.Key));
+                    sb.Append(HttpUtility.UrlEncode(kvp.Key));
                     sb.Append("=");
-                    sb.Append(System.Web.HttpUtility.UrlEncode(js));
+                    sb.Append(HttpUtility.UrlEncode(js));
                 }
                 else
                 {
                     if (sb.Length != 0)
                         sb.Append("&");
-                    sb.Append(System.Web.HttpUtility.UrlEncode(kvp.Key));
+                    sb.Append(HttpUtility.UrlEncode(kvp.Key));
 
                     pvalue = kvp.Value.ToString();
                     if (!String.IsNullOrEmpty(pvalue))
                     {
                         sb.Append("=");
-                        sb.Append(System.Web.HttpUtility.UrlEncode(pvalue));
+                        sb.Append(HttpUtility.UrlEncode(pvalue));
                     }
                 }
             }
@@ -462,8 +463,7 @@ namespace OpenSim.Server.Base
         {
             XmlDocument doc = new XmlDocument();
 
-            XmlNode xmlnode = doc.CreateNode(XmlNodeType.XmlDeclaration,
-                    "", "");
+            XmlNode xmlnode = doc.CreateNode(XmlNodeType.XmlDeclaration, "", "");
 
             doc.AppendChild(xmlnode);
 

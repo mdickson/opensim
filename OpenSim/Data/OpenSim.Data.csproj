@@ -1,209 +1,122 @@
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
-	<PropertyGroup>
-	  <ProjectType>Local</ProjectType>
-	  <ProductVersion>14.0.23107.0</ProductVersion>
-	  <SchemaVersion>2.0</SchemaVersion>
-	  <ProjectGuid>{7E218E2D-0000-0000-0000-000000000000}</ProjectGuid>
-	  <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-	  <ApplicationIcon></ApplicationIcon>
-	  <AssemblyKeyContainerName>
-	  </AssemblyKeyContainerName>
-	  <AssemblyName>OpenSim.Data</AssemblyName>
-	  <DefaultClientScript>JScript</DefaultClientScript>
-	  <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
-	  <DefaultTargetSchema>IE50</DefaultTargetSchema>
-	  <DelaySign>false</DelaySign>
-	  <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-	  <OutputType>Library</OutputType>
-	  <AppDesignerFolder></AppDesignerFolder>
-	  <RootNamespace>OpenSim.Data</RootNamespace>
-	  <StartupObject></StartupObject>
-	  <StartArguments></StartArguments>
-	  <FileUpgradeFlags>
-	  </FileUpgradeFlags>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-	  <BaseAddress>285212672</BaseAddress>
-	  <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
-	  <ConfigurationOverrideFile>
-	  </ConfigurationOverrideFile>
-	  <DefineConstants>TRACE;DEBUG;</DefineConstants>
-	  <DocumentationFile></DocumentationFile>
-	  <DebugSymbols>True</DebugSymbols>
-	  <FileAlignment>4096</FileAlignment>
-	  <Optimize>False</Optimize>
-	  <OutputPath>..\..\bin\</OutputPath>
-	  <RegisterForComInterop>False</RegisterForComInterop>
-	  <RemoveIntegerChecks>False</RemoveIntegerChecks>
-	  <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-	  <WarningLevel>4</WarningLevel>
-	  <NoStdLib>False</NoStdLib>
-	  <NoWarn></NoWarn>
-	  <PlatformTarget>AnyCPU</PlatformTarget>
-	  <Prefer32Bit>False</Prefer32Bit>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-	  <BaseAddress>285212672</BaseAddress>
-	  <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
-	  <ConfigurationOverrideFile>
-	  </ConfigurationOverrideFile>
-	  <DefineConstants>TRACE;</DefineConstants>
-	  <DocumentationFile></DocumentationFile>
-	  <DebugSymbols>False</DebugSymbols>
-	  <FileAlignment>4096</FileAlignment>
-	  <Optimize>True</Optimize>
-	  <OutputPath>..\..\bin\</OutputPath>
-	  <RegisterForComInterop>False</RegisterForComInterop>
-	  <RemoveIntegerChecks>False</RemoveIntegerChecks>
-	  <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-	  <WarningLevel>4</WarningLevel>
-	  <NoStdLib>False</NoStdLib>
-	  <NoWarn></NoWarn>
-	  <PlatformTarget>AnyCPU</PlatformTarget>
-	  <Prefer32Bit>False</Prefer32Bit>
-	</PropertyGroup>
-	<ItemGroup>
-	  <Reference Include="log4net" >
-		  <Name>log4net</Name>
-		<HintPath>..\..\bin\log4net.dll</HintPath>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="Mono.Addins" >
-		  <Name>Mono.Addins</Name>
-		<HintPath>..\..\bin\Mono.Addins.dll</HintPath>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="OpenMetaverse" >
-		  <Name>OpenMetaverse</Name>
-		<HintPath>..\..\bin\OpenMetaverse.dll</HintPath>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="OpenMetaverse.StructuredData" >
-		  <Name>OpenMetaverse.StructuredData</Name>
-		<HintPath>..\..\bin\OpenMetaverse.StructuredData.dll</HintPath>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="OpenMetaverse.Types" >
-		  <Name>OpenMetaverse.Types</Name>
-		<HintPath>..\..\bin\OpenMetaverse.Types.dll</HintPath>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="System" >
-		  <Name>System</Name>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="System.Core" >
-		  <Name>System.Core</Name>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="System.Data" >
-		  <Name>System.Data</Name>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="System.Xml" >
-		  <Name>System.Xml</Name>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="XMLRPC" >
-		  <Name>XMLRPC</Name>
-		<HintPath>..\..\bin\XMLRPC.dll</HintPath>
-		<Private>False</Private>
-	  </Reference>
-	</ItemGroup>
-	<ItemGroup>
-	  <ProjectReference Include="..\Framework\OpenSim.Framework.csproj">
-		<Name>OpenSim.Framework</Name>
-		<Project>{BCCDBB55-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	</ItemGroup>
-	<ItemGroup>
-	  <Compile Include="AssetDataBase.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="DBGuids.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IAgentPreferencesData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IAssetData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IAuthenticationData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IAvatarData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IEstateDataStore.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IFriendsData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IFSAssetData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IGridUserData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IGroupsData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IHGTravelingData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IInventoryData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IMuteListData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IniConfig.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IOfflineIMData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IPresenceData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IProfilesData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IRegionData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IUserAccountData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IXAssetDataPlugin.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IXGroupData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="IXInventoryData.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="Migration.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="Properties\AssemblyInfo.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <EmbeddedResource Include="Resources\OpenSim.Data.addin.xml">
-	  </EmbeddedResource>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <TargetFramework>net461</TargetFramework>
+    <AssemblyTitle>OpenSim.Data</AssemblyTitle>
+    <Product>OpenSim.Data</Product>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="XMLRPC">
+      <HintPath>..\..\bin\XMLRPC.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
-	<Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-	<PropertyGroup>
-	  <PreBuildEvent>
-	  </PreBuildEvent>
-	  <PostBuildEvent>
-	  </PostBuildEvent>
-	</PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Framework\OpenSim.Framework.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\OpenSim.Data.addin.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="MySQL\MySQLAgentPreferencesData.cs" />
+    <Compile Remove="MySQL\MySQLAssetData.cs" />
+    <Compile Remove="MySQL\MySQLAuthenticationData.cs" />
+    <Compile Remove="MySQL\MySQLAvatarData.cs" />
+    <Compile Remove="MySQL\MySQLEstateData.cs" />
+    <Compile Remove="MySQL\MySQLFramework.cs" />
+    <Compile Remove="MySQL\MySQLFriendsData.cs" />
+    <Compile Remove="MySQL\MySQLFSAssetData.cs" />
+    <Compile Remove="MySQL\MySQLGenericTableHandler.cs" />
+    <Compile Remove="MySQL\MySQLGridUserData.cs" />
+    <Compile Remove="MySQL\MySQLGroupsData.cs" />
+    <Compile Remove="MySQL\MySQLHGTravelData.cs" />
+    <Compile Remove="MySQL\MySQLInventoryData.cs" />
+    <Compile Remove="MySQL\MySQLMigrations.cs" />
+    <Compile Remove="MySQL\MySQLMuteListData.cs" />
+    <Compile Remove="MySQL\MySQLOfflineIMData.cs" />
+    <Compile Remove="MySQL\MySQLPresenceData.cs" />
+    <Compile Remove="MySQL\MySQLRegionData.cs" />
+    <Compile Remove="MySQL\MySQLSimulationData.cs" />
+    <Compile Remove="MySQL\MySQLUserAccountData.cs" />
+    <Compile Remove="MySQL\MySQLUserProfilesData.cs" />
+    <Compile Remove="MySQL\MySQLXAssetData.cs" />
+    <Compile Remove="MySQL\MySQLXInventoryData.cs" />
+    <Compile Remove="Null\NullAuthenticationData.cs" />
+    <Compile Remove="Null\NullAvatarData.cs" />
+    <Compile Remove="Null\NullEstateData.cs" />
+    <Compile Remove="Null\NullFriendsData.cs" />
+    <Compile Remove="Null\NullGenericDataHandler.cs" />
+    <Compile Remove="Null\NullInventoryData.cs" />
+    <Compile Remove="Null\NullPresenceData.cs" />
+    <Compile Remove="Null\NullRegionData.cs" />
+    <Compile Remove="Null\NullSimulationData.cs" />
+    <Compile Remove="Null\NullUserAccountData.cs" />
+    <Compile Remove="Null\NullXGroupData.cs" />
+    <Compile Remove="PGSQL\PGSQLAgentPreferencesData.cs" />
+    <Compile Remove="PGSQL\PGSQLAssetData.cs" />
+    <Compile Remove="PGSQL\PGSQLAuthenticationData.cs" />
+    <Compile Remove="PGSQL\PGSQLAvatarData.cs" />
+    <Compile Remove="PGSQL\PGSQLEstateData.cs" />
+    <Compile Remove="PGSQL\PGSQLFramework.cs" />
+    <Compile Remove="PGSQL\PGSQLFriendsData.cs" />
+    <Compile Remove="PGSQL\PGSQLFSAssetData.cs" />
+    <Compile Remove="PGSQL\PGSQLGenericTableHandler.cs" />
+    <Compile Remove="PGSQL\PGSQLGridUserData.cs" />
+    <Compile Remove="PGSQL\PGSQLGroupsData.cs" />
+    <Compile Remove="PGSQL\PGSQLHGTravelData.cs" />
+    <Compile Remove="PGSQL\PGSQLInventoryData.cs" />
+    <Compile Remove="PGSQL\PGSQLManager.cs" />
+    <Compile Remove="PGSQL\PGSQLMigration.cs" />
+    <Compile Remove="PGSQL\PGSQLOfflineIMData.cs" />
+    <Compile Remove="PGSQL\PGSQLPresenceData.cs" />
+    <Compile Remove="PGSQL\PGSQLRegionData.cs" />
+    <Compile Remove="PGSQL\PGSQLSimulationData.cs" />
+    <Compile Remove="PGSQL\PGSQLUserAccountData.cs" />
+    <Compile Remove="PGSQL\PGSQLUserProfilesData.cs" />
+    <Compile Remove="PGSQL\PGSQLXAssetData.cs" />
+    <Compile Remove="PGSQL\PGSQLXInventoryData.cs" />
+    <Compile Remove="SQLite\SQLiteAgentPreferencesData.cs" />
+    <Compile Remove="SQLite\SQLiteAssetData.cs" />
+    <Compile Remove="SQLite\SQLiteAuthenticationData.cs" />
+    <Compile Remove="SQLite\SQLiteAvatarData.cs" />
+    <Compile Remove="SQLite\SQLiteEstateData.cs" />
+    <Compile Remove="SQLite\SQLiteFramework.cs" />
+    <Compile Remove="SQLite\SQLiteFriendsData.cs" />
+    <Compile Remove="SQLite\SQLiteGenericTableHandler.cs" />
+    <Compile Remove="SQLite\SQLiteGridUserData.cs" />
+    <Compile Remove="SQLite\SQLiteHGTravelData.cs" />
+    <Compile Remove="SQLite\SQLiteMuteListData.cs" />
+    <Compile Remove="SQLite\SQLiteSimulationData.cs" />
+    <Compile Remove="SQLite\SQLiteUserAccountData.cs" />
+    <Compile Remove="SQLite\SQLiteUserProfilesData.cs" />
+    <Compile Remove="SQLite\SQLiteUtils.cs" />
+    <Compile Remove="SQLite\SQLiteXInventoryData.cs" />
+    <Compile Remove="Tests\AssetTests.cs" />
+    <Compile Remove="Tests\BasicDataServiceTest.cs" />
+    <Compile Remove="Tests\DataTestUtil.cs" />
+    <Compile Remove="Tests\DefaultTestConns.cs" />
+    <Compile Remove="Tests\EstateTests.cs" />
+    <Compile Remove="Tests\InventoryTests.cs" />
+    <Compile Remove="Tests\PropertyCompareConstraint.cs" />
+    <Compile Remove="Tests\PropertyScrambler.cs" />
+    <Compile Remove="Tests\RegionTests.cs" />
+    <Compile Remove="MySQL\Properties\AssemblyInfo.cs" />
+    <Compile Remove="Null\Properties\AssemblyInfo.cs" />
+    <Compile Remove="PGSQL\Properties\AssemblyInfo.cs" />
+    <Compile Remove="SQLite\Properties\AssemblyInfo.cs" />
+    <Compile Remove="MySQL\obj\Release\.NETFramework,Version=v4.6.1.AssemblyAttributes.cs" />
+    <Compile Remove="Null\obj\Release\.NETFramework,Version=v4.6.1.AssemblyAttributes.cs" />
+    <Compile Remove="PGSQL\obj\Release\.NETFramework,Version=v4.6.1.AssemblyAttributes.cs" />
+    <Compile Remove="SQLite\obj\Release\.NETFramework,Version=v4.6.1.AssemblyAttributes.cs" />
+    <Compile Remove="Tests\obj\Release\.NETFramework,Version=v4.6.1.AssemblyAttributes.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="Mono.Addins" Version="1.3.8" />
+    <PackageReference Include="OpenMetaverse" Version="1.0.0" />
+  </ItemGroup>
 </Project>

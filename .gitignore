@@ -17,20 +17,9 @@ packages/
 # http://stackoverflow.com/questions/72298/should-i-add-the-visual-studio-suo-and-user-files-to-source-control
 *.suo
 *.user
-
 *.VisualState.xml
-*/*/obj
-*/*/*/obj
-*/*/*/*/obj
-*/*/*/*/*/obj
-*/*/*/*/*/*/obj
-*/*/*/*/*/*/*/obj
-*/*/bin
-*/*/*/bin
-*/*/*/*/bin
-*/*/*/*/*/bin
-*/*/*/*/*/*/bin
-*/*/*/*/*/*/*/bin
+
+obj/
 .vs/
 .vscode/
 bin/Debug/*.dll
@@ -79,6 +68,7 @@ bin/RobustConsoleHistory.txt
 bin/*.Tests.log
 bin/*.manifest
 bin/crashes/
+bin/Release
 Examples/*.dll
 OpenSim.build
 OpenSim.userprefs

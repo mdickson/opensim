@@ -35,6 +35,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Timers;
+using System.Web;
 using System.Xml;
 
 namespace OpenSim.Framework.Console
@@ -585,11 +586,11 @@ namespace OpenSim.Framework.Console
                 if (elems.Length == 0)
                     continue;
 
-                string name = System.Web.HttpUtility.UrlDecode(elems[0]);
+                string name = HttpUtility.UrlDecode(elems[0]);
                 string value = String.Empty;
 
                 if (elems.Length > 1)
-                    value = System.Web.HttpUtility.UrlDecode(elems[1]);
+                    value = HttpUtility.UrlDecode(elems[1]);
 
                 result[name] = value;
             }

@@ -3,6 +3,7 @@ using Mono.Addins;
 using Nini.Config;
 using Nwc.XmlRpc;
 using OpenMetaverse;
+using OpenSim;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;

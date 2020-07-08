@@ -230,7 +230,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 catch { }
                 try
                 {
-                    oscode = ((OpenSim.Region.Framework.Scenes.scriptEvents)(1 << i)).ToString();
+                    oscode = ((scriptEvents)(1 << i)).ToString();
                     Convert.ToInt32(oscode);
                     oscode = "undefined";
                 }

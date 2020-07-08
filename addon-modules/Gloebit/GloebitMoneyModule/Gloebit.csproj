@@ -1,34 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>14.0.23107.0</ProductVersion>
-    <ProjectGuid>{4C8A6BF4-0000-0000-0000-000000000000}</ProjectGuid>
-    <ApplicationIcon />
-    <AssemblyKeyContainerName />
-    <DefaultClientScript>JScript</DefaultClientScript>
-    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
-    <DefaultTargetSchema>IE50</DefaultTargetSchema>
     <TargetFramework>net461</TargetFramework>
-    <AppDesignerFolder />
-    <StartupObject />
-    <StartArguments />
-    <FileUpgradeFlags />
-    <FileAlignment>4096</FileAlignment>
-    <RemoveIntegerChecks>False</RemoveIntegerChecks>
-    <BaseAddress>285212672</BaseAddress>
-    <RegisterForComInterop>False</RegisterForComInterop>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <NoStdLib>False</NoStdLib>
-    <ConfigurationOverrideFile />
-    <NoWarn />
-    <DocumentationFile />
-    <OutputPath>..\..\..\bin\</OutputPath>
-    <PreBuildEvent />
-    <PostBuildEvent />
-    <PreBuildEvent />
-    <PostBuildEvent />
-    <PreBuildEvent />
-    <PostBuildEvent />
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent />
@@ -38,14 +12,6 @@
     <Copy SourceFiles="@(FilesToCopy_0000)" DestinationFolder="../../../bin/" />
   </Target>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\..\..\bin\log4net.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Mono.Addins">
-      <HintPath>..\..\..\bin\Mono.Addins.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="MySql.Data">
       <HintPath>..\..\..\bin\MySql.Data.dll</HintPath>
       <Private>False</Private>
@@ -56,18 +22,6 @@
     </Reference>
     <Reference Include="Npgsql">
       <HintPath>..\..\..\bin\Npgsql.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="OpenMetaverse">
-      <HintPath>..\..\..\bin\OpenMetaverse.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="OpenMetaverse.StructuredData">
-      <HintPath>..\..\..\bin\OpenMetaverse.StructuredData.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="OpenMetaverse.Types">
-      <HintPath>..\..\..\bin\OpenMetaverse.Types.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Web">
@@ -104,5 +58,10 @@
     <EmbeddedResource Include="Resources\GloebitUsersMySQL.migrations" />
     <EmbeddedResource Include="Resources\GloebitUsersPGSQL.migrations" />
     <EmbeddedResource Include="Resources\GloebitUsersSQLite.migrations" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="Mono.Addins" Version="1.3.8" />
+    <PackageReference Include="OpenMetaverse" Version="1.0.0" />
   </ItemGroup>
 </Project>

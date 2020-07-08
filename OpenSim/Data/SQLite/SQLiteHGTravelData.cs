@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using Mono.Data.Sqlite;
 using OpenMetaverse;
 using System;
+using System.Data.SQLite;
 
 namespace OpenSim.Data.SQLite
 {
@@ -63,7 +63,7 @@ namespace OpenSim.Data.SQLite
 
         public void DeleteOld()
         {
-            using (SqliteCommand cmd = new SqliteCommand())
+            using (var cmd = new SQLiteCommand())
             {
                 cmd.CommandText = String.Format("delete from {0} where TMStamp < datetime('now', '-2 day') ", m_Realm);
 

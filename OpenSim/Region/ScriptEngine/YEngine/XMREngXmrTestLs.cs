@@ -33,6 +33,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 
+using OpenSim.Region.ScriptEngine.Shared;
+using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
+
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
 using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
 using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
@@ -252,8 +255,8 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                     return;
                 i++;
             }
-            OpenSim.Region.ScriptEngine.Shared.EventParams eps =
-                    new OpenSim.Region.ScriptEngine.Shared.EventParams(eventname, paramvalues, zeroDetectParams);
+            
+            var eps = new EventParams(eventname, paramvalues, zeroDetectParams);
 
             // Scan instance list to find those that match selection criteria.
             if (!Monitor.TryEnter(m_InstancesDict, 100))
@@ -366,7 +369,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
             }
             if (token is TokenName)
             {
-                FieldInfo field = typeof(OpenSim.Region.ScriptEngine.Shared.ScriptBase.ScriptBaseClass).GetField(((TokenName)token).val);
+                FieldInfo field = typeof(ScriptBaseClass).GetField(((TokenName)token).val);
                 if ((field != null) && field.IsPublic && (field.IsLiteral || (field.IsStatic && field.IsInitOnly)))
                 {
                     return field.GetValue(null);

@@ -26,10 +26,6 @@
  */
 
 using OpenMetaverse;
-#if CSharpSqlite
-  using Community.CsharpSqlite.Sqlite;
-#else
-#endif
 
 namespace OpenSim.Data.SQLite
 {

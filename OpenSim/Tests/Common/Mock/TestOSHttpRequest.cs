@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenSim.Framework.Servers.HttpServer;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,6 +33,8 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Web;
+
+using OpenSim.Framework.Servers.HttpServer;
 
 namespace OpenSim.Tests.Common
 {

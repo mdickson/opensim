@@ -1,197 +1,109 @@
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
-	<PropertyGroup>
-	  <ProjectType>Local</ProjectType>
-	  <ProductVersion>14.0.23107.0</ProductVersion>
-	  <SchemaVersion>2.0</SchemaVersion>
-	  <ProjectGuid>{F93F91AD-0000-0000-0000-000000000000}</ProjectGuid>
-	  <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-	  <ApplicationIcon></ApplicationIcon>
-	  <AssemblyKeyContainerName>
-	  </AssemblyKeyContainerName>
-	  <AssemblyName>OpenSim.Region.ScriptEngine.Shared</AssemblyName>
-	  <DefaultClientScript>JScript</DefaultClientScript>
-	  <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
-	  <DefaultTargetSchema>IE50</DefaultTargetSchema>
-	  <DelaySign>false</DelaySign>
-	  <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-	  <OutputType>Library</OutputType>
-	  <AppDesignerFolder></AppDesignerFolder>
-	  <RootNamespace>OpenSim.Region.ScriptEngine.Shared</RootNamespace>
-	  <StartupObject></StartupObject>
-	  <StartArguments></StartArguments>
-	  <FileUpgradeFlags>
-	  </FileUpgradeFlags>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-	  <BaseAddress>285212672</BaseAddress>
-	  <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
-	  <ConfigurationOverrideFile>
-	  </ConfigurationOverrideFile>
-	  <DefineConstants>TRACE;DEBUG;</DefineConstants>
-	  <DocumentationFile></DocumentationFile>
-	  <DebugSymbols>True</DebugSymbols>
-	  <FileAlignment>4096</FileAlignment>
-	  <Optimize>False</Optimize>
-	  <OutputPath>..\..\..\..\bin\</OutputPath>
-	  <RegisterForComInterop>False</RegisterForComInterop>
-	  <RemoveIntegerChecks>False</RemoveIntegerChecks>
-	  <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-	  <WarningLevel>4</WarningLevel>
-	  <NoStdLib>False</NoStdLib>
-	  <NoWarn></NoWarn>
-	  <PlatformTarget>AnyCPU</PlatformTarget>
-	  <Prefer32Bit>False</Prefer32Bit>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-	  <BaseAddress>285212672</BaseAddress>
-	  <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
-	  <ConfigurationOverrideFile>
-	  </ConfigurationOverrideFile>
-	  <DefineConstants>TRACE;</DefineConstants>
-	  <DocumentationFile></DocumentationFile>
-	  <DebugSymbols>False</DebugSymbols>
-	  <FileAlignment>4096</FileAlignment>
-	  <Optimize>True</Optimize>
-	  <OutputPath>..\..\..\..\bin\</OutputPath>
-	  <RegisterForComInterop>False</RegisterForComInterop>
-	  <RemoveIntegerChecks>False</RemoveIntegerChecks>
-	  <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-	  <WarningLevel>4</WarningLevel>
-	  <NoStdLib>False</NoStdLib>
-	  <NoWarn></NoWarn>
-	  <PlatformTarget>AnyCPU</PlatformTarget>
-	  <Prefer32Bit>False</Prefer32Bit>
-	</PropertyGroup>
-	<ItemGroup>
-	  <Reference Include="log4net" >
-		  <Name>log4net</Name>
-		<HintPath>..\..\..\..\bin\log4net.dll</HintPath>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="Nini" >
-		  <Name>Nini</Name>
-		<HintPath>..\..\..\..\bin\Nini.dll</HintPath>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="Nini" >
-		  <Name>Nini</Name>
-		<HintPath>..\..\..\..\bin\Nini.dll</HintPath>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="OpenMetaverse.Types" >
-		  <Name>OpenMetaverse.Types</Name>
-		<HintPath>..\..\..\..\bin\OpenMetaverse.Types.dll</HintPath>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="System" >
-		  <Name>System</Name>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="System.Data" >
-		  <Name>System.Data</Name>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="System.Web" >
-		  <Name>System.Web</Name>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="System.Xml" >
-		  <Name>System.Xml</Name>
-		<Private>False</Private>
-	  </Reference>
-	</ItemGroup>
-	<ItemGroup>
-	  <ProjectReference Include="..\..\Application\OpenSim.csproj">
-		<Name>OpenSim</Name>
-		<Project>{AC9EB8AB-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	  <ProjectReference Include="..\..\..\Framework\OpenSim.Framework.csproj">
-		<Name>OpenSim.Framework</Name>
-		<Project>{BCCDBB55-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	  <ProjectReference Include="..\..\..\Framework\Console\OpenSim.Framework.Console.csproj">
-		<Name>OpenSim.Framework.Console</Name>
-		<Project>{0ED8EBE8-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	  <ProjectReference Include="..\..\CoreModules\OpenSim.Region.CoreModules.csproj">
-		<Name>OpenSim.Region.CoreModules</Name>
-		<Project>{B60B8DCD-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	  <ProjectReference Include="..\..\Framework\OpenSim.Region.Framework.csproj">
-		<Name>OpenSim.Region.Framework</Name>
-		<Project>{C98F6D97-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	  <ProjectReference Include="..\..\..\Services\Interfaces\OpenSim.Services.Interfaces.csproj">
-		<Name>OpenSim.Services.Interfaces</Name>
-		<Project>{08ECE473-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	  <ProjectReference Include="..\..\..\..\ThirdParty\SmartThreadPool\SmartThreadPool.csproj">
-		<Name>SmartThreadPool</Name>
-		<Project>{8C618053-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	</ItemGroup>
-	<ItemGroup>
-	  <Compile Include="AssemblyResolver.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="Helpers.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="LSL_Types.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="ScriptException.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="..\Interfaces\ICompiler.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="..\Interfaces\IScript.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="..\Interfaces\IScriptApi.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="..\Interfaces\IScriptEngine.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="..\Interfaces\IScriptInstance.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="Api\Interface\ILSL_Api.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="Api\Interface\ILS_Api.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="Api\Interface\IMOD_Api.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="Api\Interface\IOSSL_Api.cs">
-		<SubType>Code</SubType>
-	  </Compile>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <TargetFramework>net461</TargetFramework>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Nini">
+      <HintPath>..\..\..\..\bin\Nini.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
-	<Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-	<PropertyGroup>
-	  <PreBuildEvent>
-	  </PreBuildEvent>
-	  <PostBuildEvent>
-	  </PostBuildEvent>
-	</PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Application\OpenSim.csproj" />
+    <ProjectReference Include="..\..\..\Framework\OpenSim.Framework.csproj" />
+    <ProjectReference Include="..\..\..\Framework\Console\OpenSim.Framework.Console.csproj" />
+    <ProjectReference Include="..\..\CoreModules\OpenSim.Region.CoreModules.csproj" />
+    <ProjectReference Include="..\..\Framework\OpenSim.Region.Framework.csproj" />
+    <ProjectReference Include="..\..\..\Services\Interfaces\OpenSim.Services.Interfaces.csproj" />
+    <ProjectReference Include="..\..\..\..\ThirdParty\SmartThreadPool\SmartThreadPool.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Interfaces\ICompiler.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\Interfaces\IScript.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\Interfaces\IScriptApi.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\Interfaces\IScriptEngine.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="..\Interfaces\IScriptInstance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="CodeTools\Compiler.cs" />
+    <Compile Remove="CodeTools\CSCodeGenerator.cs" />
+    <Compile Remove="CodeTools\CSReservedWords.cs" />
+    <Compile Remove="CodeTools\ICodeConverter.cs" />
+    <Compile Remove="CodeTools\lsl.lexer.cs" />
+    <Compile Remove="CodeTools\lsl.parser.cs" />
+    <Compile Remove="CodeTools\LSL2CSCodeTransformer.cs" />
+    <Compile Remove="Instance\ScriptInstance.cs" />
+    <Compile Remove="Instance\ScriptSerializer.cs" />
+    <Compile Remove="Properties\AssemblyInfo.cs" />
+    <Compile Remove="Tests\LSL_ApiAvatarTests.cs" />
+    <Compile Remove="Tests\LSL_ApiHttpTests.cs" />
+    <Compile Remove="Tests\LSL_ApiInventoryTests.cs" />
+    <Compile Remove="Tests\LSL_ApiLinkingTests.cs" />
+    <Compile Remove="Tests\LSL_ApiListTests.cs" />
+    <Compile Remove="Tests\LSL_ApiNotecardTests.cs" />
+    <Compile Remove="Tests\LSL_ApiObjectTests.cs" />
+    <Compile Remove="Tests\LSL_ApiTest.cs" />
+    <Compile Remove="Tests\LSL_ApiUserTests.cs" />
+    <Compile Remove="Tests\LSL_TypesTestList.cs" />
+    <Compile Remove="Tests\LSL_TypesTestLSLFloat.cs" />
+    <Compile Remove="Tests\LSL_TypesTestLSLInteger.cs" />
+    <Compile Remove="Tests\LSL_TypesTestLSLString.cs" />
+    <Compile Remove="Tests\LSL_TypesTestVector3.cs" />
+    <Compile Remove="Tests\OSSL_ApiAppearanceTest.cs" />
+    <Compile Remove="Tests\OSSL_ApiAttachmentTests.cs" />
+    <Compile Remove="Tests\OSSL_ApiNpcTests.cs" />
+    <Compile Remove="Api\Implementation\ApiManager.cs" />
+    <Compile Remove="Api\Implementation\AsyncCommandManager.cs" />
+    <Compile Remove="Api\Implementation\LSL_Api.cs" />
+    <Compile Remove="Api\Implementation\LS_Api.cs" />
+    <Compile Remove="Api\Implementation\MOD_Api.cs" />
+    <Compile Remove="Api\Implementation\OSSL_Api.cs" />
+    <Compile Remove="Api\Runtime\Executor.cs" />
+    <Compile Remove="Api\Runtime\LSL_Constants.cs" />
+    <Compile Remove="Api\Runtime\LSL_Stub.cs" />
+    <Compile Remove="Api\Runtime\LS_Stub.cs" />
+    <Compile Remove="Api\Runtime\MOD_Stub.cs" />
+    <Compile Remove="Api\Runtime\OSSL_Stub.cs" />
+    <Compile Remove="Api\Runtime\ScriptBase.cs" />
+    <Compile Remove="Api\Runtime\ScriptSponsor.cs" />
+    <Compile Remove="CodeTools\Properties\AssemblyInfo.cs" />
+    <Compile Remove="CodeTools\Tests\CompilerTest.cs" />
+    <Compile Remove="CodeTools\Tests\CSCodeGeneratorTest.cs" />
+    <Compile Remove="CodeTools\Tests\LSL_EventTests.cs" />
+    <Compile Remove="Instance\Properties\AssemblyInfo.cs" />
+    <Compile Remove="Instance\Tests\CoopTerminationTests.cs" />
+    <Compile Remove="Api\Implementation\Plugins\Dataserver.cs" />
+    <Compile Remove="Api\Implementation\Plugins\HttpRequest.cs" />
+    <Compile Remove="Api\Implementation\Plugins\Listener.cs" />
+    <Compile Remove="Api\Implementation\Plugins\SensorRepeat.cs" />
+    <Compile Remove="Api\Implementation\Plugins\Timer.cs" />
+    <Compile Remove="Api\Implementation\Plugins\XmlRequest.cs" />
+    <Compile Remove="Api\Implementation\Properties\AssemblyInfo.cs" />
+    <Compile Remove="Api\Runtime\Properties\AssemblyInfo.cs" />
+    <Compile Remove="CodeTools\obj\Release\.NETFramework,Version=v4.6.1.AssemblyAttributes.cs" />
+    <Compile Remove="Instance\obj\Release\.NETFramework,Version=v4.6.1.AssemblyAttributes.cs" />
+    <Compile Remove="Api\Implementation\obj\Release\.NETFramework,Version=v4.6.1.AssemblyAttributes.cs" />
+    <Compile Remove="Api\Runtime\obj\Release\.NETFramework,Version=v4.6.1.AssemblyAttributes.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="Mono.Addins" Version="1.3.8" />
+    <PackageReference Include="OpenMetaverse" Version="1.0.0" />
+  </ItemGroup>
 </Project>

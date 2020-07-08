@@ -8,7 +8,6 @@ using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using System.Web;
 
-
 namespace Amib.Threading.Internal
 {
     #region CallerThreadContext class

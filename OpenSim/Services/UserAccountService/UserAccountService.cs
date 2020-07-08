@@ -35,6 +35,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Web;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 using PermissionMask = OpenSim.Framework.PermissionMask;
 
@@ -231,8 +232,8 @@ namespace OpenSim.Services.UserAccountService
                     if (parts.Length != 2)
                         continue;
 
-                    string name = System.Web.HttpUtility.UrlDecode(parts[0]);
-                    string val = System.Web.HttpUtility.UrlDecode(parts[1]);
+                    string name = HttpUtility.UrlDecode(parts[0]);
+                    string val = HttpUtility.UrlDecode(parts[1]);
 
                     u.ServiceURLs[name] = val;
                 }

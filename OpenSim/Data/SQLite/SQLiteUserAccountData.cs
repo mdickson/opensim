@@ -26,12 +26,8 @@
  */
 
 using System;
+using System.Data.SQLite;
 using OpenMetaverse;
-#if CSharpSqlite
-    using Community.CsharpSqlite.Sqlite;
-#else
-using Mono.Data.Sqlite;
-#endif
 
 namespace OpenSim.Data.SQLite
 {
@@ -62,7 +58,7 @@ namespace OpenSim.Data.SQLite
             if (words.Length > 2)
                 return new UserAccountData[0];
 
-            using (SqliteCommand cmd = new SqliteCommand())
+            using (var cmd = new SQLiteCommand())
             {
                 if (words.Length == 1)
                 {

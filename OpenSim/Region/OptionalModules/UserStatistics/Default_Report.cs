@@ -25,14 +25,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using Mono.Data.SqliteClient;
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
-using OpenSim.Region.Framework.Scenes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Data.SQLite;
+
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
+using OpenSim.Region.Framework.Scenes;
+
 
 
 namespace OpenSim.Region.UserStatistics
@@ -49,7 +51,7 @@ namespace OpenSim.Region.UserStatistics
 
         public Hashtable ProcessModel(Hashtable pParams)
         {
-            SqliteConnection conn = (SqliteConnection)pParams["DatabaseConnection"];
+            SQLiteConnection conn = (SQLiteConnection)pParams["DatabaseConnection"];
             List<Scene> m_scene = (List<Scene>)pParams["Scenes"];
 
             stats_default_page_values mData = rep_DefaultReport_data(conn, m_scene);
@@ -200,7 +202,7 @@ TD.align_top { vertical-align: top; }
 
 
 
-        public stats_default_page_values rep_DefaultReport_data(SqliteConnection db, List<Scene> m_scene)
+        public stats_default_page_values rep_DefaultReport_data(SQLiteConnection db, List<Scene> m_scene)
         {
             stats_default_page_values returnstruct = new stats_default_page_values();
             returnstruct.all_scenes = m_scene.ToArray();
@@ -210,8 +212,8 @@ TD.align_top { vertical-align: top; }
                                 AVG(avg_sim_fps) as savg_sim_fps, AVG(avg_ping) as sav_ping, SUM(n_out_kb) as num_in_kb,
                                 SUM(n_out_pk) as num_in_packets, SUM(n_in_kb) as num_out_kb, SUM(n_in_pk) as num_out_packets, AVG(mem_use) as sav_mem_use
                                 FROM stats_session_data;";
-                SqliteCommand cmd = new SqliteCommand(SQL, db);
-                SqliteDataReader sdr = cmd.ExecuteReader();
+                var cmd = new SQLiteCommand(SQL, db);
+                var sdr = cmd.ExecuteReader();
                 if (sdr.HasRows)
                 {
                     sdr.Read();

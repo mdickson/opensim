@@ -1,281 +1,34 @@
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
-	<PropertyGroup>
-	  <ProjectType>Local</ProjectType>
-	  <ProductVersion>14.0.23107.0</ProductVersion>
-	  <SchemaVersion>2.0</SchemaVersion>
-	  <ProjectGuid>{798B4867-0000-0000-0000-000000000000}</ProjectGuid>
-	  <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-	  <ApplicationIcon></ApplicationIcon>
-	  <AssemblyKeyContainerName>
-	  </AssemblyKeyContainerName>
-	  <AssemblyName>OpenSim.Region.ScriptEngine.YEngine</AssemblyName>
-	  <DefaultClientScript>JScript</DefaultClientScript>
-	  <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
-	  <DefaultTargetSchema>IE50</DefaultTargetSchema>
-	  <DelaySign>false</DelaySign>
-	  <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-	  <OutputType>Library</OutputType>
-	  <AppDesignerFolder></AppDesignerFolder>
-	  <RootNamespace>OpenSim.Region.ScriptEngine.YEngine</RootNamespace>
-	  <StartupObject></StartupObject>
-	  <StartArguments></StartArguments>
-	  <FileUpgradeFlags>
-	  </FileUpgradeFlags>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-	  <BaseAddress>285212672</BaseAddress>
-	  <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
-	  <ConfigurationOverrideFile>
-	  </ConfigurationOverrideFile>
-	  <DefineConstants>TRACE;DEBUG;</DefineConstants>
-	  <DocumentationFile></DocumentationFile>
-	  <DebugSymbols>True</DebugSymbols>
-	  <FileAlignment>4096</FileAlignment>
-	  <Optimize>False</Optimize>
-	  <OutputPath>..\..\..\..\bin\</OutputPath>
-	  <RegisterForComInterop>False</RegisterForComInterop>
-	  <RemoveIntegerChecks>False</RemoveIntegerChecks>
-	  <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-	  <WarningLevel>4</WarningLevel>
-	  <NoStdLib>False</NoStdLib>
-	  <NoWarn></NoWarn>
-	  <PlatformTarget>AnyCPU</PlatformTarget>
-	  <Prefer32Bit>False</Prefer32Bit>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-	  <BaseAddress>285212672</BaseAddress>
-	  <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
-	  <ConfigurationOverrideFile>
-	  </ConfigurationOverrideFile>
-	  <DefineConstants>TRACE;</DefineConstants>
-	  <DocumentationFile></DocumentationFile>
-	  <DebugSymbols>False</DebugSymbols>
-	  <FileAlignment>4096</FileAlignment>
-	  <Optimize>True</Optimize>
-	  <OutputPath>..\..\..\..\bin\</OutputPath>
-	  <RegisterForComInterop>False</RegisterForComInterop>
-	  <RemoveIntegerChecks>False</RemoveIntegerChecks>
-	  <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-	  <WarningLevel>4</WarningLevel>
-	  <NoStdLib>False</NoStdLib>
-	  <NoWarn></NoWarn>
-	  <PlatformTarget>AnyCPU</PlatformTarget>
-	  <Prefer32Bit>False</Prefer32Bit>
-	</PropertyGroup>
-	<ItemGroup>
-	  <Reference Include="log4net" >
-		  <Name>log4net</Name>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="Mono.Addins" >
-		  <Name>Mono.Addins</Name>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="Nini" >
-		  <Name>Nini</Name>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="OpenMetaverse" >
-		  <Name>OpenMetaverse</Name>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="OpenMetaverse.StructuredData" >
-		  <Name>OpenMetaverse.StructuredData</Name>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="OpenMetaverse.Types" >
-		  <Name>OpenMetaverse.Types</Name>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="System" >
-		  <Name>System</Name>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="System.Drawing" >
-		  <Name>System.Drawing</Name>
-		<Private>False</Private>
-	  </Reference>
-	  <Reference Include="System.Xml" >
-		  <Name>System.Xml</Name>
-		<Private>False</Private>
-	  </Reference>
-	</ItemGroup>
-	<ItemGroup>
-	  <ProjectReference Include="..\..\..\Framework\OpenSim.Framework.csproj">
-		<Name>OpenSim.Framework</Name>
-		<Project>{BCCDBB55-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	  <ProjectReference Include="..\..\..\Framework\Console\OpenSim.Framework.Console.csproj">
-		<Name>OpenSim.Framework.Console</Name>
-		<Project>{0ED8EBE8-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	  <ProjectReference Include="..\..\..\Framework\Monitoring\OpenSim.Framework.Monitoring.csproj">
-		<Name>OpenSim.Framework.Monitoring</Name>
-		<Project>{69AB1BC7-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	  <ProjectReference Include="..\..\ClientStack\Linden\Caps\OpenSim.Region.ClientStack.LindenCaps.csproj">
-		<Name>OpenSim.Region.ClientStack.LindenCaps</Name>
-		<Project>{574BCA63-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	  <ProjectReference Include="..\..\CoreModules\OpenSim.Region.CoreModules.csproj">
-		<Name>OpenSim.Region.CoreModules</Name>
-		<Project>{B60B8DCD-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	  <ProjectReference Include="..\..\Framework\OpenSim.Region.Framework.csproj">
-		<Name>OpenSim.Region.Framework</Name>
-		<Project>{C98F6D97-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	  <ProjectReference Include="..\Shared\OpenSim.Region.ScriptEngine.Shared.csproj">
-		<Name>OpenSim.Region.ScriptEngine.Shared</Name>
-		<Project>{F93F91AD-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	  <ProjectReference Include="..\Shared\Api\Implementation\OpenSim.Region.ScriptEngine.Shared.Api.csproj">
-		<Name>OpenSim.Region.ScriptEngine.Shared.Api</Name>
-		<Project>{C18E3417-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	  <ProjectReference Include="..\Shared\Api\Runtime\OpenSim.Region.ScriptEngine.Shared.Api.Runtime.csproj">
-		<Name>OpenSim.Region.ScriptEngine.Shared.Api.Runtime</Name>
-		<Project>{FC92C9C9-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	  <ProjectReference Include="..\..\..\Services\Interfaces\OpenSim.Services.Interfaces.csproj">
-		<Name>OpenSim.Services.Interfaces</Name>
-		<Project>{08ECE473-0000-0000-0000-000000000000}</Project>
-		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-		<Private>False</Private>
-	  </ProjectReference>
-	</ItemGroup>
-	<ItemGroup>
-	  <Compile Include="MMRDelegateCommon.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRIEventHandlers.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRInternalFuncDict.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRScriptBinOpStr.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRScriptCodeGen.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRScriptCollector.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRScriptCompile.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRScriptCompValu.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRScriptConsts.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRScriptEventCode.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRScriptInlines.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRScriptMyILGen.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRScriptObjCode.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRScriptObjWriter.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRScriptReduce.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRScriptTokenize.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRScriptTypeCast.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="MMRScriptVarDict.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMRArray.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMREngine.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMREngXmrTestLs.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMREvents.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMRHeapTracker.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMRInstAbstract.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMRInstBackend.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMRInstCapture.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMRInstCtor.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMRInstMain.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMRInstMisc.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMRInstQueue.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMRInstRun.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMRObjectTokens.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMRScriptThread.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMRScriptUThread.cs">
-		<SubType>Code</SubType>
-	  </Compile>
-	  <Compile Include="XMRSDTypeClObj.cs">
-		<SubType>Code</SubType>
-	  </Compile>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <TargetFramework>net461</TargetFramework>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="Mono.Addins" Version="1.3.8" />
+    <PackageReference Include="OpenMetaverse" Version="1.0.0" />
   </ItemGroup>
-	<Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-	<PropertyGroup>
-	  <PreBuildEvent>
-	  </PreBuildEvent>
-	  <PostBuildEvent>
-	  </PostBuildEvent>
-	</PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Nini">
+      <HintPath>..\..\..\..\bin\Nini.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Framework\OpenSim.Framework.csproj" />
+    <ProjectReference Include="..\..\..\Framework\Console\OpenSim.Framework.Console.csproj" />
+    <ProjectReference Include="..\..\..\Framework\Monitoring\OpenSim.Framework.Monitoring.csproj" />
+    <ProjectReference Include="..\..\ClientStack\Linden\Caps\OpenSim.Region.ClientStack.LindenCaps.csproj" />
+    <ProjectReference Include="..\..\CoreModules\OpenSim.Region.CoreModules.csproj" />
+    <ProjectReference Include="..\..\Framework\OpenSim.Region.Framework.csproj" />
+    <ProjectReference Include="..\Shared\OpenSim.Region.ScriptEngine.Shared.csproj" />
+    <ProjectReference Include="..\Shared\Api\Implementation\OpenSim.Region.ScriptEngine.Shared.Api.csproj" />
+    <ProjectReference Include="..\Shared\Api\Runtime\OpenSim.Region.ScriptEngine.Shared.Api.Runtime.csproj" />
+    <ProjectReference Include="..\..\..\Services\Interfaces\OpenSim.Services.Interfaces.csproj" />
+  </ItemGroup>
 </Project>
