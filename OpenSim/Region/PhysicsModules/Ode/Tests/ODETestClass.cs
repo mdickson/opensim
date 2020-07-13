@@ -31,6 +31,7 @@ using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.PhysicsModules.SharedBase;
+using OpenSim.Region.PhysicsModule.ODE;
 using OpenSim.Tests.Common;
 using System;
 using System.Reflection;
@@ -44,7 +45,7 @@ namespace OpenSim.Region.PhysicsModule.ODE.Tests
 
         //private OpenSim.Region.PhysicsModule.ODE.OdePlugin cbt;
         private PhysicsScene pScene;
-        private OpenSim.Region.PhysicsModule.ODE.OdeModule odemodule;
+        private OdeModule odemodule;
 
 
         [SetUp]

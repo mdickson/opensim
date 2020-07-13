@@ -43,6 +43,7 @@ using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.PhysicsModule.BasicPhysics;
 using OpenSim.Region.PhysicsModules.SharedBase;
 using OpenSim.Services.Interfaces;
+using OpenSim.Server.Base;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -97,8 +98,7 @@ namespace OpenSim.Tests.Common
 
             m_physicsScene = StartPhysicsScene();
 
-            SimDataService
-                = OpenSim.Server.Base.ServerUtils.LoadPlugin<ISimulationDataService>("OpenSim.Tests.Common.dll", null);
+            SimDataService = ServerUtils.LoadPlugin<ISimulationDataService>("OpenSim.Tests.Common.dll", null);
         }
 
         /// <summary>

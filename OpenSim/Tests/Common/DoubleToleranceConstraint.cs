@@ -72,5 +72,11 @@ namespace OpenSim.Tests.Common
         {
             writer.WriteActualValue(_valueToBeTested);
         }
+
+        public override ConstraintResult ApplyTo<TActual>(TActual actual)
+        {
+            Assert.That(5.05, Is.LessThan(5.0).Within(.05));
+            throw new NotImplementedException();
+        }
     }
 }

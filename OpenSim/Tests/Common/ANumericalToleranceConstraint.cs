@@ -30,27 +30,27 @@ using System;
 
 namespace OpenSim.Tests.Common
 {
-    public abstract class ANumericalToleranceConstraint : Constraint
+    public class ANumericalToleranceConstraint : Constraint
     {
-        protected double _tolerance;
+        private const double _tolerance = 0.0001;
 
-        public ANumericalToleranceConstraint(double tolerance)
+        public ANumericalToleranceConstraint(double tolerance) : base(tolerance)
         {
-            if (tolerance < 0)
-            {
-                throw new ArgumentException("Tolerance cannot be negative.");
-            }
-            _tolerance = tolerance;
         }
 
-        protected bool IsWithinDoubleConstraint(double doubleValue, double baseValue)
+        public override ConstraintResult ApplyTo<TActual>(TActual actual)
         {
-            if (doubleValue >= baseValue - _tolerance && doubleValue <= baseValue + _tolerance)
-            {
-                return true;
-            }
-
-            return false;
+            return NUnit.Framework.Is.EqualTo(Arguments[0]).Within(_tolerance).ApplyTo(actual);
         }
+
+        //protected bool IsWithinDoubleConstraint(double doubleValue, double baseValue)
+        //{
+        //    if (doubleValue >= baseValue - _tolerance && doubleValue <= baseValue + _tolerance)
+        //    {
+        //        return true;
+        //    }
+
+        //    return false;
+        //}
     }
 }
