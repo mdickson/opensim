@@ -212,7 +212,6 @@ namespace OpenSim.Region.CoreModules.World.LightShare
                 return;
 
             scene.EventManager.OnRegisterCaps -= OnRegisterCaps;
-            m_scene = null;
         }
         #endregion
 
