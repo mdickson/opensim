@@ -9,6 +9,9 @@
     <PostBuildEvent />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="PropertyCompareConstraint.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="MySql.Data">
       <HintPath>..\..\..\bin\MySql.Data.dll</HintPath>
       <Private>False</Private>

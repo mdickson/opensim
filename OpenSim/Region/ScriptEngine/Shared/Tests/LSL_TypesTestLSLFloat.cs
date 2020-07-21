@@ -49,7 +49,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
         /// <summary>
         /// Sets up dictionaries and arrays used in the tests.
         /// </summary>
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUpDataSets()
         {
             m_intDoubleSet = new Dictionary<int, double>();
@@ -219,7 +219,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
             foreach (KeyValuePair<int, double> number in m_intDoubleSet)
             {
                 testFloat = new LSL_Types.LSLFloat(number.Key);
-                Assert.That(testFloat.value, new DoubleToleranceConstraint(number.Value, _lowPrecisionTolerance));
+                Assert.That(testFloat.value, Is.EqualTo(number.Value).Within(_lowPrecisionTolerance));
             }
         }
 
@@ -236,7 +236,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
             foreach (KeyValuePair<double, double> number in m_doubleDoubleSet)
             {
                 testFloat = new LSL_Types.LSLFloat(number.Key);
-                Assert.That(testFloat.value, new DoubleToleranceConstraint(number.Value, _lowPrecisionTolerance));
+                Assert.That(testFloat.value, Is.EqualTo(number.Value).Within(_lowPrecisionTolerance));
             }
         }
 
@@ -321,7 +321,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
             foreach (int number in m_intList)
             {
                 testFloat = number;
-                Assert.That(testFloat.value, new DoubleToleranceConstraint(number, _lowPrecisionTolerance));
+                Assert.That(testFloat.value, Is.EqualTo(number).Within(_lowPrecisionTolerance));
             }
         }
 
@@ -338,7 +338,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
             foreach (int number in m_intList)
             {
                 testFloat = new LSL_Types.LSLInteger(number);
-                Assert.That(testFloat.value, new DoubleToleranceConstraint(number, _lowPrecisionTolerance));
+                Assert.That(testFloat.value, Is.EqualTo(number).Within(_lowPrecisionTolerance));
             }
         }
 
@@ -355,7 +355,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
             foreach (int number in m_intList)
             {
                 testFloat = (LSL_Types.LSLFloat)new LSL_Types.LSLInteger(number);
-                Assert.That(testFloat.value, new DoubleToleranceConstraint(number, _lowPrecisionTolerance));
+                Assert.That(testFloat.value, Is.EqualTo(number).Within(_lowPrecisionTolerance));
             }
         }
 
@@ -372,7 +372,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
             foreach (KeyValuePair<string, double> number in m_stringDoubleSet)
             {
                 testFloat = (LSL_Types.LSLFloat)number.Key;
-                Assert.That(testFloat.value, new DoubleToleranceConstraint(number.Value, _lowPrecisionTolerance));
+                Assert.That(testFloat.value, Is.EqualTo(number.Value).Within(_lowPrecisionTolerance));
             }
         }
 
@@ -389,7 +389,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
             foreach (KeyValuePair<string, double> number in m_stringDoubleSet)
             {
                 testFloat = (LSL_Types.LSLFloat)new LSL_Types.LSLString(number.Key);
-                Assert.That(testFloat.value, new DoubleToleranceConstraint(number.Value, _lowPrecisionTolerance));
+                Assert.That(testFloat.value, Is.EqualTo(number.Value).Within(_lowPrecisionTolerance));
             }
         }
 
@@ -406,7 +406,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
             foreach (double number in m_doubleList)
             {
                 testFloat = number;
-                Assert.That(testFloat.value, new DoubleToleranceConstraint(number, _lowPrecisionTolerance));
+                Assert.That(testFloat.value, Is.EqualTo(number).Within(_lowPrecisionTolerance));
             }
         }
 
@@ -426,7 +426,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
                 testFloat = new LSL_Types.LSLFloat(number);
                 testNumber = testFloat;
 
-                Assert.That(testNumber, new DoubleToleranceConstraint(number, _lowPrecisionTolerance));
+                Assert.That(testNumber, Is.EqualTo(number).Within(_lowPrecisionTolerance));
             }
         }
 
@@ -448,7 +448,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
                 numberAsFloat = (float)number;
                 testFloat = (float)testLSLFloat;
 
-                Assert.That((double)testFloat, new DoubleToleranceConstraint((double)numberAsFloat, _lowPrecisionTolerance));
+                Assert.That((double)testFloat, Is.EqualTo((double)numberAsFloat).Within(_lowPrecisionTolerance));
             }
         }
 
@@ -510,13 +510,13 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
                 testFloat = new LSL_Types.LSLFloat(number);
 
                 testNumber = testFloat++;
-                Assert.That(testNumber, new DoubleToleranceConstraint(number, _lowPrecisionTolerance));
+                Assert.That(testNumber, Is.EqualTo(number).Within(_lowPrecisionTolerance));
 
                 testNumber = testFloat;
-                Assert.That(testNumber, new DoubleToleranceConstraint(number + 1.0, _lowPrecisionTolerance));
+                Assert.That(testNumber, Is.EqualTo(number + 1.0).Within(_lowPrecisionTolerance));
 
                 testNumber = ++testFloat;
-                Assert.That(testNumber, new DoubleToleranceConstraint(number + 2.0, _lowPrecisionTolerance));
+                Assert.That(testNumber, Is.EqualTo(number + 2.0).Within(_lowPrecisionTolerance));
             }
         }
 
@@ -536,13 +536,13 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
                 testFloat = new LSL_Types.LSLFloat(number);
 
                 testNumber = testFloat--;
-                Assert.That(testNumber, new DoubleToleranceConstraint(number, _lowPrecisionTolerance));
+                Assert.That(testNumber, Is.EqualTo(number).Within(_lowPrecisionTolerance));
 
                 testNumber = testFloat;
-                Assert.That(testNumber, new DoubleToleranceConstraint(number - 1.0, _lowPrecisionTolerance));
+                Assert.That(testNumber, Is.EqualTo(number - 1.0).Within(_lowPrecisionTolerance));
 
                 testNumber = --testFloat;
-                Assert.That(testNumber, new DoubleToleranceConstraint(number - 2.0, _lowPrecisionTolerance));
+                Assert.That(testNumber, Is.EqualTo(number - 2.0).Within(_lowPrecisionTolerance));
             }
         }
 
@@ -576,7 +576,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
             foreach (KeyValuePair<double, double> number in m_doubleDoubleSet)
             {
                 testResult = new LSL_Types.LSLFloat(number.Key) + new LSL_Types.LSLFloat(number.Value);
-                Assert.That(testResult.value, new DoubleToleranceConstraint(number.Key + number.Value, _lowPrecisionTolerance));
+                Assert.That(testResult.value, Is.EqualTo(number.Key + number.Value).Within(_lowPrecisionTolerance));
             }
         }
 
@@ -593,7 +593,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
             foreach (KeyValuePair<double, double> number in m_doubleDoubleSet)
             {
                 testResult = new LSL_Types.LSLFloat(number.Key) - new LSL_Types.LSLFloat(number.Value);
-                Assert.That(testResult.value, new DoubleToleranceConstraint(number.Key - number.Value, _lowPrecisionTolerance));
+                Assert.That(testResult.value, Is.EqualTo(number.Key - number.Value).Within(_lowPrecisionTolerance));
             }
         }
 
@@ -610,7 +610,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
             foreach (KeyValuePair<double, double> number in m_doubleDoubleSet)
             {
                 testResult = new LSL_Types.LSLFloat(number.Key) * new LSL_Types.LSLFloat(number.Value);
-                Assert.That(testResult.value, new DoubleToleranceConstraint(number.Key * number.Value, _lowPrecisionTolerance));
+                Assert.That(testResult.value, Is.EqualTo(number.Key * number.Value).Within(_lowPrecisionTolerance));
             }
         }
 
@@ -629,7 +629,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
                 if (number.Value != 0.0) // Let's avoid divide by zero.
                 {
                     testResult = new LSL_Types.LSLFloat(number.Key) / new LSL_Types.LSLFloat(number.Value);
-                    Assert.That(testResult.value, new DoubleToleranceConstraint(number.Key / number.Value, _lowPrecisionTolerance));
+                    Assert.That(testResult.value, Is.EqualTo(number.Key / number.Value).Within(_lowPrecisionTolerance));
                 }
             }
         }
@@ -645,16 +645,16 @@ namespace OpenSim.Region.ScriptEngine.Shared.Tests
             LSL_Types.LSLFloat testFloat;
 
             testFloat = (1 == 0);
-            Assert.That(testFloat.value, new DoubleToleranceConstraint(0.0, _lowPrecisionTolerance));
+            Assert.That(testFloat.value, Is.EqualTo(0.0).Within(_lowPrecisionTolerance));
 
             testFloat = (1 == 1);
-            Assert.That(testFloat.value, new DoubleToleranceConstraint(1.0, _lowPrecisionTolerance));
+            Assert.That(testFloat.value, Is.EqualTo(1.0).Within(_lowPrecisionTolerance));
 
             testFloat = false;
-            Assert.That(testFloat.value, new DoubleToleranceConstraint(0.0, _lowPrecisionTolerance));
+            Assert.That(testFloat.value, Is.EqualTo(0.0).Within(_lowPrecisionTolerance));
 
             testFloat = true;
-            Assert.That(testFloat.value, new DoubleToleranceConstraint(1.0, _lowPrecisionTolerance));
+            Assert.That(testFloat.value, Is.EqualTo(1.0).Within(_lowPrecisionTolerance));
         }
     }
 }

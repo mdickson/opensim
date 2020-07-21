@@ -139,7 +139,7 @@ namespace OpenSim.Data.Tests
             db.addInventoryFolder(f1);
             InventoryFolderBase f1a = db.getUserRootFolder(owner1);
             Assert.That(folder1, Is.EqualTo(f1a.ID), "Assert.That(folder1, Is.EqualTo(f1a.ID))");
-            Assert.That(name1, Is.StringMatching(f1a.Name), "Assert.That(name1, Text.Matches(f1a.Name))");
+            Assert.That(name1, Is.EqualTo(f1a.Name), "Assert.That(name1, Is.EqualTo(f1a.Name))");
         }
 
         // we now have the following tree
@@ -290,14 +290,14 @@ namespace OpenSim.Data.Tests
 
             db.addInventoryFolder(f1);
             InventoryFolderBase f1a = db.getUserRootFolder(owner);
-            Assert.That(f1a, Constraints.PropertyCompareConstraint(f1));
+            Assert.That(f1a, Is.EqualTo(f1));
 
             folderScrambler.Scramble(f1a);
 
             db.updateInventoryFolder(f1a);
 
             InventoryFolderBase f1b = db.getUserRootFolder(owner);
-            Assert.That(f1b, Constraints.PropertyCompareConstraint(f1a));
+            Assert.That(f1b, Is.EqualTo(f1a));
 
             //Now we have a valid folder to insert into, we can insert the item.
             PropertyScrambler<InventoryItemBase> inventoryScrambler =
@@ -311,23 +311,25 @@ namespace OpenSim.Data.Tests
             db.addInventoryItem(root);
 
             InventoryItemBase expected = db.getInventoryItem(rootId);
-            Assert.That(expected, Constraints.PropertyCompareConstraint(root)
-                                    .IgnoreProperty(x => x.InvType)
-                                    .IgnoreProperty(x => x.CreatorIdAsUuid)
-                                    .IgnoreProperty(x => x.Description)
-                                    .IgnoreProperty(x => x.CreatorIdentification)
-                                    .IgnoreProperty(x => x.CreatorData));
+            Assert.That(expected, Is.EqualTo(root));
+            //Constraints.PropertyCompareConstraint(root)
+            //                        .IgnoreProperty(x => x.InvType)
+            //                        .IgnoreProperty(x => x.CreatorIdAsUuid)
+            //                        .IgnoreProperty(x => x.Description)
+            //                        .IgnoreProperty(x => x.CreatorIdentification)
+            //                        .IgnoreProperty(x => x.CreatorData));
 
             inventoryScrambler.Scramble(expected);
             db.updateInventoryItem(expected);
 
             InventoryItemBase actual = db.getInventoryItem(rootId);
-            Assert.That(actual, Constraints.PropertyCompareConstraint(expected)
-                                    .IgnoreProperty(x => x.InvType)
-                                    .IgnoreProperty(x => x.CreatorIdAsUuid)
-                                    .IgnoreProperty(x => x.Description)
-                                    .IgnoreProperty(x => x.CreatorIdentification)
-                                    .IgnoreProperty(x => x.CreatorData));
+            Assert.That(actual, Is.EqualTo(expected));
+            //Constraints.PropertyCompareConstraint(expected)
+            //                        .IgnoreProperty(x => x.InvType)
+            //                        .IgnoreProperty(x => x.CreatorIdAsUuid)
+            //                        .IgnoreProperty(x => x.Description)
+            //                        .IgnoreProperty(x => x.CreatorIdentification)
+            //                        .IgnoreProperty(x => x.CreatorData));
         }
 
         [Test]

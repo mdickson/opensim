@@ -48,32 +48,26 @@ namespace OpenSim.Framework.Tests
                 v1 = new Vector3(0, 0, 0);
                 v2 = new Vector3(5, 5, 5);
                 expectedDistance = 8.66;
-                Assert.That(Util.GetDistanceTo(v1, v2),
-                            new DoubleToleranceConstraint(expectedDistance, lowPrecisionTolerance),
-                            "Calculated distance between two vectors was not within tolerances.");
+                Assert.That(Util.GetDistanceTo(v1, v2), Is.EqualTo(expectedDistance).Within(lowPrecisionTolerance));
 
                 expectedMagnitude = 0;
                 Assert.That(Util.GetMagnitude(v1), Is.EqualTo(0), "Magnitude of null vector was not zero.");
 
                 expectedMagnitude = 8.66;
-                Assert.That(Util.GetMagnitude(v2),
-                            new DoubleToleranceConstraint(expectedMagnitude, lowPrecisionTolerance),
-                            "Magnitude of vector was incorrect.");
+                Assert.That(Util.GetMagnitude(v2), Is.EqualTo(expectedMagnitude).Within(lowPrecisionTolerance));
                 /*
                                 TestDelegate d = delegate() { Util.GetNormalizedVector(v1); };
                                 bool causesArgumentException = TestHelpers.AssertThisDelegateCausesArgumentException(d);
                                 Assert.That(causesArgumentException, Is.True,
                                             "Getting magnitude of null vector did not cause argument exception.");
                 */
+
                 Vector3 expectedNormalizedVector = new Vector3(.577f, .577f, .577f);
                 double expectedNormalizedMagnitude = 1;
                 Vector3 normalizedVector = Util.GetNormalizedVector(v2);
-                Assert.That(normalizedVector,
-                            new VectorToleranceConstraint(expectedNormalizedVector, lowPrecisionTolerance),
-                            "Normalized vector generated from vector was not what was expected.");
-                Assert.That(Util.GetMagnitude(normalizedVector),
-                            new DoubleToleranceConstraint(expectedNormalizedMagnitude, lowPrecisionTolerance),
-                            "Normalized vector generated from vector does not have magnitude of 1.");
+                Assert.That(normalizedVector, Is.EqualTo(expectedNormalizedVector).Within(lowPrecisionTolerance));
+
+                Assert.That(Util.GetMagnitude(normalizedVector), Is.EqualTo(expectedNormalizedMagnitude).Within(lowPrecisionTolerance));
             }
 
             //Lets test a simple case of <0,0,0> and <0,0,0>
@@ -81,17 +75,14 @@ namespace OpenSim.Framework.Tests
                 v1 = new Vector3(0, 0, 0);
                 v2 = new Vector3(0, 0, 0);
                 expectedDistance = 0;
-                Assert.That(Util.GetDistanceTo(v1, v2),
-                            new DoubleToleranceConstraint(expectedDistance, lowPrecisionTolerance),
-                            "Calculated distance between two vectors was not within tolerances.");
+                Assert.That(Util.GetDistanceTo(v1, v2), Is.EqualTo(expectedDistance).Within(lowPrecisionTolerance));
 
                 expectedMagnitude = 0;
                 Assert.That(Util.GetMagnitude(v1), Is.EqualTo(0), "Magnitude of null vector was not zero.");
 
                 expectedMagnitude = 0;
-                Assert.That(Util.GetMagnitude(v2),
-                            new DoubleToleranceConstraint(expectedMagnitude, lowPrecisionTolerance),
-                            "Magnitude of vector was incorrect.");
+                Assert.That(Util.GetMagnitude(v2), Is.EqualTo(expectedMagnitude).Within(lowPrecisionTolerance));
+
                 /*
                                 TestDelegate d = delegate() { Util.GetNormalizedVector(v1); };
                                 bool causesArgumentException = TestHelpers.AssertThisDelegateCausesArgumentException(d);
@@ -110,17 +101,14 @@ namespace OpenSim.Framework.Tests
                 v1 = new Vector3(0, 0, 0);
                 v2 = new Vector3(-5, -5, -5);
                 expectedDistance = 8.66;
-                Assert.That(Util.GetDistanceTo(v1, v2),
-                            new DoubleToleranceConstraint(expectedDistance, lowPrecisionTolerance),
-                            "Calculated distance between two vectors was not within tolerances.");
+                Assert.That(Util.GetDistanceTo(v1, v2), Is.EqualTo(expectedDistance).Within(lowPrecisionTolerance));
 
                 expectedMagnitude = 0;
                 Assert.That(Util.GetMagnitude(v1), Is.EqualTo(0), "Magnitude of null vector was not zero.");
 
                 expectedMagnitude = 8.66;
-                Assert.That(Util.GetMagnitude(v2),
-                            new DoubleToleranceConstraint(expectedMagnitude, lowPrecisionTolerance),
-                            "Magnitude of vector was incorrect.");
+                Assert.That(Util.GetMagnitude(v2), Is.EqualTo(expectedMagnitude).Within(lowPrecisionTolerance));
+
                 /*
                                 TestDelegate d = delegate() { Util.GetNormalizedVector(v1); };
                                 bool causesArgumentException = TestHelpers.AssertThisDelegateCausesArgumentException(d);
@@ -130,12 +118,9 @@ namespace OpenSim.Framework.Tests
                 Vector3 expectedNormalizedVector = new Vector3(-.577f, -.577f, -.577f);
                 double expectedNormalizedMagnitude = 1;
                 Vector3 normalizedVector = Util.GetNormalizedVector(v2);
-                Assert.That(normalizedVector,
-                            new VectorToleranceConstraint(expectedNormalizedVector, lowPrecisionTolerance),
-                            "Normalized vector generated from vector was not what was expected.");
-                Assert.That(Util.GetMagnitude(normalizedVector),
-                            new DoubleToleranceConstraint(expectedNormalizedMagnitude, lowPrecisionTolerance),
-                            "Normalized vector generated from vector does not have magnitude of 1.");
+                Assert.That(normalizedVector, Is.EqualTo(expectedNormalizedVector).Within(lowPrecisionTolerance));
+
+                Assert.That(Util.GetMagnitude(normalizedVector), Is.EqualTo(expectedNormalizedMagnitude).Within(lowPrecisionTolerance));
             }
         }
 

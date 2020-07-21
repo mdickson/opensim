@@ -29,7 +29,9 @@ using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.PhysicsModules.SharedBase;
+using OpenSim.Region.PhysicsModule.Meshing;
 using System.Collections.Generic;
 using System.IO;
 
@@ -78,9 +80,9 @@ namespace OpenSim.Region.PhysicsModule.BulletS.Tests
             RegionInfo info = new RegionInfo();
             info.RegionName = "BSTestRegion";
             info.RegionSizeX = info.RegionSizeY = info.RegionSizeZ = Constants.RegionSize;
-            OpenSim.Region.Framework.Scenes.Scene scene = new OpenSim.Region.Framework.Scenes.Scene(info);
+            Scene scene = new Scene(info);
 
-            IMesher mesher = new OpenSim.Region.PhysicsModule.Meshing.Meshmerizer();
+            IMesher mesher = new Meshmerizer();
             INonSharedRegionModule mod = mesher as INonSharedRegionModule;
             mod.Initialise(openSimINI);
             mod.AddRegion(scene);

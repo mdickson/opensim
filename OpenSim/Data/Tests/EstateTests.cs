@@ -25,8 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using Mono.Data.Sqlite;
-// DBMS-specific:
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using OpenMetaverse;
@@ -35,11 +33,12 @@ using OpenSim.Data.SQLite;
 using OpenSim.Framework;
 using OpenSim.Tests.Common;
 using System.Data.Common;
+using System.Data.SQLite;
 
 namespace OpenSim.Data.Tests
 {
     [TestFixture(Description = "Estate store tests (SQLite)")]
-    public class SQLiteEstateTests : EstateTests<SqliteConnection, SQLiteEstateStore>
+    public class SQLiteEstateTests : EstateTests<SQLiteConnection, SQLiteEstateStore>
     {
     }
 
@@ -205,7 +204,7 @@ namespace OpenSim.Data.Tests
             EstateSettings loadedSettings = db.LoadEstateSettings(REGION_ID, true);
 
             // Checking that loaded values are correct.
-            Assert.That(loadedSettings, Constraints.PropertyCompareConstraint(originalSettings));
+            Assert.That(loadedSettings, Is.EqualTo(originalSettings));
         }
 
         [Test]

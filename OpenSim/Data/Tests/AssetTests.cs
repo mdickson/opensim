@@ -25,8 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using Mono.Data.Sqlite;
-// DBMS-specific:
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using OpenMetaverse;
@@ -36,11 +34,12 @@ using OpenSim.Framework;
 using OpenSim.Tests.Common;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data.SQLite;
 
 namespace OpenSim.Data.Tests
 {
     [TestFixture(Description = "Asset store tests (SQLite)")]
-    public class SQLiteAssetTests : AssetTests<SqliteConnection, SQLiteAssetData>
+    public class SQLiteAssetTests : AssetTests<SQLiteConnection, SQLiteAssetData>
     {
     }
 
@@ -125,15 +124,15 @@ namespace OpenSim.Data.Tests
 
             AssetBase a1a = m_db.GetAsset(uuid1);
             a1a.UploadAttempts = 0;
-            Assert.That(a1a, Constraints.PropertyCompareConstraint(a1));
+            Assert.That(a1a, Is.EqualTo(a1));
 
             AssetBase a2a = m_db.GetAsset(uuid2);
             a2a.UploadAttempts = 0;
-            Assert.That(a2a, Constraints.PropertyCompareConstraint(a2));
+            Assert.That(a2a, Is.EqualTo(a2));
 
             AssetBase a3a = m_db.GetAsset(uuid3);
             a3a.UploadAttempts = 0;
-            Assert.That(a3a, Constraints.PropertyCompareConstraint(a3));
+            Assert.That(a3a, Is.EqualTo(a3));
 
             scrambler.Scramble(a1a);
             scrambler.Scramble(a2a);
@@ -148,15 +147,15 @@ namespace OpenSim.Data.Tests
 
             AssetBase a1b = m_db.GetAsset(uuid1);
             a1b.UploadAttempts = 0;
-            Assert.That(a1b, Constraints.PropertyCompareConstraint(a1a));
+            Assert.That(a1b, Is.EqualTo(a1a));
 
             AssetBase a2b = m_db.GetAsset(uuid2);
             a2b.UploadAttempts = 0;
-            Assert.That(a2b, Constraints.PropertyCompareConstraint(a2a));
+            Assert.That(a2b, Is.EqualTo(a2a));
 
             AssetBase a3b = m_db.GetAsset(uuid3);
             a3b.UploadAttempts = 0;
-            Assert.That(a3b, Constraints.PropertyCompareConstraint(a3a));
+            Assert.That(a3b, Is.EqualTo(a3a));
 
             bool[] exist = m_db.AssetsExist(new[] { uuid1, uuid2, uuid3 });
             Assert.IsTrue(exist[0]);
@@ -204,15 +203,15 @@ namespace OpenSim.Data.Tests
 
             AssetBase a1a = m_db.GetAsset(uuid1);
             a1a.UploadAttempts = 0;
-            Assert.That(a1a, Constraints.PropertyCompareConstraint(a1));
+            Assert.That(a1a, Is.EqualTo(a1));
 
             AssetBase a2a = m_db.GetAsset(uuid2);
             a2a.UploadAttempts = 0;
-            Assert.That(a2a, Constraints.PropertyCompareConstraint(a2));
+            Assert.That(a2a, Is.EqualTo(a2));
 
             AssetBase a3a = m_db.GetAsset(uuid3);
             a3a.UploadAttempts = 0;
-            Assert.That(a3a, Constraints.PropertyCompareConstraint(a3));
+            Assert.That(a3a, Is.EqualTo(a3));
         }
     }
 }

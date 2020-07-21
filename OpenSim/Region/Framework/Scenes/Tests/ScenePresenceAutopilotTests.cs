@@ -37,14 +37,14 @@ namespace OpenSim.Region.Framework.Scenes.Tests
     {
         private TestScene m_scene;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void FixtureInit()
         {
             // Don't allow tests to be bamboozled by asynchronous events.  Execute everything on the same thread.
             Util.FireAndForgetMethod = FireAndForgetMethod.None;
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void TearDown()
         {
             // We must set this back afterwards, otherwise later tests will fail since they're expecting multiple
@@ -79,8 +79,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
             sp.MoveToTarget(targetPos, false, false, false);
 
             Assert.That(sp.AbsolutePosition, Is.EqualTo(startPos));
-            Assert.That(
-                sp.Rotation, new QuaternionToleranceConstraint(new Quaternion(0, 0, 0.7071068f, 0.7071068f), 0.000001));
+            Assert.That(sp.Rotation, Is.EqualTo(new Quaternion(0, 0, 0.7071068f, 0.7071068f)).Within(0.000001));
 
             m_scene.Update(1);
 
@@ -103,8 +102,7 @@ namespace OpenSim.Region.Framework.Scenes.Tests
             sp.MoveToTarget(targetPos, false, false, false);
 
             Assert.That(sp.AbsolutePosition, Is.EqualTo(startPos));
-            Assert.That(
-                sp.Rotation, new QuaternionToleranceConstraint(new Quaternion(0, 0, 0, 1), 0.000001));
+            Assert.That(sp.Rotation, Is.EqualTo(new Quaternion(0, 0, 0, 1)).Within(0.000001));
 
             m_scene.Update(1);
 

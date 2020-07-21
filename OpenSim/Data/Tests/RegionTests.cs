@@ -25,8 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using Mono.Data.Sqlite;
-// DBMS-specific:
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using OpenMetaverse;
@@ -39,6 +37,7 @@ using OpenSim.Tests.Common;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data.SQLite;
 using System.Drawing;
 using System.Text;
 using System.Threading;
@@ -46,7 +45,7 @@ using System.Threading;
 namespace OpenSim.Data.Tests
 {
     [TestFixture(Description = "Region store tests (SQLite)")]
-    public class SQLiteRegionTests : RegionTests<SqliteConnection, SQLiteSimulationData>
+    public class SQLiteRegionTests : RegionTests<SQLiteConnection, SQLiteSimulationData>
     {
     }
 
@@ -612,15 +611,16 @@ namespace OpenSim.Data.Tests
             SceneObjectPart[] newparts = newsog.Parts;
             Assert.That(newparts.Length, Is.EqualTo(4), "Assert.That(newparts.Length,Is.EqualTo(4))");
 
-            Assert.That(newsog, Constraints.PropertyCompareConstraint(sog)
-                .IgnoreProperty(x => x.LocalId)
-                .IgnoreProperty(x => x.HasGroupChanged)
-                .IgnoreProperty(x => x.IsSelected)
-                .IgnoreProperty(x => x.RegionHandle)
-                .IgnoreProperty(x => x.RegionUUID)
-                .IgnoreProperty(x => x.Scene)
-                .IgnoreProperty(x => x.Parts)
-                .IgnoreProperty(x => x.RootPart));
+            Assert.That(newsog, Is.EqualTo(sog));
+
+                //.IgnoreProperty(x => x.LocalId)
+                //.IgnoreProperty(x => x.HasGroupChanged)
+                //.IgnoreProperty(x => x.IsSelected)
+                //.IgnoreProperty(x => x.RegionHandle)
+                //.IgnoreProperty(x => x.RegionUUID)
+                //.IgnoreProperty(x => x.Scene)
+                //.IgnoreProperty(x => x.Parts)
+                //.IgnoreProperty(x => x.RootPart));
         }
 
 

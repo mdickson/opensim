@@ -30,6 +30,7 @@ using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Framework;
+using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.PhysicsModules.SharedBase;
 using OpenSim.Region.PhysicsModule.ODE;
 using OpenSim.Tests.Common;
@@ -63,7 +64,7 @@ namespace OpenSim.Region.PhysicsModule.ODE.Tests
             RegionInfo info = new RegionInfo();
             info.RegionName = "ODETestRegion";
             info.RegionSizeX = info.RegionSizeY = info.RegionSizeZ = Constants.RegionSize;
-            OpenSim.Region.Framework.Scenes.Scene scene = new OpenSim.Region.Framework.Scenes.Scene(info);
+            Scene scene = new Scene(info);
 
             //IMesher mesher = new OpenSim.Region.PhysicsModule.Meshing.Meshmerizer();
             //INonSharedRegionModule mod = mesher as INonSharedRegionModule;
@@ -72,7 +73,7 @@ namespace OpenSim.Region.PhysicsModule.ODE.Tests
             //mod.RegionLoaded(scene);
 
             //            pScene = new OdeScene();
-            odemodule = new OpenSim.Region.PhysicsModule.ODE.OdeModule();
+            odemodule = new OdeModule();
             Console.WriteLine("HERE " + (odemodule == null ? "Null" : "Not null"));
             odemodule.Initialise(openSimINI);
             odemodule.AddRegion(scene);
