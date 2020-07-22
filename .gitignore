@@ -22,7 +22,8 @@ packages/
 obj/
 .vs/
 .vscode/
-bin/Debug/*.dll
+bin/Release
+bin/Debug
 bin/*.dll.mdb
 bin/*.db
 bin/*.db-journal

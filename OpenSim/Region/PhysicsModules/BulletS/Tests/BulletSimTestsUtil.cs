@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
@@ -34,6 +33,7 @@ using OpenSim.Region.PhysicsModules.SharedBase;
 using OpenSim.Region.PhysicsModule.Meshing;
 using System.Collections.Generic;
 using System.IO;
+using Nini.Config;
 
 namespace OpenSim.Region.PhysicsModule.BulletS.Tests
 {
