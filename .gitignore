@@ -11,6 +11,8 @@
 *.dll
 *.log
 
+launchSettings.json
+
 packages/
 
 # Ignore .user and .suo files as these are user preference specific
@@ -18,6 +20,9 @@ packages/
 *.suo
 *.user
 *.VisualState.xml
+
+config/*
+logs/*
 
 obj/
 .vs/
