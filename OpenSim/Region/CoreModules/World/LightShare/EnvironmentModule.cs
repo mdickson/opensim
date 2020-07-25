@@ -582,7 +582,7 @@ namespace OpenSim.Region.CoreModules.World.LightShare
                     goto Error;
                 }
 
-                if (!m_scene.Permissions.CanEditParcelProperties(agentID, lchannel, (GroupPowers.AllowEnvironment | GroupPowers.LandEdit), true)) // wrong
+                if (!m_scene.Permissions.CanEditParcelProperties(agentID, lchannel, GroupPowers.AllowEnvironment, true)) // wrong
                 {
                     message = "No permission to change parcel environment";
                     goto Error;
@@ -593,16 +593,16 @@ namespace OpenSim.Region.CoreModules.World.LightShare
             try
             {
                 OSD req = OSDParser.Deserialize(httpRequest.InputStream);
-                if(req is OpenMetaverse.StructuredData.OSDMap)
+                if(req is OSDMap)
                 {
-                    OSDMap map = req as OpenMetaverse.StructuredData.OSDMap;
+                    OSDMap map = req as OSDMap;
                     if(map.TryGetValue("environment", out OSD env))
                     {
                         if (VEnv == null)
                             // need a proper clone
                             VEnv = m_DefaultEnv.Clone();
 
-                        OSDMap evmap = (OSDMap)env;
+                        OSDMap evmap = env as OSDMap;
                         if(evmap.TryGetValue("day_asset", out OSD tmp) && !evmap.ContainsKey("day_cycle"))
                         {
                             string id = tmp.AsString();
@@ -615,7 +615,11 @@ namespace OpenSim.Region.CoreModules.World.LightShare
                             try
                             {
                                 OSD oenv = OSDParser.Deserialize(asset.Data);
-                                VEnv.CycleFromOSD(oenv);
+                                evmap.TryGetValue("day_name", out tmp);
+                                if(tmp is OSDString)
+                                    VEnv.FromAssetOSD(tmp.AsString(), oenv);
+                                else
+                                    VEnv.FromAssetOSD(null, oenv);
                             }
                             catch
                             {
@@ -623,7 +627,9 @@ namespace OpenSim.Region.CoreModules.World.LightShare
                                 return;
                             }
                         }
-                        VEnv.FromOSD(env);
+                        else
+                            VEnv.FromOSD(env);
+
                         if(lchannel == null)
                         {
                             StoreOnRegion(VEnv);

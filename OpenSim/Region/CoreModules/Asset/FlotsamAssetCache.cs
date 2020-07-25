@@ -28,6 +28,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -50,6 +51,12 @@ namespace OpenSim.Region.CoreModules.Asset
     [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "FlotsamAssetCache")]
     public class FlotsamAssetCache : ISharedRegionModule, IAssetCache, IAssetService
     {
+        private struct WriteAssetInfo
+        {
+            public string filename;
+            public AssetBase asset;
+        }
+
         private static readonly ILog m_log = LogManager.GetLogger( MethodBase.GetCurrentMethod().DeclaringType);
 
         private bool m_Enabled;
@@ -73,6 +80,8 @@ namespace OpenSim.Region.CoreModules.Asset
         private ulong m_weakRefHits;
 
         private static HashSet<string> m_CurrentlyWriting = new HashSet<string>();
+        private static BlockingCollection<WriteAssetInfo> m_assetFileWriteQueue = null;
+        private static CancellationTokenSource m_cancelSource;
 
         private bool m_FileCacheEnabled = true;
 
@@ -99,10 +108,10 @@ namespace OpenSim.Region.CoreModules.Asset
 
         private IAssetService m_AssetService;
         private List<Scene> m_Scenes = new List<Scene>();
-        private object timerLock = new object();
+        private readonly object timerLock = new object();
 
-        private Dictionary<string, WeakReference> weakAssetReferences = new Dictionary<string, WeakReference>();
-        private object weakAssetReferencesLock = new object();
+        private Dictionary<string,WeakReference> weakAssetReferences = new Dictionary<string, WeakReference>();
+        private readonly object weakAssetReferencesLock = new object();
         private bool m_updateFileTimeOnCacheHit = false;
 
         public FlotsamAssetCache()
@@ -112,8 +121,6 @@ namespace OpenSim.Region.CoreModules.Asset
             invalidChars.AddRange(Path.GetInvalidFileNameChars());
             m_InvalidChars = invalidChars.ToArray();
         }
-
-        private static JobEngine m_DiskWriterEngine = null;
 
         public Type ReplaceableInterface
         {
@@ -216,6 +223,19 @@ namespace OpenSim.Region.CoreModules.Asset
 
         public void Close()
         {
+            if(m_Scenes.Count <= 0)
+            {
+                if (m_assetFileWriteQueue != null)
+                {
+                    m_assetFileWriteQueue.Dispose();
+                    m_assetFileWriteQueue = null;
+                }
+                if(m_cancelSource != null)
+                {
+                    m_cancelSource.Dispose();
+                    m_cancelSource = null;
+                }
+            }
         }
 
         public void AddRegion(Scene scene)
@@ -235,13 +255,16 @@ namespace OpenSim.Region.CoreModules.Asset
                 m_Scenes.Remove(scene);
                 lock (timerLock)
                 {
-                    if (m_timerRunning && m_Scenes.Count <= 0)
+                    if(m_Scenes.Count <= 0)
                     {
-                        m_timerRunning = false;
-                        m_CacheCleanTimer.Stop();
-                        m_CacheCleanTimer.Close();
-                        if (m_FileCacheEnabled && m_DiskWriterEngine != null && m_DiskWriterEngine.IsRunning)
-                            m_DiskWriterEngine.Stop();
+                        if (m_timerRunning)
+                        {
+                            m_timerRunning = false;
+                            m_CacheCleanTimer.Stop();
+                            m_CacheCleanTimer.Close();
+                        }
+                        if (m_FileCacheEnabled && m_assetFileWriteQueue != null)
+                            m_cancelSource.Cancel();
                     }
                 }
             }
@@ -259,21 +282,40 @@ namespace OpenSim.Region.CoreModules.Asset
                     {
                         if (m_FileCacheEnabled && (m_FileExpiration > TimeSpan.Zero) && (m_FileExpirationCleanupTimer > TimeSpan.Zero))
                         {
-                            m_CacheCleanTimer = new System.Timers.Timer(m_FileExpirationCleanupTimer.TotalMilliseconds);
-                            m_CacheCleanTimer.AutoReset = false;
+                            m_CacheCleanTimer = new System.Timers.Timer(m_FileExpirationCleanupTimer.TotalMilliseconds)
+                            {
+                                AutoReset = false
+                            };
                             m_CacheCleanTimer.Elapsed += CleanupExpiredFiles;
                             m_CacheCleanTimer.Start();
                             m_timerRunning = true;
                         }
                     }
 
-                    if(m_DiskWriterEngine == null)
+                    if (m_FileCacheEnabled && m_assetFileWriteQueue == null)
                     {
-                        m_DiskWriterEngine = new JobEngine("FlotsamWriter", "FlotsamWriter");
-                        m_DiskWriterEngine.Start();
+                        m_assetFileWriteQueue = new BlockingCollection<WriteAssetInfo>();
+                        m_cancelSource = new CancellationTokenSource();
+                        WorkManager.RunInThreadPool(ProcessWrites, null, "FloatsamCacheWriter", false);
                     }
                 }
             }
+        }
+
+        private void ProcessWrites(object o)
+        {
+            try
+            {
+                while(true)
+                {
+                    if(m_assetFileWriteQueue.TryTake(out WriteAssetInfo wai,-1, m_cancelSource.Token))
+                    {
+                        WriteFileCache(wai.filename,wai.asset,false);
+                        wai.asset = null;
+                    }
+                }
+            }
+            catch{ }
         }
 
         ////////////////////////////////////////////////////////////
@@ -281,10 +323,9 @@ namespace OpenSim.Region.CoreModules.Asset
         //
         private void UpdateWeakReference(string key, AssetBase asset)
         {
-            WeakReference aref;
             lock(weakAssetReferencesLock)
             {
-                if(weakAssetReferences.TryGetValue(key , out aref))
+                if(weakAssetReferences.TryGetValue(key , out WeakReference aref))
                     aref.Target = asset;
                 else
                     weakAssetReferences[key] = new WeakReference(asset);
@@ -299,6 +340,9 @@ namespace OpenSim.Region.CoreModules.Asset
 
         private void UpdateFileCache(string key, AssetBase asset, bool replace = false)
         {
+            if(m_assetFileWriteQueue == null)
+                return;
+
             string filename = GetFileName(key);
 
             try
@@ -320,8 +364,14 @@ namespace OpenSim.Region.CoreModules.Asset
                         m_CurrentlyWriting.Add(filename);
                 }
 
-                // weakreferences should hold and return the asset while async write happens
-                m_DiskWriterEngine?.QueueJob("", delegate { WriteFileCache(filename, asset, replace); });
+                WriteAssetInfo wai = new WriteAssetInfo()
+                {
+                    filename = filename,
+                    asset = asset
+                };
+
+                if (m_assetFileWriteQueue != null)
+                    m_assetFileWriteQueue.Add(wai);
             }
             catch (Exception e)
             {
@@ -405,12 +455,12 @@ namespace OpenSim.Region.CoreModules.Asset
         /// <returns></returns>
         private AssetBase GetFromMemoryCache(string id)
         {
-            AssetBase asset = null;
-
-            if (m_MemoryCache.TryGetValue(id, out asset))
+            if (m_MemoryCache.TryGetValue(id, out AssetBase asset))
+            {
                 m_MemoryHits++;
-
-            return asset;
+                return asset;
+            }
+            return null;
         }
 
         private bool CheckFromMemoryCache(string id)
@@ -505,8 +555,7 @@ namespace OpenSim.Region.CoreModules.Asset
         // For IAssetService
         public AssetBase Get(string id)
         {
-            AssetBase asset;
-            Get(id, out asset);
+            Get(id, out AssetBase asset);
             return asset;
         }
 
@@ -516,8 +565,7 @@ namespace OpenSim.Region.CoreModules.Asset
 
             m_Requests++;
 
-            object dummy;
-            if (m_negativeCache.TryGetValue(id, out dummy))
+            if (m_negativeCache.TryGetValue(id, out object dummy))
             {
                 return false;
             }
@@ -575,8 +623,7 @@ namespace OpenSim.Region.CoreModules.Asset
 
         public AssetBase GetCached(string id)
         {
-            AssetBase asset;
-            Get(id, out asset);
+            Get(id, out AssetBase asset);
             return asset;
         }
 
@@ -909,28 +956,31 @@ namespace OpenSim.Region.CoreModules.Asset
                 gatherer.AddGathered(s.RegionInfo.RegionSettings.TerrainTexture4, (sbyte)AssetType.Texture);
                 gatherer.AddGathered(s.RegionInfo.RegionSettings.TerrainImageID, (sbyte)AssetType.Texture);
 
-                s.ForEachSOG(delegate (SceneObjectGroup e)
+                EntityBase[] entities = s.Entities.GetEntities();
+                for (int i = 0; i < entities.Length; ++i)
                 {
-                    if(!m_timerRunning && !tryGetUncached || e.IsDeleted)
-                        return;
+                    if (!m_timerRunning && !tryGetUncached)
+                        break;
 
-                    gatherer.AddForInspection(e);
-                    gatherer.GatherAll();
+                    EntityBase entity = entities[i];
+                    if(entity is SceneObjectGroup)
+                    {
+                        SceneObjectGroup e = entity as SceneObjectGroup;
+                        if(e.IsDeleted)
+                            continue;
 
-                    if (++cooldown > 200)
-                    {
-                        GC.Collect();
-                        gatherer.AssetGetCount = 0;
-                        Thread.Sleep(50);
-                        cooldown = 0;
+                        gatherer.AddForInspection(e);
+                        gatherer.GatherAll();
+
+                        if (++cooldown > 200)
+                        {
+                            Thread.Sleep(50);
+                            cooldown = 0;
+                        }
                     }
-                    else if(gatherer.AssetGetCount > 200)
-                    {
-                        GC.Collect();
-                        gatherer.AssetGetCount = 0;
-                    }
-                });
-                if(!m_timerRunning && !tryGetUncached)
+                }
+                entities = null;
+                if (!m_timerRunning && !tryGetUncached)
                     break;
             }
 
@@ -943,13 +993,11 @@ namespace OpenSim.Region.CoreModules.Asset
                 string idstr = id.ToString();
                 if(!UpdateFileLastAccessTime(GetFileName(idstr)) && tryGetUncached)
                 {
-                    cooldown += 50;
+                    cooldown += 10;
                     m_AssetService.Get(idstr);
                 }
-                if (++cooldown > 500)
+                if (++cooldown > 100)
                 {
-                    if(tryGetUncached)
-                        GC.Collect();
                     Thread.Sleep(50);
                     cooldown = 0;
                 }
@@ -959,8 +1007,8 @@ namespace OpenSim.Region.CoreModules.Asset
             gatherer.GatheredUuids.Clear();
             gatherer.FailedUUIDs.Clear();
             gatherer.UncertainAssetsUUIDs.Clear();
+            gatherer = null;
 
-            GC.Collect();
             return count;
         }
 
@@ -1248,8 +1296,7 @@ namespace OpenSim.Region.CoreModules.Asset
 
         public AssetMetadata GetMetadata(string id)
         {
-            AssetBase asset;
-            Get(id, out asset);
+            Get(id, out AssetBase asset);
             if (asset == null)
                 return null;
             return asset.Metadata;
@@ -1257,8 +1304,7 @@ namespace OpenSim.Region.CoreModules.Asset
 
         public byte[] GetData(string id)
         {
-            AssetBase asset;
-            Get(id, out asset);
+            Get(id, out AssetBase asset);
             if (asset == null)
                 return null;
             return asset.Data;
@@ -1266,8 +1312,7 @@ namespace OpenSim.Region.CoreModules.Asset
 
         public bool Get(string id, object sender, AssetRetrieved handler)
         {
-            AssetBase asset;
-            if (!Get(id, out asset))
+            if (!Get(id, out AssetBase asset))
                 return false;
             handler(id, sender, asset);
             return true;
@@ -1299,8 +1344,7 @@ namespace OpenSim.Region.CoreModules.Asset
 
         public bool UpdateContent(string id, byte[] data)
         {
-            AssetBase asset;
-            if (!Get(id, out asset))
+            if (!Get(id, out AssetBase asset))
                 return false;
             asset.Data = data;
             Cache(asset, true);

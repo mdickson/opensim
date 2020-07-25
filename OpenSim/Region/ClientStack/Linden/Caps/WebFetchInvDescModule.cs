@@ -37,6 +37,7 @@ using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Capabilities.Handlers;
+using OpenSim.Framework;
 using OpenSim.Framework.Monitoring;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenSim.Region.Framework.Interfaces;
@@ -44,6 +45,7 @@ using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
 
 using Caps = OpenSim.Framework.Capabilities.Caps;
+
 
 namespace OpenSim.Region.ClientStack.Linden
 {
@@ -87,6 +89,7 @@ namespace OpenSim.Region.ClientStack.Linden
         private ILibraryService m_LibraryService;
 
         private bool m_Enabled;
+        private ExpiringKey<UUID> m_badRequests;
 
         private string m_fetchInventoryDescendents2Url;
         //        private string m_webFetchInventoryDescendentsUrl;
@@ -190,6 +193,9 @@ namespace OpenSim.Region.ClientStack.Linden
 
             Scene.EventManager.OnRegisterCaps += RegisterCaps;
 
+            if(m_badRequests == null)
+                m_badRequests = new ExpiringKey<UUID>(30000);
+
             m_NumberScenes++;
 
             int nworkers = 2; // was 2
@@ -228,6 +234,8 @@ namespace OpenSim.Region.ClientStack.Linden
                         Watchdog.AbortThread(t.ManagedThreadId);
 
                     m_workerThreads = null;
+                    m_badRequests.Dispose();
+                    m_badRequests = null;
                 }
             }
             //            m_queue.Dispose();
@@ -328,7 +336,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 }
 
                 OSHttpResponse osresponse = new OSHttpResponse(requestinfo.request);
-                m_webFetchHandler.FetchInventoryDescendentsRequest(requestinfo.request, osresponse);
+                m_webFetchHandler.FetchInventoryDescendentsRequest(requestinfo.request, osresponse, m_module.m_badRequests);
                 requestinfo.request.InputStream.Dispose();
 
                 lock (responses)
