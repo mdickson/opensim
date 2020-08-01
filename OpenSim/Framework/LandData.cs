@@ -730,6 +730,11 @@ namespace OpenSim.Framework
             }
         }
 
+        public int EnvironmentVersion = -1;
+
+        [XmlIgnore] //this needs to be added by hand
+        public ViewerEnvironment Environment { get; set;}
+
         public LandData()
         {
             _globalID = UUID.Random();
@@ -737,6 +742,8 @@ namespace OpenSim.Framework
             AnyAVSounds = true;
             GroupAVSounds = true;
             LastDwellTimeMS = Util.GetTimeStampMS();
+            EnvironmentVersion = -1;
+            Environment = null;
         }
 
         /// <summary>
@@ -800,6 +807,17 @@ namespace OpenSim.Framework
                 newEntry.Expires = entry.Expires;
 
                 landData._parcelAccessList.Add(newEntry);
+            }
+
+            if (Environment == null)
+            {
+                landData.Environment = null;
+                landData.EnvironmentVersion = -1;
+            }
+            else
+            {
+                landData.Environment = Environment.Clone();
+                landData.EnvironmentVersion = EnvironmentVersion;
             }
 
             return landData;

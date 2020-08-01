@@ -25,12 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenMetaverse;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
+using log4net;
+using OpenMetaverse;
 
 namespace OpenSim.Framework.Serialization.External
 {
@@ -97,7 +98,10 @@ namespace OpenSim.Framework.Serialization.External
                 "ParcelAccessList", ProcessParcelAccessList);
 
             m_ldProcessors.Add(
-                "PassHours", (ld, xtr) => ld.PassHours = Convert.ToSingle(xtr.ReadElementString("PassHours")));
+                "Environment", ProcessParcelEnvironment);
+
+            m_ldProcessors.Add(
+                "PassHours",        (ld, xtr) => ld.PassHours = Convert.ToSingle(xtr.ReadElementString("PassHours")));
             m_ldProcessors.Add(
                 "PassPrice", (ld, xtr) => ld.PassPrice = Convert.ToInt32(xtr.ReadElementString("PassPrice")));
             m_ldProcessors.Add(
@@ -128,7 +132,15 @@ namespace OpenSim.Framework.Serialization.External
                 }
             );
             m_laeProcessors.Add(
-                "AccessList", (lae, xtr) => lae.Flags = (AccessList)Convert.ToUInt32(xtr.ReadElementString("AccessList")));
+                "AccessList",       (lae, xtr) => lae.Flags = (AccessList)Convert.ToUInt32(xtr.ReadElementString("AccessList")));
+
+        }
+
+        public static void ProcessParcelEnvironment(LandData ld, XmlReader xtr)
+        {
+            string senv = xtr.ReadElementString("Environment");
+            ld.Environment = ViewerEnvironment.FromOSDString(senv);
+            ld.EnvironmentVersion = ld.Environment.version;
         }
 
         public static void ProcessParcelAccessList(LandData ld, XmlReader xtr)
@@ -252,6 +264,15 @@ namespace OpenSim.Framework.Serialization.External
             xtw.WriteElementString("Dwell", "0");
             xtw.WriteElementString("OtherCleanTime", Convert.ToString(landData.OtherCleanTime));
 
+            if(landData.Environment != null)
+            {
+                try
+                {
+                    string senv = ViewerEnvironment.ToOSDString(landData.Environment);
+                    xtw.WriteElementString("Environment", senv);
+                }
+                catch { }
+            }
             xtw.WriteEndElement();
 
             xtw.Close();
