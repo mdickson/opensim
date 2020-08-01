@@ -246,7 +246,6 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
         public AssetMetadata GetMetadata(string id)
         {
             AssetBase asset = null;
-
             if (m_Cache != null)
             {
                 if (!m_Cache.Get(id, out asset))
@@ -298,7 +297,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
 
             if (asset != null)
             {
-                Util.FireAndForget(delegate { handler(id, sender, asset); }, null, "HGAssetBroker.GotFromCache");
+                Util.FireAndForget(delegate { handler(id, sender, asset); asset = null; }, null, "HGAssetBroker.GotFromCache");
                 return true;
             }
 
@@ -309,6 +308,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
                     if (m_Cache != null)
                         m_Cache.Cache(a);
                     handler(assetID, s, a);
+                    a = null;
                 });
             }
             else
@@ -318,6 +318,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
                     if (m_Cache != null)
                         m_Cache.Cache(a);
                     handler(assetID, s, a);
+                    a = null;
                 });
             }
         }

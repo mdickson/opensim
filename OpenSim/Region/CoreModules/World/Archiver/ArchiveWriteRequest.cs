@@ -144,8 +144,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
             if (options.ContainsKey("noassets") && (bool)options["noassets"])
                 SaveAssets = false;
 
-            Object temp;
-            if (options.TryGetValue("checkPermissions", out temp))
+            if (options.TryGetValue("checkPermissions", out Object temp))
                 FilterContent = (string)temp;
 
 
@@ -237,7 +236,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
             {
                 if (entity is SceneObjectGroup)
                 {
-                    SceneObjectGroup sceneObject = (SceneObjectGroup)entity;
+                    SceneObjectGroup sceneObject = entity as SceneObjectGroup;
 
                     if (!sceneObject.IsDeleted && !sceneObject.IsAttachment && !sceneObject.IsTemporary && !sceneObject.inTransit)
                     {
@@ -314,6 +313,16 @@ namespace OpenSim.Region.CoreModules.World.Archiver
 
             if (regionSettings.TerrainTexture4 != RegionSettings.DEFAULT_TERRAIN_TEXTURE_4)
                 assetUuids[regionSettings.TerrainTexture4] = (sbyte)AssetType.Texture;
+
+            if(scene.RegionEnvironment != null)
+                scene.RegionEnvironment.GatherAssets(assetUuids);
+
+            List<ILandObject> landObjects = scene.LandChannel.AllParcels();
+            foreach (ILandObject lo in landObjects)
+            {
+                if(lo.LandData != null && lo.LandData.Environment != null)
+                    lo.LandData.Environment.GatherAssets(assetUuids);
+            }
 
             Save(scene, sceneObjects, regionDir);
             GC.Collect();
@@ -512,15 +521,13 @@ namespace OpenSim.Region.CoreModules.World.Archiver
 
             for (uint y = (uint)scenesGroup.Rect.Top; y < scenesGroup.Rect.Bottom; ++y)
             {
-                SortedDictionary<uint, Scene> row;
-                if (scenesGroup.Regions.TryGetValue(y, out row))
+                if (scenesGroup.Regions.TryGetValue(y, out SortedDictionary<uint, Scene> row))
                 {
                     xtw.WriteStartElement("row");
 
                     for (uint x = (uint)scenesGroup.Rect.Left; x < scenesGroup.Rect.Right; ++x)
                     {
-                        Scene scene;
-                        if (row.TryGetValue(x, out scene))
+                        if (row.TryGetValue(x, out Scene scene))
                         {
                             xtw.WriteStartElement("region");
                             xtw.WriteElementString("id", scene.RegionInfo.RegionID.ToString());
@@ -566,7 +573,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
             // Write out region settings
             string settingsPath = String.Format("{0}{1}{2}.xml",
                 regionDir, ArchiveConstants.SETTINGS_PATH, scene.RegionInfo.RegionName);
-            m_archiveWriter.WriteFile(settingsPath, RegionSettingsSerializer.Serialize(scene.RegionInfo.RegionSettings));
+            m_archiveWriter.WriteFile(settingsPath, RegionSettingsSerializer.Serialize(scene.RegionInfo.RegionSettings, scene.RegionEnvironment));
 
             m_log.InfoFormat("[ARCHIVER]: Adding parcel settings to archive.");
 

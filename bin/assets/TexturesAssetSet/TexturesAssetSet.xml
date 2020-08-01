@@ -855,6 +855,30 @@
      <Key Name="assetType" Value="0" />
      <Key Name="fileName" Value="FALLBACK_BAKED_AUX3_32X32.j2k"/>
   </Section>
-
+  <Section Name="DefaultCloud">
+     <Key Name="assetID" Value="1dc1368f-e8fe-f02d-a08d-9d9f11c1af6b"/>
+     <Key Name="name" Value="DefaultCloud"/>
+     <Key Name="assetType" Value="0" />
+     <Key Name="fileName" Value="DefaultClouds.j2c"/>
+  </Section>
+  <Section Name="DefaultRainbow">
+     <Key Name="assetID" Value="11b4c57c-56b3-04ed-1f82-2004363882e4"/>
+     <Key Name="name" Value="DefaultRainbow"/>
+     <Key Name="assetType" Value="0" />
+     <Key Name="fileName" Value="rainbow.j2c"/>
+  </Section>
+  <Section Name="DefaultHalo">
+     <Key Name="assetID" Value="12149143-f599-91a7-77ac-b52a3c0f59cd"/>
+     <Key Name="name" Value="DefaultHalo"/>
+     <Key Name="assetType" Value="0" />
+     <Key Name="fileName" Value="halo.j2c"/>
+  </Section>
+  
+  <Section Name="MoonAlias">
+     <Key Name="assetID" Value="d07f6eed-b96a-47cd-b51d-400ad4a1c428"/>
+     <Key Name="name" Value="MoonAlias"/>
+     <Key Name="assetType" Value="0" />
+     <Key Name="fileName" Value="moon.jp2"/>
+  </Section>
 
 </Nini>
