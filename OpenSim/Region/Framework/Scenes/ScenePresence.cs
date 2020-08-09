@@ -78,6 +78,31 @@ namespace OpenSim.Region.Framework.Scenes
         //            m_log.DebugFormat("[SCENE PRESENCE]: Destructor called on {0}", Name);
         //        }
 
+
+        public int EnvironmentVersion = -1;
+        private ViewerEnvironment m_environment = null;
+        public ViewerEnvironment Environment
+        {
+            get
+            {
+                return m_environment;
+            }
+            set
+            {
+                m_environment = value;
+                if (value == null)
+                    EnvironmentVersion = -1;
+                else
+                {
+                    if(EnvironmentVersion <= 0)
+                        EnvironmentVersion = 0x7000000 | Util.RandomClass.Next();
+                    else
+                        ++EnvironmentVersion;
+                    m_environment.version = EnvironmentVersion;
+                }
+            }
+        }
+
         public void TriggerScenePresenceUpdated()
         {
             if (m_scene != null)
@@ -1197,13 +1222,14 @@ namespace OpenSim.Region.Framework.Scenes
 
                 Animator = null;
                 Appearance = null;
+                /* temporary out: timming issues
                 if(m_attachments != null)
                 {
                     foreach(SceneObjectGroup sog in m_attachments)
                         sog.Dispose();
                     m_attachments = null;
                 }
-
+                */
                 scriptedcontrols.Clear();
                 ControllingClient = null;
             }
@@ -1625,19 +1651,7 @@ namespace OpenSim.Region.Framework.Scenes
 */
         public int GetStateSource()
         {
-            /*
-                        AgentCircuitData aCircuit = m_scene.AuthenticateHandler.GetAgentCircuitData(UUID);
-
-                        if (aCircuit != null && (aCircuit.teleportFlags != (uint)TeleportFlags.Default))
-                        {
-                            // This will get your attention
-                            //m_log.Error("[XXX] Triggering CHANGED_TELEPORT");
-
-                            return 5; // StateSource.Teleporting
-                        }
-                        return 2; // StateSource.PrimCrossing
-            */
-            return m_teleportFlags == TeleportFlags.Default ? 2 : 5;
+            return m_teleportFlags == TeleportFlags.Default ? 2 : 5; // StateSource.PrimCrossing : StateSource.Teleporting
         }
 
         /// <summary>
@@ -1679,6 +1693,8 @@ namespace OpenSim.Region.Framework.Scenes
                 Animator = new ScenePresenceAnimator(this);
             else
                 Animator.ResetAnimations();
+
+            Environment = null;
 
 
             //            m_log.DebugFormat(
@@ -2159,7 +2175,7 @@ namespace OpenSim.Region.Framework.Scenes
             catch { }
             finally
             {
-                m_updateAgentReceivedAfterTransferEvent.Reset();
+                m_updateAgentReceivedAfterTransferEvent?.Reset();
             }
 
             return false;
@@ -4112,19 +4128,14 @@ namespace OpenSim.Region.Framework.Scenes
             TriggerScenePresenceUpdated();
         }
 
-        public void SendCoarseLocations(List<Vector3> coarseLocations, List<UUID> avatarUUIDs)
-        {
-            SendCoarseLocationsMethod d = m_sendCoarseLocationsMethod;
-            if (d != null)
-            {
-                d.Invoke(m_scene.RegionInfo.originRegionID, this, coarseLocations, avatarUUIDs);
-            }
-        }
-
         public void SetSendCoarseLocationMethod(SendCoarseLocationsMethod d)
         {
-            if (d != null)
-                m_sendCoarseLocationsMethod = d;
+            m_sendCoarseLocationsMethod = d;
+        }
+
+        public void SendCoarseLocations(List<Vector3> coarseLocations, List<UUID> avatarUUIDs)
+        {
+            m_sendCoarseLocationsMethod?.Invoke(m_scene.RegionInfo.originRegionID, this, coarseLocations, avatarUUIDs);
         }
 
         public void SendCoarseLocationsDefault(UUID sceneId, ScenePresence p, List<Vector3> coarseLocations, List<UUID> avatarUUIDs)
@@ -4148,11 +4159,12 @@ namespace OpenSim.Region.Framework.Scenes
 
         private void SendInitialData()
         {
-            uint flags = ControllingClient.GetViewerCaps();
-            if ((flags & 0x1000) == 0) // wait for seeds sending
+            //wait for region handshake
+            if (NeedInitialData < 2)
                 return;
 
-            if (NeedInitialData < 2)
+            uint flags = ControllingClient.GetViewerCaps();
+            if ((flags & 0x1000) == 0) // wait for seeds sending
                 return;
 
             // give some extra time to make sure viewers did process seeds

@@ -1672,20 +1672,24 @@ namespace OpenSim.Region.Framework.Scenes
                     */
                     if (Frame % (m_update_coarse_locations) == 0 && !m_sendingCoarseLocations)
                     {
-                        m_sendingCoarseLocations = true;
-                        WorkManager.RunInThreadPool(
-                            delegate
-                            {
-                                List<Vector3> coarseLocations;
-                                List<UUID> avatarUUIDs;
-                                SceneGraph.GetCoarseLocations(out coarseLocations, out avatarUUIDs, 60);
-                                // Send coarse locations to clients
-                                ForEachScenePresence(delegate (ScenePresence presence)
+                        if(GetNumberOfClients() > 0)
+                        {
+                            m_sendingCoarseLocations = true;
+                            WorkManager.RunInThreadPool(
+                                delegate
                                 {
-                                    presence.SendCoarseLocations(coarseLocations, avatarUUIDs);
-                                });
-                                m_sendingCoarseLocations = false;
-                            }, null, string.Format("SendCoarseLocations ({0})", Name));
+                                    List<Vector3> coarseLocations;
+                                    List<UUID> avatarUUIDs;
+                                    SceneGraph.GetCoarseLocations(out coarseLocations, out avatarUUIDs, 60);
+                                    // Send coarse locations to clients
+                                    ForEachScenePresence(delegate(ScenePresence presence)
+                                    {
+                                        if(!presence.IsNPC)
+                                            presence.SendCoarseLocations(coarseLocations, avatarUUIDs);
+                                    });
+                                    m_sendingCoarseLocations = false; 
+                                }, null, string.Format("SendCoarseLocations ({0})", Name));
+                        }
                     }
 
                     // Get the simulation frame time that the avatar force input
@@ -2131,17 +2135,17 @@ namespace OpenSim.Region.Framework.Scenes
                 SimulationDataService.StoreBakedTerrain(Bakedmap.GetTerrainData(), RegionInfo.RegionID);
         }
 
-        public void StoreWindlightProfile(RegionLightShareData wl)
+        private ViewerEnvironment m_regionEnvironment;
+        public ViewerEnvironment RegionEnvironment
         {
-            RegionInfo.WindlightSettings = wl;
-            SimulationDataService.StoreRegionWindlightSettings(wl);
-            m_eventManager.TriggerOnSaveNewWindlightProfile();
-        }
-
-        public void LoadWindlightProfile()
-        {
-            RegionInfo.WindlightSettings = SimulationDataService.LoadRegionWindlightSettings(RegionInfo.RegionID);
-            m_eventManager.TriggerOnSaveNewWindlightProfile();
+            get
+            {
+                return m_regionEnvironment;
+            }
+            set
+            {
+                m_regionEnvironment = value;
+            }
         }
 
         /// <summary>
@@ -2299,15 +2303,12 @@ namespace OpenSim.Region.Framework.Scenes
             foreach (SceneObjectGroup group in PrimsFromDB)
             {
                 AddRestoredSceneObject(group, true, true);
-                EventManager.TriggerOnSceneObjectLoaded(group);
                 SceneObjectPart rootPart = group.GetPart(group.UUID);
-                rootPart.Flags &= ~PrimFlags.Scripted;
+                rootPart.Flags &= ~(PrimFlags.Scripted | PrimFlags.CreateSelected);
 
                 rootPart.TrimPermissions();
                 group.InvalidateDeepEffectivePerms();
-
-                // Don't do this here - it will get done later on when sculpt data is loaded.
-                //                group.CheckSculptAndLoad();
+                EventManager.TriggerOnSceneObjectLoaded(group);
             }
 
             LoadingPrims = false;
@@ -2557,7 +2558,12 @@ namespace OpenSim.Region.Framework.Scenes
                 // Otherwise, use this default creation code;
                 sceneObject = new SceneObjectGroup(ownerID, pos, rot, shape);
                 sceneObject.SetGroup(groupID, null);
-                AddNewSceneObject(sceneObject, true);
+
+                if ((addFlags & (uint)PrimFlags.CreateSelected) != 0)
+                {
+                    sceneObject.IsSelected = true;
+                    sceneObject.RootPart.CreateSelected = true;
+                }
 
                 if (AgentPreferencesService != null) // This will override the brave new full perm world!
                 {
@@ -2570,16 +2576,13 @@ namespace OpenSim.Region.Framework.Scenes
                         sceneObject.RootPart.NextOwnerMask = (uint)prefs.PermNextOwner;
                     }
                 }
+
+                AddNewSceneObject(sceneObject, true, false);
             }
 
             if (UserManagementModule != null)
                 sceneObject.RootPart.CreatorIdentification = UserManagementModule.GetUserUUI(ownerID);
 
-            if((addFlags & (uint)PrimFlags.CreateSelected) != 0)
-            {
-                sceneObject.IsSelected = true;
-                sceneObject.RootPart.CreateSelected = true;
-            }
 
             sceneObject.InvalidateDeepEffectivePerms();;
             sceneObject.ScheduleGroupForFullAnimUpdate();
@@ -3908,10 +3911,9 @@ namespace OpenSim.Region.Framework.Scenes
 
         public bool NewUserConnection(AgentCircuitData acd, uint teleportFlags, GridRegion source, out string reason, bool requirePresenceLookup)
         {
-            bool vialogin = ((teleportFlags & (uint)TPFlags.ViaLogin) != 0 ||
-                (teleportFlags & (uint)TPFlags.ViaHGLogin) != 0);
-            bool viahome = ((teleportFlags & (uint)TPFlags.ViaHome) != 0);
-            //            bool godlike = ((teleportFlags & (uint)TPFlags.Godlike) != 0);
+            bool vialogin = (teleportFlags & (uint)(TPFlags.ViaLogin | TPFlags.ViaHGLogin)) != 0;
+            bool viahome = (teleportFlags & (uint)TPFlags.ViaHome) != 0;
+//            bool godlike = ((teleportFlags & (uint)TPFlags.Godlike) != 0);
 
             reason = String.Empty;
 
@@ -3986,7 +3988,7 @@ namespace OpenSim.Region.Framework.Scenes
                 m_log.DebugFormat(
                     "[SCENE]: Access denied for {0} {1} using {2}",
                     acd.firstname, acd.lastname, curViewer);
-                reason = "Access denied, your viewer is banned by the region owner";
+                reason = "Access denied, your viewer is banned";
                 return false;
             }
 
@@ -4109,11 +4111,10 @@ namespace OpenSim.Region.Framework.Scenes
                 {
                     IUserAccountCacheModule cache = RequestModuleInterface<IUserAccountCacheModule>();
                     if (cache != null)
-                        //                        cache.Remove(acd.firstname + " " + acd.lastname);
                         cache.Remove(acd.AgentID);
                 }
 
-                m_authenticateHandler.AddNewCircuit(acd.circuitcode, acd);
+                m_authenticateHandler.AddNewCircuit(acd);
 
                 if (sp == null) // We don't have an [child] agent here already
                 {
@@ -4123,7 +4124,7 @@ namespace OpenSim.Region.Framework.Scenes
                         {
                             if (!VerifyUserPresence(acd, out reason))
                             {
-                                m_authenticateHandler.RemoveCircuit(acd.circuitcode);
+                                m_authenticateHandler.RemoveCircuit(acd);
                                 return false;
                             }
                         }
@@ -4132,7 +4133,7 @@ namespace OpenSim.Region.Framework.Scenes
                             m_log.ErrorFormat(
                                 "[SCENE]: Exception verifying presence {0}{1}", e.Message, e.StackTrace);
 
-                            m_authenticateHandler.RemoveCircuit(acd.circuitcode);
+                            m_authenticateHandler.RemoveCircuit(acd);
                             return false;
                         }
                     }
@@ -4141,7 +4142,7 @@ namespace OpenSim.Region.Framework.Scenes
                     {
                         if (!AuthorizeUser(acd, (vialogin ? false : SeeIntoRegion), out reason))
                         {
-                            m_authenticateHandler.RemoveCircuit(acd.circuitcode);
+                            m_authenticateHandler.RemoveCircuit(acd);
                             return false;
                         }
                     }
@@ -4150,7 +4151,7 @@ namespace OpenSim.Region.Framework.Scenes
                         m_log.ErrorFormat(
                             "[SCENE]: Exception authorizing user {0}{1}", e.Message, e.StackTrace);
 
-                        m_authenticateHandler.RemoveCircuit(acd.circuitcode);
+                        m_authenticateHandler.RemoveCircuit(acd);
                         return false;
                     }
 
@@ -4198,10 +4199,10 @@ namespace OpenSim.Region.Framework.Scenes
                 CapsModule.ActivateCaps(acd.circuitcode);
             }
 
-            //            if (vialogin)
-            //            {
-            //                CleanDroppedAttachments();
-            //            }
+            //if (vialogin)
+            //{
+            //    CleanDroppedAttachments();
+            //}
 
             if (teleportFlags != (uint)TPFlags.Default)
             {
@@ -4215,28 +4216,28 @@ namespace OpenSim.Region.Framework.Scenes
                 else if (acd.startpos.Y >= RegionInfo.RegionSizeY)
                     acd.startpos.Y = RegionInfo.RegionSizeY - 1f;
             }
+
             // only check access, actual relocations will happen later on ScenePresence MakeRoot
             // allow child agents creation
-            //            if(!godlike && teleportFlags != (uint) TPFlags.Default)
+            //if(!godlike && teleportFlags != (uint) TPFlags.Default)
             if (teleportFlags != (uint)TPFlags.Default)
             {
                 bool checkTeleHub;
 
                 // don't check hubs if via home or via lure
-                if ((teleportFlags & (uint)TPFlags.ViaHome) != 0
-                        || (teleportFlags & (uint)TPFlags.ViaLure) != 0)
+                if ((teleportFlags & (uint)(TPFlags.ViaHome | TPFlags.ViaLure)) != 0)
                     checkTeleHub = false;
                 else
                     checkTeleHub = vialogin
-                        || (TelehubAllowLandmarks == true ? false : ((teleportFlags & (uint)TPFlags.ViaLandmark) != 0))
-                        || (teleportFlags & (uint)TPFlags.ViaLocation) != 0;
+                        || (TelehubAllowLandmarks == true ? false : ((teleportFlags & (uint)(TPFlags.ViaLandmark | TPFlags.ViaLocation)) != 0));
 
                 if (!CheckLandPositionAccess(acd.AgentID, true, checkTeleHub, acd.startpos, out reason))
                 {
-                    m_authenticateHandler.RemoveCircuit(acd.circuitcode);
+                    m_authenticateHandler.RemoveCircuit(acd);
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -5892,16 +5893,22 @@ Environment.Exit(1);
             IEstateDataService estateDataService = EstateDataService;
             if (estateDataService != null)
             {
+                bool parcelEnvOvr = RegionInfo.EstateSettings.AllowEnvironmentOverride;
                 RegionInfo.EstateSettings = estateDataService.LoadEstateSettings(RegionInfo.RegionID, false);
-                TriggerEstateSunUpdate();
+                if(parcelEnvOvr && !RegionInfo.EstateSettings.AllowEnvironmentOverride)
+                    ClearAllParcelEnvironments();
             }
         }
 
-        public void TriggerEstateSunUpdate()
+        public void ClearAllParcelEnvironments()
         {
-            EventManager.TriggerEstateToolsSunUpdate(RegionInfo.RegionHandle);
+            IEnvironmentModule envM = RequestModuleInterface<IEnvironmentModule>();
+            if(LandChannel != null && envM != null)
+            {
+                LandChannel.ClearAllEnvironments();
+                envM.WindlightRefresh(1,false);
+            }
         }
-
         private void HandleReloadEstate(string module, string[] cmd)
         {
             if (MainConsole.Instance.ConsoleScene == null ||
@@ -6126,7 +6133,7 @@ Environment.Exit(1);
 
             // We may be called before there is a presence or a client.
             // Fake AgentCircuitData to keep IAuthorizationModule smiling
-            if (client == null)
+            if (aCircuit == null)
             {
                 aCircuit = new AgentCircuitData();
                 aCircuit.AgentID = agentID;

@@ -237,6 +237,7 @@ namespace OpenSim.Region.Framework.Scenes
         public HashSet<UUID> UncertainAssetsUUIDs { get; private set; }
         public int possibleNotAssetCount { get; set; }
         public int ErrorCount { get; private set; }
+        public int AssetGetCount;
         private bool verbose = true;
 
         /// <summary>
@@ -293,6 +294,7 @@ namespace OpenSim.Region.Framework.Scenes
             UncertainAssetsUUIDs = uncertainAssetsUUIDs;
             ErrorCount = 0;
             possibleNotAssetCount = 0;
+            AssetGetCount = 0;
         }
 
         public bool AddGathered(UUID uuid, sbyte type)
@@ -563,7 +565,9 @@ namespace OpenSim.Region.Framework.Scenes
                 return;
             }
 
-            if (UncertainAssetsUUIDs.Contains(assetUuid))
+            ++AssetGetCount;
+
+            if(UncertainAssetsUUIDs.Contains(assetUuid))
                 UncertainAssetsUUIDs.Remove(assetUuid);
 
             sbyte assetType = assetBase.Type;
