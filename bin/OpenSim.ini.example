@@ -682,7 +682,7 @@
     ; These are enabled by default to localhost. Change if you see fit.
     Cap_GetTexture = "localhost"
     Cap_GetMesh = "localhost"
-	Cap_GetMesh2 = "localhost"
+    Cap_GetMesh2 = "localhost"
 	Cap_ViewerAsset = "localhost"
     Cap_AvatarPickerSearch = "localhost"
     Cap_GetDisplayNames = "localhost"
