@@ -178,13 +178,6 @@ namespace OpenSim.Region.CoreModules.Framework.EntityTransfer
             }
         }
 
-        protected override void OnNewClient(IClientAPI client)
-        {
-            client.OnTeleportHomeRequest += TriggerTeleportHome;
-            client.OnTeleportLandmarkRequest += RequestTeleportLandmark;
-            client.OnConnectionClosed += new Action<IClientAPI>(OnConnectionClosed);
-        }
-
         public override void RegionLoaded(Scene scene)
         {
             base.RegionLoaded(scene);
@@ -285,8 +278,10 @@ namespace OpenSim.Region.CoreModules.Framework.EntityTransfer
                     else
                         connector = new UserAgentServiceConnector(userAgentDriver);
 
-                    GridRegion source = new GridRegion(Scene.RegionInfo);
-                    source.RawServerURI = m_GatekeeperURI;
+                    GridRegion source = new GridRegion(Scene.RegionInfo)
+                    {
+                        RawServerURI = m_GatekeeperURI
+                    };
 
                     bool success = connector.LoginAgentToGrid(source, agentCircuit, reg, finalDestination, false, out reason);
                     logout = success; // flag for later logout from this grid; this is an HG TP
@@ -573,8 +568,7 @@ namespace OpenSim.Region.CoreModules.Framework.EntityTransfer
 
                 string homeURI = Scene.GetAgentHomeURI(remoteClient.AgentId);
 
-                string message;
-                GridRegion finalDestination = gConn.GetHyperlinkRegion(gatekeeper, new UUID(lm.RegionID), remoteClient.AgentId, homeURI, out message);
+                GridRegion finalDestination = gConn.GetHyperlinkRegion(gatekeeper, new UUID(lm.RegionID), remoteClient.AgentId, homeURI, out string message);
 
                 if (finalDestination != null)
                 {
@@ -633,11 +627,20 @@ namespace OpenSim.Region.CoreModules.Framework.EntityTransfer
 
         public override bool HandleIncomingSceneObject(SceneObjectGroup so, Vector3 newPosition)
         {
+            UUID OwnerID = so.OwnerID;
+            if (Scene.RegionInfo.EstateSettings.IsBanned(OwnerID))
+            {
+                m_log.DebugFormat(
+                    "[HG TRANSFER MODULE]: Denied prim crossing of {0} {1} into {2} for banned avatar {3}",
+                    so.Name, so.UUID, Scene.Name, so.OwnerID);
+
+                return false;
+            }
+
             // FIXME: We must make it so that we can use SOG.IsAttachment here.  At the moment it is always null!
             if (!so.IsAttachmentCheckFull())
                 return base.HandleIncomingSceneObject(so, newPosition);
 
-            UUID OwnerID = so.OwnerID;
             // Equally, we can't use so.AttachedAvatar here.
             if (OwnerID == UUID.Zero || Scene.UserManagementModule.IsLocalGridUser(OwnerID))
                 return base.HandleIncomingSceneObject(so, newPosition);
@@ -754,7 +757,7 @@ namespace OpenSim.Region.CoreModules.Framework.EntityTransfer
             return false;
         }
 
-        void OnConnectionClosed(IClientAPI obj)
+        public override void OnConnectionClosed(IClientAPI obj)
         {
             if (obj.SceneAgent.IsChildAgent)
                 return;
@@ -782,25 +785,25 @@ namespace OpenSim.Region.CoreModules.Framework.EntityTransfer
             {
                 m_log.DebugFormat("[HG ENTITY TRANSFER MODULE]: HomeURI not found for agent {0} logout", obj.AgentId);
             }
+            base.OnConnectionClosed(obj);
         }
 
         #endregion
 
         private GridRegion MakeGateKeeperRegion(string wantedURI)
         {
-            Uri uri;
-            if (!Uri.TryCreate(wantedURI, UriKind.Absolute, out uri))
+            if(!Uri.TryCreate(wantedURI, UriKind.Absolute, out Uri uri))
                 return null;
 
-            GridRegion region = new GridRegion();
-
-            region.ExternalHostName = uri.Host;
-            region.HttpPort = (uint)uri.Port;
-            region.ServerURI = wantedURI;  //uri.AbsoluteUri for some reason default ports are needed
-            region.RegionName = string.Empty;
-            region.InternalEndPoint = new System.Net.IPEndPoint(System.Net.IPAddress.Parse("0.0.0.0"), (int)0);
-            region.RegionFlags = OpenSim.Framework.RegionFlags.Hyperlink;
-            return region;
+            return new GridRegion()
+            {
+                ExternalHostName = uri.Host,
+                HttpPort = (uint)uri.Port,
+                ServerURI = wantedURI,  //uri.AbsoluteUri for some reason default ports are needed
+                RegionName = string.Empty,
+                InternalEndPoint = new System.Net.IPEndPoint(System.Net.IPAddress.Parse("0.0.0.0"), (int)0),
+                RegionFlags = OpenSim.Framework.RegionFlags.Hyperlink
+            };
         }
     }
 }

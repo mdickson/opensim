@@ -102,16 +102,15 @@ namespace OpenSim.Region.Framework.Scenes
 
     public class ScenePermissions
     {
-        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private Scene m_scene;
-
         public ScenePermissions(Scene scene)
         {
             m_scene = scene;
         }
 
-        #region Events
+        #region events
         public event GenerateClientFlagsHandler OnGenerateClientFlags;
         public event SetBypassPermissionsHandler OnSetBypassPermissions;
         public event BypassPermissionsHandler OnBypassPermissions;
@@ -154,7 +153,7 @@ namespace OpenSim.Region.Framework.Scenes
         public event IsGridGodHandler OnIsGridGod;
         public event IsAdministratorHandler OnIsAdministrator;
         public event IsEstateManagerHandler OnIsEstateManager;
-        //        public event EditParcelHandler OnEditParcel;
+        // public event EditParcelHandler OnEditParcel;
         public event EditParcelPropertiesHandler OnEditParcelProperties;
         public event SellParcelHandler OnSellParcel;
         public event AbandonParcelHandler OnAbandonParcel;
@@ -184,9 +183,6 @@ namespace OpenSim.Region.Framework.Scenes
 
         public uint GenerateClientFlags(SceneObjectPart part, ScenePresence sp)
         {
-            // libomv will moan about PrimFlags.ObjectYouOfficer being
-            // obsolete...
-#pragma warning disable 0612
             const PrimFlags DEFAULT_FLAGS =
                 PrimFlags.ObjectModify |
                 PrimFlags.ObjectCopy |
@@ -195,7 +191,6 @@ namespace OpenSim.Region.Framework.Scenes
                 PrimFlags.ObjectYouOwner |
                 PrimFlags.ObjectAnyOwner |
                 PrimFlags.ObjectOwnerModify;
-#pragma warning restore 0612
 
             if (part == null)
                 return 0;
@@ -216,9 +211,7 @@ namespace OpenSim.Region.Framework.Scenes
 
         public void SetBypassPermissions(bool value)
         {
-            SetBypassPermissionsHandler handler = OnSetBypassPermissions;
-            if (handler != null)
-                handler(value);
+            OnSetBypassPermissions?.Invoke(value);
         }
 
         public bool BypassPermissions()

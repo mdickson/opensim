@@ -420,10 +420,11 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         LSL_Integer llSubStringIndex(string source, string pattern);
         void llTakeCamera(string avatar);
         void llTakeControls(int controls, int accept, int pass_on);
-        LSL_Float llTan(double f);
+         LSL_Float llTan(double f);
         LSL_Integer llTarget(LSL_Vector position, double range);
         void llTargetOmega(LSL_Vector axis, double spinrate, double gain);
         void llTargetRemove(int number);
+        void llTargetedEmail(LSL_Integer target, LSL_String subject, LSL_String message);
         void llTeleportAgentHome(string agent);
         void llTeleportAgent(string agent, string simname, LSL_Vector pos, LSL_Vector lookAt);
         void llTeleportAgentGlobalCoords(string agent, LSL_Vector global, LSL_Vector pos, LSL_Vector lookAt);
