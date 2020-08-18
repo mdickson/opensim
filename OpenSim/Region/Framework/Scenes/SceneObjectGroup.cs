@@ -1033,7 +1033,7 @@ namespace OpenSim.Region.Framework.Scenes
 
             if (Scene.PositionIsInCurrentRegion(targetPosition))
             {
-                if (Scene.InTeleportTargetsCoolDown(UUID, sourceID, 1.0))
+                if(Scene.InTeleportTargetsCoolDown(UUID, sourceID, 1000)) 
                 {
                     inTransit = false;
                     return -2;
@@ -1080,7 +1080,7 @@ namespace OpenSim.Region.Framework.Scenes
                 return 1;
             }
 
-            if (Scene.InTeleportTargetsCoolDown(UUID, sourceID, 20.0))
+            if(Scene.InTeleportTargetsCoolDown(UUID, sourceID, 20000)) 
             {
                 inTransit = false;
                 return -1;
@@ -5249,6 +5249,20 @@ namespace OpenSim.Region.Framework.Scenes
         {
             lock (m_sittingAvatars)
                 return new List<ScenePresence>(m_sittingAvatars);
+        }
+
+        public bool HasSittingAvatar(UUID avatarID)
+        {
+            // locked O(n) :(
+            lock (m_sittingAvatars)
+            {
+                for(int i = 0; i < m_sittingAvatars.Count; ++i)
+                {
+                    if(m_sittingAvatars[i].UUID == avatarID)
+                        return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>

@@ -43,6 +43,7 @@ using OpenSim.Region.ScriptEngine.Interfaces;
 using OpenSim.Region.ScriptEngine.Shared.Api.Interfaces;
 using OpenSim.Region.ScriptEngine.Shared.ScriptBase;
 using OpenSim.Services.Interfaces;
+using OpenSim.Services.Connectors.Hypergrid;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -50,12 +51,12 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting.Lifetime;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+
 using AssetLandmark = OpenSim.Framework.AssetLandmark;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
@@ -73,14 +74,6 @@ using RegionInfo = OpenSim.Framework.RegionInfo;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Api
 {
-    // MUST be a ref type
-    public class UserInfoCacheEntry
-    {
-        public int time;
-        public UserAccount account;
-        public PresenceInfo pinfo;
-    }
-
     /// <summary>
     /// Contains all LSL ll-functions. This class will be in Default AppDomain.
     /// </summary>
@@ -88,11 +81,23 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public int LlRequestAgentDataCacheTimeoutMs { get; set; }
+        private int m_llRequestAgentDataCacheTimeout;
+        public int LlRequestAgentDataCacheTimeoutMs
+        {
+            get
+            {
+                return 1000 * m_llRequestAgentDataCacheTimeout;
+            }
+            set
+            {
+                m_llRequestAgentDataCacheTimeout = value / 1000;
+            }
+       }
 
         protected IScriptEngine m_ScriptEngine;
         protected SceneObjectPart m_host;
 
+        protected UUID RegionScopeID = UUID.Zero;
         /// <summary>
         /// The item that hosts this script
         /// </summary>
@@ -108,7 +113,6 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
         protected double m_timer = Util.GetTimeStampMS();
         protected bool m_waitingForScriptAnswer = false;
         protected bool m_automaticLinkPermission = false;
-        protected IMessageTransferModule m_TransferModule = null;
         protected int m_notecardLineReadCharsMax = 255;
         protected int m_scriptConsoleChannel = 0;
         protected bool m_scriptConsoleChannelEnabled = false;
@@ -119,8 +123,10 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
         protected IMaterialsModule m_materialsModule = null;
         protected IEnvironmentModule m_envModule = null;
         protected IEmailModule m_emailModule = null;
+        protected IUserAccountService m_userAccountService = null;
+        protected IMessageTransferModule m_TransferModule = null;
 
-        protected Dictionary<UUID, UserInfoCacheEntry> m_userInfoCache = new Dictionary<UUID, UserInfoCacheEntry>();
+        protected ExpiringCacheOS<UUID, PresenceInfo> m_PresenceInfoCache = new ExpiringCacheOS<UUID, PresenceInfo>(10000);
         protected int EMAIL_PAUSE_TIME = 20;  // documented delay value for smtp.
         protected int m_sleepMsOnSetTexture = 200;
         protected int m_sleepMsOnSetLinkTexture = 200;
@@ -219,7 +225,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
         protected float m_primSafetyCoeffX = 2.414214f;
         protected float m_primSafetyCoeffY = 2.414214f;
         protected float m_primSafetyCoeffZ = 1.618034f;
-        protected bool m_useCastRayV3 = false;
+
         protected float m_floatToleranceInCastRay = 0.00001f;
         protected float m_floatTolerance2InCastRay = 0.001f;
         protected DetailLevel m_primLodInCastRay = DetailLevel.Medium;
@@ -271,7 +277,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
 
         //An array of HTTP/1.1 headers that are not allowed to be used
         //as custom headers by llHTTPRequest.
-        private string[] HttpStandardHeaders =
+        private HashSet<string> HttpStandardHeaders = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase)
         {
             "Accept", "Accept-Charset", "Accept-Encoding", "Accept-Language",
             "Accept-Ranges", "Age", "Allow", "Authorization", "Cache-Control",
@@ -308,6 +314,10 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             m_envModule = m_ScriptEngine.World.RequestModuleInterface< IEnvironmentModule>();
 
             m_AsyncCommands = new AsyncCommandManager(m_ScriptEngine);
+            m_userAccountService = World.UserAccountService;
+            if(World.RegionInfo != null)
+                RegionScopeID = World.RegionInfo.ScopeID;
+
         }
 
         /// <summary>
@@ -381,7 +391,6 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                     m_primSafetyCoeffX = lslConfig.GetFloat("PrimBoundingBoxSafetyCoefficientX", m_primSafetyCoeffX);
                     m_primSafetyCoeffY = lslConfig.GetFloat("PrimBoundingBoxSafetyCoefficientY", m_primSafetyCoeffY);
                     m_primSafetyCoeffZ = lslConfig.GetFloat("PrimBoundingBoxSafetyCoefficientZ", m_primSafetyCoeffZ);
-                    m_useCastRayV3 = lslConfig.GetBoolean("UseLlCastRayV3", m_useCastRayV3);
                     m_floatToleranceInCastRay = lslConfig.GetFloat("FloatToleranceInLlCastRay", m_floatToleranceInCastRay);
                     m_floatTolerance2InCastRay = lslConfig.GetFloat("FloatTolerance2InLlCastRay", m_floatTolerance2InCastRay);
                     m_primLodInCastRay = (DetailLevel)lslConfig.GetInt("PrimDetailLevelInLlCastRay", (int)m_primLodInCastRay);
@@ -1296,7 +1305,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
         public string resolveName(UUID objecUUID)
         {
             // try avatar username surname
-            UserAccount account = World.UserAccountService.GetUserAccount(World.RegionInfo.ScopeID, objecUUID);
+            UserAccount account = m_userAccountService.GetUserAccount(RegionScopeID, objecUUID);
             if (account != null)
             {
                 string avatarname = account.Name;
@@ -2594,7 +2603,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             }
             else
             {
-                return UUID.Zero.ToString();
+                return ScriptBaseClass.NULL_KEY;
             }
         }
 
@@ -3455,39 +3464,39 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
 
         public LSL_Integer llGiveMoney(LSL_Key destination, LSL_Integer amount)
         {
-            Util.FireAndForget(x =>
+            m_host.AddScriptLPS(1);
+
+            if (m_item.PermsGranter == UUID.Zero)
+                return 0;
+
+            if ((m_item.PermsMask & ScriptBaseClass.PERMISSION_DEBIT) == 0)
             {
-                m_host.AddScriptLPS(1);
+                Error("llGiveMoney", "No permissions to give money");
+                return 0;
+            }
 
-                if (m_item.PermsGranter == UUID.Zero)
-                    return;
+            UUID toID = new UUID();
 
-                if ((m_item.PermsMask & ScriptBaseClass.PERMISSION_DEBIT) == 0)
-                {
-                    Error("llGiveMoney", "No permissions to give money");
-                    return;
-                }
+            if (!UUID.TryParse(destination, out toID))
+            {
+                Error("llGiveMoney", "Bad key in llGiveMoney");
+                return 0;
+            }
 
-                UUID toID = new UUID();
+            IMoneyModule money = World.RequestModuleInterface<IMoneyModule>();
+            if (money == null)
+            {
+                NotImplemented("llGiveMoney");
+                return 0;
+            }
 
-                if (!UUID.TryParse(destination, out toID))
-                {
-                    Error("llGiveMoney", "Bad key in llGiveMoney");
-                    return;
-                }
-
-                IMoneyModule money = World.RequestModuleInterface<IMoneyModule>();
-
-                if (money == null)
-                {
-                    NotImplemented("llGiveMoney");
-                    return;
-                }
-
+            Action<string> act = dontcare =>
+            {
                 money.ObjectGiveMoney(m_host.ParentGroup.RootPart.UUID, m_host.ParentGroup.RootPart.OwnerID,
                                         toID, amount,UUID.Zero, out string reason);
-            }, null, "LSL_Api.llGiveMoney");
+            };
 
+            m_AsyncCommands.DataserverPlugin.RegisterRequest(m_host.LocalId, m_item.ItemID, act);
             return 0;
         }
 
@@ -3975,31 +3984,28 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                 return;
             }
 
-            //Restrict email destination to the avatars registered email address?
-            //The restriction only applies if the destination address is not local.
-            if (m_restrictEmail == true && address.Contains(m_internalObjectHost) == false)
+            // this is a fire and forget no event is sent to script
+            Action<string> act = eventID =>
             {
-                UserAccount account =
-                        World.UserAccountService.GetUserAccount(
-                            World.RegionInfo.ScopeID,
-                            m_host.OwnerID);
-
-                if (account == null)
+                //Restrict email destination to the avatars registered email address?
+                //The restriction only applies if the destination address is not local.
+                if (m_restrictEmail == true && address.Contains(m_internalObjectHost) == false)
                 {
-                    Error("llEmail", "Can't find user account for '" + m_host.OwnerID.ToString() + "'");
-                    return;
+                    UserAccount account = m_userAccountService.GetUserAccount(RegionScopeID, m_host.OwnerID);
+                    if (account == null)
+                        return;
+
+                    if (String.IsNullOrEmpty(account.Email))
+                        return;
+                    address = account.Email;
                 }
 
-                if (String.IsNullOrEmpty(account.Email))
-                {
-                    Error("llEmail", "User account has not registered an email address.");
-                    return;
-                }
+                m_emailModule.SendEmail(m_host.UUID, address, subject, message);
+                // no dataserver event
+            };
 
-                address = account.Email;
-            }
-
-            m_emailModule.SendEmail(m_host.UUID, address, subject, message);
+            m_AsyncCommands.DataserverPlugin.RegisterRequest(m_host.LocalId,
+                                                     m_item.ItemID, act);
             ScriptSleep(m_sleepMsOnEmail);
         }
 
@@ -4050,44 +4056,45 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                 return;
             }
 
-            UserAccount account = null;
-            if (target == ScriptBaseClass.TARGETED_EMAIL_OBJECT_OWNER)
+            // this is a fire and forget no event is sent to script
+            Action<string> act = eventID =>
             {
-                if(parent.OwnerID == parent.GroupID)
-                    return;
-                account = World.UserAccountService.GetUserAccount(
-                            World.RegionInfo.ScopeID,
-                            parent.OwnerID);
-            }
-            else if (target == ScriptBaseClass.TARGETED_EMAIL_ROOT_CREATOR)
-            {
-                // non standard avoid creator spam
-                if(m_item.CreatorID == parent.RootPart.CreatorID)
+                UserAccount account = null;
+                if (target == ScriptBaseClass.TARGETED_EMAIL_OBJECT_OWNER)
                 {
-                    account = World.UserAccountService.GetUserAccount(
-                            World.RegionInfo.ScopeID,
-                            parent.RootPart.CreatorID);
+                    if(parent.OwnerID == parent.GroupID)
+                        return;
+                    account = m_userAccountService.GetUserAccount(RegionScopeID, parent.OwnerID);
+                }
+                else if (target == ScriptBaseClass.TARGETED_EMAIL_ROOT_CREATOR)
+                {
+                    // non standard avoid creator spam
+                    if(m_item.CreatorID == parent.RootPart.CreatorID)
+                    {
+                        account = m_userAccountService.GetUserAccount(RegionScopeID, parent.RootPart.CreatorID);
+                    }
+                    else
+                        return;
                 }
                 else
                     return;
-            }
-            else
-                return;
 
-            if (account == null)
-            {
-                Error("llTargetedEmail", "Can't find user account for '" + m_host.OwnerID.ToString() + "'");
-                return;
-            }
+                if (account == null)
+                {
+                    return;
+                }
 
-            string address = account.Email;
-            if (String.IsNullOrEmpty(address))
-            {
-                Error("llTargetedEmail", "User account has not registered an email address.");
-                return;
-            }
+                string address = account.Email;
+                if (String.IsNullOrEmpty(address))
+                {
+                    return;
+                }
 
-            m_emailModule.SendEmail(m_host.UUID, address, subject, message);
+                m_emailModule.SendEmail(m_host.UUID, address, subject, message);
+            };
+
+            m_AsyncCommands.DataserverPlugin.RegisterRequest(m_host.LocalId,
+                                                     m_item.ItemID, act);
             ScriptSleep(m_sleepMsOnEmail);
         }
 
@@ -4340,7 +4347,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             }
             else
             {
-                if (m_host.ParentGroup.GetSittingAvatars().SingleOrDefault(sp => sp.UUID == agentID) != null)
+                if (m_host.ParentGroup.HasSittingAvatar(agentID))
                 {
                     // When agent is sitting, certain permissions are implicit if requested from sitting agent
                     implicitPerms = ScriptBaseClass.PERMISSION_TRIGGER_ANIMATION |
@@ -4712,7 +4719,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                     linknum -= (m_host.ParentGroup.PrimCount) + 1;
 
                     if (linknum < 0)
-                        return UUID.Zero.ToString();
+                        return ScriptBaseClass.NULL_KEY;
 
                     List<ScenePresence> avatars = GetLinkAvatars(ScriptBaseClass.LINK_SET);
                     if (avatars.Count > linknum)
@@ -4720,7 +4727,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                         return avatars[linknum].UUID.ToString();
                     }
                 }
-                return UUID.Zero.ToString();
+                return ScriptBaseClass.NULL_KEY;
             }
         }
 
@@ -4861,10 +4868,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
 
                 if (presence == null)
                 {
-                    UserAccount account =
-                            World.UserAccountService.GetUserAccount(
-                            World.RegionInfo.ScopeID,
-                            destId);
+                    UserAccount account = m_userAccountService.GetUserAccount(RegionScopeID, destId);
 
                     if (account == null)
                     {
@@ -4957,108 +4961,112 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
         {
             m_host.AddScriptLPS(1);
 
-            if (UUID.TryParse(id, out UUID uuid))
+            if (UUID.TryParse(id, out UUID uuid) && uuid != UUID.Zero)
             {
-                PresenceInfo pinfo = null;
-                UserAccount account;
+                if (uuid == UUID.Zero)
+                    return string.Empty;
 
-                if (!m_userInfoCache.TryGetValue(uuid, out UserInfoCacheEntry ce))
+                //pre process fast local avatars
+                switch(data)
                 {
-                    account = World.UserAccountService.GetUserAccount(World.RegionInfo.ScopeID, uuid);
-                    if (account == null)
-                    {
-                        m_userInfoCache[uuid] = null; // Cache negative
-                        return UUID.Zero.ToString();
-                    }
-
-                    PresenceInfo[] pinfos = World.PresenceService.GetAgents(new string[] { uuid.ToString() });
-                    if (pinfos != null && pinfos.Length > 0)
-                    {
-                        foreach (PresenceInfo p in pinfos)
+                    case ScriptBaseClass.DATA_ONLINE:
+                        World.TryGetScenePresence(uuid, out ScenePresence sp);
+                        if (sp != null)
                         {
-                            if (p.RegionID != UUID.Zero)
-                            {
-                                pinfo = p;
-                            }
+                            string ftid = m_AsyncCommands.DataserverPlugin.RequestWithImediatePost(m_host.LocalId,
+                                                    m_item.ItemID, "1");
+                            ScriptSleep(m_sleepMsOnRequestAgentData);
+                            return ftid;
                         }
-                    }
-
-                    ce = new UserInfoCacheEntry
-                    {
-                        time = Util.EnvironmentTickCount(),
-                        account = account,
-                        pinfo = pinfo
-                    };
-                    m_userInfoCache[uuid] = ce;
-                }
-                else
-                {
-                    if (ce == null)
-                        return UUID.Zero.ToString();
-
-                    account = ce.account;
-                    pinfo = ce.pinfo;
+                        break;
+                    case ScriptBaseClass.DATA_NAME: // DATA_NAME (First Last)
+                    case ScriptBaseClass.DATA_BORN: // DATA_BORN (YYYY-MM-DD)
+                    case ScriptBaseClass.DATA_RATING: // DATA_RATING (0,0,0,0,0,0)
+                    case 7: // DATA_USERLEVEL (integer).  This is not available in LL and so has no constant.
+                    case ScriptBaseClass.DATA_PAYINFO: // DATA_PAYINFO (0|1|2|3)
+                        break;
+                    default:
+                        return string.Empty; // Raise no event
                 }
 
-                if (Util.EnvironmentTickCount() < ce.time ||
-                            (Util.EnvironmentTickCount() - ce.time) >= LlRequestAgentDataCacheTimeoutMs)
+                Action<string> act = eventID =>
                 {
-                    PresenceInfo[] pinfos = World.PresenceService.GetAgents(new string[] { uuid.ToString() });
-                    if (pinfos != null && pinfos.Length > 0)
+                    UserAccount account = null;
+                    string reply;
+
+                    if (data == ScriptBaseClass.DATA_ONLINE)
                     {
-                        foreach (PresenceInfo p in pinfos)
+                        World.TryGetScenePresence(uuid, out ScenePresence sp);
+                        if(sp != null)
+                            reply = "1";
+                        else
                         {
-                            if (p.RegionID != UUID.Zero)
+                            account = m_userAccountService.GetUserAccount(RegionScopeID, uuid);
+                            if (account == null)
+                                reply = "0";
+                            else
                             {
-                                pinfo = p;
+                                PresenceInfo pinfo = null;
+                                if (!m_PresenceInfoCache.TryGetValue(uuid, out pinfo))
+                                {
+                                    PresenceInfo[] pinfos = World.PresenceService.GetAgents(new string[] { uuid.ToString() });
+                                    if (pinfos != null && pinfos.Length > 0)
+                                    {
+                                        foreach (PresenceInfo p in pinfos)
+                                        {
+                                            if (p.RegionID != UUID.Zero)
+                                            {
+                                                pinfo = p;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                m_PresenceInfoCache.AddOrUpdate(uuid, pinfo, m_llRequestAgentDataCacheTimeout);
+                                if (pinfo != null && pinfo.RegionID != UUID.Zero)
+                                    reply = "1";
+                                else
+                                    reply = "0";
                             }
                         }
                     }
                     else
-                        pinfo = null;
+                    {
+                        if (account == null)
+                            account = m_userAccountService.GetUserAccount(RegionScopeID, uuid);
 
-                    ce.time = Util.EnvironmentTickCount();
-                    ce.pinfo = pinfo;
-                }
-
-                string reply = String.Empty;
-
-                switch (data)
-                {
-                    case ScriptBaseClass.DATA_ONLINE: // DATA_ONLINE (0|1)
-                        if (pinfo != null && pinfo.RegionID != UUID.Zero)
-                            reply = "1";
-                        else
+                        if (account == null)
                             reply = "0";
-                        break;
-                    case ScriptBaseClass.DATA_NAME: // DATA_NAME (First Last)
-                        reply = account.FirstName + " " + account.LastName;
-                        break;
-                    case ScriptBaseClass.DATA_BORN: // DATA_BORN (YYYY-MM-DD)
-                        DateTime born = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-                        born = born.AddSeconds(account.Created);
-                        reply = born.ToString("yyyy-MM-dd");
-                        break;
-                    case ScriptBaseClass.DATA_RATING: // DATA_RATING (0,0,0,0,0,0)
-                        reply = "0,0,0,0,0,0";
-                        break;
-                    case 7: // DATA_USERLEVEL (integer).  This is not available in LL and so has no constant.
-                        reply = account.UserLevel.ToString();
-                        break;
-                    case ScriptBaseClass.DATA_PAYINFO: // DATA_PAYINFO (0|1|2|3)
-                        reply = "0";
-                        break;
-                    default:
-                        return UUID.Zero.ToString(); // Raise no event
-                }
+                        else
+                            switch (data)
+                            {
+                                case ScriptBaseClass.DATA_NAME: // DATA_NAME (First Last)
+                                    reply = account.FirstName + " " + account.LastName;
+                                    break;
+                                case ScriptBaseClass.DATA_BORN: // DATA_BORN (YYYY-MM-DD)
+                                    DateTime born = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+                                    born = born.AddSeconds(account.Created);
+                                    reply = born.ToString("yyyy-MM-dd");
+                                    break;
+                                case ScriptBaseClass.DATA_RATING: // DATA_RATING (0,0,0,0,0,0)
+                                    reply = "0,0,0,0,0,0";
+                                    break;
+                                case 7: // DATA_USERLEVEL (integer).  This is not available in LL and so has no constant.
+                                    reply = account.UserLevel.ToString();
+                                    break;
+                                case ScriptBaseClass.DATA_PAYINFO: // DATA_PAYINFO (0|1|2|3)
+                                    reply = "0";
+                                    break;
+                                default:
+                                    reply = "0"; // Raise no event
+                                    break;
+                            }
+                        }
+                    m_AsyncCommands.DataserverPlugin.DataserverReply(eventID, reply);
+                };
 
-                UUID rq = UUID.Random();
-
-                UUID tid = m_AsyncCommands.
-                    DataserverPlugin.RegisterRequest(m_host.LocalId,
-                                                 m_item.ItemID, rq.ToString());
-
-                m_AsyncCommands.DataserverPlugin.DataserverReply(rq.ToString(), reply);
+                UUID tid = m_AsyncCommands.DataserverPlugin.RegisterRequest(m_host.LocalId,
+                                                 m_item.ItemID, act);
 
                 ScriptSleep(m_sleepMsOnRequestAgentData);
                 return tid.ToString();
@@ -5070,42 +5078,42 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             return "";
         }
 
-        public LSL_Key llRequestInventoryData(string name)
+        //bad if lm is HG
+        public LSL_Key llRequestInventoryData(LSL_String name)
         {
             m_host.AddScriptLPS(1);
 
-            foreach (TaskInventoryItem item in m_host.Inventory.GetInventoryItems())
+            Action<string> act = eventID =>
             {
-                if (item.Type == 3 && item.Name == name)
+                string reply = String.Empty;
+                foreach (TaskInventoryItem item in m_host.Inventory.GetInventoryItems())
                 {
-                    UUID tid = m_AsyncCommands.
-                        DataserverPlugin.RegisterRequest(m_host.LocalId,
-                                                     m_item.ItemID, item.AssetID.ToString());
-
-                    Vector3 region = new Vector3(World.RegionInfo.WorldLocX, World.RegionInfo.WorldLocY, 0);
-
-                    World.AssetService.Get(item.AssetID.ToString(), this,
-                        delegate (string i, object sender, AssetBase a)
+                    if (item.Type == 3 && item.Name == name)
+                    {
+                        AssetBase a = World.AssetService.Get(item.AssetID.ToString());
+                        if(a != null)
                         {
                             AssetLandmark lm = new AssetLandmark(a);
-
-                            float rx = (uint)(lm.RegionHandle >> 32);
-                            float ry = (uint)lm.RegionHandle;
-                            region = lm.Position + new Vector3(rx, ry, 0) - region;
-
-                            string reply = region.ToString();
-                            m_AsyncCommands.
-                                DataserverPlugin.DataserverReply(i.ToString(),
-                                                             reply);
-                        });
-
-                    ScriptSleep(m_sleepMsOnRequestInventoryData);
-                    return tid.ToString();
+                            if(lm != null)
+                            {
+                                float rx = (uint)(lm.RegionHandle >> 32);
+                                float ry = (uint)lm.RegionHandle;
+                                Vector3 region = new Vector3(World.RegionInfo.WorldLocX, World.RegionInfo.WorldLocY, 0);
+                                region = lm.Position + new Vector3(rx, ry, 0) - region;
+                                reply = region.ToString();
+                            }
+                        }
+                        break;
+                    }
                 }
-            }
+                m_AsyncCommands.DataserverPlugin.DataserverReply(eventID, reply);
+            };
+
+            UUID tid = m_AsyncCommands.DataserverPlugin.RegisterRequest(m_host.LocalId,
+                                                         m_item.ItemID, act);
 
             ScriptSleep(m_sleepMsOnRequestInventoryData);
-            return String.Empty;
+            return tid.ToString();
         }
 
         public void llSetDamage(double damage)
@@ -5704,7 +5712,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             TaskInventoryItem item = m_host.Inventory.GetInventoryItem(name);
 
             if (item == null)
-                return UUID.Zero.ToString();
+                return ScriptBaseClass.NULL_KEY;
 
             if ((item.CurrentPermissions
                  & (uint)(PermissionMask.Copy | PermissionMask.Transfer | PermissionMask.Modify))
@@ -5713,7 +5721,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                 return item.AssetID.ToString();
             }
 
-            return UUID.Zero.ToString();
+            return ScriptBaseClass.NULL_KEY;
         }
 
         public void llAllowInventoryDrop(LSL_Integer add)
@@ -5825,7 +5833,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             }
             else
             {
-                return UUID.Zero.ToString();
+                return ScriptBaseClass.NULL_KEY;
             }
         }
 
@@ -6586,7 +6594,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             ex += World.RegionInfo.WorldLocX;
             ey += World.RegionInfo.WorldLocY;
 
-            if (World.GridService.GetRegionByPosition(World.RegionInfo.ScopeID, (int)ex, (int)ey) != null)
+            if(World.GridService.GetRegionByPosition(RegionScopeID, (int)ex, (int)ey) != null)
                 return 0;
             return 1;
         }
@@ -6844,7 +6852,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
 
                 if (presence != null)
                 {
-                    return presence.ControllingClient.Name;
+                    return presence.Name;
                     //return presence.Name;
                 }
 
@@ -6860,20 +6868,120 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
         {
             m_host.AddScriptLPS(1);
 
+            if(string.IsNullOrWhiteSpace(name))
+                return ScriptBaseClass.NULL_KEY;
+
+            int nc = Util.ParseAvatarName(name, out string firstName, out string lastName, out string server);
+            if (nc < 2)
+                return ScriptBaseClass.NULL_KEY;
+
+            string sname;
+            if (nc == 2)
+                sname = firstName + " " + lastName;
+            else
+                sname = firstName + "." + lastName + " @" + server;
+
             foreach (ScenePresence sp in World.GetScenePresences())
             {
                 if (sp.IsDeleted || sp.IsChildAgent)
                     continue;
-
-                string test = sp.ControllingClient.Name;
-                if (!name.Contains(" "))
-                    test = test.Replace(" ", ".");
-
-                if (String.Compare(name, test, true) == 0)
+                if (String.Compare(sname, sp.Name, true) == 0)
                     return sp.UUID.ToString();
             }
 
-            return UUID.Zero.ToString();
+            return ScriptBaseClass.NULL_KEY;
+        }
+
+        public LSL_Key llRequestUserKey(LSL_String username)
+        {
+            m_host.AddScriptLPS(1);
+
+            if (string.IsNullOrWhiteSpace(username))
+                return ScriptBaseClass.NULL_KEY;
+
+            int nc = Util.ParseAvatarName(username, out string firstName, out string lastName, out string server);
+            if (nc < 2)
+                return ScriptBaseClass.NULL_KEY;
+
+            string sname;
+            if (nc == 2)
+                sname = firstName + " " + lastName;
+            else
+                sname = firstName + "." + lastName + " @" + server;
+
+            foreach (ScenePresence sp in World.GetScenePresences())
+            {
+                if (sp.IsDeleted || sp.IsChildAgent)
+                    continue;
+                if (String.Compare(sname, sp.Name, true) == 0)
+                {
+                    string ftid = m_AsyncCommands.DataserverPlugin.RequestWithImediatePost(m_host.LocalId,
+                                                        m_item.ItemID, sp.UUID.ToString());
+                    return ftid;
+                }
+            }
+
+            Action<string> act = eventID =>
+            {
+                string reply = ScriptBaseClass.NULL_KEY;
+                UUID userID = UUID.Zero;
+                IUserManagement userManager = World.RequestModuleInterface<IUserManagement>();
+                if (nc == 2)
+                {
+                    if (userManager != null)
+                    {
+                        userID = userManager.GetUserIdByName(firstName, lastName);
+                        if (userID != UUID.Zero)
+                            reply = userID.ToString();
+                    }
+                }
+                else
+                {
+                    string url = "http://" + server;
+                    if (Uri.TryCreate(url, UriKind.Absolute, out Uri dummy))
+                    {
+                        bool notfound = true;
+                        if (userManager != null)
+                        {
+                            string hgfirst = firstName + "." + lastName;
+                            string hglast = "@" + server;
+                            userID = userManager.GetUserIdByName(hgfirst, hglast);
+                            if (userID != UUID.Zero)
+                            {
+                                notfound = false;
+                                reply = userID.ToString();
+                            }
+                        }
+
+                        if(notfound)
+                        {
+                            try
+                            {
+                                UserAgentServiceConnector userConnection = new UserAgentServiceConnector(url);
+                                if (userConnection != null)
+                                {
+                                    userID = userConnection.GetUUID(firstName, lastName);
+                                    if (userID != UUID.Zero)
+                                    {
+                                        if (userManager != null)
+                                            userManager.AddUser(userID, firstName, lastName, url);
+                                        reply = userID.ToString();
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                                reply = ScriptBaseClass.NULL_KEY;
+                            }
+                        }
+                    }
+                }
+                m_AsyncCommands.DataserverPlugin.DataserverReply(eventID, reply);
+            };
+
+            UUID tid = m_AsyncCommands.DataserverPlugin.RegisterRequest(m_host.LocalId, m_item.ItemID, act);
+            ScriptSleep(m_sleepMsOnRequestAgentData);
+            return tid.ToString();
         }
 
         public void llSetTextureAnim(int mode, int face, int sizex, int sizey, double start, double length, double rate)
@@ -7001,7 +7109,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             m_host.AddScriptLPS(1);
             ILandObject land = World.LandChannel.GetLandObject((float)pos.x, (float)pos.y);
             if (land == null)
-                return UUID.Zero.ToString();
+                return ScriptBaseClass.NULL_KEY;
             return land.LandData.OwnerID.ToString();
         }
 
@@ -8004,11 +8112,11 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                     linknum == ScriptBaseClass.LINK_ALL_CHILDREN ||
                     linknum == ScriptBaseClass.LINK_ALL_OTHERS ||
                     linknum == 0)
-                return UUID.Zero.ToString();
+                return ScriptBaseClass.NULL_KEY;
 
             List<SceneObjectPart> parts = GetLinkParts(linknum);
             if (parts.Count == 0)
-                return UUID.Zero.ToString();
+                return ScriptBaseClass.NULL_KEY;
             return parts[0].SitTargetAvatar.ToString();
         }
 
@@ -8297,7 +8405,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                     {
                         new LSL_Integer(1),
                         new LSL_String(channelID.ToString()),
-                        new LSL_String(UUID.Zero.ToString()),
+                        new LSL_String(ScriptBaseClass.NULL_KEY),
                         new LSL_String(String.Empty),
                         new LSL_Integer(0),
                         new LSL_String(String.Empty)
@@ -11253,25 +11361,6 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
 
                 if (presence.Animator.Animations.ImplicitDefaultAnimation.AnimID
                     == DefaultAvatarAnimations.AnimsUUIDbyName["SIT_GROUND_CONSTRAINED"])
-/*
-                {
-                    // This is for ground sitting avatars
-                    float height = presence.Appearance.AvatarHeight / 2.66666667f;
-                    lower = new LSL_Vector(-0.3375f, -0.45f, height * -1.0f);
-                    upper = new LSL_Vector(0.3375f, 0.45f, 0.0f);
-                }
-                else
-                {
-                    // This is for standing/flying avatars
-                    float height = presence.Appearance.AvatarHeight / 2.0f;
-                    lower = new LSL_Vector(-0.225f, -0.3f, height * -1.0f);
-                    upper = new LSL_Vector(0.225f, 0.3f, height + 0.05f);
-                }
-
-                                // Adjust to the documented error offsets (see LSL Wiki)
-                                lower += new LSL_Vector(0.05f, 0.05f, 0.05f);
-                                upper -= new LSL_Vector(0.05f, 0.05f, 0.05f);
-                */
                 {
                     // This is for ground sitting avatars TODO!
                     lower = new LSL_Vector(-box.X - 0.1125, -box.Y, box.Z * -1.0f);
@@ -11947,7 +12036,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                 }
             }
 
-            return UUID.Zero.ToString();
+            return ScriptBaseClass.NULL_KEY;
         }
 
         private void getLSLFaceMaterial(ref LSL_List res, int code, SceneObjectPart part, Primitive.TextureEntryFace texface)
@@ -11993,7 +12082,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             // material not found
             if (code == (int)ScriptBaseClass.PRIM_NORMAL || code == (int)ScriptBaseClass.PRIM_SPECULAR)
             {
-                res.Add(new LSL_String(UUID.Zero.ToString()));
+                res.Add(new LSL_String(ScriptBaseClass.NULL_KEY));
                 res.Add(new LSL_Vector(1.0, 1.0, 0));
                 res.Add(new LSL_Vector(0, 0, 0));
                 res.Add(new LSL_Float(0));
@@ -12979,7 +13068,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             m_host.AddScriptLPS(1);
             if (m_UrlModule != null)
                 return m_UrlModule.RequestSecureURL(m_ScriptEngine.ScriptModule, m_host, m_item.ItemID, null).ToString();
-            return UUID.Zero.ToString();
+            return ScriptBaseClass.NULL_KEY;
         }
 
         public LSL_Key llRequestSimulatorData(string simulator, int data)
@@ -12988,93 +13077,101 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             {
                 m_host.AddScriptLPS(1);
 
-                string reply = String.Empty;
-
-                GridRegion info;
-
                 if (World.RegionInfo.RegionName == simulator)
-                    info = new GridRegion(World.RegionInfo);
-                else
-                    info = World.GridService.GetRegionByName(m_ScriptEngine.World.RegionInfo.ScopeID, simulator);
-
-                switch (data)
                 {
-                    case ScriptBaseClass.DATA_SIM_POS:
-                        if (info == null)
-                        {
+                    string lreply = String.Empty;
+                    GridRegion linfo = new GridRegion(World.RegionInfo);
+                    switch (data)
+                    {
+                        case ScriptBaseClass.DATA_SIM_POS:
+                            {
+                                lreply = new LSL_Vector(
+                                    linfo.RegionLocX,
+                                    linfo.RegionLocY,
+                                    0).ToString();
+                            }
+                            break;
+                        case ScriptBaseClass.DATA_SIM_STATUS:
+                                lreply = "up"; // Duh!
+                            break;
+                        case ScriptBaseClass.DATA_SIM_RATING:
+                            int access = linfo.Maturity;
+                            if (access == 0)
+                                lreply = "PG";
+                            else if (access == 1)
+                                lreply = "MATURE";
+                            else if (access == 2)
+                                lreply = "ADULT";
+                            else
+                                lreply = "UNKNOWN";
+                            break;
+                        case ScriptBaseClass.DATA_SIM_RELEASE:
+                            lreply = "OpenSim";
+                            break;
+                        default:
                             ScriptSleep(m_sleepMsOnRequestSimulatorData);
-                            return UUID.Zero.ToString();
-                        }
-
-                        bool isHypergridRegion = false;
-
-                        if (World.RegionInfo.RegionName != simulator && info.RegionSecret != "")
-                        {
-                            // Hypergrid is currently placing real destination region co-ords into RegionSecret.
-                            // But other code can also use this field for a genuine RegionSecret!  Therefore, if
-                            // anything is present we need to disambiguate.
-                            //
-                            // FIXME: Hypergrid should be storing this data in a different field.
-                            RegionFlags regionFlags
-                                = (RegionFlags)m_ScriptEngine.World.GridService.GetRegionFlags(
-                                    info.ScopeID, info.RegionID);
-                            isHypergridRegion = (regionFlags & RegionFlags.Hyperlink) != 0;
-                        }
-
-                        if (isHypergridRegion)
-                        {
-                            Utils.LongToUInts(Convert.ToUInt64(info.RegionSecret), out uint rx, out uint ry);
-
-                            reply = new LSL_Vector(
-                                rx,
-                                ry,
-                                0).ToString();
-                        }
-                        else
-                        {
-                            // Local grid co-oridnates
-                            reply = new LSL_Vector(
-                                info.RegionLocX,
-                                info.RegionLocY,
-                                0).ToString();
-                        }
-                        break;
-                    case ScriptBaseClass.DATA_SIM_STATUS:
-                        if (info != null)
-                            reply = "up"; // Duh!
-                        else
-                            reply = "unknown";
-                        break;
-                    case ScriptBaseClass.DATA_SIM_RATING:
-                        if (info == null)
-                        {
-                            ScriptSleep(m_sleepMsOnRequestSimulatorData);
-                            return UUID.Zero.ToString();
-                        }
-                        int access = info.Maturity;
-                        if (access == 0)
-                            reply = "PG";
-                        else if (access == 1)
-                            reply = "MATURE";
-                        else if (access == 2)
-                            reply = "ADULT";
-                        else
-                            reply = "UNKNOWN";
-                        break;
-                    case ScriptBaseClass.DATA_SIM_RELEASE:
-                        reply = "OpenSim";
-                        break;
-                    default:
-                        ScriptSleep(m_sleepMsOnRequestSimulatorData);
-                        return UUID.Zero.ToString(); // Raise no event
+                            return ScriptBaseClass.NULL_KEY; // Raise no event
+                    }
+                    string ltid = m_AsyncCommands.DataserverPlugin.RequestWithImediatePost(m_host.LocalId,
+                                                                        m_item.ItemID, lreply);
+                    ScriptSleep(m_sleepMsOnRequestSimulatorData);
+                    return ltid;
                 }
-                UUID rq = UUID.Random();
 
-                UUID tid = m_AsyncCommands.
-                    DataserverPlugin.RegisterRequest(m_host.LocalId, m_item.ItemID, rq.ToString());
+                Action<string> act = eventID =>
+                {
+                    GridRegion info = World.GridService.GetRegionByName(RegionScopeID, simulator);
+                    string reply = "unknown";
+                    if (info != null)
+                    {
+                        switch (data)
+                        {
+                            case ScriptBaseClass.DATA_SIM_POS:
+                                // Hypergrid is currently placing real destination region co-ords into RegionSecret.
+                                // But other code can also use this field for a genuine RegionSecret!  Therefore, if
+                                // anything is present we need to disambiguate.
+                                //
+                                // FIXME: Hypergrid should be storing this data in a different field.
+                                RegionFlags regionFlags = (RegionFlags)m_ScriptEngine.World.GridService.GetRegionFlags(
+                                        info.ScopeID, info.RegionID);
 
-                m_AsyncCommands.
-                    DataserverPlugin.DataserverReply(rq.ToString(), reply);
+                                if ((regionFlags & RegionFlags.Hyperlink) != 0)
+                                {
+                                    Utils.LongToUInts(Convert.ToUInt64(info.RegionSecret), out uint rx, out uint ry);
+                                    reply = new LSL_Vector(rx, ry, 0).ToString();
+                                }
+                                else
+                                {
+                                    // Local grid co-oridnates
+                                    reply = new LSL_Vector(info.RegionLocX, info.RegionLocY, 0).ToString();
+                                }
+                                break;
+                            case ScriptBaseClass.DATA_SIM_STATUS:
+                                reply = "up"; // Duh!
+                                break;
+                            case ScriptBaseClass.DATA_SIM_RATING:
+                                int access = info.Maturity;
+                                if (access == 0)
+                                    reply = "PG";
+                                else if (access == 1)
+                                    reply = "MATURE";
+                                else if (access == 2)
+                                    reply = "ADULT";
+                                else
+                                    reply = "UNKNOWN";
+                                break;
+                            case ScriptBaseClass.DATA_SIM_RELEASE:
+                                reply = "OpenSim";
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    m_AsyncCommands.DataserverPlugin.DataserverReply(eventID, reply);
+                };
+
+                UUID tid = m_AsyncCommands.DataserverPlugin.RegisterRequest(
+                    m_host.LocalId, m_item.ItemID, act);
 
                 ScriptSleep(m_sleepMsOnRequestSimulatorData);
                 return tid.ToString();
@@ -13082,7 +13179,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             catch (Exception)
             {
                 //m_log.Error("[LSL_API]: llRequestSimulatorData" + e.ToString());
-                return UUID.Zero.ToString();
+                return ScriptBaseClass.NULL_KEY;
             }
         }
 
@@ -13092,7 +13189,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
 
             if (m_UrlModule != null)
                 return m_UrlModule.RequestURL(m_ScriptEngine.ScriptModule, m_host, m_item.ItemID, null).ToString();
-            return UUID.Zero.ToString();
+            return ScriptBaseClass.NULL_KEY;
         }
 
         public void llForceMouselook(int mouselook)
@@ -14083,8 +14180,8 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             if (httpScriptMod == null)
                 return "";
 
-            if (!httpScriptMod.CheckThrottle(m_host.LocalId, m_host.OwnerID))
-                return UUID.Zero.ToString();
+            if(!httpScriptMod.CheckThrottle(m_host.LocalId, m_host.OwnerID))
+                return ScriptBaseClass.NULL_KEY;
 
             List<string> param = new List<string>();
             bool  ok;
@@ -14130,7 +14227,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                             break;
                         }
 
-                        if (HttpStandardHeaders.Contains(parameters.Data[i].ToString(), StringComparer.OrdinalIgnoreCase))
+                        if (HttpStandardHeaders.Contains(parameters.Data[i].ToString()))
                             Error("llHTTPRequest", "Name is invalid as a custom header at parameter " + i.ToString());
 
                         param.Add(parameters.Data[i].ToString());
@@ -14511,10 +14608,10 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                             ret.Add(new LSL_Key((string)id));
                             break;
                         case ScriptBaseClass.OBJECT_GROUP:
-                            ret.Add(new LSL_String(UUID.Zero.ToString()));
+                            ret.Add(new LSL_String(ScriptBaseClass.NULL_KEY));
                             break;
                         case ScriptBaseClass.OBJECT_CREATOR:
-                            ret.Add(new LSL_Key(UUID.Zero.ToString()));
+                            ret.Add(new LSL_Key(ScriptBaseClass.NULL_KEY));
                             break;
                         // For the following 8 see the Object version below
                         case ScriptBaseClass.OBJECT_RUNNING_SCRIPT_COUNT:
@@ -14614,8 +14711,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                                 foreach (SceneObjectGroup Attachment in Attachments)
                                 {
                                     SceneObjectPart[] parts = Attachment.Parts;
-                                    int nparts = parts.Count();
-                                    for (int i = 0; i < nparts; i++)
+                                    for(int i = 0; i < parts.Length; i++)
                                         count += parts[i].Inventory.Count;
                                 }
                             } catch { };
@@ -14873,7 +14969,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                         case ScriptBaseClass.OBJECT_TOTAL_INVENTORY_COUNT:
                             SceneObjectPart[] parts = obj.ParentGroup.Parts;
                             count = 0;
-                            for (int i = 0; i < parts.Count(); i++)
+                            for(int i = 0; i < parts.Length; i++)
                                 count += parts[i].Inventory.Count;
                             ret.Add(new LSL_Integer(count));
                             break;
@@ -15034,35 +15130,36 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             {
                 // => complain loudly, as specified by the LSL docs
                 Error("llGetNumberOfNotecardLines", "Can't find notecard '" + name + "'");
-
-                return UUID.Zero.ToString();
+                return ScriptBaseClass.NULL_KEY;
             }
-
-            string reqIdentifier = UUID.Random().ToString();
-
-            // was: UUID tid = tid = AsyncCommands.
-            UUID tid = m_AsyncCommands.DataserverPlugin.RegisterRequest(m_host.LocalId, m_item.ItemID, reqIdentifier);
 
             if (NotecardCache.IsCached(assetID))
             {
-                m_AsyncCommands.DataserverPlugin.DataserverReply(reqIdentifier, NotecardCache.GetLines(assetID).ToString());
-
+                string ftid = m_AsyncCommands.DataserverPlugin.RequestWithImediatePost(m_host.LocalId, m_item.ItemID, NotecardCache.GetLines(assetID).ToString());
                 ScriptSleep(m_sleepMsOnGetNumberOfNotecardLines);
-                return tid.ToString();
+                return ftid;
             }
 
-            WithNotecard(assetID, delegate (UUID id, AssetBase a)
+            Action<string> act = eventID =>
             {
-                if (a == null || a.Type != 7)
+                if (NotecardCache.IsCached(assetID))
                 {
-                    Error("llGetNumberOfNotecardLines", "Can't find notecard '" + name + "'");
+                    m_AsyncCommands.DataserverPlugin.DataserverReply(eventID, NotecardCache.GetLines(assetID).ToString());
                     return;
                 }
 
-                NotecardCache.Cache(id, a.Data);
-                m_AsyncCommands.DataserverPlugin.DataserverReply(reqIdentifier, NotecardCache.GetLines(id).ToString());
-            });
+                AssetBase a = World.AssetService.Get(assetID.ToString());
+                if (a == null || a.Type != 7)
+                {
+                    m_AsyncCommands.DataserverPlugin.DataserverReply(eventID, string.Empty);
+                    return;
+                }
 
+                NotecardCache.Cache(assetID, a.Data);
+                m_AsyncCommands.DataserverPlugin.DataserverReply(eventID, NotecardCache.GetLines(assetID).ToString());
+             };
+
+            UUID tid = m_AsyncCommands.DataserverPlugin.RegisterRequest(m_host.LocalId, m_item.ItemID, act);
             ScriptSleep(m_sleepMsOnGetNumberOfNotecardLines);
             return tid.ToString();
         }
@@ -15085,39 +15182,39 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             {
                 // => complain loudly, as specified by the LSL docs
                 Error("llGetNotecardLine", "Can't find notecard '" + name + "'");
-
-                return UUID.Zero.ToString();
+                return ScriptBaseClass.NULL_KEY;
             }
-
-            string reqIdentifier = UUID.Random().ToString();
-
-            // was: UUID tid = tid = AsyncCommands.
-            UUID tid = m_AsyncCommands.DataserverPlugin.RegisterRequest(m_host.LocalId, m_item.ItemID, reqIdentifier);
 
             if (NotecardCache.IsCached(assetID))
             {
-                m_AsyncCommands.DataserverPlugin.DataserverReply(
-                    reqIdentifier, NotecardCache.GetLine(assetID, line, m_notecardLineReadCharsMax));
+                string eid = m_AsyncCommands.DataserverPlugin.RequestWithImediatePost(m_host.LocalId, m_item.ItemID,
+                    NotecardCache.GetLine(assetID, line, m_notecardLineReadCharsMax));
 
                 ScriptSleep(m_sleepMsOnGetNotecardLine);
-                return tid.ToString();
+                return eid;
             }
 
-            WithNotecard(assetID, delegate (UUID id, AssetBase a)
-                         {
-                             if (a == null || a.Type != 7)
-                             {
-                                 Error("llGetNotecardLine", "Can't find notecard '" + name + "'");
-                                 return;
-                             }
+            Action<string> act = eventID =>
+            {
+                if (NotecardCache.IsCached(assetID))
+                {
+                    m_AsyncCommands.DataserverPlugin.DataserverReply(eventID, NotecardCache.GetLine(assetID, line, m_notecardLineReadCharsMax));
+                    return;
+                }
 
-                             //string data = Encoding.UTF8.GetString(a.Data);
-                             //m_log.Debug(data);
-                             NotecardCache.Cache(id, a.Data);
-                             m_AsyncCommands.DataserverPlugin.DataserverReply(
-                                reqIdentifier, NotecardCache.GetLine(assetID, line, m_notecardLineReadCharsMax));
-                         });
+                AssetBase a = World.AssetService.Get(assetID.ToString());
+                if (a == null || a.Type != 7)
+                {
+                    m_AsyncCommands.DataserverPlugin.DataserverReply(eventID, string.Empty);
+                    return;
+                }
 
+                NotecardCache.Cache(assetID, a.Data);
+                m_AsyncCommands.DataserverPlugin.DataserverReply(
+                   eventID, NotecardCache.GetLine(assetID, line, m_notecardLineReadCharsMax));
+            };
+
+            UUID tid = m_AsyncCommands.DataserverPlugin.RegisterRequest(m_host.LocalId, m_item.ItemID, act);
             ScriptSleep(m_sleepMsOnGetNotecardLine);
             return tid.ToString();
         }
@@ -15240,48 +15337,104 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             return Name2Username(llKey2Name(id));
         }
 
-        public LSL_Key llRequestUsername(string id)
+        public LSL_Key llRequestUsername(LSL_Key id)
         {
-            UUID rq = UUID.Random();
+            m_host.AddScriptLPS(1);
+            if (!UUID.TryParse(id, out UUID key) || key == UUID.Zero)
+                return string.Empty;
 
-            m_AsyncCommands.DataserverPlugin.RegisterRequest(m_host.LocalId, m_item.ItemID, rq.ToString());
-
-            m_AsyncCommands.DataserverPlugin.DataserverReply(rq.ToString(), Name2Username(llKey2Name(id)));
-
-            return rq.ToString();
-        }
-
-        public LSL_String llGetDisplayName(string id)
-        {
-            IDisplayNamesModule namesModule = World.RequestModuleInterface<IDisplayNamesModule>();
-
-            if(namesModule != null)
+            ScenePresence lpresence = World.GetScenePresence(key);
+            if (lpresence != null)
             {
-                return namesModule.GetCachedDisplayName(id);
+                string lname = lpresence.Name;
+                string ftid = m_AsyncCommands.DataserverPlugin.RequestWithImediatePost(m_host.LocalId,
+                                                    m_item.ItemID, Name2Username(lname));
+                return ftid;
             }
-            else
+
+            Action<string> act = eventID =>
             {
-                return llKey2Name(id);
-            }
-        }
-
-        public LSL_Key llRequestDisplayName(string id)
-        {
-            UUID rq = UUID.Random();
-
-            m_AsyncCommands.DataserverPlugin.RegisterRequest(m_host.LocalId, m_item.ItemID, rq.ToString());
-
-            m_AsyncCommands.DataserverPlugin.DataserverReply(rq.ToString(), llKey2Name(id));
-
-            return rq.ToString();
-        }
-        
-        /*
-                private void SayShoutTimerElapsed(Object sender, ElapsedEventArgs args)
+                string name = String.Empty;
+                ScenePresence presence = World.GetScenePresence(key);
+                if (presence != null)
                 {
-                    m_SayShoutCount = 0;
+                    name = presence.Name;
                 }
-        */
+                else if (World.TryGetSceneObjectPart(key, out SceneObjectPart sop ) && sop != null)
+                {
+                    name = sop.Name;
+                }
+                else
+                {
+                    UserAccount account = m_userAccountService.GetUserAccount(RegionScopeID, key);
+                    if(account != null)
+                    {
+                        name = account.FirstName + " " + account.LastName;
+                    }
+                }
+                m_AsyncCommands.DataserverPlugin.DataserverReply(eventID, Name2Username(name));
+            };
+
+            UUID rq = m_AsyncCommands.DataserverPlugin.RegisterRequest(m_host.LocalId, m_item.ItemID, act);
+            ScriptSleep(m_sleepMsOnRequestAgentData);
+            return rq.ToString();
+        }
+
+        public LSL_String llGetDisplayName(LSL_Key id)
+        {
+            m_host.AddScriptLPS(1);
+            if (UUID.TryParse(id, out UUID key) && key != UUID.Zero)
+            {
+                ScenePresence presence = World.GetScenePresence(key);
+                if (presence != null)
+                {
+                    return presence.Name;
+                }
+            }
+            return String.Empty;
+        }
+
+        public LSL_Key llRequestDisplayName(LSL_Key id)
+        {
+            m_host.AddScriptLPS(1);
+            if (!UUID.TryParse(id, out UUID key) || key == UUID.Zero)
+                return string.Empty;
+
+            ScenePresence lpresence = World.GetScenePresence(key);
+            if (lpresence != null)
+            {
+                string lname = lpresence.Name;
+                string ftid = m_AsyncCommands.DataserverPlugin.RequestWithImediatePost(m_host.LocalId,
+                                                                   m_item.ItemID, lname);
+                return ftid;
+            }
+
+            Action<string> act = eventID =>
+            {
+                string name = String.Empty;
+                ScenePresence presence = World.GetScenePresence(key);
+                if (presence != null)
+                {
+                    name = presence.Name;
+                }
+                else if (World.TryGetSceneObjectPart(key, out SceneObjectPart sop) && sop != null)
+                {
+                    name = sop.Name;
+                }
+                else
+                {
+                    UserAccount account = m_userAccountService.GetUserAccount(RegionScopeID, key);
+                    if (account != null)
+                    {
+                        name = account.FirstName + " " + account.LastName;
+                    }
+                }
+                m_AsyncCommands.DataserverPlugin.DataserverReply(eventID, name);
+            };
+
+            UUID rq = m_AsyncCommands.DataserverPlugin.RegisterRequest(m_host.LocalId, m_item.ItemID, act);
+            return rq.ToString();
+        }
         private struct Tri
         {
             public Vector3 p1;
@@ -15591,10 +15744,6 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
 
         public LSL_List llCastRay(LSL_Vector start, LSL_Vector end, LSL_List options)
         {
-            // Use llCastRay V3 if configured
-            if (m_useCastRayV3)
-                return llCastRayV3(start, end, options);
-
             LSL_List list = new LSL_List();
 
             m_host.AddScriptLPS(1);
@@ -16693,7 +16842,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             if (!UUID.TryParse(avatar, out id))
                 return 0;
 
-            UserAccount account = World.UserAccountService.GetUserAccount(World.RegionInfo.ScopeID, id);
+            UserAccount account = m_userAccountService.GetUserAccount(RegionScopeID, id);
             isAccount = account != null ? true : false;
             if (!isAccount)
             {
@@ -16861,68 +17010,81 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
 
         public LSL_Key llTransferLindenDollars(LSL_Key destination, LSL_Integer amount)
         {
-            UUID txn = UUID.Random();
+            m_host.AddScriptLPS(1);
 
-            Util.FireAndForget(delegate (object x)
+            IMoneyModule money = World.RequestModuleInterface<IMoneyModule>();
+            UUID txn = UUID.Random();
+            UUID toID = UUID.Zero;
+
+            string replydata = "UnKnownError";
+            bool bad = true;
+            while(true)
+            {
+                if (amount <= 0)
+                {
+                    replydata = "INVALID_AMOUNT";
+                    break;
+                }
+
+                if (money == null)
+                {
+                    replydata = "TRANSFERS_DISABLED";
+                    break;
+                }
+
+                if (m_host.OwnerID == m_host.GroupID)
+                {
+                    replydata = "GROUP_OWNED";
+                    break;
+                }
+
+                if (m_item == null)
+                {
+                    replydata = "SERVICE_ERROR";
+                    break;
+                }
+
+                if (m_item.PermsGranter == UUID.Zero)
+                {
+                    replydata = "MISSING_PERMISSION_DEBIT";
+                    break;
+                }
+
+                if ((m_item.PermsMask & ScriptBaseClass.PERMISSION_DEBIT) == 0)
+                {
+                    replydata = "MISSING_PERMISSION_DEBIT";
+                    break;
+                }
+
+                if (!UUID.TryParse(destination, out toID))
+                {
+                    replydata = "INVALID_AGENT";
+                    break;
+                }
+                bad = false;
+                break;
+            }
+            if(bad)
+            {
+                m_ScriptEngine.PostScriptEvent(m_item.ItemID, new EventParams(
+                        "transaction_result", new Object[] {
+                            new LSL_String(txn.ToString()),
+                            new LSL_Integer(0),
+                            new LSL_String(replydata) },
+                        new DetectParams[0]));
+                return txn.ToString();
+            }
+
+            //fire and forget...
+            Action<string> act = eventID =>
             {
                 int replycode = 0;
-                string replydata = destination + "," + amount.ToString();
-
                 try
                 {
-                    if (amount <= 0)
-                    {
-                        replydata = "INVALID_AMOUNT";
-                        return;
-                    }
-
-                    TaskInventoryItem item = m_item;
-                    if (item == null)
-                    {
-                        replydata = "SERVICE_ERROR";
-                        return;
-                    }
-
-                    if (m_host.OwnerID == m_host.GroupID)
-                    {
-                        replydata = "GROUP_OWNED";
-                        return;
-                    }
-
-                    m_host.AddScriptLPS(1);
-
-                    if (item.PermsGranter == UUID.Zero)
-                    {
-                        replydata = "MISSING_PERMISSION_DEBIT";
-                        return;
-                    }
-
-                    if ((item.PermsMask & ScriptBaseClass.PERMISSION_DEBIT) == 0)
-                    {
-                        replydata = "MISSING_PERMISSION_DEBIT";
-                        return;
-                    }
-
-                    UUID toID = new UUID();
-
-                    if (!UUID.TryParse(destination, out toID))
-                    {
-                        replydata = "INVALID_AGENT";
-                        return;
-                    }
-
-                    UserAccount account = World.UserAccountService.GetUserAccount(World.RegionInfo.ScopeID, toID);
+                    UserAccount account = m_userAccountService.GetUserAccount(RegionScopeID, toID);
                     if (account == null)
                     {
                         replydata = "LINDENDOLLAR_ENTITYDOESNOTEXIST";
-                        return;
-                    }
-
-                    IMoneyModule money = World.RequestModuleInterface<IMoneyModule>();
-
-                    if (money == null)
-                    {
-                        replydata = "TRANSFERS_DISABLED";
                         return;
                     }
 
@@ -16931,9 +17093,9 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                     if (result)
                     {
                         replycode = 1;
+                        replydata = destination + "," + amount.ToString();
                         return;
                     }
-
                     replydata = reason;
                 }
                 finally
@@ -16945,8 +17107,9 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                             new LSL_String(replydata) },
                             new DetectParams[0]));
                 }
-            }, null, "LSL_Api.llTransferLindenDollars");
+            };
 
+            m_AsyncCommands.DataserverPlugin.RegisterRequest(m_host.LocalId, m_item.ItemID, act);
             return txn.ToString();
         }
 
@@ -18441,51 +18604,26 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
 
     public class NotecardCache
     {
-        protected class Notecard
-        {
-            public string[] text;
-            public DateTime lastRef;
-        }
-
-        private static Dictionary<UUID, Notecard> m_Notecards =
-            new Dictionary<UUID, Notecard>();
+        private static ExpiringCacheOS<UUID, string[]> m_Notecards = new ExpiringCacheOS<UUID, string[]>(30000);
 
         public static void Cache(UUID assetID, byte[] text)
         {
-            CheckCache();
+            if (m_Notecards.ContainsKey(assetID, 30000))
+                return;
 
-            lock (m_Notecards)
-            {
-                if (m_Notecards.ContainsKey(assetID))
-                    return;
-
-                Notecard nc = new Notecard
-                {
-                    lastRef = DateTime.Now,
-                    text = SLUtil.ParseNotecardToArray(text)
-                };
-                m_Notecards[assetID] = nc;
-            }
+            m_Notecards.AddOrUpdate(assetID, SLUtil.ParseNotecardToArray(text), 30);
         }
 
         public static bool IsCached(UUID assetID)
         {
-            lock (m_Notecards)
-            {
-                return m_Notecards.ContainsKey(assetID);
-            }
+            return m_Notecards.ContainsKey(assetID, 30000);
         }
 
         public static int GetLines(UUID assetID)
         {
-            if (!IsCached(assetID))
-                return -1;
-
-            lock (m_Notecards)
-            {
-                m_Notecards[assetID].lastRef = DateTime.Now;
-                return m_Notecards[assetID].text.Length;
-            }
+            if (m_Notecards.TryGetValue(assetID, 30000, out string[] text))
+                return text.Length;
+            return -1;
         }
 
         /// <summary>
@@ -18496,25 +18634,13 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
         /// <returns></returns>
         public static string GetLine(UUID assetID, int lineNumber)
         {
-            if (lineNumber < 0)
-                return "";
-
-            string data;
-
-            if (!IsCached(assetID))
-                return "";
-
-            lock (m_Notecards)
+            if (lineNumber >= 0 && m_Notecards.TryGetValue(assetID, 30000, out string[] text))
             {
-                m_Notecards[assetID].lastRef = DateTime.Now;
-
-                if (lineNumber >= m_Notecards[assetID].text.Length)
+                if (lineNumber >= text.Length)
                     return "\n\n\n";
-
-                data = m_Notecards[assetID].text[lineNumber];
-
-                return data;
+                return text[lineNumber];
             }
+            return "";
         }
 
         /// <summary>
@@ -18534,23 +18660,9 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             string line = GetLine(assetID, lineNumber);
 
             if (line.Length > maxLength)
-                line = line.Substring(0, maxLength);
+                return line.Substring(0, maxLength);
 
             return line;
         }
-
-        public static void CheckCache()
-        {
-            lock (m_Notecards)
-            {
-                foreach (UUID key in new List<UUID>(m_Notecards.Keys))
-                {
-                    Notecard nc = m_Notecards[key];
-                    if (nc.lastRef.AddSeconds(30) < DateTime.Now)
-                        m_Notecards.Remove(key);
-                }
-            }
-        }
-
     }
 }
