@@ -25,40 +25,36 @@
  * this file will likely require some modification.
  */
 
-using log4net;
-// TODO: convert OSDMaps to Dictionaries and UUIDs to GUIDs and remove requirement for OpenMetaverse libraries to make this more generic.
-using OpenMetaverse;
-using OpenMetaverse.StructuredData;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using log4net;
+// TODO: convert OSDMaps to Dictionaries and UUIDs to GUIDs and remove requirement for OpenMetaverse libraries to make this more generic.
+using OpenMetaverse;
+using OpenMetaverse.StructuredData;
 
-namespace Gloebit.GloebitMoneyModule
-{
+namespace Gloebit.GloebitMoneyModule {
 
-    public class GloebitAPIWrapper : GloebitAPI.IAsyncEndpointCallback
-    {
+    public class GloebitAPIWrapper : GloebitAPI.IAsyncEndpointCallback {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public readonly string m_key;
         private string m_keyAlias;
         private string m_secret;
         public readonly Uri m_url;
-        private GloebitAPI m_api;
+        private GloebitAPI m_api; 
 
         private static GloebitTransaction.IAssetCallback m_assetCallbacks;
 
-        public interface IUriLoader
-        {
+        public interface IUriLoader {
             // Load funcs below are used in flows where we need to send the user to the Gloebit Website.
             void LoadAuthorizeUriForUser(GloebitUser user, Uri authorizeUri);
             void LoadSubscriptionAuthorizationUriForUser(GloebitUser user, Uri subAuthUri, GloebitSubscription sub, bool isDeclined);
         }
         private static IUriLoader m_uriLoaders;
 
-        public interface IPlatformAccessor
-        {
+        public interface IPlatformAccessor {
             Uri GetBaseURI();
             string resolveAgentEmail(UUID agentID);
             string resolveAgentName(UUID agentID);  // TODO: may be able to remove this if we add it to the GloebitUser
@@ -66,14 +62,12 @@ namespace Gloebit.GloebitMoneyModule
         private static IPlatformAccessor m_platformAccessors;
 
         // TODO: might be better to do these with event handlers
-        public interface IUserAlert
-        {
+        public interface IUserAlert {
             void AlertUserAuthorized(GloebitUser user, UUID agentID, double balance, OSDMap extraData);
         }
         private static IUserAlert m_userAlerts;
 
-        public interface ITransactionAlert
-        {
+        public interface ITransactionAlert {
             void AlertTransactionBegun(GloebitTransaction txn, string description);
             void AlertTransactionStageCompleted(GloebitTransaction txn, GloebitAPI.TransactionStage stage, string additionalDetails);
             void AlertTransactionFailed(GloebitTransaction txn, GloebitAPI.TransactionStage stage, GloebitAPI.TransactionFailure failure, string additionalFailureDetails, OSDMap extraData);
@@ -81,15 +75,13 @@ namespace Gloebit.GloebitMoneyModule
         }
         private static ITransactionAlert m_transactionAlerts;
 
-        public interface ISubscriptionAlert
-        {
+        public interface ISubscriptionAlert {
             void AlertSubscriptionCreated(GloebitSubscription subscription);
             void AlertSubscriptionCreationFailed(GloebitSubscription subscription);
         }
         private static ISubscriptionAlert m_subscriptionAlerts;
 
-        public GloebitAPIWrapper(string key, string keyAlias, string secret, Uri url, string dbProvider, string dbConnectionString, GloebitTransaction.IAssetCallback assetCallbacks, IUriLoader uriLoaders, IPlatformAccessor platformAccessors, IUserAlert userAlerts, ITransactionAlert transactionAlerts, ISubscriptionAlert subscriptionAlerts)
-        {
+        public GloebitAPIWrapper(string key, string keyAlias, string secret, Uri url, string dbProvider, string dbConnectionString, GloebitTransaction.IAssetCallback assetCallbacks, IUriLoader uriLoaders, IPlatformAccessor platformAccessors, IUserAlert userAlerts, ITransactionAlert transactionAlerts, ISubscriptionAlert subscriptionAlerts) {
             m_key = key;
             m_keyAlias = keyAlias;
             m_secret = secret;
@@ -121,9 +113,9 @@ namespace Gloebit.GloebitMoneyModule
          * GloebitUser.Get() should be called to create or retrieve an AppUser
          * --- There is not one central GloebitAPIWrapper function for starting a new user session
          * --- but it may later be centralized.
-         * --- See GMM.SendNewSessionMessaging() func for closest thing to a StartUserSession().
+         * --- See GMM.SendNewSessionMessaging() function for closest thing to a StartUserSession().
          * GloebitUser.Cleanup() should be called to free up memory when a User is no longer active
-         * calling GetUserBalance() func with forceAuthoOnInvalidToken=true
+         * calling GetUserBalance() function with forceAuthoOnInvalidToken=true
          * --- is simplest way to ensure user is authorized and ready to proceed with transactions.
          ***************/
 
@@ -155,17 +147,16 @@ namespace Gloebit.GloebitMoneyModule
             Uri authUri = m_api.BuildAuthorizationURI(user, userName, m_platformAccessors.GetBaseURI());
             m_uriLoaders.LoadAuthorizeUriForUser(user, authUri);
         }
-
+            
         /*** GloebitAPI Required HTTP Callback Entrance Point - must be registered by GMM ***/
         /// <summary>
         /// Registered to the redirectURI from GloebitAPI.Authorize.  Called when a user approves authorization.
         /// Enacts the GloebitAPI.ExchangeAccessToken endpoint to exchange the auth_code for the token.
         /// </summary>
         /// <param name="requestData">response data from GloebitAPI.Authorize</param>
-        public Hashtable authComplete_func(Hashtable requestData)
-        {
+        public Hashtable authComplete_func(Hashtable requestData) {
             m_log.InfoFormat("[GLOEBITMONEYMODULE] authComplete_func");
-            foreach (DictionaryEntry e in requestData) { m_log.DebugFormat("{0}: {1}", e.Key, e.Value); }
+            foreach(DictionaryEntry e in requestData) { m_log.DebugFormat("{0}: {1}", e.Key, e.Value); }
 
             string agentId = requestData["agentId"] as string;
             string code = requestData["code"] as string;
@@ -186,7 +177,7 @@ namespace Gloebit.GloebitMoneyModule
 
             return response;
         }
-
+            
         /**** IAsyncEndpointCallback Interface ****/
         /// <summary>
         /// Called by the GloebitAPI after the async call to ExchangeAccessToken completes.
@@ -198,22 +189,19 @@ namespace Gloebit.GloebitMoneyModule
         /// <param name="responseDataMap">OSDMap of response data from GloebitAPI.ExchangeAccessToken</param>
         public void exchangeAccessTokenCompleted(bool success, GloebitUser user, OSDMap responseDataMap)
         {
-            if (success)
-            {
+            if (success) {
                 // This is the point where a user is actually authorized/linked
 
                 // Eventually, auth may pass balance back.  It doesn't yet, but will almost always be desired by app, so we'll retrieve it.
                 bool invalidatedToken;
-                double balance = m_api.GetBalance(user, out invalidatedToken);
+                double balance = m_api.GetBalance (user, out invalidatedToken);
 
                 // retrieve the agentID since that is what the calling app provided to us
                 UUID agentID = UUID.Parse(user.PrincipalID);
 
                 // TODO: determine what, if anything, should actually be in extraData that could be useful.  For now, entire response
                 m_userAlerts.AlertUserAuthorized(user, agentID, balance, responseDataMap);
-            }
-            else
-            {
+            } else {
                 // May want to log an error or retry.
                 // Don't think App should need to know that this failed 
             }
@@ -227,7 +215,7 @@ namespace Gloebit.GloebitMoneyModule
         /// <param name="userIDOnApp">ID from this app for the user whose balance is being requested</param>
         /// <param name ="forceAuthOnInvalidToken">Bool indicating whether we should request auth on failures from lack of auth</param>
         /// <param name="userName">string name of the user in this application.</param>
-        /// <returns>Gloebit balance for the gloebit account linked to this user or 0.0.</returns>
+        /// <returns>Gloebit balance for the Gloebit account linked to this user or 0.0.</returns>
         public double GetUserBalance(UUID userIDOnApp, bool forceAuthOnInvalidToken, string userName)
         {
             m_log.DebugFormat("[GLOEBITMONEYMODULE] GetAppUserBalance userIDOnApp:{0}", userIDOnApp);
@@ -236,28 +224,23 @@ namespace Gloebit.GloebitMoneyModule
 
             // Get User for agent
             GloebitUser user = GloebitUser.Get(m_key, userIDOnApp);
-            if (!user.IsAuthed())
-            {
+            if(!user.IsAuthed()) {
                 // If no auth token on file, request authorization.
                 needsAuth = true;
-            }
-            else
-            {
+            } else {
                 returnfunds = m_api.GetBalance(user, out needsAuth);
                 // if GetBalance fails due to invalidToken, needsAuth is set to true
 
                 // Fix for having a few old tokens out in the wild without an app_user_id stored as the user.GloebitID
                 // TODO: Remove this  once it's been released for awhile, as this fix should only be necessary for a short time.
-                if (String.IsNullOrEmpty(user.GloebitID) || user.GloebitID == UUID.Zero.ToString())
-                {
+                if (String.IsNullOrEmpty(user.GloebitID) || user.GloebitID == UUID.Zero.ToString()) {
                     m_log.InfoFormat("[GLOEBITMONEYMODULE] GetAppUserBalance userIDOnApp:{0} INVALIDATING TOKEN FROM GMM", userIDOnApp);
                     user.InvalidateToken();
                     needsAuth = true;
                 }
             }
 
-            if (needsAuth && forceAuthOnInvalidToken)
-            {
+            if (needsAuth && forceAuthOnInvalidToken) {
                 Authorize(user, userName);
             }
 
@@ -267,19 +250,19 @@ namespace Gloebit.GloebitMoneyModule
         #endregion // User Auth and Balance
 
         #region Purchasing gloebits
-
+        
         /*****************************/
         /**** PURCHASING gloebits ****/
         /*****************************/
-
+                   
         /******************
          * Users can do this directly from their Gloebit account on the website, so these methods are not required.
-         * However, they are useful for providing gloebit purchase links to the user to take them directly to the purchase page.
+         * However, they are useful for providing Gloebit purchase links to the user to take them directly to the purchase page.
          * Eventually, these links will enable returning directly to a commerce flow or alerting the app that the user's balance
          * has been updated.
          ******************/
 
-        // TODO: should this be moved to API and replaced with purchase func here which builds and calls send with URI?
+        // TODO: should this be moved to API and replaced with purchase function here which builds and calls send with URI?
         //       GMM definitely needs to just build the URI, though it could call purchase when it needs it for a link and not send it
         //       if it can supply extra info for how to handle the return.  This seems more complex than necessary right now, so we've
         //       left it here.
@@ -291,20 +274,16 @@ namespace Gloebit.GloebitMoneyModule
         ///                               yet implemented on the Gloebit server.</param>
         /// <param name ="u">GloebitUser representing the agent and app requesting to purchase gloebits</param>
         /// <returns>URI for the platform to provide at which this user can purchase gloebits.</returns>
-        public Uri BuildPurchaseURI(Uri callbackBaseUri, GloebitUser u)
-        {
+        public Uri BuildPurchaseURI(Uri callbackBaseUri, GloebitUser u) {
             UriBuilder purchaseUri = new UriBuilder(m_url);
             purchaseUri.Path = "/purchase";
-            if (callbackBaseUri != null)
-            {
+            if (callbackBaseUri != null) {
                 // could do a try/catch here with the errors that UriBuilder can throw to also prevent crash from poorly formatted server uri.
                 UriBuilder callbackUrl = new UriBuilder(callbackBaseUri);
                 callbackUrl.Path = "/gloebit/buy_complete";
                 callbackUrl.Query = String.Format("agentId={0}", u.PrincipalID);
                 purchaseUri.Query = String.Format("reset&r={0}&inform={1}", m_keyAlias, callbackUrl.Uri);
-            }
-            else
-            {
+            } else {
                 purchaseUri.Query = String.Format("reset&r={0}", m_keyAlias);
             }
             return purchaseUri.Uri;
@@ -317,8 +296,7 @@ namespace Gloebit.GloebitMoneyModule
         /// Sends a balance update to the user
         /// </summary>
         /// <param name="requestData">response data from GloebitAPI.Purchase</param>
-        public Hashtable buyComplete_func(Hashtable requestData)
-        {
+        public Hashtable buyComplete_func(Hashtable requestData) {
             // TODO: This is not yet implemented on the api side.  BuildPurchaseURI sets the inform query arg to this.
             // But that's we need to build the functionality to call that url upon purchase completion.
             // We would probably pass this through and do it when we load the purchase success page.
@@ -354,7 +332,7 @@ namespace Gloebit.GloebitMoneyModule
         /// Helper function to build the minimal transaction description sent to the Gloebit transactU2U endpoint.
         /// Used for tracking as well as information provided in transaction histories.
         /// </summary>
-        /// <param name="txnType">String describing the type of transaction.  eg. ObjectBuy, PayObject, PayUser, etc.</param>
+        /// <param name="txnType">String describing the type of transaction.  e.g. ObjectBuy, PayObject, PayUser, etc.</param>
         /// <returns>OSDMap to be sent with the transaction request parameters.  Map contains six dictionary entries, each including an OSDArray.</returns>
         public OSDMap BuildBaseTransactionDescMap(string txnType)
         {
@@ -383,39 +361,34 @@ namespace Gloebit.GloebitMoneyModule
         /// Any entryName/Value pairs added to a descMap passed to the transactU2U endpoint will be sent to Gloebit, tracked with the transaction, and will appear in the transaction history for all users who are a party to the transaction.
         /// </summary>
         /// <param name="descMap">descMap created by buildBaseTransactionDescMap.</param>
-        /// <param name="entryGroup">String group to which to add entryName/Value pair.  Must be one of {"platform", "location", "transactino"}.  Specifies group to which these details are most applicable.</param>
+        /// <param name="entryGroup">String group to which to add entryName/Value pair.  Must be one of {"platform", "location", "transaction"}.  Specifies group to which these details are most applicable.</param>
         /// <param name="entryName">String providing the name for entry to be added.  This is the name users will see in their transaction history for this entry.</param>
         /// <param name="entryValue">String providing the value for entry to be added.  This is the value users will see in their transaction history for this entry.</param>
         public void AddDescMapEntry(OSDMap descMap, string entryGroup, string entryName, string entryValue)
         {
 
             /****** ERROR CHECKING *******/
-            if (descMap == null)
-            {
+            if (descMap == null) {
                 m_log.ErrorFormat("[GLOEBITMONEYMODULE] addDescMapEntry: Attempted to add an entry to a NULL descMap.  entryGroup:{0} entryName:{1} entryValue:{2}", entryGroup, entryName, entryValue);
                 return;
             }
-            if (entryGroup == null || entryName == null || entryValue == null)
-            {
+            if (entryGroup == null || entryName == null || entryValue == null) {
                 m_log.ErrorFormat("[GLOEBITMONEYMODULE] addDescMapEntry: Attempted to add an entry to a descMap where one of the entry strings is NULL.  entryGroup:{0} entryName:{1} entryValue:{2}", entryGroup, entryName, entryValue);
                 return;
             }
-            if (entryGroup == String.Empty || entryName == String.Empty)
-            {
+            if (entryGroup == String.Empty || entryName == String.Empty) {
                 m_log.ErrorFormat("[GLOEBITMONEYMODULE] addDescMapEntry: Attempted to add an entry to a descMap where entryGroup or entryName is the empty string.  entryGroup:{0} entryName:{1} entryValue:{2}", entryGroup, entryName, entryValue);
                 return;
             }
 
-            List<string> permittedGroups = new List<string> { "platform", "location", "transaction" };
-            if (!permittedGroups.Contains(entryGroup))
-            {
+            List<string> permittedGroups = new List<string> {"platform", "location", "transaction"};
+            if (!permittedGroups.Contains(entryGroup)) {
                 m_log.ErrorFormat("[GLOEBITMONEYMODULE] addDescMapEntry: Attempted to add a transaction description parameter in an entryGroup that is not be tracked by Gloebit.  entryGroup:{0} permittedGroups:{1} entryName:{2} entryValue:{3}", entryGroup, permittedGroups, entryName, entryValue);
                 return;
             }
 
             /******* ADD ENTRY TO PROPER ARRAYS ******/
-            switch (entryGroup)
-            {
+            switch (entryGroup) {
                 case "platform":
                     ((OSDArray)descMap["platform-names"]).Add(entryName);
                     ((OSDArray)descMap["platform-values"]).Add(entryValue);
@@ -430,20 +403,20 @@ namespace Gloebit.GloebitMoneyModule
                     break;
                 default:
                     // SHOULD NEVER GET HERE
-                    m_log.ErrorFormat("[GLOEBITMONEYMODULE] addDescMapEntry: Attempted to add a transaction description parameter in an entryGroup that is not be tracked by Gloebit and made it to defualt of switch statement.  entryGroup:{0} permittedGroups:{1} entryName:{2} entryValue:{3}", entryGroup, permittedGroups, entryName, entryValue);
+                    m_log.ErrorFormat("[GLOEBITMONEYMODULE] addDescMapEntry: Attempted to add a transaction description parameter in an entryGroup that is not be tracked by Gloebit and made it to default of switch statement.  entryGroup:{0} permittedGroups:{1} entryName:{2} entryValue:{3}", entryGroup, permittedGroups, entryName, entryValue);
                     break;
             }
             return;
         }
 
         /// <summary>
-        /// Submits a GloebitTransaction to gloebit for processing and provides any necessary feedback to user/platform.
+        /// Submits a GloebitTransaction to Gloebit for processing and provides any necessary feedback to user/platform.
         /// --- Must call buildTransaction() to create argument 1.
         /// --- Must call buildBaseTransactionDescMap() to create argument 3.
         /// </summary>
         /// <param name="txn">GloebitTransaction created from buildTransaction().  Contains vital transaction details.</param>
         /// <param name="description">Description of transaction for transaction history reporting.</param>
-        /// <param name="descMap">Map of platform, location & transaction descriptors for tracking/querying and transaciton history details.  For more details, <see cref="GloebitMoneyModule.buildBaseTransactionDescMap"/> helper function.</param>
+        /// <param name="descMap">Map of platform, location & transaction descriptors for tracking/querying and transaction history details.  For more details, <see cref="GloebitMoneyModule.buildBaseTransactionDescMap"/> helper function.</param>
         /// <param name="u2u">boolean declaring whether this is a user-to-app (false) or user-to-user (true) transaction.</param>
         /// <returns>
         /// true if async transactU2U web request was built and submitted successfully; false if failed to submit request.
@@ -456,26 +429,20 @@ namespace Gloebit.GloebitMoneyModule
             m_log.InfoFormat("[GLOEBITMONEYMODULE] SubmitTransaction Txn: {0}, from {1} to {2}, for amount {3}, transactionType: {4}, description: {5}", txn.TransactionID, txn.PayerID, txn.PayeeID, txn.Amount, txn.TransactionType, description);
             m_transactionAlerts.AlertTransactionBegun(txn, description);
 
-            // TODO: Update all the alert funcs to handle fees properly.
+            // TODO: Update all the alert functions to handle fees properly.
 
             // TODO: Should we wrap TransactU2U or request.BeginGetResponse in Try/Catch?
             bool result = false;
-            if (u2u)
-            {
+            if (u2u) {
                 result = m_api.TransactU2U(txn, description, descMap, GloebitUser.Get(m_key, txn.PayerID), GloebitUser.Get(m_key, txn.PayeeID), m_platformAccessors.resolveAgentEmail(txn.PayeeID), m_platformAccessors.GetBaseURI());
-            }
-            else
-            {
+            } else {
                 result = m_api.Transact(txn, description, descMap, GloebitUser.Get(m_key, txn.PayerID), m_platformAccessors.GetBaseURI());
             }
 
-            if (!result)
-            {
+            if (!result) {
                 m_log.ErrorFormat("[GLOEBITMONEYMODULE] SubmitTransaction failed to create HttpWebRequest in GloebitAPI.TransactU2U");
                 m_transactionAlerts.AlertTransactionFailed(txn, GloebitAPI.TransactionStage.SUBMIT, GloebitAPI.TransactionFailure.SUBMISSION_FAILED, String.Empty, new OSDMap());
-            }
-            else
-            {
+            } else {
                 m_transactionAlerts.AlertTransactionStageCompleted(txn, GloebitAPI.TransactionStage.SUBMIT, String.Empty);
             }
 
@@ -483,7 +450,7 @@ namespace Gloebit.GloebitMoneyModule
         }
 
         /// <summary>
-        /// Submits a GloebitTransaction usings synchronous web requests to gloebit for processing and provides any necessary feedback to user/platform.
+        /// Submits a GloebitTransaction using synchronous web requests to Gloebit for processing and provides any necessary feedback to user/platform.
         /// Rather than solely receiving a "submission" response, TransactU2UCallback happens during request, and receives transaction success/failure response.
         /// --- Must call buildTransaction() to create argument 1.
         /// --- Must call buildBaseTransactionDescMap() to create argument 3.
@@ -491,7 +458,7 @@ namespace Gloebit.GloebitMoneyModule
         /// </summary>
         /// <param name="txn">GloebitTransaction created from buildTransaction().  Contains vital transaction details.</param>
         /// <param name="description">Description of transaction for transaction history reporting.</param>
-        /// <param name="descMap">Map of platform, location & transaction descriptors for tracking/querying and transaciton history details.  For more details, <see cref="GloebitMoneyModule.buildBaseTransactionDescMap"/> helper function.</param>
+        /// <param name="descMap">Map of platform, location & transaction descriptors for tracking/querying and transaction history details.  For more details, <see cref="GloebitMoneyModule.buildBaseTransactionDescMap"/> helper function.</param>
         /// <returns>
         /// true if sync transactU2U web request was built and submitted successfully and Gloebit components of transaction were enacted successfully.
         /// false if failed to submit request or if txn failed at any stage prior to successfully enacting Gloebit txn components.
@@ -512,17 +479,13 @@ namespace Gloebit.GloebitMoneyModule
             GloebitAPI.TransactionFailure failure = GloebitAPI.TransactionFailure.NONE;
             bool result = m_api.TransactU2USync(txn, description, descMap, GloebitUser.Get(m_key, txn.PayerID), GloebitUser.Get(m_key, txn.PayeeID), m_platformAccessors.resolveAgentEmail(txn.PayeeID), m_platformAccessors.GetBaseURI(), out stage, out failure);
 
-            if (!result)
-            {
+            if (!result) {
                 m_log.ErrorFormat("[GLOEBITMONEYMODULE] SubmitSyncTransaction failed in stage: {0} with failure: {1}", stage, failure);
-                if (stage == GloebitAPI.TransactionStage.SUBMIT)
-                {
-                    // currently need to handle these errors here as the TransactU2UCallback is not called unless sumission is successful and we receive a response
+                if (stage == GloebitAPI.TransactionStage.SUBMIT) {
+                    // currently need to handle these errors here as the TransactU2UCallback is not called unless submission is successful and we receive a response
                     m_transactionAlerts.AlertTransactionFailed(txn, GloebitAPI.TransactionStage.SUBMIT, failure, String.Empty, new OSDMap());
                 }
-            }
-            else
-            {
+            } else {
                 // TODO: figure out how/where to send this alert in a synchronous transaction.  Maybe it should always come from the API.
                 // m_transactionAlerts.AlertTransactionStageCompleted(txn, GloebitAPI.TransactionStage.SUBMIT, String.Empty);
             }
@@ -536,7 +499,7 @@ namespace Gloebit.GloebitMoneyModule
         /// If this was successful, then the transaction was submitted and queued and the monetary pieces
         /// of the transaction were each enacted by the server.  The transaction processor will re-enact those
         /// and call enact/cancel/consume on the local asset / transaction part.
-        /// This function parses the repsonse from Gloebit, logs useful information, and calls ITransactionAlert
+        /// This function parses the response from Gloebit, logs useful information, and calls ITransactionAlert
         /// interface functions with the data needed by the platform for any processing.
         /// </summary>
         /// <param name="success">bool - if true, the exchange was successful and this user is authorized and linked to a Gloebit account</param>
@@ -553,13 +516,11 @@ namespace Gloebit.GloebitMoneyModule
             bool success = (bool)responseDataMap["success"];
             string reason = responseDataMap["reason"];
             string status = "";
-            if (responseDataMap.ContainsKey("status"))
-            {
+            if (responseDataMap.ContainsKey("status")) {
                 status = responseDataMap["status"];
             }
             string tID = "";
-            if (responseDataMap.ContainsKey("id"))
-            {
+            if (responseDataMap.ContainsKey("id")) {
                 tID = responseDataMap["id"];
             }
             // TODO: verify that tID = txn.TransactionID --- should never be otherwise.
@@ -568,25 +529,19 @@ namespace Gloebit.GloebitMoneyModule
             OSDMap extraData = new OSDMap();
 
             // Can/should this be moved to QUEUE with no errors?
-            if (success)
-            {
+            if (success) {
                 // If we get here, queuing and early enact were successful.
                 // When the processor runs this, we are guaranteed that it will call our enact URI eventually, or succeed if no callback-uris were provided.
                 m_log.InfoFormat("[GLOEBITMONEYMODULE].transactU2UCompleted with SUCCESS reason:{0} id:{1}", reason, tID);
-                if (reason == "success")
-                {                                  /* successfully queued, early enacted all non-asset transaction parts */
+                if (reason == "success") {                                  /* successfully queued, early enacted all non-asset transaction parts */
                     // TODO: if we update GMM to allow transactions without callback-uris, then we would need to signal full success here.
                     // TODO: we should really provide an interface for checking status or require at least a single callback uri.
                     // Early enact also succeeded, so could add additional details that funds have successfully been transferred or set to stage ENACT_GLOEBIT
                     additionalDetailStr = String.Empty;
-                }
-                else if (reason == "resubmitted")
-                {                       /* transaction had already been created.  resubmitted to queue */
+                } else if (reason == "resubmitted") {                       /* transaction had already been created.  resubmitted to queue */
                     m_log.InfoFormat("[GLOEBITMONEYMODULE].transactU2UCompleted resubmitted transaction  id:{0}", tID);
                     additionalDetailStr = "Transaction resubmitted to queue.";
-                }
-                else
-                {                                                    /* Unhandled success reason */
+                } else {                                                    /* Unhandled success reason */
                     m_log.ErrorFormat("[GLOEBITMONEYMODULE].transactU2UCompleted unhandled response reason:{0}  id:{1}", reason, tID);
                     additionalDetailStr = reason;
                 }
@@ -597,20 +552,16 @@ namespace Gloebit.GloebitMoneyModule
             m_log.InfoFormat("[GLOEBITMONEYMODULE].transactU2UCompleted with FAILURE reason:{0} status:{1} id:{2}", reason, status, tID);
 
             // Handle errors
-            switch (stage)
-            {
+            switch (stage) {
                 case GloebitAPI.TransactionStage.ENACT_GLOEBIT:     /* Placed this first as it is an odd case where early-enact failed. */
                     // We're announcing failure here, but it's possible we should just announce completion of QUEUE state instead.
                     // It is unlikely, though may be possible, for this to fail and the processor (rather than server queuing and then attempting early enact) could succeed.
                     m_log.InfoFormat("[GLOEBITMONEYMODULE].transactU2UCompleted transaction successfully queued for processing, but failed early enact.  id:{0} reason:{1}", tID, reason);
                     // TODO: Should we send a failure alert here?  Could transaction enact successfully?  Need to research this
                     // insufficient-balance; pending probably can't occur; something new?
-                    if (failure == GloebitAPI.TransactionFailure.INSUFFICIENT_FUNDS)
-                    {
-                        m_log.InfoFormat("[GLOEBITMONEYMODULE].transactU2UCompleted transaction failed.  Buyer has insufficent funds.  id:{0}", tID);
-                    }
-                    else
-                    {
+                    if (failure == GloebitAPI.TransactionFailure.INSUFFICIENT_FUNDS) {
+                        m_log.InfoFormat("[GLOEBITMONEYMODULE].transactU2UCompleted transaction failed.  Buyer has insufficient funds.  id:{0}", tID);
+                    } else {
                         // unhandled, so pass reason
                         m_log.ErrorFormat("[GLOEBITMONEYMODULE].transactU2UCompleted transaction failed during processing.  reason:{0} id:{1} failure:{2}", reason, tID, failure);
                         additionalDetailStr = reason;
@@ -629,27 +580,23 @@ namespace Gloebit.GloebitMoneyModule
                     string appSubscriptionIDStr = String.Empty;
                     string subscriptionAuthIDStr = String.Empty;
                     UUID subscriptionAuthID = UUID.Zero;
-                    if (responseDataMap.ContainsKey("subscription-id"))
-                    {
+                    if (responseDataMap.ContainsKey("subscription-id")) {
                         subscriptionIDStr = responseDataMap["subscription-id"];
                         // txn has app-sub-id and can be used to retrieve sub-id, but including this for now anyway;
                         extraData["subscription-id"] = subscriptionIDStr;
                     }
-                    if (responseDataMap.ContainsKey("app-subscription-id"))
-                    {
+                    if (responseDataMap.ContainsKey("app-subscription-id")) {
                         appSubscriptionIDStr = responseDataMap["app-subscription-id"];
                         // Not adding to extraData since this is in the txn
                     }
-                    if (responseDataMap.ContainsKey("subscription-authorization-id"))
-                    {
+                    if (responseDataMap.ContainsKey("subscription-authorization-id")) {
                         subscriptionAuthIDStr = responseDataMap["subscription-authorization-id"];
                         subscriptionAuthID = UUID.Parse(subscriptionAuthIDStr);
                         // Add to extraData for now since not in txn.  Consider storing these locally and in txn.
                         extraData["subscription-authorization-id"] = subscriptionAuthIDStr;
                     }
 
-                    switch (failure)
-                    {
+                    switch (failure) {
                         case GloebitAPI.TransactionFailure.FORM_GENERIC_ERROR:                    /* One of many form errors.  something needs fixing.  See reason */
                             // All form errors are errors the app needs to fix
                             m_log.ErrorFormat("[GLOEBITMONEYMODULE].transactU2UCompleted Transaction failed.  App needs to fix something. id:{0} failure:{1} reason:{2}", tID, failure, reason);
@@ -680,13 +627,13 @@ namespace Gloebit.GloebitMoneyModule
                             // Send dialog asking user to auth or report --- needs different message.
                             m_log.Info("[GLOEBITMONEYMODULE] TransactU2UCompleted - SUBSCRIPTION_AUTH_DECLINED - requesting SubAuth approval");
                             break;
-                        case GloebitAPI.TransactionFailure.PAYER_ACCOUNT_LOCKED:                  /* Buyer's gloebit account is locked and not allowed to spend gloebits */
+                        case GloebitAPI.TransactionFailure.PAYER_ACCOUNT_LOCKED:                  /* Buyer's Gloebit account is locked and not allowed to spend gloebits */
                             m_log.InfoFormat("[GLOEBITMONEYMODULE] transactU2UCompleted - FAILURE -- payer account locked.  id:{0}", tID);
                             break;
                         case GloebitAPI.TransactionFailure.PAYEE_CANNOT_BE_IDENTIFIED:            /* can not identify merchant from params supplied by app */
                             m_log.ErrorFormat("[GLOEBITMONEYMODULE].transactU2UCompleted Gloebit could not identify payee from params.  transactionID:{0} payeeID:{1}", tID, payeeUser.PrincipalID);
                             break;
-                        case GloebitAPI.TransactionFailure.PAYEE_CANNOT_RECEIVE:                  /* Seller's gloebit account can not receive gloebits */
+                        case GloebitAPI.TransactionFailure.PAYEE_CANNOT_RECEIVE:                  /* Seller's Gloebit account can not receive Gloebits */
                             // TODO: research if/when account is in this state.  Only by admin?  All accounts until merchants?
                             m_log.InfoFormat("[GLOEBITMONEYMODULE] transactU2UCompleted - FAILURE -- payee account locked - can't receive gloebits.  id:{0}", tID);
                             break;
@@ -698,14 +645,13 @@ namespace Gloebit.GloebitMoneyModule
                     }
                     break;
                 case GloebitAPI.TransactionStage.QUEUE:
-                    switch (failure)
-                    {
+                    switch (failure) {
                         case GloebitAPI.TransactionFailure.QUEUEING_FAILED:                     /* failed to queue.  net or processor error */
                             m_log.InfoFormat("[GLOEBITMONEYMODULE] transactU2UCompleted - FAILURE -- queuing failed.  id:{0}", tID);
                             break;
                         case GloebitAPI.TransactionFailure.RACE_CONDITION:                      /* race condition - already queued */
                             // nothing to tell user.  buyer doesn't need to know it was double submitted
-                            m_log.ErrorFormat("[GLOEBITMONEYMODULE].transactU2UCompleted race condition.  You double submitted transaction:{0}", tID);
+                            m_log.ErrorFormat ("[GLOEBITMONEYMODULE].transactU2UCompleted race condition.  You double submitted transaction:{0}", tID);
                             return; /* don't report anything as the other flow this hit will handle reporting */
                         default:
                             m_log.ErrorFormat("[GLOEBITMONEYMODULE].transactU2UCompleted unhandled queueing failure:{0}  transactionID:{1}", failure, tID);
@@ -714,14 +660,14 @@ namespace Gloebit.GloebitMoneyModule
                     }
                     break;
                 default:
-                    m_log.ErrorFormat("[GLOEBITMONEYMODULE].transactU2UCompleted unhandled Transaciton Stage:{0} failure:{1}  transactionID:{2}", stage, failure, tID);
+                    m_log.ErrorFormat("[GLOEBITMONEYMODULE].transactU2UCompleted unhandled Transaction Stage:{0} failure:{1}  transactionID:{2}", stage, failure, tID);
                     additionalDetailStr = reason;
                     break;
             }
             m_transactionAlerts.AlertTransactionFailed(txn, stage, failure, additionalDetailStr, extraData);
             return;
         }
-
+            
         /*** GloebitAPI Required HTTP Callback Entrance Points --- must be registered by GMM ***/
         /// <summary>
         /// Registered to the enactHoldURI, consumeHoldURI and cancelHoldURI from GloebitTransaction.
@@ -735,15 +681,14 @@ namespace Gloebit.GloebitMoneyModule
         /// </summary>
         /// <param name="requestData">GloebitAPI.Asset enactHoldURI, consumeHoldURI or cancelHoldURI query arguments tying this callback to a specific Asset.</param>
         /// <returns>
-        /// Web respsponse including JSON array of one or two elements.  First element is bool representing success state of call.
+        /// Web response including JSON array of one or two elements.  First element is bool representing success state of call.
         /// --- If first element is false, the second element is a string providing the reason for failure.
         /// --- If the second element is "pending", then the transaction processor will retry.
         /// --- All other reasons are considered permanent failure.
         /// </returns>
-        public Hashtable transactionState_func(Hashtable requestData)
-        {
+        public Hashtable transactionState_func(Hashtable requestData) {
             m_log.DebugFormat("[GLOEBITMONEYMODULE] transactionState_func **************** Got Callback");
-            foreach (DictionaryEntry e in requestData) { m_log.DebugFormat("{0}: {1}", e.Key, e.Value); }
+            foreach(DictionaryEntry e in requestData) { m_log.DebugFormat("{0}: {1}", e.Key, e.Value); }
 
             // TODO: check that these exist in requestData.  If not, signal error and send response with false.
             string transactionIDstr = requestData["id"] as string;
@@ -762,8 +707,7 @@ namespace Gloebit.GloebitMoneyModule
 
             OSDArray paramArray = new OSDArray();
             paramArray.Add(success);
-            if (!success)
-            {
+            if (!success) {
                 paramArray.Add(returnMsg);
             }
 
@@ -803,8 +747,7 @@ namespace Gloebit.GloebitMoneyModule
         {
             m_log.InfoFormat("[GLOEBITMONEYMODULE] GloebitAPIWrapper.CreateSubscription for appSubID:{0}, subName:{1}, subDesc:{2}", appSubID, subName, subDesc);
             // Validate that subName and subDesc are not empty or null as Gloebit requires both for a Subscription creation
-            if (String.IsNullOrEmpty(subName) || String.IsNullOrEmpty(subDesc))
-            {
+            if (String.IsNullOrEmpty(subName) || String.IsNullOrEmpty(subDesc)) {
                 m_log.WarnFormat("[GLOEBITMONEYMODULE] GloebitAPIWrapper.CreateSubscription - Can not create subscription because subscription name or description is blank - Name:{0} Description:{1}", subName, subDesc);
                 //TODO: should this throw an exception?
                 return UUID.Zero;
@@ -812,8 +755,7 @@ namespace Gloebit.GloebitMoneyModule
 
             // If no local appSubID provided, then generate one randomly
             bool idIsRandom = false;
-            if (appSubID == UUID.Zero)
-            {
+            if (appSubID == UUID.Zero) {
                 // Create a transaction ID
                 appSubID = UUID.Random();
                 idIsRandom = true;
@@ -823,22 +765,19 @@ namespace Gloebit.GloebitMoneyModule
             GloebitSubscription sub = null;
             // Double check that a local subscription hasn't already been created
             sub = GloebitSubscription.Get(appSubID, m_key, m_url);
-            if (sub != null)
-            {
+            if(sub != null) {
                 m_log.WarnFormat("[GLOEBITMONEYMODULE] GloebitAPIWrapper.CreateSubscription found existing local sub for appSubID:{0}", appSubID);
                 // TODO: Should we check to see if there is a SubscriptionID on sub which would mean that this was already created on Gloebit as well?
                 //       For now, we'll assume that this could be an attempt to recreate after an issue and that Gloebit will return the Subscription ID
                 //       on a duplicate create request and that this will refresh that ID for the app.
-                if (idIsRandom)
-                {
+                if(idIsRandom) {
                     m_log.ErrorFormat("[GLOEBITMONEYMODULE] GloebitAPIWrapper.CreateSubscription randomly generated appSubID:{0} conflicted with existing sub", appSubID);
                     return UUID.Zero;
                 }
                 // TODO: Should consider checking that name and desc match, but can't do so until we verify that OpenSim integration doesn't need adjustment.
                 //       Can't recall if the UUID of an object is changed when the name or desc are updated.  If not, we need to handle that in GMM first.
             }
-            if (sub == null)
-            {
+            if(sub == null) {
                 m_log.DebugFormat("[GLOEBITMONEYMODULE] GloebitAPIWrapper.CreateSubscription - creating local subscription for {0}", subName);
                 // Create local sub in cache and db
                 sub = GloebitSubscription.Init(appSubID, m_key, m_url.ToString(), subName, subDesc);
@@ -856,7 +795,7 @@ namespace Gloebit.GloebitMoneyModule
         /// If this was successful, then the subscription was created on the server and the GloebitAPI
         /// has recorded the id of the subscription on the server into the SubscriptionID field of the
         /// local subscription and marked it enabled.
-        /// This function parses the repsonse from Gloebit, logs useful information, and calls ISubscriptionAlert
+        /// This function parses the response from Gloebit, logs useful information, and calls ISubscriptionAlert
         /// interface functions with the data needed by the platform for any processing.
         /// </summary>
         /// <param name="responseDataMap">OSDMap of response data from GloebitAPI.CreateSubscription</param>
@@ -867,25 +806,18 @@ namespace Gloebit.GloebitMoneyModule
             string reason = responseDataMap["reason"];
             string status = responseDataMap["status"];
 
-            if (success)
-            {
+            if (success) {
                 m_log.InfoFormat("[GLOEBITMONEYMODULE] GloebitAPIWrapper.createSubscriptionCompleted with SUCCESS reason:{0} status:{1}", reason, status);
                 m_subscriptionAlerts.AlertSubscriptionCreated(subscription);
                 return;
 
-            }
-            else if (status == "retry")
-            {                                /* failure could be temporary -- retry. */
+            } else if (status == "retry") {                                /* failure could be temporary -- retry. */
                 m_log.InfoFormat("[GLOEBITMONEYMODULE] GloebitAPIWrapper.createSubscriptionCompleted with FAILURE but suggested retry.  reason:{0}", reason);
                 // TODO: Should we retry?  How do we prevent infinite loop?
-            }
-            else if (status == "failed")
-            {                                /* failure permanent -- requires fixing something. */
+            } else if (status == "failed") {                                /* failure permanent -- requires fixing something. */
                 m_log.ErrorFormat("[GLOEBITMONEYMODULE] GloebitAPIWrapper.createSubscriptionCompleted with FAILURE permanently.  reason:{0}", reason);
                 // TODO: Any action required
-            }
-            else
-            {                                                        /* failure - unexpected status */
+            } else {                                                        /* failure - unexpected status */
                 m_log.ErrorFormat("[GLOEBITMONEYMODULE] GloebitAPIWrapper.createSubscriptionCompleted with FAILURE - unhandled status:{0} reason:{1}", status, reason);
             }
             // If we added to this map.  remove so we're not leaking memory in failure cases.
@@ -894,7 +826,7 @@ namespace Gloebit.GloebitMoneyModule
         }
 
         /// <summary>
-        /// Ask user to authorize a subscription for an agent on an app linked to thier Gloebit account.
+        /// Ask user to authorize a subscription for an agent on an app linked to their Gloebit account.
         /// This builds the URI which must be loaded for the user to take action.
         /// The subscription authorization must be created first if this has not already been done.
         /// Once created, The user can also authorize or decline it on their own from the Subscriptions 
@@ -915,7 +847,7 @@ namespace Gloebit.GloebitMoneyModule
         }
 
         /// <summary>
-        /// Ask user to authorize a subscription for an agent on an app linked to thier Gloebit account.
+        /// Ask user to authorize a subscription for an agent on an app linked to their Gloebit account.
         /// This builds the URI which must be loaded for the user to take action.
         /// The subscription authorization must be created first if this has not already been done.
         /// Once created, The user can also authorize or decline it on their own from the Subscriptions 
@@ -935,13 +867,10 @@ namespace Gloebit.GloebitMoneyModule
             // Create response will call the send func
             // Else just call send func
 
-            if (String.IsNullOrEmpty(subAuthID))
-            {
+            if (String.IsNullOrEmpty(subAuthID)) {
                 // TODO: once we start storing Subscription Authorizations, look it up.
                 m_api.CreateSubscriptionAuthorization(sub, user, m_platformAccessors.resolveAgentName(UUID.Parse(user.PrincipalID)), m_platformAccessors.GetBaseURI());
-            }
-            else
-            {
+            } else {
                 SendSubscriptionAuthorizationToUser(user, subAuthID, sub, isDeclined);
             }
         }
@@ -951,15 +880,14 @@ namespace Gloebit.GloebitMoneyModule
         /// Called by the GloebitAPI after the async call to CreateSubscriptionAuthorization completes.
         /// If this was successful, then the subscription authorization was created or located on the Gloebit service
         /// and the ID of the subscription authorization was returned in the response.
-        /// This function parses the repsonse from Gloebit, logs useful information, builds the 
+        /// This function parses the response from Gloebit, logs useful information, builds the 
         /// URI where the user can authorize the subscription, and asks the platform to send that
         /// URI to the user.
         /// </summary>
         /// <param name="responseDataMap">OSDMap of response data from GloebitAPI.CreateSubscriptionAuthorization</param>
         /// <param name="sub">local GloebitSubscription detailing the subscription the authorization is for.</param>
         /// <param name="user">GloebitUser representing the agent and app the subscription authorization is for.</param>
-        public void createSubscriptionAuthorizationCompleted(OSDMap responseDataMap, GloebitSubscription sub, GloebitUser user)
-        {
+        public void createSubscriptionAuthorizationCompleted(OSDMap responseDataMap, GloebitSubscription sub, GloebitUser user) {
             m_log.InfoFormat("[GLOEBITMONEYMODULE] GloebitAPIWrapper.createSubscriptionAuthorizationCompleted");
 
             bool success = (bool)responseDataMap["success"];
@@ -968,11 +896,9 @@ namespace Gloebit.GloebitMoneyModule
 
             UUID agentID = UUID.Parse(user.PrincipalID);
 
-            if (success)
-            {
+            if (success) {
                 m_log.InfoFormat("[GLOEBITMONEYMODULE] GloebitAPIWrapper.createSubscriptionAuthorizationCompleted with SUCCESS reason:{0} status:{1}", reason, status);
-                switch (status)
-                {
+                switch (status) {
                     case "success":
                     case "created":
                     case "duplicate":
@@ -995,25 +921,19 @@ namespace Gloebit.GloebitMoneyModule
                         break;
                     default:
                         break;
-                }
-            }
-            else if (status == "retry")
-            {                                /* failure could be temporary -- retry. */
+                    }
+            } else if (status == "retry") {                                /* failure could be temporary -- retry. */
                 m_log.InfoFormat("[GLOEBITMONEYMODULE] GloebitAPIWrapper.createSubscriptionAuthorizationCompleted with FAILURE but suggested retry.  reason:{0}", reason);
 
                 // TODO: Should we retry?  How do we prevent infinite loop?
 
-            }
-            else if (status == "failed")
-            {                                /* failure permanent -- requires fixing something. */
+            } else if (status == "failed") {                                /* failure permanent -- requires fixing something. */
                 m_log.ErrorFormat("[GLOEBITMONEYMODULE] GloebitAPIWrapper.createSubscriptionAuthorizationCompleted with FAILURE permanently.  reason:{0}", reason);
 
                 // TODO: Any action required?
                 // TODO: if we move "duplicate-and-previously-declined-by-user" to here, then we should handle it here and we need another endpoint to reset status of this subscription auth to pending
 
-            }
-            else
-            {                                                        /* failure - unexpected status */
+            } else {                                                        /* failure - unexpected status */
                 m_log.ErrorFormat("[GLOEBITMONEYMODULE] GloebitAPIWrapper.createSubscriptionAuthorizationCompleted with FAILURE - unhandled status:{0} reason:{1}", status, reason);
             }
             return;
@@ -1027,7 +947,7 @@ namespace Gloebit.GloebitMoneyModule
         /// </summary>
         /// <param name="user">GloebitUser we are sending the URL to</param>
         /// <param name="subAuthID">ID of the authorization request the user will be asked to approve - provided by Gloebit.</param>
-        /// <param name="sub">GloebitSubscription which containes necessary details for message to user.</param>
+        /// <param name="sub">GloebitSubscription which contains necessary details for message to user.</param>
         /// <param name="isDeclined">Bool is true if this sub auth has already been declined by the user which should present different messaging.</param>
         private void SendSubscriptionAuthorizationToUser(GloebitUser user, string subAuthID, GloebitSubscription sub, bool isDeclined)
         {
