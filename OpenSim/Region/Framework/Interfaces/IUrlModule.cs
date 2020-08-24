@@ -45,5 +45,6 @@ namespace OpenSim.Region.Framework.Interfaces
 
         void ScriptRemoved(UUID itemID);
         void ObjectRemoved(UUID objectID);
+        int GetUrlCount(UUID groupID);
     }
 }

@@ -25,6 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Reflection;
+using System.Runtime;
+using System.Text;
+using System.Threading;
+
 using log4net;
 using OpenMetaverse;
 using OpenMetaverse.Packets;
@@ -35,13 +43,7 @@ using OpenSim.Framework.Monitoring;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Reflection;
-using System.Runtime;
-using System.Text;
-using System.Threading;
+
 using AssetLandmark = OpenSim.Framework.AssetLandmark;
 using Caps = OpenSim.Framework.Capabilities.Caps;
 using PermissionMask = OpenSim.Framework.PermissionMask;
@@ -309,9 +311,6 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         // LLClientView Only
         public delegate void BinaryGenericMessage(Object sender, string method, byte[][] args);
 
-        /// <summary>Used to adjust Sun Orbit values so Linden based viewers properly position sun</summary>
-        private const float m_sunPainDaHalfOrbitalCutoff = 4.712388980384689858f;
-
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static string LogHeader = "[LLCLIENTVIEW]";
 
@@ -356,7 +355,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         /// </value>
         protected List<uint> m_killRecord;
 
-        //        protected HashSet<uint> m_attachmentsSent;
+        //protected HashSet<uint> m_attachmentsSent;
 
         private bool m_SendLogoutPacketWhenClosing = true;
 
@@ -472,7 +471,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         /// <summary>
         /// Used to synchronise threads when client is being closed.
         /// </summary>
-        public Object CloseSyncLock { get; private set; }
+        public object CloseSyncLock { get;} = new object();
 
         public bool IsLoggingOut { get; set; }
 
@@ -502,7 +501,6 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         {
             //            DebugPacketLevel = 1;
 
-            CloseSyncLock = new Object();
             SelectedObjects = new List<uint>();
 
             RegisterInterface<IClientIM>(this);
@@ -552,7 +550,6 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         }
 
         #region Client Methods
-
 
         /// <summary>
         /// Close down the client view
@@ -604,7 +601,6 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 DisableSimulatorPacket disable = (DisableSimulatorPacket)PacketPool.Instance.GetPacket(PacketType.DisableSimulator);
                 OutPacket(disable, ThrottleOutPacketType.Unknown);
             }
-
 
             // Fire the callback for this connection closing
             if (OnConnectionClosed != null)
@@ -2557,10 +2553,10 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             }
         }
 
-        protected void SendBulkUpdateInventoryFolder(InventoryFolderBase folderBase)
+        protected void SendBulkUpdateInventoryFolder(InventoryFolderBase folderBase, UUID? transationID)
         {
             // We will use the same transaction id for all the separate packets to be sent out in this update.
-            UUID transactionId = UUID.Random();
+            UUID transactionId = transationID ?? UUID.Random();
 
             List<BulkUpdateInventoryPacket.FolderDataBlock> folderDataBlocks
                 = new List<BulkUpdateInventoryPacket.FolderDataBlock>();
@@ -2707,19 +2703,19 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             return itemBlock;
         }
 
-        public void SendBulkUpdateInventory(InventoryNodeBase node)
+        public void SendBulkUpdateInventory(InventoryNodeBase node, UUID? transationID = null)
         {
             if (node is InventoryItemBase)
-                SendBulkUpdateInventoryItem((InventoryItemBase)node);
+                SendBulkUpdateInventoryItem((InventoryItemBase)node, transationID);
             else if (node is InventoryFolderBase)
-                SendBulkUpdateInventoryFolder((InventoryFolderBase)node);
+                SendBulkUpdateInventoryFolder((InventoryFolderBase)node, transationID);
             else if (node != null)
                 m_log.ErrorFormat("[CLIENT]: {0} sent unknown inventory node named {1}", Name, node.Name);
             else
                 m_log.ErrorFormat("[CLIENT]: {0} sent null inventory node", Name);
         }
 
-        protected void SendBulkUpdateInventoryItem(InventoryItemBase item)
+        protected void SendBulkUpdateInventoryItem(InventoryItemBase item, UUID? transationID = null)
         {
             const uint FULL_MASK_PERMISSIONS = (uint)0x7ffffff;
 
@@ -2727,7 +2723,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 = (BulkUpdateInventoryPacket)PacketPool.Instance.GetPacket(PacketType.BulkUpdateInventory);
 
             bulkUpdate.AgentData.AgentID = AgentId;
-            bulkUpdate.AgentData.TransactionID = UUID.Random();
+            bulkUpdate.AgentData.TransactionID = transationID ?? UUID.Random();
 
             bulkUpdate.FolderData = new BulkUpdateInventoryPacket.FolderDataBlock[1];
             bulkUpdate.FolderData[0] = new BulkUpdateInventoryPacket.FolderDataBlock();
@@ -3495,29 +3491,83 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
         public void SendLandStatReply(uint reportType, uint requestFlags, uint resultCount, LandStatReportItem[] lsrpia)
         {
-            LandStatReplyPacket lsrp = new LandStatReplyPacket();
-            // LandStatReplyPacket.RequestDataBlock lsreqdpb = new LandStatReplyPacket.RequestDataBlock();
-            LandStatReplyPacket.ReportDataBlock[] lsrepdba = new LandStatReplyPacket.ReportDataBlock[lsrpia.Length];
-            //LandStatReplyPacket.ReportDataBlock lsrepdb = new LandStatReplyPacket.ReportDataBlock();
-            // lsrepdb.
-            lsrp.RequestData.ReportType = reportType;
-            lsrp.RequestData.RequestFlags = requestFlags;
-            lsrp.RequestData.TotalObjectCount = resultCount;
-            for (int i = 0; i < lsrpia.Length; i++)
+            IEventQueue eq = Scene.RequestModuleInterface<IEventQueue>();
+            if (eq == null)
             {
-                LandStatReplyPacket.ReportDataBlock lsrepdb = new LandStatReplyPacket.ReportDataBlock();
-                lsrepdb.LocationX = lsrpia[i].LocationX;
-                lsrepdb.LocationY = lsrpia[i].LocationY;
-                lsrepdb.LocationZ = lsrpia[i].LocationZ;
-                lsrepdb.Score = lsrpia[i].Score;
-                lsrepdb.TaskID = lsrpia[i].TaskID;
-                lsrepdb.TaskLocalID = lsrpia[i].TaskLocalID;
-                lsrepdb.TaskName = Util.StringToBytes256(lsrpia[i].TaskName);
-                lsrepdb.OwnerName = Util.StringToBytes256(lsrpia[i].OwnerName);
-                lsrepdba[i] = lsrepdb;
+                LandStatReplyPacket lsrp = new LandStatReplyPacket();
+                // LandStatReplyPacket.RequestDataBlock lsreqdpb = new LandStatReplyPacket.RequestDataBlock();
+                LandStatReplyPacket.ReportDataBlock[] lsrepdba = new LandStatReplyPacket.ReportDataBlock[lsrpia.Length];
+                //LandStatReplyPacket.ReportDataBlock lsrepdb = new LandStatReplyPacket.ReportDataBlock();
+                // lsrepdb.
+                lsrp.RequestData.ReportType = reportType;
+                lsrp.RequestData.RequestFlags = requestFlags;
+                lsrp.RequestData.TotalObjectCount = resultCount;
+                for (int i = 0; i < lsrpia.Length; i++)
+                {
+                    LandStatReplyPacket.ReportDataBlock lsrepdb = new LandStatReplyPacket.ReportDataBlock();
+                    lsrepdb.LocationX = lsrpia[i].LocationX;
+                    lsrepdb.LocationY = lsrpia[i].LocationY;
+                    lsrepdb.LocationZ = lsrpia[i].LocationZ;
+                    lsrepdb.Score = lsrpia[i].Score;
+                    lsrepdb.TaskID = lsrpia[i].TaskID;
+                    lsrepdb.TaskLocalID = lsrpia[i].TaskLocalID;
+                    lsrepdb.TaskName = Util.StringToBytes256(lsrpia[i].TaskName);
+                    lsrepdb.OwnerName = Util.StringToBytes256(lsrpia[i].OwnerName);
+                    lsrepdba[i] = lsrepdb;
+                }
+                lsrp.ReportData = lsrepdba;
+                OutPacket(lsrp, ThrottleOutPacketType.Task);
             }
-            lsrp.ReportData = lsrepdba;
-            OutPacket(lsrp, ThrottleOutPacketType.Task);
+            else
+            {
+                StringBuilder sb = eq.StartEvent("LandStatReply");
+
+                LLSDxmlEncode.AddArrayAndMap("RequestData", sb);
+                LLSDxmlEncode.AddElem("ReportType", reportType, sb);
+                LLSDxmlEncode.AddElem("RequestFlags", requestFlags, sb);
+                LLSDxmlEncode.AddElem("TotalObjectCount", (uint)lsrpia.Length, sb);
+                LLSDxmlEncode.AddEndMapAndArray(sb);
+
+                if (lsrpia.Length > 0)
+                {
+                    LLSDxmlEncode.AddArray("ReportData", sb);
+
+                    foreach (var item in lsrpia)
+                    {
+                        LLSDxmlEncode.AddMap(sb);
+                        LLSDxmlEncode.AddElem("LocationX", item.LocationX, sb);
+                        LLSDxmlEncode.AddElem("LocationY", item.LocationY, sb);
+                        LLSDxmlEncode.AddElem("LocationZ", item.LocationZ, sb);
+                        LLSDxmlEncode.AddElem("OwnerName", item.OwnerName, sb);
+                        LLSDxmlEncode.AddElem("Score", item.Score, sb);
+                        LLSDxmlEncode.AddElem("TaskID", item.TaskID, sb);
+                        LLSDxmlEncode.AddElem("TaskLocalID", item.TaskLocalID, sb);
+                        LLSDxmlEncode.AddElem("TaskName", item.TaskName, sb);
+                        LLSDxmlEncode.AddEndMap(sb);
+                    }
+
+                    LLSDxmlEncode.AddEndArray(sb);
+
+                    LLSDxmlEncode.AddArray("DataExtended", sb);
+
+                    foreach (var item in lsrpia)
+                    {
+                        LLSDxmlEncode.AddMap(sb);
+                        LLSDxmlEncode.AddElem("MonoScore", 0.0f, sb);
+                        LLSDxmlEncode.AddElem("OwnerID", item.OwnerID, sb);
+                        LLSDxmlEncode.AddElem("ParcelName", item.Parcel, sb);
+                        LLSDxmlEncode.AddElem("PublicURLs", item.Urls, sb);
+                        LLSDxmlEncode.AddElem("Size", (float)item.Bytes, sb);
+                        LLSDxmlEncode.AddElem("TimeStamp", item.Time, sb);
+                        LLSDxmlEncode.AddEndMap(sb);
+                    }
+
+                    LLSDxmlEncode.AddEndArray(sb);
+                }
+
+                OSD ev = new OSDllsdxml(eq.EndEvent(sb));
+                eq.Enqueue(ev, AgentId);
+            }
         }
 
         public void SendScriptRunningReply(UUID objectID, UUID itemID, bool running)
@@ -7942,9 +7992,6 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
         #endregion
 
-        /// <summary>
-        /// This is a different way of processing packets then ProcessInPacket
-        /// </summary>
         protected virtual void RegisterLocalPacketHandlers()
         {
             AddLocalPacketHandler(PacketType.LogoutRequest, HandleLogout);
@@ -13164,9 +13211,9 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
         public bool TryGet<T>(out T iface)
         {
-            if (m_clientInterfaces.ContainsKey(typeof(T)))
+            if(m_clientInterfaces.TryGetValue(typeof(T), out object o))
             {
-                iface = (T)m_clientInterfaces[typeof(T)];
+                iface = (T)o;
                 return true;
             }
             iface = default(T);

@@ -124,6 +124,11 @@ namespace OpenSim.Region.CoreModules.World.Land
             }
         }
 
+        public ISceneObject[] GetSceneObjectGroups()
+        {
+            return primsOverMe.ToArray();
+        }
+
         public Vector2? GetNearestPoint(Vector3 pos)
         {
             Vector3 direction = new Vector3(m_centerPoint.X - pos.X, m_centerPoint.Y - pos.Y, 0f);
@@ -1121,11 +1126,16 @@ namespace OpenSim.Region.CoreModules.World.Land
 
             int regionSizeX = (int)Constants.RegionSize;
             int regionSizeY = (int)Constants.RegionSize;
+            ulong regionHandle;
 
             if (m_scene != null)
             {
-                regionSizeX = (int)m_scene.RegionInfo.RegionSizeX;
-                regionSizeY = (int)m_scene.RegionInfo.RegionSizeX;
+                RegionInfo ri = m_scene.RegionInfo;
+                regionSizeX = (int)ri.RegionSizeX;
+                regionSizeY = (int)ri.RegionSizeY;
+                regionHandle = ri.RegionHandle;
+                //create a fake ID
+                LandData.FakeID = Util.BuildFakeParcelID(regionHandle, (uint)(lastX * landUnit), (uint)(lastY * landUnit));
             }
 
             int tx = min_x * landUnit;
