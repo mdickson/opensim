@@ -2579,6 +2579,63 @@ namespace OpenSim.Region.ClientStack.Linden
             httpResponse.StatusCode = (int)HttpStatusCode.OK;
         }
 
+        public string SetDisplayNames(string request, string path,
+                string param, IOSHttpRequest httpRequest,
+                IOSHttpResponse httpResponse)
+        {
+            if (m_EventQueue == null)
+                return string.Empty;
+
+            if (!m_UserManager.IsLocalGridUser(m_AgentID))
+            {
+                m_Scene.GetScenePresence(m_AgentID).ControllingClient.SendAlertMessage("You can only set your display name on your home grid!");
+                return string.Empty;
+            }
+
+            OSDMap req = (OSDMap)OSDParser.DeserializeLLSDXml(request);
+            if (req.ContainsKey("display_name"))
+            {
+                OSDArray name = req["display_name"] as OSDArray;
+
+                string oldName = name[0].AsString();
+                string newName = name[1].AsString();
+
+                bool resetting = string.IsNullOrWhiteSpace(newName);
+                if (resetting) newName = string.Empty;
+
+                UUID agentID = m_AgentID;
+
+                NameInfo nameInfo = null;
+                bool success = m_DisplayNames.SetDisplayName(agentID, newName, out nameInfo);
+
+                if (success)
+                {
+                    if (resetting)
+                    {
+                        m_log.InfoFormat("[DISPLAY NAMES] {0} {1} reset their display name", nameInfo.FirstName, nameInfo.LastName);
+                    }
+                    else
+                    {
+                        m_log.InfoFormat("[DISPLAY NAMES] {0} {1} changed their display name to {2}", nameInfo.FirstName, nameInfo.LastName, nameInfo.DisplayName);
+                    }
+
+                    DateTime date = DateTime.UtcNow.AddDays(7);
+
+                    DisplayNameUpdate(newName, oldName, nameInfo, m_AgentID, date);
+
+                    m_Scene.ForEachClient(x => { if (x.AgentId != m_AgentID) DisplayNameUpdate(newName, oldName, nameInfo, x.AgentId, date); });
+
+                    SetDisplayNameReply(newName, oldName, nameInfo, date);
+                }
+                else
+                {
+                    m_Scene.GetScenePresence(m_AgentID).ControllingClient.SendAlertMessage("You are unable to change your display name at this time!");
+                }
+            }
+
+            return string.Empty;
+        }
+
         public class AssetUploader
         {
             private static readonly ILog m_log =
