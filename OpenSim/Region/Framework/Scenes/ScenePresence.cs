@@ -696,6 +696,7 @@ namespace OpenSim.Region.Framework.Scenes
 
         public IClientAPI ControllingClient { get; set; }
 
+        // dead end do not use
         public IClientCore ClientView
         {
             get { return (IClientCore)ControllingClient; }
@@ -1831,6 +1832,9 @@ namespace OpenSim.Region.Framework.Scenes
 
             if (IsSatOnObject)
                 StandUp();
+
+            if(m_movingToTarget)
+                ResetMoveToTarget();
 
             float localHalfAVHeight = 0.8f;
             if (Appearance != null)

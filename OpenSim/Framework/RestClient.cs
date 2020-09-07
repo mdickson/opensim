@@ -92,7 +92,7 @@ namespace OpenSim.Framework
         /// <summary>
         /// MemoryStream representing the resulting resource
         /// </summary>
-        private Stream _resource;
+        private MemoryStream _resource;
 
         /// <summary>
         /// WebRequest object, held as a member variable
@@ -312,7 +312,7 @@ namespace OpenSim.Framework
         /// <summary>
         /// Perform a synchronous request
         /// </summary>
-        public Stream Request()
+        public MemoryStream Request()
         {
             return Request(null);
         }
@@ -320,7 +320,7 @@ namespace OpenSim.Framework
         /// <summary>
         /// Perform a synchronous request
         /// </summary>
-        public Stream Request(IServiceAuth auth)
+        public MemoryStream Request(IServiceAuth auth)
         {
             lock (_lock)
             {
@@ -470,7 +470,7 @@ namespace OpenSim.Framework
             try
             {
                 // Perform the operation; if sucessful set the result
-                Stream s = Request(null);
+                MemoryStream s = Request(null);
                 ar.SetAsCompleted(s, false);
             }
             catch (Exception e)

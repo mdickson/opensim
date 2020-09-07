@@ -4924,7 +4924,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
                 PrimUpdateFlags updateFlags = update.Flags;
 
-                if (updateFlags.HasFlag(PrimUpdateFlags.Kill))
+                if ((updateFlags  & PrimUpdateFlags.Kill) != 0)
                 {
                     m_killRecord.Add(update.Entity.LocalId);
                     maxUpdatesBytes -= 30;
@@ -4938,7 +4938,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 {
                     SceneObjectPart part = (SceneObjectPart)update.Entity;
                     SceneObjectGroup grp = part.ParentGroup;
-                    if (grp.inTransit && !update.Flags.HasFlag(PrimUpdateFlags.SendInTransit))
+                    if (grp.inTransit && ((update.Flags & PrimUpdateFlags.SendInTransit) == 0))
                         continue;
 
                     if (grp.IsDeleted)
@@ -5019,7 +5019,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                             if (dpos > maxview * maxview)
                                 continue;
 
-                            if (!viewerCache || !updateFlags.HasFlag(PrimUpdateFlags.UpdateProbe))
+                            if (!viewerCache || ((updateFlags & PrimUpdateFlags.UpdateProbe) == 0))
                             {
                                 GroupsNeedFullUpdate.Add(grp);
                                 continue;
@@ -5027,7 +5027,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         }
                     }
 
-                    if (updateFlags.HasFlag(PrimUpdateFlags.UpdateProbe))
+                    if ((updateFlags & PrimUpdateFlags.UpdateProbe) != 0)
                     {
                         if (objectUpdateProbes == null)
                         {
@@ -5039,7 +5039,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         continue;
                     }
 
-                    if (updateFlags.HasFlag(PrimUpdateFlags.Animations))
+                    if ((updateFlags & PrimUpdateFlags.Animations) != 0)
                     {
                         if (m_SupportObjectAnimations && part.Animations != null)
                         {
@@ -10669,12 +10669,10 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             if (propertiesRequest.AgentData.SessionID != SessionId || propertiesRequest.AgentData.AgentID != AgentId)
                 return;
 
-            OnParcelPropertiesRequest?.Invoke((int)Math.Round(propertiesRequest.ParcelData.West),
-                                               (int)Math.Round(propertiesRequest.ParcelData.South),
-                                               (int)Math.Round(propertiesRequest.ParcelData.East),
-                                               (int)Math.Round(propertiesRequest.ParcelData.North),
-                                               propertiesRequest.ParcelData.SequenceID,
-                                               propertiesRequest.ParcelData.SnapSelection, this);
+            ParcelPropertiesRequestPacket.ParcelDataBlock pdb = propertiesRequest.ParcelData;
+            OnParcelPropertiesRequest?.Invoke((int)Math.Round(pdb.West), (int)Math.Round(pdb.South),
+                                              (int)Math.Round(pdb.East), (int)Math.Round(pdb.North),
+                                              pdb.SequenceID, pdb.SnapSelection, this);
         }
 
         private void HandleParcelDivide(Packet Pack)
@@ -11475,8 +11473,8 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             }
             catch( Exception e)
             {
-                m_log.ErrorFormat("{0} HandleMapItemRequest exception: {1}", LogHeader, e.Message);
-            }
+                m_log.ErrorFormat("{0} HandleMapItemRequest exception: {1} : {2}", LogHeader, e.Message, e.StackTrace);
+            } 
         }
 
         private void HandleTransferAbort(Packet Pack)

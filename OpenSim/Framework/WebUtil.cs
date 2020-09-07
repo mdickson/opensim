@@ -25,10 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using log4net;
-using Nwc.XmlRpc;
-using OpenMetaverse.StructuredData;
-using OpenSim.Framework.ServiceAuth;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,15 +42,23 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
+using log4net;
+using Nwc.XmlRpc;
+using OpenMetaverse.StructuredData;
+using OpenSim.Framework.ServiceAuth;
+
 namespace OpenSim.Framework
 {
     /// <summary>
     /// Miscellaneous static methods and extension methods related to the web
     /// </summary>
+    /// 
+
     public static class WebUtil
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        public static ExpiringKey<string> GlobalExpiringBadURLs = new ExpiringKey<string>(30000);
         /// <summary>
         /// Control the printing of certain debug messages.
         /// </summary>
@@ -221,11 +225,15 @@ namespace OpenSim.Framework
                 // If there is some input, write it into the request
                 if (data != null)
                 {
-                    string strBuffer = OSDParser.SerializeJsonString(data);
+                    byte[] buffer;
                     if (DebugLevel >= 5)
+                    {
+                        string strBuffer = OSDParser.SerializeJsonString(data);
                         LogOutgoingDetail(method, reqnum, strBuffer);
-
-                    byte[] buffer = Util.UTF8Getbytes(strBuffer);
+                        buffer = Util.UTF8Getbytes(strBuffer);
+                    }
+                    else
+                        buffer = OSDParser.SerializeJsonToBytes(data);
 
                     request.ContentType = rpc ? "application/json-rpc" : "application/json";
 
@@ -247,6 +255,7 @@ namespace OpenSim.Framework
                     request.ContentLength = buffer.Length;   //Count bytes to send
                     using (Stream requestStream = request.GetRequestStream())
                         requestStream.Write(buffer, 0, buffer.Length);         //Send it
+                    buffer = null;
                 }
 
                 using (WebResponse response = request.GetResponse())
@@ -395,6 +404,7 @@ namespace OpenSim.Framework
                         LogOutgoingDetail("SEND", reqnum, queryString);
 
                     byte[] buffer = System.Text.Encoding.UTF8.GetBytes(queryString);
+                    queryString = null;
 
                     request.ContentLength = buffer.Length;
                     sendlen = buffer.Length;
@@ -995,6 +1005,7 @@ namespace OpenSim.Framework
                 {
                     using(Stream requestStream = request.GetRequestStream())
                         requestStream.Write(data, 0, sendlen);
+                    data = null;
                 }
                 catch (Exception e)
                 {
@@ -1103,8 +1114,7 @@ namespace OpenSim.Framework
                 {
                     if (resp.ContentLength != 0)
                     {
-                        using (Stream respStream = resp.GetResponseStream())
-                        using (StreamReader reader = new StreamReader(respStream))
+                        using (StreamReader reader = new StreamReader(resp.GetResponseStream()))
                             respstring = reader.ReadToEnd();
                     }
                 }
@@ -1313,15 +1323,12 @@ namespace OpenSim.Framework
                 {
                     if (hwr != null)
                     {
-                        if (hwr.StatusCode == HttpStatusCode.NotFound)
-                            return deserial;
-
                         if (hwr.StatusCode == HttpStatusCode.Unauthorized)
                         {
                             m_log.ErrorFormat("[SynchronousRestObjectRequester]: Web request {0} requires authentication",
                                 requestUrl);
                         }
-                        else
+                        else if(hwr.StatusCode != HttpStatusCode.NotFound)
                         {
                             m_log.WarnFormat("[SynchronousRestObjectRequester]: Web request {0} returned error: {1}",
                                 requestUrl, hwr.StatusCode);
@@ -1331,8 +1338,6 @@ namespace OpenSim.Framework
                         m_log.ErrorFormat(
                             "[SynchronousRestObjectRequester]: WebException for {0} {1} {2} {3}",
                             verb, requestUrl, typeof(TResponse).ToString(), e.Message);
-
-                    return deserial;
                 }
             }
             catch (System.InvalidOperationException)

@@ -2652,8 +2652,8 @@ namespace OpenSim.Region.CoreModules.Framework.EntityTransfer
             if (newAgent)
             {
                 // we may already had lost this sp
-                if (sp == null || sp.IsDeleted || sp.ClientView == null) // something bad already happened
-                    return;
+                if(sp == null || sp.IsDeleted || sp.ControllingClient == null) // something bad already happened
+                   return;
 
                 Scene scene = sp.Scene;
 
@@ -2675,7 +2675,7 @@ namespace OpenSim.Region.CoreModules.Framework.EntityTransfer
 
                     if (m_eqModule != null)
                     {
-                        if (sp == null || sp.IsDeleted || sp.ClientView == null) // something bad already happened
+                        if(sp == null || sp.IsDeleted || sp.ControllingClient == null) // something bad already happened
                             return;
 
                         m_log.DebugFormat("{0} {1} is sending {2} EnableSimulator for neighbour region {3}(loc=<{4},{5}>,siz=<{6},{7}>) " +

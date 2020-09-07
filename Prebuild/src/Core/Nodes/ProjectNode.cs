@@ -108,8 +108,16 @@ namespace Prebuild.Core.Nodes
         /// <summary>
         /// .NET 4.6.1
         /// </summary>
-        v4_6_1
-    }
+        v4_6_1,
+		/// <summary>
+		/// .NET 4.7.2
+		/// </summary>
+		v4_7_2,
+		/// <summary>
+		/// .NET 4.8
+		/// </summary>
+		v4_8
+	}
 	/// <summary>
 	/// The Node object representing /Prebuild/Solution/Project elements
 	/// </summary>

@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Net;
+using System.Threading;
 using System.Reflection;
 using System.Text;
 using System.Web;
@@ -53,6 +54,7 @@ using Caps = OpenSim.Framework.Capabilities.Caps;
 using OSDArray = OpenMetaverse.StructuredData.OSDArray;
 using OSDMap = OpenMetaverse.StructuredData.OSDMap;
 using PermissionMask = OpenSim.Framework.PermissionMask;
+using Timer = System.Threading.Timer;
 
 namespace OpenSim.Region.ClientStack.Linden
 {
@@ -1798,7 +1800,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 UUID parcelID = tmp.AsUUID();
                 if (Util.ParseFakeParcelID(parcelID, out ulong regionHandle, out uint x, out uint y) && regionHandle == myHandler)
                 {
-                    ILandObject land = m_Scene.LandChannel.GetLandObjectClipedXY(x, y);
+                    ILandObject land = m_Scene.LandChannel.GetLandObjectClippedXY(x, y);
                     if (land != null)
                         landdata = land.LandData;
                     land = null;
@@ -2659,7 +2661,7 @@ namespace OpenSim.Region.ClientStack.Linden
             private int m_cost;
             private string m_error = String.Empty;
 
-            private Timer m_timeoutTimer = new Timer();
+            private System.Timers.Timer m_timeoutTimer;
             private UUID m_texturesFolder;
             private int m_nreqtextures;
             private int m_nreqmeshs;
@@ -2695,6 +2697,7 @@ namespace OpenSim.Region.ClientStack.Linden
                 m_nreqinstances = nreqinstances;
                 m_IsAtestUpload = IsAtestUpload;
 
+                m_timeoutTimer = new System.Timers.Timer();
                 m_timeoutTimer.Elapsed += TimedOut;
                 m_timeoutTimer.Interval = 120000;
                 m_timeoutTimer.AutoReset = false;
@@ -2803,35 +2806,57 @@ namespace OpenSim.Region.ClientStack.Linden
             }
         }
 
-        public class ScriptResourceSummary
+        public class ExpiringCapBase
+        {
+            protected IHttpServer m_httpListener;
+            protected string m_mypath;
+            protected Timer m_timeoutTimer;
+
+            public ExpiringCapBase(IHttpServer httpServer, string path)
+            {
+                m_httpListener = httpServer;
+                m_mypath = path;
+            }
+
+            public virtual void Start(int timeout)
+            {
+                m_timeoutTimer = new Timer(Timedout, null, timeout, Timeout.Infinite);
+            }
+
+            public virtual void Stop()
+            {
+                m_httpListener.RemoveSimpleStreamHandler(m_mypath);
+                m_timeoutTimer.Dispose();
+                m_timeoutTimer = null;
+            }
+
+            public virtual void Timedout(object state)
+            {
+                Stop();
+                m_log.InfoFormat("[CAPS]: Removing URL and handler for timed out service");
+            }
+        }
+
+        public class ScriptResourceSummary : ExpiringCapBase
         {
             private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-            private IHttpServer m_httpListener;
-            private string m_mypath;
             private Scene m_scene;
-            private Timer m_timeoutTimer;
             private UUID m_agentID;
             private int m_memory;
             private int m_urls;
             private IPAddress m_address;
 
             public ScriptResourceSummary(Scene scene, UUID agentID, IHttpServer httpServer, string path, IPAddress address, 
-                int memory, int urls)
+                int memory, int urls) : base(httpServer, path)
             {
-                m_httpListener = httpServer;
                 m_address = address;
-                m_mypath = path;
                 m_scene = scene;
                 m_agentID = agentID;
                 m_memory = memory;
                 m_urls  = urls;
 
-                m_timeoutTimer = new Timer();
-                m_timeoutTimer.Elapsed += TimedOut;
-                m_timeoutTimer.Interval = 30000;
-                m_timeoutTimer.AutoReset = false;
-                m_timeoutTimer.Start();
+                Start(30000);
             }
 
             /// <summary>
@@ -2843,9 +2868,7 @@ namespace OpenSim.Region.ClientStack.Linden
             /// <returns></returns>
             public void ScriptResourceSummaryCap(IOSHttpRequest request, IOSHttpResponse response)
             {
-                m_timeoutTimer.Stop();
-                m_httpListener.RemoveSimpleStreamHandler(m_mypath);
-                m_timeoutTimer.Dispose();
+                Stop();
 
                 if (!request.RemoteIPEndPoint.Address.Equals(m_address))
                 {
@@ -2897,43 +2920,26 @@ namespace OpenSim.Region.ClientStack.Linden
                 response.RawBuffer = LLSDxmlEncode.EndToNBBytes(sb);
                 response.StatusCode = (int)HttpStatusCode.OK;
             }
-
-            private void TimedOut(object sender, ElapsedEventArgs args)
-            {
-                m_httpListener.RemoveSimpleStreamHandler(m_mypath);
-                m_log.InfoFormat("[CAPS]: Removing URL and handler for timed out ScriptResourceSummary");
-                m_timeoutTimer.Dispose();
-            }
         }
 
-        public class ScriptResourceDetails
+        public class ScriptResourceDetails : ExpiringCapBase
         {
             private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-            private IHttpServer m_httpListener;
-            private string m_mypath;
             private Scene m_scene;
-            private Timer m_timeoutTimer;
             private UUID m_agentID;
             private List<ParcelScriptInfo> m_parcelsInfo;
-
             private IPAddress m_address;
 
             public ScriptResourceDetails(Scene scene, UUID agentID, IHttpServer httpServer, string path, IPAddress address,
-                List<ParcelScriptInfo> parcelsInfo)
+                List<ParcelScriptInfo> parcelsInfo) :base(httpServer, path)
             {
-                m_httpListener = httpServer;
                 m_address = address;
-                m_mypath = path;
                 m_scene = scene;
                 m_agentID = agentID;
                 m_parcelsInfo = parcelsInfo;
 
-                m_timeoutTimer = new Timer();
-                m_timeoutTimer.Elapsed += TimedOut;
-                m_timeoutTimer.Interval = 30000;
-                m_timeoutTimer.AutoReset = false;
-                m_timeoutTimer.Start();
+                Start(30000);
             }
 
             /// <summary>
@@ -2945,9 +2951,7 @@ namespace OpenSim.Region.ClientStack.Linden
             /// <returns></returns>
             public void ScriptResourceDetailsCap(IOSHttpRequest request, IOSHttpResponse response)
             {
-                m_timeoutTimer.Stop();
-                m_httpListener.RemoveSimpleStreamHandler(m_mypath);
-                m_timeoutTimer.Dispose();
+                Stop();
 
                 if (!request.RemoteIPEndPoint.Address.Equals(m_address))
                 {
@@ -3005,17 +3009,9 @@ namespace OpenSim.Region.ClientStack.Linden
                 else
                     LLSDxmlEncode.AddEmptyArray("parcels", sb);
 
-
                 LLSDxmlEncode.AddEndMap(sb);
                 response.RawBuffer = LLSDxmlEncode.EndToNBBytes(sb);
                 response.StatusCode = (int)HttpStatusCode.OK;
-            }
-
-            private void TimedOut(object sender, ElapsedEventArgs args)
-            {
-                m_httpListener.RemoveSimpleStreamHandler(m_mypath);
-                m_log.InfoFormat("[CAPS]: Removing URL and handler for timed out ScriptResourceSummary");
-                m_timeoutTimer.Dispose();
             }
         }
     }
