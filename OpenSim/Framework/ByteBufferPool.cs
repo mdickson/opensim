@@ -42,7 +42,7 @@ namespace OpenSim.Framework
     /// operations to prevent unnecessary allocations and gc thrashing as well as preventing
     /// too much gen0 memory from being pinned in the case of network operations
     /// </summary>
-    public class ByteBufferPool : IByteBufferPool
+    public class ByteBufferPool // : IByteBufferPool XXX
     {
         private static readonly ILog s_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
