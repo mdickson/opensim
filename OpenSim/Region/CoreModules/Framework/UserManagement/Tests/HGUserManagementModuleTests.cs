@@ -25,10 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+
 using Nini.Config;
 using NUnit.Framework;
 using OpenMetaverse;
 using OpenSim.Framework;
+using OpenSim.Region.CoreModules.Framework.UserManagement;
 using OpenSim.Tests.Common;
 
 namespace OpenSim.Region.CoreModules.Framework.UserManagement.Tests
@@ -43,7 +46,7 @@ namespace OpenSim.Region.CoreModules.Framework.UserManagement.Tests
         public void TestCachedUserNameForNewAgent()
         {
             TestHelpers.InMethod();
-            //            TestHelpers.EnableLogging();
+//            TestHelpers.EnableLogging();
 
             HGUserManagementModule hgumm = new HGUserManagementModule();
             UUID userId = TestHelpers.ParseStem("11");

@@ -27,6 +27,7 @@
 
 using Mono.Addins;
 using Nini.Config;
+using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;

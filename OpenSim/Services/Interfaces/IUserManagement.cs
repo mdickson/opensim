@@ -25,9 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+
 using OpenMetaverse;
 using OpenSim.Framework;
-using System.Collections.Generic;
 
 //namespace OpenSim.Services.Interfaces
 namespace OpenSim.Framework
@@ -48,6 +50,8 @@ namespace OpenSim.Framework
         Dictionary<UUID,string> GetUsersNames(string[] ids, UUID scopeID);
         void UserWebFailed(UUID id);
 
+        Dictionary<UUID, UserData> GetUserDatas(string[] ids, UUID scopeID, bool update_name = false);
+		
         /// <summary>
         /// Get user ID by the given name.
         /// </summary>

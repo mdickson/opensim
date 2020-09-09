@@ -100,9 +100,10 @@
       <Reference name="System.Xml.Linq"/>
       <Reference name="System.Data"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="System.Web"/>
       <Reference name="System.Security"/>
-       <Reference name="OpenMetaverse.Types" path="../../bin/"/>
+      <Reference name="OpenMetaverse.Types" path="../../bin/"/>
       <Reference name="OpenMetaverse" path="../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../bin/"/>
       <Reference name="XMLRPC" path="../../bin/"/>
@@ -448,6 +449,7 @@
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="System.Web"/>
       <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
@@ -632,6 +634,7 @@
       <Reference name="System.Web"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
@@ -675,6 +678,7 @@
       <Reference name="System.Web"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Data"/>
@@ -1125,6 +1129,7 @@
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenSim.Framework"/>
@@ -1265,6 +1270,7 @@
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Web"/>
       <Reference name="System.Core"/>
@@ -1382,6 +1388,7 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Web"/>
       <Reference name="NDesk.Options" path="../../../../../bin/"/>
@@ -1389,7 +1396,7 @@
       <Reference name="OpenMetaverse.StructuredData" path="../../../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../../../bin/"/>
       <Reference name="OpenSim.Data"/>
-	  <Reference name="OpenSim.Capabilities"/>
+      <Reference name="OpenSim.Capabilities"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Framework.Monitoring"/>
       <Reference name="OpenSim.Framework.Servers"/>
@@ -1476,6 +1483,7 @@
       <Reference name="System.Core"/>
       <Reference name="System.Data"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="System.Xml"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Data"/>
@@ -1517,13 +1525,14 @@
       <Reference name="System.Xml"/>
       <Reference name="System.Data"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="OpenSim.Framework"/>
       <Reference name="OpenSim.Data"/>
       <Reference name="OpenSim.Region.Framework"/>
       <Reference name="OpenSim.Framework.Console"/>
       <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
-	  <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
+      <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
       <Reference name="log4net" path="../../../bin/"/>
       <Reference name="Mono.Addins" path="../../../bin/"/>
       <Reference name="Npgsql" path="../../../bin/"/>
@@ -1554,6 +1563,7 @@
       <Reference name="System.Core"/>
       <Reference name="System.Data"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="System.Xml"/>
       <Reference name="OpenSim.Data"/>
       <Reference name="OpenSim.Framework"/>
@@ -1598,6 +1608,7 @@
       <Reference name="System.Xml"/>
       <Reference name="System.Xml.Linq"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="System.Web"/>
       <Reference name="System.Data"/>
       <Reference name="Microsoft.CSharp" />
@@ -1665,6 +1676,7 @@
       <Reference name="System.Data"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="System.Web"/>
       <Reference name="Ionic.Zip" path="../../../bin/"/>
       <Reference name="NDesk.Options" path="../../../bin/"/>
@@ -1780,6 +1792,7 @@
       <ReferencePath>../../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="CSJ2K" path="../../../../bin/"/>
       <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../../bin/"/>
@@ -1935,6 +1948,7 @@
       <ReferencePath>../../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="CSJ2K" path="../../../../bin/"/>
       <Reference name="OpenMetaverse.Types" path="../../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../../bin/"/>
@@ -2235,6 +2249,7 @@
       <Reference name="System.Core"/>
       <Reference name="System.Data"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="System.Web"/>
       <Reference name="System.Xml"/>
       <Reference name="OpenMetaverse.Types" path="../../../../../../bin/"/>
@@ -2445,6 +2460,7 @@
       <Reference name="OpenSim.Services.Interfaces"/>
       <Reference name="System"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="System.Xml"/>
 
       <Files>
@@ -2694,6 +2710,7 @@
       <Reference name="System.Core"/>
       <Reference name="System.Data"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Web"/>
       <Reference name="log4net" path="../../../bin/"/>
@@ -2766,6 +2783,7 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Web"/>
       <Reference name="nunit.framework" path="../../../../bin/"/>
@@ -2847,6 +2865,7 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Web"/>
       <Reference name="nunit.framework" path="../../../bin/"/>
@@ -2903,6 +2922,7 @@
       <Reference name="System.Xml"/>
       <Reference name="System.Core"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="System.Data"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
@@ -3039,6 +3059,7 @@
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="OpenMetaverse.Types" path="../../../bin/"/>
       <Reference name="OpenMetaverse" path="../../../bin/"/>
       <Reference name="OpenMetaverse.StructuredData" path="../../../bin/"/>
@@ -3156,6 +3177,7 @@
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Drawing"/>
+      <Reference name="System.Drawing.Common"/>
       <Reference name="System.Runtime.Remoting"/>
       <Reference name="Mono.Addins" path="../../../bin/"/>
       <Reference name="OpenMetaverse.Types" path="../../../bin/"/>

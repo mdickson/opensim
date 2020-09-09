@@ -171,8 +171,8 @@ namespace OpenSim.Region.ClientStack.Linden
         {
             Dictionary<UUID, NameInfo> result = GetCachedDisplayNames(ref ids);
 
-            Dictionary<UUID, UserData> names = m_UserManager.GetUsersUserData(ids, UUID.Zero, true);
-
+            Dictionary<UUID, UserData> names = m_UserManager.GetUserDatas(ids, UUID.Zero, true);
+            
             if (names.Count != 0)
             {
                 foreach (KeyValuePair<UUID, UserData> kvp in names)
