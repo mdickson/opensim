@@ -84,7 +84,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
 
         private INPCModule m_npcModule;
 
-        private Object SenseLock = new Object();
+        private readonly object SenseLock = new object();
 
         private const int AGENT = 1;
         private const int AGENT_BY_USERNAME = 0x10;
@@ -129,7 +129,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
         /// Always lock SenseRepeatListLock when updating this list.
         /// </remarks>
         private List<SensorInfo> SenseRepeaters = new List<SensorInfo>();
-        private object SenseRepeatListLock = new object();
+        private readonly object SenseRepeatListLock = new object();
 
         public void SetSenseRepeatEvent(uint m_localID, UUID m_itemID,
                                         string name, UUID keyID, int type, double range,
@@ -142,13 +142,15 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
                 return;
 
             // Add to timer
-            SensorInfo ts = new SensorInfo();
-            ts.localID = m_localID;
-            ts.itemID = m_itemID;
-            ts.interval = sec;
-            ts.name = name;
-            ts.keyID = keyID;
-            ts.type = type;
+            SensorInfo ts = new SensorInfo
+            {
+                localID = m_localID,
+                itemID = m_itemID,
+                interval = sec,
+                name = name,
+                keyID = keyID,
+                type = type
+            };
             if (range > maximumRange)
                 ts.range = maximumRange;
             else
@@ -165,8 +167,10 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
         {
             lock (SenseRepeatListLock)
             {
-                List<SensorInfo> newSenseRepeaters = new List<SensorInfo>(SenseRepeaters);
-                newSenseRepeaters.Add(senseRepeater);
+                List<SensorInfo> newSenseRepeaters = new List<SensorInfo>(SenseRepeaters)
+                {
+                    senseRepeater
+                };
                 SenseRepeaters = newSenseRepeaters;
             }
         }
@@ -215,13 +219,15 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
                               double range, double arc, SceneObjectPart host)
         {
             // Add to timer
-            SensorInfo ts = new SensorInfo();
-            ts.localID = m_localID;
-            ts.itemID = m_itemID;
-            ts.interval = 0;
-            ts.name = name;
-            ts.keyID = keyID;
-            ts.type = type;
+            SensorInfo ts = new SensorInfo
+            {
+                localID = m_localID,
+                itemID = m_itemID,
+                interval = 0,
+                name = name,
+                keyID = keyID,
+                type = type
+            };
             if (range > maximumRange)
                 ts.range = maximumRange;
             else
@@ -273,8 +279,10 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
                     {
                         try
                         {
-                            DetectParams detect = new DetectParams();
-                            detect.Key = sensedEntities[idx].itemID;
+                            DetectParams detect = new DetectParams
+                            {
+                                Key = sensedEntities[idx].itemID
+                            };
                             detect.Populate(m_CmdManager.m_ScriptEngine.World);
                             detected.Add(detect);
                         }
@@ -316,12 +324,13 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
             // rather than getting a list to scan through
             if (ts.keyID != UUID.Zero)
             {
-                EntityBase e = null;
-                m_CmdManager.m_ScriptEngine.World.Entities.TryGetValue(ts.keyID, out e);
+                m_CmdManager.m_ScriptEngine.World.Entities.TryGetValue(ts.keyID, out EntityBase e);
                 if (e == null)
                     return sensedEntities;
-                Entities = new List<EntityBase>();
-                Entities.Add(e);
+                Entities = new List<EntityBase>
+                {
+                    e
+                };
             }
             else
             {
@@ -613,17 +622,15 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
             // rather than getting a list to scan through
             if (ts.keyID != UUID.Zero)
             {
-                ScenePresence sp;
                 // Try direct lookup by UUID
-                if (!m_CmdManager.m_ScriptEngine.World.TryGetScenePresence(ts.keyID, out sp))
+                if (!m_CmdManager.m_ScriptEngine.World.TryGetScenePresence(ts.keyID, out ScenePresence sp))
                     return sensedEntities;
                 senseEntity(sp);
             }
             else if (!string.IsNullOrEmpty(ts.name))
             {
-                ScenePresence sp;
                 // Try lookup by name will return if/when found
-                if (((ts.type & AGENT) != 0) && m_CmdManager.m_ScriptEngine.World.TryGetAvatarByName(ts.name, out sp))
+                if (((ts.type & AGENT) != 0) && m_CmdManager.m_ScriptEngine.World.TryGetAvatarByName(ts.name, out ScenePresence sp))
                     senseEntity(sp);
                 if ((ts.type & AGENT_BY_USERNAME) != 0)
                 {
@@ -685,18 +692,19 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
 
             while (idx < data.Length)
             {
-                SensorInfo ts = new SensorInfo();
+                SensorInfo ts = new SensorInfo
+                {
+                    localID = localID,
+                    itemID = itemID,
 
-                ts.localID = localID;
-                ts.itemID = itemID;
-
-                ts.interval = (double)data[idx];
-                ts.name = (string)data[idx + 1];
-                ts.keyID = (UUID)data[idx + 2];
-                ts.type = (int)data[idx + 3];
-                ts.range = (double)data[idx + 4];
-                ts.arc = (double)data[idx + 5];
-                ts.host = part;
+                    interval = (double)data[idx],
+                    name = (string)data[idx + 1],
+                    keyID = (UUID)data[idx + 2],
+                    type = (int)data[idx + 3],
+                    range = (double)data[idx + 4],
+                    arc = (double)data[idx + 5],
+                    host = part
+                };
 
                 ts.next =
                     DateTime.Now.ToUniversalTime().AddSeconds(ts.interval);

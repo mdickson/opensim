@@ -25,20 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using log4net;
-using OpenMetaverse;
-using OpenSim.Framework;
-using OpenSim.Framework.Client;
-using OpenSim.Framework.Serialization.External;
-using OpenSim.Region.Framework.Interfaces;
-using OpenSim.Region.Framework.Scenes.Serialization;
-using OpenSim.Services.Interfaces;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Xml;
+
+using log4net;
+using OpenMetaverse;
+using OpenSim.Framework;
+using OpenSim.Framework.Serialization.External;
+using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes.Serialization;
+
 using PermissionMask = OpenSim.Framework.PermissionMask;
 
 namespace OpenSim.Region.Framework.Scenes
@@ -76,9 +77,8 @@ namespace OpenSim.Region.Framework.Scenes
             {
                 if (group is SceneObjectGroup)
                 {
-                    scriptsValidForStarting
-                        += ((SceneObjectGroup)group).CreateScriptInstances(0, false, DefaultScriptEngine, 0);
-                    ((SceneObjectGroup)group).ResumeScripts();
+                    scriptsValidForStarting += ((SceneObjectGroup) group).CreateScriptInstances(0, false, DefaultScriptEngine, 0);
+                    ((SceneObjectGroup) group).ResumeScripts();
                 }
             }
 
@@ -210,24 +210,16 @@ namespace OpenSim.Region.Framework.Scenes
         private void ChangePlacement(InventoryItemBase item, InventoryFolderBase f)
         {
             ScenePresence sp = GetScenePresence(item.Owner);
-            if (sp != null)
+            if (sp != null && sp.ControllingClient != null && sp.ControllingClient.IsActive)
             {
-                if (sp.ControllingClient is IClientCore)
-                {
-                    IClientCore core = (IClientCore)sp.ControllingClient;
-                    IClientInventory inv;
-
-                    if (core.TryGet<IClientInventory>(out inv))
-                    {
-                        InventoryFolderBase parent = InventoryService.GetFolder(f.Owner, f.ParentID);
-                        inv.SendRemoveInventoryItems(new UUID[] { item.ID });
-                        inv.SendBulkUpdateInventory(new InventoryFolderBase[0], new InventoryItemBase[] { item });
-                        string message = "The item was placed in folder " + f.Name;
-                        if (parent != null)
-                            message += " under " + parent.Name;
-                        sp.ControllingClient.SendAgentAlertMessage(message, false);
-                    }
-                }
+                IClientAPI cli = sp.ControllingClient;
+                InventoryFolderBase parent = InventoryService.GetFolder(f.Owner, f.ParentID);
+                cli.SendRemoveInventoryItems(new UUID[] { item.ID });
+                cli.SendBulkUpdateInventory(new InventoryFolderBase[0], new InventoryItemBase[] { item });
+                string message = "The item was placed in folder " + f.Name;
+                if (parent != null)
+                    message += " under " + parent.Name;
+                cli.SendAgentAlertMessage(message, false);
             }
         }
 
@@ -669,6 +661,12 @@ namespace OpenSim.Region.Framework.Scenes
                 return null;
             }
 
+            if (item.AssetType == (int)AssetType.Link || item.AssetType == (int)AssetType.LinkFolder)
+            {
+                message = "inventory links not supported.";
+                return null;
+            }
+
             if (item.Owner != senderId)
             {
                 m_log.WarnFormat(
@@ -885,6 +883,16 @@ namespace OpenSim.Region.Framework.Scenes
             return itemCopy;
         }
 
+        private readonly HashSet<short> denyGiveFolderTypes = new HashSet<short>()
+            {
+                (short)FolderType.Trash,
+                (short)FolderType.LostAndFound,
+                (short)FolderType.CurrentOutfit,
+                (short)FolderType.Inbox,
+                (short)FolderType.Outbox,
+                (short)FolderType.Suitcase,
+                (short)FolderType.Root
+            };
         /// <summary>
         /// Give an entire inventory folder from one user to another.  The entire contents (including all descendent
         /// folders) is given.
@@ -904,11 +912,15 @@ namespace OpenSim.Region.Framework.Scenes
         {
             //// Retrieve the folder from the sender
             InventoryFolderBase folder = InventoryService.GetFolder(senderId, folderId);
-            if (null == folder)
+            if (folder == null)
             {
-                m_log.ErrorFormat(
-                     "[AGENT INVENTORY]: Could not find inventory folder {0} to give", folderId);
+                m_log.ErrorFormat("[AGENT INVENTORY]: Could not find inventory folder {0} to give", folderId);
+                return null;
+            }
 
+            if (denyGiveFolderTypes.Contains(folder.Type))
+            {
+                m_log.ErrorFormat("[AGENT INVENTORY]: can not give inventory folder {0}", folderId);
                 return null;
             }
 
@@ -925,19 +937,14 @@ namespace OpenSim.Region.Framework.Scenes
             }
 
             UUID newFolderId = UUID.Random();
-            InventoryFolderBase newFolder
-                = new InventoryFolderBase(
+            InventoryFolderBase newFolder = new InventoryFolderBase(
                     newFolderId, folder.Name, recipientId, folder.Type, recipientParentFolderId, folder.Version);
             InventoryService.AddFolder(newFolder);
 
             // Give all the subfolders
             InventoryCollection contents = InventoryService.GetFolderContent(senderId, folderId);
-            foreach (InventoryFolderBase childFolder in contents.Folders)
-            {
-                GiveInventoryFolder(client, recipientId, senderId, childFolder.ID, newFolder.ID);
-            }
 
-            // Give all the items
+            // Give all the items (first, this is recursive call)
             foreach (InventoryItemBase item in contents.Items)
             {
                 string message;
@@ -946,6 +953,79 @@ namespace OpenSim.Region.Framework.Scenes
                     if (client != null)
                         client.SendAgentAlertMessage(message, false);
                 }
+            }
+            contents.Items = null;
+
+            foreach (InventoryFolderBase childFolder in contents.Folders)
+            {
+                GiveInventoryFolder(client, recipientId, senderId, childFolder.ID, newFolder.ID);
+            }
+
+            return newFolder;
+        }
+
+        public virtual InventoryFolderBase GiveInventoryFolder(IClientAPI client,
+            UUID recipientId, UUID senderId, UUID folderId, UUID recipientParentFolderId, Dictionary<UUID, AssetType> ids)
+        {
+            //// Retrieve the folder from the sender
+            InventoryFolderBase folder = InventoryService.GetFolder(senderId, folderId);
+            if (folder == null)
+            {
+                m_log.ErrorFormat("[AGENT INVENTORY]: Could not find inventory folder {0} to give", folderId);
+                return null;
+            }
+
+            if(!ids.Remove(folder.ID))
+                return null;
+
+            if (denyGiveFolderTypes.Contains(folder.Type))
+            {
+                m_log.ErrorFormat("[AGENT INVENTORY]: can not give inventory folder {0}", folderId);
+                return null;
+            }
+
+            if (recipientParentFolderId == UUID.Zero)
+            {
+                InventoryFolderBase recipientRootFolder = InventoryService.GetRootFolder(recipientId);
+                if (recipientRootFolder != null)
+                    recipientParentFolderId = recipientRootFolder.ID;
+                else
+                {
+                    m_log.WarnFormat("[AGENT INVENTORY]: Unable to find root folder for receiving agent");
+                    return null;
+                }
+            }
+
+            UUID newFolderId = UUID.Random();
+            InventoryFolderBase newFolder = new InventoryFolderBase(
+                    newFolderId, folder.Name, recipientId, folder.Type, recipientParentFolderId, folder.Version);
+            InventoryService.AddFolder(newFolder);
+
+            InventoryCollection contents = InventoryService.GetFolderContent(senderId, folderId);
+            if(client == null)
+            {
+                foreach (InventoryItemBase item in contents.Items)
+                {
+                    if (ids.Remove(item.ID))
+                        GiveInventoryItem(recipientId, senderId, item.ID, newFolder.ID, out string message);
+                }
+            }
+            else
+            {
+                foreach (InventoryItemBase item in contents.Items)
+                {
+                    if (ids.Remove(item.ID))
+                    {
+                        if (GiveInventoryItem(recipientId, senderId, item.ID, newFolder.ID, out string message) == null)
+                            client.SendAgentAlertMessage(message, false);
+                    }
+                }
+            }
+            contents.Items = null;
+
+            foreach (InventoryFolderBase childFolder in contents.Folders)
+            {
+                GiveInventoryFolder(client, recipientId, senderId, childFolder.ID, newFolder.ID);
             }
 
             return newFolder;
@@ -1595,14 +1675,14 @@ namespace OpenSim.Region.Framework.Scenes
             }
         }
 
-        public UUID MoveTaskInventoryItems(UUID destID, string category, SceneObjectPart host, List<UUID> items)
+        public UUID MoveTaskInventoryItems(UUID destID, string category, SceneObjectPart host, List<UUID> items, bool sendUpdates = true)
         {
 
             ScenePresence avatar;
             IClientAPI remoteClient = null;
             if (TryGetScenePresence(destID, out avatar))
                 remoteClient = avatar.ControllingClient;
-            // ????
+
             SceneObjectPart destPart = GetSceneObjectPart(destID);
             if (destPart != null) // Move into a prim
             {
@@ -1610,12 +1690,16 @@ namespace OpenSim.Region.Framework.Scenes
                     MoveTaskInventoryItem(destID, host, itemID);
                 return destID; // Prim folder ID == prim ID
             }
-            // /????
+
+            // move to a avatar inventory
+            if(remoteClient == null)
+                return UUID.Zero;
 
             InventoryFolderBase rootFolder = InventoryService.GetRootFolder(destID);
+            if(rootFolder == null)
+                return UUID.Zero;
 
             UUID newFolderID = UUID.Random();
-
             InventoryFolderBase newFolder = new InventoryFolderBase(newFolderID, category, destID, -1, rootFolder.ID, rootFolder.Version);
             InventoryService.AddFolder(newFolder);
 
@@ -1623,23 +1707,19 @@ namespace OpenSim.Region.Framework.Scenes
             {
                 string message;
                 InventoryItemBase agentItem = CreateAgentInventoryItemFromTask(destID, host, itemID, out message);
-
                 if (agentItem != null)
                 {
                     agentItem.Folder = newFolderID;
-
                     AddInventoryItem(agentItem);
-
                     RemoveNonCopyTaskItemFromPrim(host, itemID);
                 }
                 else
                 {
-                    if (remoteClient != null)
-                        remoteClient.SendAgentAlertMessage(message, false);
+                    remoteClient.SendAgentAlertMessage(message, false);
                 }
             }
 
-            if (remoteClient != null)
+            if(sendUpdates)
             {
                 SendInventoryUpdate(remoteClient, rootFolder, true, false);
                 SendInventoryUpdate(remoteClient, newFolder, false, true);

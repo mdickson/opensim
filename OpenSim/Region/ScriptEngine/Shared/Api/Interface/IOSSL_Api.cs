@@ -138,7 +138,8 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         void osRegionNotice(string msg);
         void osRegionNotice(LSL_Key agentID, string msg);
         bool osConsoleCommand(string Command);
-        void osSetParcelMediaURL(string url);
+        void osSetParcelMusicURL(LSL_String url);
+        void osSetParcelMediaURL(LSL_String url);
         void osSetPrimFloatOnWater(int floatYN);
         void osSetParcelSIPAddress(string SIPAddress);
 
@@ -240,7 +241,6 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Interfaces
         string osSetPenCap(string drawList, string direction, string type);
         string osDrawImage(string drawList, int width, int height, string imageUrl);
         vector osGetDrawStringSize(string contentType, string text, string fontName, int fontSize);
-        void osSetStateEvents(int events);
 
         void osSetRegionWaterHeight(double height);
         void osSetRegionSunSettings(bool useEstateSun, bool sunFixed, double sunHour);
