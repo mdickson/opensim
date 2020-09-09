@@ -664,6 +664,8 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                         continue;
 
                     if(m_blacklistedregions.ContainsKey(st.regionhandle))
+                        continue;
+
                     if (m_cachedRegionMapItemsResponses.TryGetValue(st.regionhandle, out OSDMap responseMap))
                     {
                         if (responseMap != null)
