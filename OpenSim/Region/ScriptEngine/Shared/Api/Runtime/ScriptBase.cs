@@ -30,7 +30,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics; //for [DebuggerNonUserCode]
 using System.Reflection;
-using System.Runtime.Remoting.Lifetime;
+
+//using System.Runtime.Remoting.Lifetime;
 
 namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 {

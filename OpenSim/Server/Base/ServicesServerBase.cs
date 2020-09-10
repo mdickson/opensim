@@ -153,14 +153,15 @@ namespace OpenSim.Server.Base
             MainConsole.Instance.ReadConfig(Config);
             m_console = MainConsole.Instance;
 
+            var repository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+
             if (logConfig != null)
             {
-                FileInfo cfg = new FileInfo(logConfig);
-                XmlConfigurator.Configure(cfg);
+                XmlConfigurator.Configure(repository, new FileInfo(logConfig));
             }
             else
             {
-                XmlConfigurator.Configure();
+                XmlConfigurator.Configure(repository);
             }
 
             LogEnvironmentInformation();

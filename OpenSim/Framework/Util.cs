@@ -1573,7 +1573,7 @@ namespace OpenSim.Framework
 
         public static string logFile()
         {
-            foreach (IAppender appender in LogManager.GetRepository().GetAppenders())
+            foreach (var appender in LogManager.GetRepository(Assembly.GetEntryAssembly()).GetAppenders())
             {
                 if (appender is FileAppender && appender.Name == "LogFileAppender")
                 {
@@ -1586,7 +1586,7 @@ namespace OpenSim.Framework
 
         public static string StatsLogFile()
         {
-            foreach (IAppender appender in LogManager.GetRepository().GetAppenders())
+            foreach (IAppender appender in LogManager.GetRepository(Assembly.GetEntryAssembly()).GetAppenders())
             {
                 if (appender is FileAppender && appender.Name == "StatsLogFileAppender")
                 {

@@ -4,7 +4,7 @@
     <FileVersion>0.9.2.1</FileVersion>
 	<MSBuildProjectExtensionsPath>$(SolutionDir)\obj\$(Configuration)\$(MSBuildProjectName)\</MSBuildProjectExtensionsPath>
 	<IntermediateOutputPath>$(SolutionDir)\obj\$(Configuration)\$(MSBuildProjectName)\</IntermediateOutputPath>
-	<OutputPath>$(SolutionDir)\release\$(Configuration)\$(AssemblyName)\</OutputPath>
+	<OutputPath>$(SolutionDir)\build\$(Configuration)\$(AssemblyName)\</OutputPath>
 	<OutDir>$(OutputPath)</OutDir>
  </PropertyGroup>
 </Project>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyTitle>OpenSim.Region.ScriptEngine.XEngine</AssemblyTitle>
     <Company>http://opensimulator.org</Company>
     <Product>OpenSim</Product>
@@ -33,7 +33,6 @@
     <ProjectReference Include="..\Shared\CodeTools\OpenSim.Region.ScriptEngine.Shared.CodeTools.csproj" />
     <ProjectReference Include="..\Shared\Instance\OpenSim.Region.ScriptEngine.Shared.Instance.csproj" />
     <ProjectReference Include="..\XEngine\Api\Runtime\OpenSim.Region.ScriptEngine.XEngine.Api.Runtime.csproj" />
-    <ProjectReference Include="..\..\..\..\ThirdParty\SmartThreadPool\SmartThreadPool.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Tests\XEngineBasicTests.cs" />
@@ -46,6 +45,6 @@
     <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.6" />
     <PackageReference Include="Mono.Addins" Version="1.3.8" />
-    <PackageReference Include="OpenMetaverse" Version="1.0.0" />
+    <PackageReference Include="OpenMetaverse" Version="1.0.1" />
   </ItemGroup>
 </Project>

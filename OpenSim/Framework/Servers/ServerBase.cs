@@ -145,7 +145,7 @@ namespace OpenSim.Framework.Servers
 
         public void RegisterCommonAppenders(IConfig startupConfig)
         {
-            ILoggerRepository repository = LogManager.GetRepository();
+            ILoggerRepository repository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             IAppender[] appenders = repository.GetAppenders();
 
             foreach (IAppender appender in appenders)
@@ -669,7 +669,7 @@ namespace OpenSim.Framework.Servers
 
             string rawLevel = cmd[3];
 
-            ILoggerRepository repository = LogManager.GetRepository();
+            ILoggerRepository repository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             Level consoleLevel = repository.LevelMap[rawLevel];
 
             if (consoleLevel != null)

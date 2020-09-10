@@ -29,6 +29,7 @@ using log4net;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Timers;
 
 namespace OpenSim.Framework.Monitoring
@@ -38,7 +39,8 @@ namespace OpenSim.Framework.Monitoring
     /// </summary>
     public static class StatsLogger
     {
-        private static readonly ILog m_statsLog = LogManager.GetLogger("special.StatsLogger");
+        private static readonly ILog m_statsLog = 
+            LogManager.GetLogger(Assembly.GetEntryAssembly(), "special.StatsLogger");
 
         private static Timer m_loggingTimer;
         private static int m_statsLogIntervalMs = 5000;

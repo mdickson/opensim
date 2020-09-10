@@ -37,6 +37,7 @@ using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.PhysicsModules.SharedBase;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -94,7 +95,7 @@ namespace OpenSim.Region.PhysicsModule.ODE
 
     public class OdeScene : PhysicsScene
     {
-        private readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType.ToString());
+        private readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         // private Dictionary<string, sCollisionData> m_storedCollisions = new Dictionary<string, sCollisionData>();
 

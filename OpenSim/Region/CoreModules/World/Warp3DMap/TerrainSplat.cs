@@ -34,6 +34,7 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Reflection;
 
 namespace OpenSim.Region.CoreModules.World.Warp3DMap
 {
@@ -66,7 +67,7 @@ namespace OpenSim.Region.CoreModules.World.Warp3DMap
 
         #endregion Constants
 
-        private static readonly ILog m_log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static string LogHeader = "[WARP3D TERRAIN SPLAT]";
 
         /// <summary>
