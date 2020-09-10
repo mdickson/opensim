@@ -44,11 +44,9 @@ namespace OpenSim.Services.HypergridService
     /// </summary>
     public class HGInstantMessageService : IInstantMessage
     {
-        private static readonly ILog m_log =
-                LogManager.GetLogger(
-                MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_log = LogManager.GetLogger( MethodBase.GetCurrentMethod().DeclaringType);
 
-        private const double CACHE_EXPIRATION_SECONDS = 120000.0; // 33 hours
+        private const int REGIONCACHE_EXPIRATION = 300000;
 
         static bool m_Initialized = false;
 
@@ -59,8 +57,8 @@ namespace OpenSim.Services.HypergridService
 
         protected static IInstantMessageSimConnector m_IMSimConnector;
 
-        protected static Dictionary<UUID, object> m_UserLocationMap = new Dictionary<UUID, object>();
-        private static ExpiringCache<UUID, GridRegion> m_RegionCache;
+        protected static readonly Dictionary<UUID, object> m_UserLocationMap = new Dictionary<UUID, object>();
+        private static readonly ExpiringCacheOS<UUID, GridRegion> m_RegionCache = new ExpiringCacheOS<UUID, GridRegion>(60000);
 
         private static bool m_ForwardOfflineGroupMessages;
         private static bool m_InGatekeeper;
@@ -104,8 +102,6 @@ namespace OpenSim.Services.HypergridService
                 {
                     m_log.WarnFormat("[HG IM SERVICE]: Unable to create User Agent Service. Missing config var  in [HGInstantMessageService]?");
                 }
-
-                m_RegionCache = new ExpiringCache<UUID, GridRegion>();
 
                 IConfig cnf = config.Configs["Messaging"];
                 if (cnf == null)
@@ -269,11 +265,10 @@ namespace OpenSim.Services.HypergridService
         {
             bool imresult = false;
             GridRegion reginfo = null;
-            if (!m_RegionCache.TryGetValue(upd.RegionID, out reginfo))
+            if (!m_RegionCache.TryGetValue(upd.RegionID, REGIONCACHE_EXPIRATION, out reginfo))
             {
                 reginfo = m_GridService.GetRegionByUUID(UUID.Zero /*!!!*/, upd.RegionID);
-                if (reginfo != null)
-                    m_RegionCache.AddOrUpdate(upd.RegionID, reginfo, CACHE_EXPIRATION_SECONDS);
+                m_RegionCache.AddOrUpdate(upd.RegionID, reginfo, reginfo == null ? 60000 : REGIONCACHE_EXPIRATION);
             }
 
             if (reginfo != null)

@@ -955,17 +955,17 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
             return m_LSL_Functions.llGetUsername(id);
         }
 
-        public LSL_Key llRequestUsername(string id)
+        public LSL_Key llRequestUsername(LSL_Key id)
         {
             return m_LSL_Functions.llRequestUsername(id);
         }
 
-        public LSL_String llGetDisplayName(string id)
+        public LSL_String llGetDisplayName(LSL_Key id)
         {
             return m_LSL_Functions.llGetDisplayName(id);
         }
 
-        public LSL_Key llRequestDisplayName(string id)
+        public LSL_Key llRequestDisplayName(LSL_Key id)
         {
             return m_LSL_Functions.llRequestDisplayName(id);
         }
@@ -1330,12 +1330,17 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
             m_LSL_Functions.llRemoveVehicleFlags(flags);
         }
 
+        public LSL_Key llRequestUserKey(LSL_String username)
+        {
+            return m_LSL_Functions.llRequestUserKey(username);
+        }
+
         public LSL_Key llRequestAgentData(string id, int data)
         {
             return m_LSL_Functions.llRequestAgentData(id, data);
         }
 
-        public LSL_Key llRequestInventoryData(string name)
+        public LSL_Key llRequestInventoryData(LSL_String name)
         {
             return m_LSL_Functions.llRequestInventoryData(name);
         }
@@ -1913,6 +1918,11 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
         public void llTargetRemove(int number)
         {
             m_LSL_Functions.llTargetRemove(number);
+        }
+
+        public void llTargetedEmail(LSL_Integer target, LSL_String subject, LSL_String message)
+        {
+            m_LSL_Functions.llTargetedEmail(target, subject, message);
         }
 
         public void llTeleportAgent(string agent, string simname, LSL_Vector pos, LSL_Vector lookAt)

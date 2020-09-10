@@ -220,6 +220,19 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Grid
             return rinfo;
         }
 
+        public GridRegion GetRegionByHandle(UUID scopeID, ulong regionhandle)
+        {
+            bool inCache = false;
+            GridRegion rinfo = m_RegionInfoCache.Get(scopeID, regionhandle, out inCache);
+            if (inCache)
+                return rinfo;
+
+            rinfo = m_GridService.GetRegionByHandle(scopeID, regionhandle);
+            if (rinfo != null)
+                m_RegionInfoCache.Cache(scopeID, rinfo);
+            return rinfo;
+        }
+
         // Get a region given its base coordinates.
         // NOTE: this is NOT 'get a region by some point in the region'. The coordinate MUST
         //     be the base coordinate of the region.

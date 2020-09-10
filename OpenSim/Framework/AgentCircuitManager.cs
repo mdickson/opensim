@@ -51,7 +51,6 @@ namespace OpenSim.Framework
 
         public virtual AuthenticateResponse AuthenticateSession(UUID sessionID, UUID agentID, uint circuitcode)
         {
-
             AuthenticateResponse user = new AuthenticateResponse();
             if (!m_agentCircuits.TryGetValue(circuitcode, out AgentCircuitData validcircuit) || validcircuit == null)
             {
@@ -87,6 +86,13 @@ namespace OpenSim.Framework
         /// </summary>
         /// <param name="circuitCode"></param>
         /// <param name="agentData"></param>
+        public virtual void AddNewCircuit(AgentCircuitData agentData)
+        {
+            RemoveCircuit(agentData.AgentID); // no duplications
+            m_agentCircuits[agentData.circuitcode] = agentData;
+            m_agentCircuitsByUUID[agentData.AgentID] = agentData;
+        }
+
         public virtual void AddNewCircuit(uint circuitCode, AgentCircuitData agentData)
         {
             RemoveCircuit(agentData.AgentID); // no duplications
@@ -108,6 +114,14 @@ namespace OpenSim.Framework
             {
                 m_agentCircuits.TryRemove(ac.circuitcode, out AgentCircuitData dummy);
             }
+        }
+
+        public virtual void RemoveCircuit(AgentCircuitData ac)
+        {
+            m_agentCircuitsByUUID.TryRemove(ac.AgentID, out AgentCircuitData dummy);
+            m_agentCircuits.TryRemove(ac.circuitcode, out AgentCircuitData dummyb);
+            if (dummy.circuitcode != ac.circuitcode) //??
+                m_agentCircuits.TryRemove(dummy.circuitcode, out AgentCircuitData dummyc);
         }
 
         public AgentCircuitData GetAgentCircuitData(uint circuitCode)
@@ -161,7 +175,7 @@ namespace OpenSim.Framework
             if (m_agentCircuits.TryRemove(circuitcode, out AgentCircuitData agentData))
             {
                 agentData.circuitcode = newcircuitcode;
-                m_agentCircuits.TryAdd(newcircuitcode, agentData);
+                m_agentCircuits[newcircuitcode] = agentData;
                 m_agentCircuitsByUUID[agentData.AgentID] = agentData;
                 return true;
             }

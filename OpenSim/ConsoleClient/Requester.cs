@@ -63,8 +63,7 @@ namespace OpenSim.ConsoleClient
                     {
                         try
                         {
-                            using (Stream s = response.GetResponseStream())
-                            using (StreamReader r = new StreamReader(s))
+                            using (StreamReader r = new StreamReader(response.GetResponseStream()))
                                 reply = r.ReadToEnd();
 
                         }

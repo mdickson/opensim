@@ -92,9 +92,9 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
     {
         //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private object m_httpListLock = new object();
+        private readonly object m_httpListLock = new object();
         private int m_httpTimeout = 30000;
-        private string m_name = "HttpScriptRequests";
+        private readonly string m_name = "HttpScriptRequests";
 
         private OutboundUrlFilter m_outboundUrlFilter;
         private string m_proxyurl = "";
@@ -132,11 +132,10 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
 
         public bool CheckThrottle(uint localID, UUID ownerID)
         {
-            ThrottleData th;
             double now = Util.GetTimeStamp();
             bool ret;
 
-            if (m_RequestsThrottle.TryGetValue(localID, out th))
+            if (m_RequestsThrottle.TryGetValue(localID, out ThrottleData th))
             {
                 double delta = now - th.lastTime;
                 th.lastTime = now;
@@ -350,8 +349,7 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
 
         public IServiceRequest GetNextCompletedRequest()
         {
-            HttpRequestClass req;
-            if (m_CompletedRequests.TryDequeue(out req))
+            if(m_CompletedRequests.TryDequeue(out HttpRequestClass req))
                 return req;
 
             return null;
@@ -361,8 +359,7 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
         {
             lock (m_httpListLock)
             {
-                HttpRequestClass tmpReq;
-                if (m_pendingRequests.TryGetValue(reqId, out tmpReq))
+                if (m_pendingRequests.TryGetValue(reqId, out HttpRequestClass tmpReq))
                 {
                     tmpReq.Stop();
                     m_pendingRequests.Remove(reqId);
@@ -407,13 +404,15 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
             // First instance sets this up for all sims
             if (ThreadPool == null)
             {
-                STPStartInfo startInfo = new STPStartInfo();
-                startInfo.IdleTimeout = 2000;
-                startInfo.MaxWorkerThreads = maxThreads;
-                startInfo.MinWorkerThreads = 0;
-                startInfo.ThreadPriority = ThreadPriority.BelowNormal;
-                startInfo.StartSuspended = true;
-                startInfo.ThreadPoolName = "ScriptsHttpReq";
+                STPStartInfo startInfo = new STPStartInfo()
+                {
+                    IdleTimeout = 2000,
+                    MaxWorkerThreads = maxThreads,
+                    MinWorkerThreads = 0,
+                    ThreadPriority = ThreadPriority.Normal,
+                    StartSuspended = true,
+                    ThreadPoolName = "ScriptsHttpReq"
+                };
 
                 ThreadPool = new SmartThreadPool(startInfo);
                 ThreadPool.Start();
@@ -537,7 +536,7 @@ namespace OpenSim.Region.CoreModules.Scripting.HttpRequest
             // We may want to ignore SSL
             if (sender is HttpWebRequest)
             {
-                HttpWebRequest Request = (HttpWebRequest)sender;
+                HttpWebRequest Request = sender as HttpWebRequest;
                 ServicePoint sp = Request.ServicePoint;
 
                 // We don't case about encryption, get out of here
