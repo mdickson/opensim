@@ -324,7 +324,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         /// <summary>Flag to signal when clients should send pings</summary>
         protected bool m_sendPing;
 
-        protected ExpiringCache<IPEndPoint, Queue<UDPPacketBuffer>> m_pendingCache = new ExpiringCache<IPEndPoint, Queue<UDPPacketBuffer>>();
+        protected ExpiringCacheOS<IPEndPoint, Queue<UDPPacketBuffer>> m_pendingCache = new ExpiringCacheOS<IPEndPoint, Queue<UDPPacketBuffer>>(10000);
 
         protected int m_defaultRTO = 0;
         protected int m_maxRTO = 0;
@@ -1340,8 +1340,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             // If this is a pending connection, enqueue, don't process yet
             lock (m_pendingCache)
             {
-                Queue<UDPPacketBuffer> queue;
-                if (m_pendingCache.TryGetValue(endPoint, out queue))
+                if (m_pendingCache.TryGetValue(endPoint, out Queue<UDPPacketBuffer> queue))
                 {
                     //m_log.DebugFormat("[LLUDPSERVER]: Enqueued a {0} packet into the pending queue", packet.Type);
                     queue.Enqueue(buffer);
@@ -1656,12 +1655,9 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         return;
                     }
 
-                    // Now we know we can handle more data
-                    //Thread.Sleep(200);
 
                     // Obtain the pending queue and remove it from the cache
                     Queue<UDPPacketBuffer> queue = null;
-
                     lock (m_pendingCache)
                     {
                         if (!m_pendingCache.TryGetValue(endPoint, out queue))

@@ -25,25 +25,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenMetaverse;
-using OpenSim.Framework;
+using System;
 using System.Collections.Generic;
 
-namespace OpenSim.Services.Interfaces
+using OpenMetaverse;
+using OpenSim.Framework;
+
+//namespace OpenSim.Services.Interfaces
+namespace OpenSim.Framework
 {
     /// <summary>
     /// This maintains the relationship between a UUID and a user name.
     /// </summary>
     public interface IUserManagement
     {
+        UserData GetUserData(UUID id);
         string GetUserName(UUID uuid);
         string GetUserHomeURL(UUID uuid);
+        string GetUserHomeURL(UUID uuid, out bool failedWeb);
         string GetUserUUI(UUID uuid);
         bool GetUserUUI(UUID userID, out string uui);
         string GetUserServerURL(UUID uuid, string serverType);
-        Dictionary<UUID, string> GetUsersNames(string[] ids, UUID scopeID);
-        Dictionary<UUID, UserData> GetUsersUserData(string[] ids, UUID scopeID, bool update_name = false);
-	
+        string GetUserServerURL(UUID uuid, string serverType, out bool failedWeb);
+        Dictionary<UUID,string> GetUsersNames(string[] ids, UUID scopeID);
+        void UserWebFailed(UUID id);
+
+        Dictionary<UUID, UserData> GetUserDatas(string[] ids, UUID scopeID, bool update_name = false);
+		
         /// <summary>
         /// Get user ID by the given name.
         /// </summary>
@@ -79,7 +87,7 @@ namespace OpenSim.Services.Interfaces
         /// <param name="uuid"></param>
         /// <param name="firstName"></param>
         /// <param name="lastName"></param>
-        void AddUser(UUID uuid, string first, string last, bool isNPC = false);
+        void AddUser(UUID uuid, string first, string last, bool isNPC = false, int expire = 1800000);
 
         /// <summary>
         /// Add a user.

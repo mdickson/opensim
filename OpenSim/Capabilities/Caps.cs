@@ -156,12 +156,7 @@ namespace OpenSim.Framework.Capabilities
 
         ~Caps()
         {
-            Flags = CapsFlags.None;
-            if (m_capsActive != null)
-            {
-                m_capsActive.Dispose();
-                m_capsActive = null;
-            }
+            Dispose(false);
         }
         
         public void Dispose()
@@ -170,7 +165,7 @@ namespace OpenSim.Framework.Capabilities
             GC.SuppressFinalize(this);
         }
 
-        public void Dispose(bool disposing)
+        protected void Dispose(bool disposing)
         {
             Flags = CapsFlags.None;
             if (m_capsActive != null)

@@ -456,9 +456,7 @@ namespace OpenSim.Region.CoreModules.World.Permissions
 
             if (args.Length > 2)
             {
-                bool val;
-
-                if (!bool.TryParse(args[2], out val))
+                if (!bool.TryParse(args[2], out bool val))
                     return;
 
                 m_bypassPermissions = val;
@@ -485,9 +483,7 @@ namespace OpenSim.Region.CoreModules.World.Permissions
 
             if (args.Length > 2)
             {
-                bool val;
-
-                if (!bool.TryParse(args[2], out val))
+                if (!bool.TryParse(args[2], out bool val))
                     return;
 
                 m_bypassPermissionsValue = val;
@@ -506,9 +502,7 @@ namespace OpenSim.Region.CoreModules.World.Permissions
 
             if (args.Length > 2)
             {
-                bool val;
-
-                if (!bool.TryParse(args[2], out val))
+                if (!bool.TryParse(args[2], out bool val))
                     return;
 
                 m_debugPermissions = val;
@@ -1878,7 +1872,7 @@ namespace OpenSim.Region.CoreModules.World.Permissions
                 return false;
 
             Vector3 pos = sog.AbsolutePosition;
-            ILandObject parcel = m_scene.LandChannel.GetLandObject(pos.X, pos.Y);
+            ILandObject parcel = m_scene.LandChannel.GetLandObjectClippedXY(pos.X, pos.Y);
             if (parcel == null)
                 return false;
 
@@ -2084,16 +2078,7 @@ namespace OpenSim.Region.CoreModules.World.Permissions
                 parcel = m_scene.LandChannel.GetLandObject(id);
             else
             {
-                if (X < 0)
-                    X = 0;
-                else if (X > ((int)m_scene.RegionInfo.RegionSizeX - 1))
-                    X = ((int)m_scene.RegionInfo.RegionSizeX - 1);
-                if (Y < 0)
-                    Y = 0;
-                else if (Y > ((int)m_scene.RegionInfo.RegionSizeY - 1))
-                    Y = ((int)m_scene.RegionInfo.RegionSizeY - 1);
-
-                parcel = m_scene.LandChannel.GetLandObject(X, Y);
+                parcel = m_scene.LandChannel.GetLandObjectClippedXY(X, Y);
             }
 
             if (parcel == null)

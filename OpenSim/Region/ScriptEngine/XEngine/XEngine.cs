@@ -1566,14 +1566,11 @@ namespace OpenSim.Region.ScriptEngine.XEngine
             }
 
             IScriptInstance instance = null;
-
             lock (m_Scripts)
             {
                 // Do we even have it?
-                if (!m_Scripts.ContainsKey(itemID))
+                if (!m_Scripts.TryGetValue(itemID, out instance))
                     return;
-
-                instance = m_Scripts[itemID];
                 m_Scripts.Remove(itemID);
             }
 
@@ -1742,18 +1739,15 @@ namespace OpenSim.Region.ScriptEngine.XEngine
 
             lock (m_PrimObjects)
             {
-                if (!m_PrimObjects.ContainsKey(localID))
+                if (!m_PrimObjects.TryGetValue(localID, out uuids))
                     return false;
-
-                uuids = m_PrimObjects[localID];
 
                 foreach (UUID itemID in uuids)
                 {
                     IScriptInstance instance = null;
                     try
                     {
-                        if (m_Scripts.ContainsKey(itemID))
-                            instance = m_Scripts[itemID];
+                        m_Scripts.TryGetValue(itemID, out instance);
                     }
                     catch { /* ignore race conditions */ }
 
@@ -1791,11 +1785,9 @@ namespace OpenSim.Region.ScriptEngine.XEngine
         /// <returns></returns>
         public bool PostScriptEvent(UUID itemID, EventParams p)
         {
-            if (m_Scripts.ContainsKey(itemID))
+            if (m_Scripts.TryGetValue(itemID, out IScriptInstance instance))
             {
-                IScriptInstance instance = m_Scripts[itemID];
-                if (instance != null)
-                    instance.PostEvent(p);
+                instance?.PostEvent(p);
                 return true;
             }
             lock (m_CompileDict)
@@ -1887,14 +1879,12 @@ namespace OpenSim.Region.ScriptEngine.XEngine
 
         private IScriptInstance GetInstance(UUID itemID)
         {
-            IScriptInstance instance;
             lock (m_Scripts)
             {
-                if (!m_Scripts.ContainsKey(itemID))
-                    return null;
-                instance = m_Scripts[itemID];
+                if (m_Scripts.TryGetValue(itemID, out IScriptInstance instance))
+                    return instance;
             }
-            return instance;
+            return null;
         }
 
         public void SetScriptState(UUID itemID, bool running, bool self)
@@ -2409,7 +2399,7 @@ namespace OpenSim.Region.ScriptEngine.XEngine
             {
                 foreach (IScriptInstance si in m_Scripts.Values)
                 {
-                    if (!topScripts.ContainsKey(si.LocalID))
+                    if (!topScripts.ContainsKey(si.RootLocalID))
                         topScripts[si.RootLocalID] = 0;
 
                     topScripts[si.RootLocalID] += GetExectionTime(si);
@@ -2438,6 +2428,11 @@ namespace OpenSim.Region.ScriptEngine.XEngine
                 }
             }
             return time;
+        }
+
+        public int GetScriptsMemory(List<UUID> itemIDs)
+        {
+            return 0;
         }
 
         private float GetExectionTime(IScriptInstance si)
@@ -2508,5 +2503,35 @@ namespace OpenSim.Region.ScriptEngine.XEngine
                 instance.ExecutionTimer.Start();
             }
         }
+
+        public ICollection<ScriptTopStatsData> GetTopObjectStats(float mintime, int minmemory, out float totaltime, out float totalmemory)
+        {
+            Dictionary<uint, ScriptTopStatsData> topScripts = new Dictionary<uint, ScriptTopStatsData>();
+            totalmemory = 0;
+            totaltime = 0;
+            lock (m_Scripts)
+            {
+                foreach (IScriptInstance si in m_Scripts.Values)
+                {
+                    float time = GetExectionTime(si);
+                    totaltime += time;
+                    if(time > mintime)
+                    {
+                        ScriptTopStatsData sd;
+                        if (topScripts.TryGetValue(si.RootLocalID, out sd))
+                            sd.time += time;
+                        else
+                        {
+                            sd = new ScriptTopStatsData();
+                            sd.localID = si.RootLocalID;
+                            sd.time = time;
+                            topScripts[si.RootLocalID] = sd;
+                        }
+                    }
+                }
+            }
+            return topScripts.Values;
+        }
+
     }
 }
