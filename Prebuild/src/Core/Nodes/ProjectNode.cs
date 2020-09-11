@@ -97,21 +97,22 @@ namespace Prebuild.Core.Nodes
         /// .NET 4.5
         /// </summary>
         v4_5,
-        /// <summary>
-        /// .NET 4.5.1
-        /// </summary>
-        v4_5_1,
-        /// <summary>
-        /// .NET 4.6
-        /// </summary>
-        v4_6,
-        /// <summary>
-        /// .NET 4.6.1
-        /// </summary>
-        v4_6_1,
 		/// <summary>
-		/// .NET 4.7.2
+		/// .NET 4.5.1
 		/// </summary>
+		v4_5_1,
+		v4_5_2,
+		/// <summary>
+		/// .NET 4.6
+		/// </summary>
+		v4_6,
+		v4_6_1,
+		v4_6_2,
+		/// <summary>
+		/// .NET 4.7
+		/// </summary>
+		v4_7,
+		v4_7_1,
 		v4_7_2,
 		/// <summary>
 		/// .NET 4.8
