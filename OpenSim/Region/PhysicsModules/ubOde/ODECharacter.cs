@@ -872,19 +872,6 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             SafeNativeMethods.GeomSetCategoryBits(collider, (uint)m_collisionCategories);
             SafeNativeMethods.GeomSetCollideBits(collider, (uint)m_collisionFlags);
 
-<<<<<<< HEAD
-            float r = m_size.X;
-            if (m_size.Y > r)
-                r = m_size.Y;
-            float l = m_size.Z - r;
-            r *= 0.5f;
-
-            capsule = SafeNativeMethods.CreateCapsule(collider, r, l);
-
-            m_mass = m_density * m_size.X * m_size.Y * m_size.Z;  // update mass
-
-            SafeNativeMethods.MassSetBoxTotal(out ShellMass, m_mass, m_size.X, m_size.Y, m_size.Z);
-=======
             float r = sx;
             if(sy > r)
                 r = sy;
@@ -895,7 +882,6 @@ namespace OpenSim.Region.PhysicsModule.ubOde
 
             m_mass = m_density * sx * sy * sz;  // update mass
             SafeNativeMethods.MassSetBoxTotal(out ShellMass, m_mass, sx, sy, sz);
->>>>>>> upstream/master
 
             PID_D = basePID_D * m_mass / m_parent_scene.ODE_STEPSIZE;
             PID_P = basePID_P * m_mass / m_parent_scene.ODE_STEPSIZE;
@@ -1902,12 +1888,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                     float oldsz = m_size.Z;
                     m_size = pSize;
 
-<<<<<<< HEAD
-                    AvatarGeomAndBodyCreation(_position.X, _position.Y,
-                                      _position.Z + (m_size.Z - oldsz) * 0.5f);
-=======
                     float sz = m_size.Z;
->>>>>>> upstream/master
 
                     float bot = -sz * 0.5f + m_feetOffset;
                     boneOff = bot + 0.3f;
