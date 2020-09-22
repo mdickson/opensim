@@ -877,9 +877,7 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
             InventoryItemBase item = m_Scene.InventoryService.GetItem(remoteClient.AgentId, itemID);
 
             if (item == null)
-            {
                 return null;
-            }
 
             item.Owner = remoteClient.AgentId;
 
@@ -907,8 +905,10 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
                 byte BypassRayCast, bool RayEndIsIntersection,
                 bool RezSelected, bool RemoveItem, UUID fromTaskID, bool attachment)
         {
-            AssetBase rezAsset = m_Scene.AssetService.Get(assetID.ToString());
+            if(assetID == UUID.Zero)
+                return null;
 
+            AssetBase rezAsset = m_Scene.AssetService.Get(assetID.ToString());
             if (rezAsset == null)
             {
                 if (item != null)
@@ -925,7 +925,6 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
                         assetID, remoteClient.Name);
                     remoteClient.SendAgentAlertMessage(string.Format("Unable to rez: could not find asset {0}.", assetID), false);
                 }
-
                 return null;
             }
 

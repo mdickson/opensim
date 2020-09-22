@@ -847,7 +847,6 @@ namespace OpenSim.Region.PhysicsModule.ubOde
 
         private void AvatarGeomAndBodyCreation(float npositionX, float npositionY, float npositionZ)
         {
-            // sizes  one day should came from visual parameters
             float sx = m_size.X;
             float sy = m_size.Y;
             float sz = m_size.Z;
@@ -858,7 +857,6 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             float feetsz = sz * 0.45f;
             if (feetsz > 0.6f)
                 feetsz = 0.6f;
-
             feetOff = bot + feetsz;
 
             AvaAvaSizeXsq = 0.4f * sx;
@@ -874,6 +872,7 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             SafeNativeMethods.GeomSetCategoryBits(collider, (uint)m_collisionCategories);
             SafeNativeMethods.GeomSetCollideBits(collider, (uint)m_collisionFlags);
 
+<<<<<<< HEAD
             float r = m_size.X;
             if (m_size.Y > r)
                 r = m_size.Y;
@@ -885,6 +884,18 @@ namespace OpenSim.Region.PhysicsModule.ubOde
             m_mass = m_density * m_size.X * m_size.Y * m_size.Z;  // update mass
 
             SafeNativeMethods.MassSetBoxTotal(out ShellMass, m_mass, m_size.X, m_size.Y, m_size.Z);
+=======
+            float r = sx;
+            if(sy > r)
+                r = sy;
+            float l = sz - r;
+            r *= 0.5f;
+
+            capsule = SafeNativeMethods.CreateCapsule(collider, r, l);
+
+            m_mass = m_density * sx * sy * sz;  // update mass
+            SafeNativeMethods.MassSetBoxTotal(out ShellMass, m_mass, sx, sy, sz);
+>>>>>>> upstream/master
 
             PID_D = basePID_D * m_mass / m_parent_scene.ODE_STEPSIZE;
             PID_P = basePID_P * m_mass / m_parent_scene.ODE_STEPSIZE;
@@ -1888,18 +1899,53 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                 // for now only look to Z changes since viewers also don't change X and Y
                 if (pSize.Z != m_size.Z)
                 {
-                    AvatarGeomAndBodyDestroy();
-
                     float oldsz = m_size.Z;
                     m_size = pSize;
 
+<<<<<<< HEAD
                     AvatarGeomAndBodyCreation(_position.X, _position.Y,
                                       _position.Z + (m_size.Z - oldsz) * 0.5f);
+=======
+                    float sz = m_size.Z;
+>>>>>>> upstream/master
 
-                    //                    Velocity = Vector3.Zero;
+                    float bot = -sz * 0.5f + m_feetOffset;
+                    boneOff = bot + 0.3f;
+
+                    float feetsz = sz * 0.45f;
+                    if (feetsz > 0.6f)
+                        feetsz = 0.6f;
+                    feetOff = bot + feetsz;
+
+                    float sx = m_size.X;
+                    AvaAvaSizeXsq = 0.4f * sx;
+                    AvaAvaSizeXsq *= AvaAvaSizeXsq;
+
+                    float sy = m_size.Y;
+                    AvaAvaSizeYsq = 0.5f * sy;
+                    AvaAvaSizeYsq *= AvaAvaSizeYsq;
+
+                    float r = sx;
+                    if (sy > r)
+                        r = sy;
+                    float l = sz - r;
+                    r *= 0.5f;
+
+                    SafeNativeMethods.GeomCapsuleSetParams(capsule, r, l);
+
+                    m_mass = m_density * sx * sy * sz;  // update mass
+                    PID_D = basePID_D * m_mass / m_parent_scene.ODE_STEPSIZE;
+                    PID_P = basePID_P * m_mass / m_parent_scene.ODE_STEPSIZE;
+                    SafeNativeMethods.MassSetBoxTotal(out ShellMass, m_mass, sx, sy, sz);
+                    SafeNativeMethods.BodySetMass(Body, ref ShellMass);
+
+                    _position.Z += (sz - oldsz) * 0.5f;
+                    SafeNativeMethods.BodySetPosition(Body, _position.X, _position.Y, _position.Z);
+
+                    m_bodydisablecontrol = 0;
+                    _zeroFlag = false;
+                    _velocity = Vector3.Zero;
                     m_targetVelocity = Vector3.Zero;
-
-                    m_parent_scene.actor_name_map[capsule] = (PhysicsActor)this;
                 }
                 m_freemove = false;
                 m_pidControllerActive = true;

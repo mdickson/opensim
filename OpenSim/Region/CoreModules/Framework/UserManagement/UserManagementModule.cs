@@ -425,11 +425,7 @@ namespace OpenSim.Region.CoreModules.Framework.UserManagement
             if(m_Scenes.Count <= 0)
                 return ret;
 
-            var missing = new List<UUID>();
-
-            // look in cache
             UserData userdata = new UserData();
-
             UUID uuid = UUID.Zero;
             foreach(string id in ids)
             {
@@ -438,10 +434,8 @@ namespace OpenSim.Region.CoreModules.Framework.UserManagement
                     if (GetUser(uuid, out userdata))
                         ret[uuid] = userdata.FirstName + " " + userdata.LastName;
                     else
-                        ret[uuid] = "UnknownUMM1 " + uuid.ToString();
+                        ret[uuid] = "Unknown " + uuid.ToString() + "UMM1";
                 }
-                else
-                    ret[uuid] = "UnknownUMM0 " + id;
             }
             return ret;
         }
@@ -951,7 +945,7 @@ namespace OpenSim.Region.CoreModules.Framework.UserManagement
                     user.IsLocal = true;
                     user.HasGridUserTried = true;
                 }
-                m_userCacheByID.Add(uuid, user, expire);
+                m_userCacheByID.Add(uuid, user, isNPC ? int.MaxValue / 16 : expire);
             }
         }
 
