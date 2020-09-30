@@ -50,6 +50,8 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
 
         protected bool m_Enabled = false;
         protected Scene m_Scene;
+
+        protected GridInfo m_thisGridInfo;
         protected IUserManagement m_UserManagement;
         protected IUserManagement UserManagementModule
         {
@@ -117,6 +119,8 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
                 return;
 
             m_Scene = scene;
+            if (m_thisGridInfo == null)
+                m_thisGridInfo = scene.SceneGridInfo;
 
             scene.RegisterModuleInterface<IInventoryAccessModule>(this);
             scene.EventManager.OnNewClient += OnNewClient;
@@ -131,8 +135,8 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
         {
             if (!m_Enabled)
                 return;
+            m_thisGridInfo = null;
         }
-
 
         public virtual void RemoveRegion(Scene scene)
         {

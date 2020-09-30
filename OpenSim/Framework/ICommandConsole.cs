@@ -82,6 +82,7 @@ namespace OpenSim.Framework
     }
 
     public delegate void OnOutputDelegate(string message);
+    public delegate void OnCntrCCelegate();
 
     public interface ICommandConsole : IConsole
     {
@@ -104,5 +105,6 @@ namespace OpenSim.Framework
         string ReadLine(string p, bool isCommand, bool e);
 
         void ReadConfig(IConfigSource configSource);
+        void SetCntrCHandler(OnCntrCCelegate handler);
     }
 }

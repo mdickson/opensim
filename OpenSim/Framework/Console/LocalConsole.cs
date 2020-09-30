@@ -149,6 +149,8 @@ namespace OpenSim.Framework.Console
                 m_log.InfoFormat("[LOCAL CONSOLE]: Creating new empty command line history file {0}", m_historyPath);
                 File.Create(m_historyPath).Dispose();
             }
+
+            System.Console.TreatControlCAsInput = true;
         }
 
         private void AddToHistory(string text)
@@ -412,7 +414,6 @@ namespace OpenSim.Framework.Console
                     else
                         components = null;
                 }
-
             }
             string text;
             if (components == null || components.Length == 0)
@@ -491,6 +492,13 @@ namespace OpenSim.Framework.Console
                 Show();
 
                 ConsoleKeyInfo key = System.Console.ReadKey(true);
+
+                if((key.Modifiers & ConsoleModifiers.Control) != 0 && key.Key == ConsoleKey.C)
+                {
+                    System.Console.Write(Environment.NewLine);
+                    LocalCancelKeyPressed();
+                    return string.Empty;
+                }
                 char enteredChar = key.KeyChar;
 
                 if (!Char.IsControl(enteredChar))

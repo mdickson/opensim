@@ -637,6 +637,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
 
             callNo = sf.callNo;
             stackFrames = sf.nextSF;
+            sf.nextSF = null;
             return sf.objArray;
         }
 
