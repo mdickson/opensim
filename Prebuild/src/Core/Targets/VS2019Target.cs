@@ -20,9 +20,9 @@ namespace Prebuild.Core.Targets
         #region Fields
 
         string solutionVersion = "12.00";
-        string productVersion = "16.0.30320.27";
+        string productVersion = "16.7.3";
         string schemaVersion = "2.0";
-        string versionName = "Visual Studio 16";
+        string versionName = "Visual Studio 19";
         string name = "vs2019";
         VSVersion version = VSVersion.VS19;
 
@@ -109,24 +109,30 @@ namespace Prebuild.Core.Targets
                 case FrameworkVersion.v4_8:
                 case FrameworkVersion.v4_7_2:
                     return "ToolsVersion=\"16.0\"";
+                case FrameworkVersion.v4_7_1:
+                case FrameworkVersion.v4_7:
+                    return "ToolsVersion=\"15.0\"";
+                case FrameworkVersion.v4_6_2:
                 case FrameworkVersion.v4_6_1:
                 case FrameworkVersion.v4_6:
                     return "ToolsVersion=\"14.0\"";
-                case FrameworkVersion.v4_5:
+                case FrameworkVersion.v4_5_2:
                     return "ToolsVersion=\"12.0\"";
+                case FrameworkVersion.v4_5_1:
+                case FrameworkVersion.v4_5:
                 case FrameworkVersion.v4_0:
                 case FrameworkVersion.v3_5:
                     return "ToolsVersion=\"4.0\"";
                 case FrameworkVersion.v3_0:
-                    return "ToolsVersion=\"3.0\"";
-                default:
-                    return "ToolsVersion=\"2.0\"";
+                return "ToolsVersion=\"3.0\"";
+            default:
+                return "ToolsVersion=\"2.0\"";
             }
         }
 
         public override string SolutionTag
         {
-            get { return "# Visual Studio 16"; }
+            get { return "# Visual Studio 19"; }
         }
 
         #endregion
@@ -134,9 +140,10 @@ namespace Prebuild.Core.Targets
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="VS2019Target"/> class.
+        /// Initializes a new instance of the <see cref="VS2012Target"/> class.
         /// </summary>
-        public VS2019Target() : base()
+        public VS2019Target()
+            : base()
         {
         }
 

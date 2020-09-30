@@ -17,11 +17,8 @@ case "$1" in
 
   *)
 
-    mono bin/Prebuild.exe /target nant
-    mono bin/Prebuild.exe /target vs2015
+    mono bin/Prebuild.exe /target vs2019 /file prebuild.xml
 
   ;;
 
 esac
-    rm -fr bin/addin-db-002
-
