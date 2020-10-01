@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
     <ApplicationIcon />
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <OutputType>Exe</OutputType>
     <AssemblyTitle>OpenSim</AssemblyTitle>
     <Company>http://opensimulator.org</Company>
