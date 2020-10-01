@@ -3565,8 +3565,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                     LLSDxmlEncode.AddEndArray(sb);
                 }
 
-                OSD ev = new OSDllsdxml(eq.EndEvent(sb));
-                eq.Enqueue(ev, AgentId);
+                eq.Enqueue(eq.EndEventToBytes(sb), AgentId);
             }
         }
 
@@ -3724,6 +3723,9 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             reply.Data.Flags = (byte)Util.ConvertAccessLevelToMaturity((byte)info.AccessLevel);
             if ((land.Flags & (uint)ParcelFlags.ForSale) != 0)
                 reply.Data.Flags |= (byte)((1 << 7));
+
+            if (land.GroupID == land.OwnerID)
+                reply.Data.Flags |= 4;
 
             Vector3 pos = land.UserLocation;
             if (pos.Equals(Vector3.Zero))
@@ -4105,9 +4107,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 }
                 LLSDxmlEncode.AddEndArray(sb);
             }
-
-            OSD ev = new OSDllsdxml(eq.EndEvent(sb));
-            eq.Enqueue(ev, AgentId);
+            eq.Enqueue(eq.EndEventToBytes(sb), AgentId);
         }
 
         public void SendAgentGroupDataUpdate(UUID avatarID, GroupMembershipData[] data)
@@ -4779,10 +4779,10 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 }
             }
 
-            uint priority = m_prioritizer.GetUpdatePriority(this, entity);
+            int priority = m_prioritizer.GetUpdatePriority(this, entity);
 
             lock (m_entityUpdates.SyncRoot)
-                m_entityUpdates.Enqueue(priority, new EntityUpdate(entity, updateFlags));
+                m_entityUpdates.Enqueue(priority, EntityUpdatesPool.Get(entity, updateFlags));
         }
 
         /// <summary>
@@ -4795,7 +4795,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         {
             // If the update exists in priority queue, it will be updated.
             // If it does not exist then it will be added with the current (rather than its original) priority
-            uint priority = m_prioritizer.GetUpdatePriority(this, update.Entity);
+            int priority = m_prioritizer.GetUpdatePriority(this, update.Entity);
 
             lock (m_entityUpdates.SyncRoot)
                 m_entityUpdates.Enqueue(priority, update);
@@ -4928,6 +4928,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 {
                     m_killRecord.Add(update.Entity.LocalId);
                     maxUpdatesBytes -= 30;
+                    update.Free();
                     continue;
                 }
 
@@ -4939,7 +4940,10 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                     SceneObjectPart part = (SceneObjectPart)update.Entity;
                     SceneObjectGroup grp = part.ParentGroup;
                     if (grp.inTransit && ((update.Flags & PrimUpdateFlags.SendInTransit) == 0))
+                    {
+                        update.Free();
                         continue;
+                    }
 
                     if (grp.IsDeleted)
                     {
@@ -4951,23 +4955,33 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                             m_killRecord.Add(grp.LocalId);
                             maxUpdatesBytes -= 30;
                         }
+                        update.Free();
                         continue;
                     }
 
                     if (grp.IsAttachment)
                     {
                         // animated attachments are nasty if not supported by viewer
-                        if (!m_SupportObjectAnimations && grp.RootPart.Shape.MeshFlagEntry)
+                        if(!m_SupportObjectAnimations && grp.RootPart.Shape.MeshFlagEntry)
+                        {
+                            update.Free();
                             continue;
+                        }
 
                         // Someone else's HUD, why are we getting these?
                         if (grp.OwnerID != AgentId && grp.HasPrivateAttachmentPoint)
+                        {
+                            update.Free();
                             continue;
+                        }
 
                         // if owner gone don't update it to anyone
                         ScenePresence sp;
                         if (!m_scene.TryGetScenePresence(part.OwnerID, out sp))
+                        {
+                            update.Free();
                             continue;
+                        }
 
                         // On vehicle crossing, the attachments are received
                         // while the avatar is still a child. Don't send
@@ -4975,7 +4989,10 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         // been updated and the viewer will derender the
                         // attachments until the avatar becomes root.
                         if (sp.IsChildAgent)
+                        {
+                            update.Free();
                             continue;
+                        }
 
                         // It's an attachment of a valid avatar, but
                         // doesn't seem to be attached, skip
@@ -4990,7 +5007,10 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                             }
                         }
                         if (!found)
+                        {
+                            update.Free();
                             continue;
+                        }
 
                         if (m_disableFacelights)
                         {
@@ -5004,8 +5024,11 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
                     else if (doCulling)
                     {
-                        if (GroupsNeedFullUpdate.Contains(grp))
+                        if(GroupsNeedFullUpdate.Contains(grp))
+                        {
+                            update.Free();
                             continue;
+                        }
 
                         bool inViewGroups = false;
                         lock (GroupsInView)
@@ -5017,11 +5040,15 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                             float dpos = (partpos - mypos).LengthSquared();
                             float maxview = grp.GetBoundsRadius() + cullingrange;
                             if (dpos > maxview * maxview)
+                            {
+                                update.Free();
                                 continue;
+                            }
 
                             if (!viewerCache || ((updateFlags & PrimUpdateFlags.UpdateProbe) == 0))
                             {
                                 GroupsNeedFullUpdate.Add(grp);
+                                update.Free();
                                 continue;
                             }
                         }
@@ -5031,7 +5058,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                     {
                         if (objectUpdateProbes == null)
                         {
-                            objectUpdateProbes = new List<EntityUpdate>();
+                            objectUpdateProbes = new List<EntityUpdate>(32);
                             maxUpdatesBytes -= 18;
                         }
                         objectUpdateProbes.Add(update);
@@ -5044,7 +5071,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         if (m_SupportObjectAnimations && part.Animations != null)
                         {
                             if (ObjectAnimationUpdates == null)
-                                ObjectAnimationUpdates = new List<SceneObjectPart>();
+                                ObjectAnimationUpdates = new List<SceneObjectPart>(8);
                             ObjectAnimationUpdates.Add(part);
                             maxUpdatesBytes -= 20 * part.Animations.Count + 24;
                         }
@@ -5059,23 +5086,35 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 {
                     ScenePresence presence = (ScenePresence)update.Entity;
                     if (presence.IsDeleted)
+                    {
+                        update.Free();
                         continue;
+                    }
                     // If ParentUUID is not UUID.Zero and ParentID is 0, this
                     // avatar is in the process of crossing regions while
                     // sat on an object. In this state, we don't want any
                     // updates because they will visually orbit the avatar.
                     // Update will be forced once crossing is completed anyway.
                     if (presence.ParentUUID != UUID.Zero && presence.ParentID == 0)
+                    {
+                        update.Free();
                         continue;
+                    }
                 }
                 else // what is this update ?
+                {
+                    update.Free();
                     continue;
+                }
 
                 #region UpdateFlags to packet type conversion
 
                 updateFlags &= PrimUpdateFlags.FullUpdate; // clear other control bits already handled
-                if (updateFlags == PrimUpdateFlags.None)
+                if(updateFlags == PrimUpdateFlags.None)
+                {
+                    update.Free();
                     continue;
+                }
 
                 const PrimUpdateFlags canNotUseImprovedMask = ~(
                         PrimUpdateFlags.AttachmentPoint |
@@ -5096,7 +5135,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 {
                     if (terseUpdates == null)
                     {
-                        terseUpdates = new List<EntityUpdate>();
+                        terseUpdates = new List<EntityUpdate>(16);
                         maxUpdatesBytes -= 18;
                     }
                     terseUpdates.Add(update);
@@ -5119,7 +5158,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
                         if (objectUpdates == null)
                         {
-                            objectUpdates = new List<EntityUpdate>();
+                            objectUpdates = new List<EntityUpdate>(16);
                             maxUpdatesBytes -= 18;
                         }
                         objectUpdates.Add(update);
@@ -5135,7 +5174,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
                             if (compressedUpdates == null)
                             {
-                                compressedUpdates = new List<EntityUpdate>();
+                                compressedUpdates = new List<EntityUpdate>(16);
                                 maxUpdatesBytes -= 18;
                             }
                             compressedUpdates.Add(update);
@@ -5149,7 +5188,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
                             if (objectUpdates == null)
                             {
-                                objectUpdates = new List<EntityUpdate>();
+                                objectUpdates = new List<EntityUpdate>(16);
                                 maxUpdatesBytes -= 18;
                             }
                             objectUpdates.Add(update);
@@ -5171,7 +5210,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
             if (objectUpdates != null)
             {
-                List<EntityUpdate> tau = new List<EntityUpdate>(30);
+                //List<EntityUpdate> tau = new List<EntityUpdate>(30);
 
                 UDPPacketBuffer buf = m_udpServer.GetNewUDPBuffer(m_udpClient.RemoteEndPoint);
                 Buffer.BlockCopy(objectUpdateHeader, 0, buf.Data, 0, 7);
@@ -5205,9 +5244,10 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         shouldCreateSelected = part.CreateSelected;
                         CreatePrimUpdateBlock(part, mysp, zc);
                     }
+
                     if (zc.Position < LLUDPServer.MAXPAYLOAD - 300)
                     {
-                        tau.Add(eu);
+                        //tau.Add(eu);
                         ++count;
                     }
                     else
@@ -5243,10 +5283,11 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                             CreatePrimUpdateBlock((SceneObjectPart)eu.Entity, mysp, zc);
                         }
 
-                        tau = new List<EntityUpdate>(30);
-                        tau.Add(eu);
+                        //tau = new List<EntityUpdate>(30);
+                        //tau.Add(eu);
                         count = 1;
                     }
+                    eu.Free(); //remove if using resend
                 }
 
                 if (count > 0)
@@ -5326,7 +5367,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
             if (compressedUpdates != null)
             {
-                List<EntityUpdate> tau = new List<EntityUpdate>(30);
+                //List<EntityUpdate> tau = new List<EntityUpdate>(30);
 
                 UDPPacketBuffer buf = m_udpServer.GetNewUDPBuffer(m_udpClient.RemoteEndPoint);
                 byte[] data = buf.Data;
@@ -5363,6 +5404,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                     lastzc = zc.ZeroCount;
 
                     CreateCompressedUpdateBlockZC(sop, mysp, zc);
+
                     if (zc.Position < LLUDPServer.MAXPAYLOAD - 200)
                     {
                         //tau.Add(eu);
@@ -5400,10 +5442,11 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
                         // im lazy now, just do last again
                         CreateCompressedUpdateBlockZC(sop, mysp, zc);
-                        tau = new List<EntityUpdate>(30);
+                        //tau = new List<EntityUpdate>(30);
                         //tau.Add(eu);
                         count = 1;
                     }
+                    eu.Free(); //remove if using resend
                 }
 
                 if (count > 0)
@@ -5469,6 +5512,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
                         count = 0;
                     }
+                    eu.Free();
                 }
 
                 if (count > 0)
@@ -5482,7 +5526,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             if (terseUpdates != null)
             {
                 int blocks = terseUpdates.Count;
-                List<EntityUpdate> tau = new List<EntityUpdate>(30);
+                //List<EntityUpdate> tau = new List<EntityUpdate>(30);
 
                 UDPPacketBuffer buf = m_udpServer.GetNewUDPBuffer(m_udpClient.RemoteEndPoint);
 
@@ -5502,7 +5546,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                     CreateImprovedTerseBlock(eu.Entity, buf.Data, ref pos, (eu.Flags & PrimUpdateFlags.Textures) != 0);
                     if (pos < LLUDPServer.MAXPAYLOAD)
                     {
-                        tau.Add(eu);
+                        //tau.Add(eu);
                         ++count;
                         --blocks;
                     }
@@ -5522,15 +5566,16 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         buf.DataLength = lastpos;
                         // zero encode is not as spec
                         m_udpServer.SendUDPPacket(m_udpClient, buf, ThrottleOutPacketType.Task,
-                            delegate (OutgoingPacket oPacket) { ResendPrimUpdates(tau, oPacket); }, true);
-                            //null, false, true);
+                            //delegate (OutgoingPacket oPacket) { ResendPrimUpdates(tau, oPacket); }, true);
+                            null, true);
 
-                        tau = new List<EntityUpdate>(30);
-                        tau.Add(eu);
+                        //tau = new List<EntityUpdate>(30);
+                        //tau.Add(eu);
                         count = 1;
                         --blocks;
                         buf = newbuf;
                     }
+                    eu.Free(); //remove if using resend
                 }
 
                 if (count > 0)
@@ -5778,9 +5823,9 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             CheckGroupsInViewBusy = false;
         }
 
-        private bool UpdatePriorityHandler(ref uint priority, ISceneEntity entity)
+        private bool UpdatePriorityHandler(ref int priority, ISceneEntity entity)
         {
-            if (entity == null)
+            if (!IsActive)
                 return false;
 
             priority = m_prioritizer.GetUpdatePriority(this, entity);
@@ -5965,41 +6010,19 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             m_udpServer.SendUDPPacket(m_udpClient, buf, ThrottleOutPacketType.Task);
         }
 
-        private class ObjectPropertyUpdate : EntityUpdate
-        {
-            internal bool SendFamilyProps;
-            internal bool SendObjectProps;
-
-            public ObjectPropertyUpdate(ISceneEntity entity, uint flags, bool sendfam, bool sendobj)
-                : base(entity, (PrimUpdateFlags)flags)
-            {
-                SendFamilyProps = sendfam;
-                SendObjectProps = sendobj;
-            }
-            public void Update(ObjectPropertyUpdate update)
-            {
-                SendFamilyProps = SendFamilyProps || update.SendFamilyProps;
-                SendObjectProps = SendObjectProps || update.SendObjectProps;
-                // other properties may need to be updated by base class
-                base.Update(update);
-            }
-        }
-
         public void SendObjectPropertiesFamilyData(ISceneEntity entity, uint requestFlags)
         {
-            uint priority = 0;  // time based ordering only
             lock (m_entityProps.SyncRoot)
-                m_entityProps.Enqueue(priority, new ObjectPropertyUpdate(entity, requestFlags, true, false));
+                m_entityProps.Enqueue(0, EntityUpdatesPool.Get(entity, (PrimUpdateFlags)requestFlags, true, false));
         }
 
-        private void ResendPropertyUpdate(ObjectPropertyUpdate update)
+        private void ResendPropertyUpdate(EntityUpdate update)
         {
-            uint priority = 0;
             lock (m_entityProps.SyncRoot)
-                m_entityProps.Enqueue(priority, update);
+                m_entityProps.Enqueue(0, update);
         }
 
-        private void ResendPropertyUpdates(List<ObjectPropertyUpdate> updates, OutgoingPacket oPacket)
+        private void ResendPropertyUpdates(List<EntityUpdate> updates, OutgoingPacket oPacket)
         {
             // m_log.WarnFormat("[CLIENT] resending object property {0}",updates[0].UpdateTime);
 
@@ -6015,15 +6038,14 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             // is 100% correct
             m_udpServer.PacketsResentCount++;
 
-            foreach (ObjectPropertyUpdate update in updates)
+            foreach (EntityUpdate update in updates)
                 ResendPropertyUpdate(update);
         }
 
         public void SendObjectPropertiesReply(ISceneEntity entity)
         {
-            uint priority = 0;  // time based ordering only
             lock (m_entityProps.SyncRoot)
-                m_entityProps.Enqueue(priority, new ObjectPropertyUpdate(entity, 0, false, true));
+                m_entityProps.Enqueue(0, EntityUpdatesPool.Get(entity,0,false,true));
         }
 
         static private readonly byte[] ObjectPropertyUpdateHeader = new byte[] {
@@ -6042,13 +6064,14 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 
         private void ProcessEntityPropertyRequests(int maxUpdateBytes)
         {
-            List<ObjectPropertyUpdate> objectPropertiesUpdates = null;
-            List<ObjectPropertyUpdate> objectPropertiesFamilyUpdates = null;
+            List<EntityUpdate> objectPropertiesUpdates = null;
+            List<EntityUpdate> objectPropertiesFamilyUpdates = null;
+            List<EntityUpdate> used = new List<EntityUpdate>(64);
             List<SceneObjectPart> needPhysics = null;
 
             // bool orderedDequeue = m_scene.UpdatePrioritizationScheme  == UpdatePrioritizationSchemes.SimpleAngularDistance;
             bool orderedDequeue = false; // for now
-            EntityUpdate iupdate;
+            EntityUpdate update;
 
             while (maxUpdateBytes > 0)
             {
@@ -6056,42 +6079,48 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 {
                     if (orderedDequeue)
                     {
-                        if (!m_entityProps.TryOrderedDequeue(out iupdate))
+                        if (!m_entityProps.TryOrderedDequeue(out update))
                             break;
                     }
                     else
                     {
-                        if (!m_entityProps.TryDequeue(out iupdate))
+                        if (!m_entityProps.TryDequeue(out update))
                             break;
                     }
                 }
 
-                ObjectPropertyUpdate update = (ObjectPropertyUpdate)iupdate;
-                if (update.SendFamilyProps)
+                if (update.PropsFlags == 0)
                 {
-                    if (update.Entity is SceneObjectPart)
-                    {
-                        SceneObjectPart sop = (SceneObjectPart)update.Entity;
-                        if (objectPropertiesFamilyUpdates == null)
-                            objectPropertiesFamilyUpdates = new List<ObjectPropertyUpdate>();
-                        objectPropertiesFamilyUpdates.Add(update);
-                        maxUpdateBytes -= 100;
-                    }
+                    update.Free();
+                    continue;
                 }
 
-                if (update.SendObjectProps)
+                SceneObjectPart sop = (SceneObjectPart)update.Entity as SceneObjectPart;
+                if(sop == null)
                 {
-                    if (update.Entity is SceneObjectPart)
-                    {
-                        SceneObjectPart sop = (SceneObjectPart)update.Entity;
-                        if (needPhysics == null)
-                            needPhysics = new List<SceneObjectPart>();
-                        needPhysics.Add(sop);
-                        if (objectPropertiesUpdates == null)
-                            objectPropertiesUpdates = new List<ObjectPropertyUpdate>();
-                        objectPropertiesUpdates.Add(update);
-                        maxUpdateBytes -= 200; // aprox
-                    }
+                    update.Free();
+                    continue;
+                }
+
+                used.Add(update);
+
+                if ((update.PropsFlags & ObjectPropertyUpdateFlags.Family) != 0)
+                {
+                    if(objectPropertiesFamilyUpdates == null)
+                        objectPropertiesFamilyUpdates = new List<EntityUpdate>();
+                    objectPropertiesFamilyUpdates.Add(update);
+                    maxUpdateBytes -= 100;
+                }
+
+                if ((update.PropsFlags & ObjectPropertyUpdateFlags.Object) != 0)
+                {
+                    if(needPhysics == null)
+                        needPhysics = new List<SceneObjectPart>();
+                    needPhysics.Add(sop);
+                    if(objectPropertiesUpdates == null)
+                        objectPropertiesUpdates = new List<EntityUpdate>();
+                    objectPropertiesUpdates.Add(update);
+                    maxUpdateBytes -= 200; // aprox
                 }
             }
 
@@ -6206,10 +6235,12 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                         LLSDxmlEncode.AddEndMap(sb);
                     }
                     LLSDxmlEncode.AddEndArray(sb);
-                    OSDllsdxml ev = new OSDllsdxml(eq.EndEvent(sb));
-                    eq.Enqueue(eq.EndEvent(sb), AgentId);
+                    eq.Enqueue(eq.EndEventToBytes(sb), AgentId);
                 }
             }
+
+            foreach(EntityUpdate eu in used)
+                eu.Free();
         }
 
         private void CreateObjectPropertiesFamilyBlock(SceneObjectPart sop, PrimUpdateFlags requestFlags, LLUDPZeroEncoder zc)
@@ -13634,8 +13665,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             }
             LLSDxmlEncode.AddEndArray(sb);
 
-            OSD ev = new OSDllsdxml(eq.EndEvent(sb));
-            eq.Enqueue(ev, AgentId);
+            eq.Enqueue(eq.EndEventToBytes(sb), AgentId);
         }
 
         public void SendRemoveInventoryFolders(UUID[] folders)
@@ -13664,8 +13694,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             }
             LLSDxmlEncode.AddEndArray(sb);
 
-            OSD ev = new OSDllsdxml(eq.EndEvent(sb));
-            eq.Enqueue(ev, AgentId);
+            eq.Enqueue(eq.EndEventToBytes(sb), AgentId);
         }
 
         public void SendBulkUpdateInventory(InventoryFolderBase[] folders, InventoryItemBase[] items)
@@ -13749,8 +13778,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 LLSDxmlEncode.AddEndArray(sb);
             }
 
-            OSD ev = new OSDllsdxml(eq.EndEvent(sb));
-            eq.Enqueue(ev, AgentId);
+            eq.Enqueue(eq.EndEventToBytes(sb), AgentId);
         }
 
         private HashSet<string> m_outPacketsToDrop;

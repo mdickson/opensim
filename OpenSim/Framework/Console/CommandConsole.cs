@@ -716,6 +716,7 @@ namespace OpenSim.Framework.Console
         //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public event OnOutputDelegate OnOutput;
+        public static event OnCntrCCelegate OnCntrC;
 
         public ICommands Commands { get; private set; }
 
@@ -786,6 +787,29 @@ namespace OpenSim.Framework.Console
 
         public virtual void ReadConfig(IConfigSource configSource)
         {
+        }
+
+        public virtual void SetCntrCHandler(OnCntrCCelegate handler)
+        {
+            if(OnCntrC == null)
+            {
+                OnCntrC += handler;
+                System.Console.CancelKeyPress += CancelKeyPressed;
+            }
+        }
+
+        protected static void CancelKeyPressed(object sender, ConsoleCancelEventArgs args)
+        {
+            if (OnCntrC != null && args.SpecialKey == ConsoleSpecialKey.ControlC)
+            {
+                OnCntrC?.Invoke();
+                args.Cancel = false;
+            }
+        }
+
+        protected static void LocalCancelKeyPressed()
+        {
+            OnCntrC?.Invoke();
         }
     }
 }
