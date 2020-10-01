@@ -49,6 +49,7 @@ using System.Text;
 using System.Threading;
 using System.Timers;
 using System.Xml;
+
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
 using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
 using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
@@ -226,7 +227,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 catch { }
                 try
                 {
-                    oscode = ((OpenSim.Region.Framework.Scenes.scriptEvents)(1ul << i)).ToString();
+                    oscode = ((scriptEvents)(1ul << i)).ToString();
                     Convert.ToInt64(oscode);
                     oscode = "undefined";
                 }
