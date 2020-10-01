@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <AssemblyTitle>Amib.Threading</AssemblyTitle>
     <Product>Amib.Threading</Product>
     <Description>Smart Thread Pool</Description>
