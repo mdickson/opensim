@@ -12,6 +12,7 @@
 *.dll.build
 *.dll
 *.log
+.idea
 
 launchSettings.json
 
