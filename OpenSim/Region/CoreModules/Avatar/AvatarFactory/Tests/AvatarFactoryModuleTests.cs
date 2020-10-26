@@ -51,7 +51,7 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
 
             // We need an asset cache because otherwise the LocalAssetServiceConnector will short-circuit directly
             // to the AssetService, which will then store temporary and local assets permanently
-            CoreAssetCache assetCache = new CoreAssetCache();
+            TestsAssetCache assetCache = new TestsAssetCache();
 
             AvatarFactoryModule afm = new AvatarFactoryModule();
             TestScene scene = new SceneHelpers(assetCache).SetupScene();
@@ -109,7 +109,7 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
 
             // We need an asset cache because otherwise the LocalAssetServiceConnector will short-circuit directly
             // to the AssetService, which will then store temporary and local assets permanently
-            CoreAssetCache assetCache = new CoreAssetCache();
+            TestsAssetCache assetCache = new TestsAssetCache();
 
             AvatarFactoryModule afm = new AvatarFactoryModule();
             TestScene scene = new SceneHelpers(assetCache).SetupScene();
@@ -154,7 +154,7 @@ namespace OpenSim.Region.CoreModules.Avatar.AvatarFactory
 
             // We need an asset cache because otherwise the LocalAssetServiceConnector will short-circuit directly
             // to the AssetService, which will then store temporary and local assets permanently
-            CoreAssetCache assetCache = new CoreAssetCache();
+            TestsAssetCache assetCache = new TestsAssetCache();
 
             AvatarFactoryModule afm = new AvatarFactoryModule();
             TestScene scene = new SceneHelpers(assetCache).SetupScene();

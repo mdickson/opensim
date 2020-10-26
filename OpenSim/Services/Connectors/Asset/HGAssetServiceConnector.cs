@@ -38,29 +38,8 @@ namespace OpenSim.Services.Connectors
 {
     public class HGAssetServiceConnector : IAssetService
     {
-        private static readonly ILog m_log =
-                LogManager.GetLogger(
-                MethodBase.GetCurrentMethod().DeclaringType);
-
-        private Dictionary<IAssetService, object> m_endpointSerializer = new Dictionary<IAssetService, object>();
-        private object EndPointLock(IAssetService connector)
-        {
-            lock (m_endpointSerializer)
-            {
-                object eplock = null;
-
-                if (!m_endpointSerializer.TryGetValue(connector, out eplock))
-                {
-                    eplock = new object();
-                    m_endpointSerializer.Add(connector, eplock);
-                    // m_log.WarnFormat("[WEB UTIL] add a new host to end point serializer {0}",endpoint);
-                }
-
-                return eplock;
-            }
-        }
-
-        private Dictionary<string, IAssetService> m_connectors = new Dictionary<string, IAssetService>();
+        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private ExpiringCacheOS<string, AssetServicesConnector> m_connectors = new ExpiringCacheOS<string, AssetServicesConnector>(120000);
 
         public HGAssetServiceConnector(IConfigSource source)
         {
@@ -80,16 +59,12 @@ namespace OpenSim.Services.Connectors
             }
         }
 
-        private IAssetService GetConnector(string url)
+        private AssetServicesConnector GetConnector(string url)
         {
-            IAssetService connector = null;
+            AssetServicesConnector connector = null;
             lock (m_connectors)
             {
-                if (m_connectors.ContainsKey(url))
-                {
-                    connector = m_connectors[url];
-                }
-                else
+                if (!m_connectors.TryGetValue(url, 120000, out connector))
                 {
                     // Still not as flexible as I would like this to be,
                     // but good enough for now
@@ -105,7 +80,7 @@ namespace OpenSim.Services.Connectors
             string url = string.Empty;
             string assetID = string.Empty;
 
-            if (Util.ParseForeignAssetID(id, out url, out assetID))
+            if (Util.ParseForeignAssetID(id, out url, out assetID) > 0)
             {
                 IAssetService connector = GetConnector(url);
                 return connector.Get(assetID);
@@ -114,12 +89,18 @@ namespace OpenSim.Services.Connectors
             return null;
         }
 
+        public AssetBase Get(string id, string ForeignAssetService)
+        {
+            IAssetService connector = GetConnector(ForeignAssetService);
+            return connector.Get(id);
+        }
+
         public AssetBase GetCached(string id)
         {
             string url = string.Empty;
             string assetID = string.Empty;
 
-            if (Util.ParseForeignAssetID(id, out url, out assetID))
+            if (Util.ParseForeignAssetID(id, out url, out assetID) > 0)
             {
                 IAssetService connector = GetConnector(url);
                 return connector.GetCached(assetID);
@@ -133,7 +114,7 @@ namespace OpenSim.Services.Connectors
             string url = string.Empty;
             string assetID = string.Empty;
 
-            if (Util.ParseForeignAssetID(id, out url, out assetID))
+            if (Util.ParseForeignAssetID(id, out url, out assetID) > 0)
             {
                 IAssetService connector = GetConnector(url);
                 return connector.GetMetadata(assetID);
@@ -147,12 +128,12 @@ namespace OpenSim.Services.Connectors
             return null;
         }
 
-        public bool Get(string id, Object sender, AssetRetrieved handler)
+        public bool Get(string id, object sender, AssetRetrieved handler)
         {
             string url = string.Empty;
             string assetID = string.Empty;
 
-            if (Util.ParseForeignAssetID(id, out url, out assetID))
+            if (Util.ParseForeignAssetID(id, out url, out assetID) > 0)
             {
                 IAssetService connector = GetConnector(url);
                 return connector.Get(assetID, sender, handler);
@@ -160,7 +141,6 @@ namespace OpenSim.Services.Connectors
 
             return false;
         }
-
 
         private struct AssetAndIndex
         {
@@ -188,7 +168,7 @@ namespace OpenSim.Services.Connectors
                 string url = string.Empty;
                 string assetID = string.Empty;
 
-                if (Util.ParseForeignAssetID(ids[i], out url, out assetID))
+                if (Util.ParseForeignAssetID(ids[i], out url, out assetID) > 0)
                 {
                     if (!url2assets.ContainsKey(url))
                         url2assets.Add(url, new List<AssetAndIndex>());
@@ -202,8 +182,8 @@ namespace OpenSim.Services.Connectors
 
             foreach (string url in url2assets.Keys)
             {
-                IAssetService connector = GetConnector(url);
-                lock (EndPointLock(connector))
+                AssetServicesConnector connector = GetConnector(url);
+                lock (connector.ConnectorLock)
                 {
                     List<AssetAndIndex> curAssets = url2assets[url];
                     string[] assetIDs = curAssets.ConvertAll(a => a.assetID.ToString()).ToArray();
@@ -226,16 +206,16 @@ namespace OpenSim.Services.Connectors
             string url = string.Empty;
             string assetID = string.Empty;
 
-            if (Util.ParseForeignAssetID(asset.ID, out url, out assetID))
+            if (Util.ParseForeignAssetID(asset.ID, out url, out assetID) > 0)
             {
-                IAssetService connector = GetConnector(url);
+                AssetServicesConnector connector = GetConnector(url);
                 // Restore the assetID to a simple UUID
                 asset.ID = assetID;
-                lock (EndPointLock(connector))
+                lock ((connector.ConnectorLock))
                     return connector.Store(asset);
             }
 
-            return String.Empty;
+            return string.Empty;
         }
 
         public bool UpdateContent(string id, byte[] data)

@@ -2708,6 +2708,7 @@
       <Reference name="System.Data"/>
       <Reference name="System.Drawing"/>
       <Reference name="System.Drawing.Common"/>
+      <Reference name="System.Runtime.Caching"/>
       <Reference name="System.Xml"/>
       <Reference name="System.Web"/>
       <Reference name="log4net" path="../../../bin/"/>
