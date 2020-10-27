@@ -2068,10 +2068,9 @@ namespace OpenSim.Region.PhysicsModule.ubOde
                         if (x > 1 && x < maxXX)
                             xx++;
 
-                        val = heightMap[yy + xx];
-                        if (val < -100.0f)
-                            val = -100.0f;
-                        if (val > maxH)
+                        val = Util.Clamp(heightMap[yy + xx], Constants.MinTerrainHeightmap, Constants.MaxTerrainHeightmap);
+                        
+                        if(val > maxH)
                             maxH = val;
                         if (val < minH)
                             minH = val;

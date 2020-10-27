@@ -298,6 +298,11 @@ namespace OpenSim.Region.CoreModules.Avatar.UserProfiles
             // If we find ProfileURL then we configure for FULL support
             // else we setup for BASIC support
             ProfileServerUri = profileConfig.GetString("ProfileServiceURL", "");
+            if (string.IsNullOrEmpty(ProfileServerUri))
+            {
+                Enabled = false;
+                return;
+            }
 
             OSHTTPURI tmp = new OSHTTPURI(ProfileServerUri, true);
             if (!tmp.IsResolvedHost)
@@ -1884,16 +1889,7 @@ namespace OpenSim.Region.CoreModules.Avatar.UserProfiles
             if (string.IsNullOrWhiteSpace(assetServerURI))
                 return;
 
-            string imageIDstr = imageID.ToString();
-
-
-            if (m_assetCache != null && m_assetCache.Check(imageIDstr))
-                return;
-
-            if (Scene.AssetService.Get(imageIDstr) != null)
-                return;
-
-            Scene.AssetService.Get(string.Format("{0}/{1}", assetServerURI, imageIDstr));
+            Scene.AssetService.Get(imageID.ToString(), assetServerURI);
         }
 
         /// <summary>
