@@ -109,7 +109,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         {
             // defaults
             RecyclePackets = true;
-            RecycleDataBlocks = true;
+            //RecyclePackets = false;
         }
 
         /// <summary>

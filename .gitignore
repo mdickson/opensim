@@ -10,6 +10,7 @@
 *.dll.build
 *.dll
 *.log
+.idea
 
 launchSettings.json
 
@@ -108,5 +109,6 @@ OpenSim/Tests/test-results/
 test-results/
 doc/html
 doc/doxygen.error.log
+bin/OpenSim.ini
 
 *.patch
