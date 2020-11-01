@@ -165,7 +165,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
             return asset;
         }
 
-        public AssetBase Get(string id, string ForeignAssetService)
+        public AssetBase Get(string id, string ForeignAssetService, bool dummy)
         {
             return null;
         }
@@ -230,7 +230,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
             return null;
         }
 
-        public bool Get(string id, Object sender, AssetRetrieved handler)
+        public bool Get(string id, object sender, AssetRetrieved handler)
         {
             //            m_log.DebugFormat("[LOCAL ASSET SERVICES CONNECTOR]: Asynchronously requesting asset {0}", id);
 
