@@ -930,7 +930,7 @@ namespace OpenSim.Region.Framework.Scenes
         /// </summary>
         /// <remarks>A more readable way of testing presence sit status than ParentID == 0</remarks>
         public bool IsSatOnObject { get { return ParentID != 0; } }
-
+        public bool IsSitting { get {return SitGround || IsSatOnObject; }}
         /// <summary>
         /// If the avatar is sitting, the prim that it's sitting on.  If not sitting then null.
         /// </summary>
@@ -1119,7 +1119,7 @@ namespace OpenSim.Region.Framework.Scenes
             ControllingClient = client;
             Firstname = ControllingClient.FirstName;
             Lastname = ControllingClient.LastName;
-            m_name = String.Format("{0} {1}", Firstname, Lastname);
+            Name = String.Format("{0} {1}", Firstname, Lastname);
             m_uuid = client.AgentId;
             LocalId = m_scene.AllocateLocalId();
             LegacySitOffsets = m_scene.LegacySitOffsets;
@@ -1766,8 +1766,8 @@ namespace OpenSim.Region.Framework.Scenes
             if (!CheckLocalTPLandingPoint(ref pos))
                 return;
 
-            if (ParentID != (uint)0)
-                StandUp();
+            if (IsSitting)
+                StandUp(false);
 
             bool isFlying = Flying;
             Vector3 vel = Velocity;
@@ -1788,8 +1788,8 @@ namespace OpenSim.Region.Framework.Scenes
 
         public void TeleportOnEject(Vector3 pos)
         {
-            if (ParentID != (uint)0)
-                StandUp();
+            if (IsSitting )
+                StandUp(false);
 
             bool isFlying = Flying;
             RemoveFromPhysicalScene();
@@ -1831,7 +1831,7 @@ namespace OpenSim.Region.Framework.Scenes
             if (!m_scene.TestLandRestrictions(UUID, out string reason, ref newpos.X, ref newpos.Y))
                 return ;
 
-            if (IsSatOnObject)
+            if (IsSitting)
                 StandUp();
 
             if(m_movingToTarget)
@@ -3193,7 +3193,7 @@ namespace OpenSim.Region.Framework.Scenes
         { 
             m_delayedStop = -1;
 
-            if (SitGround || IsSatOnObject)
+            if (IsSitting)
                 StandUp();
 
             //            m_log.DebugFormat(
@@ -3293,7 +3293,7 @@ namespace OpenSim.Region.Framework.Scenes
         /// Perform the logic necessary to stand the avatar up.  This method also executes
         /// the stand animation.
         /// </summary>
-        public void StandUp()
+        public void StandUp(bool addPhys = true)
         {
             //            m_log.DebugFormat("[SCENE PRESENCE]: StandUp() for {0}", Name);
 
@@ -3382,7 +3382,7 @@ namespace OpenSim.Region.Framework.Scenes
                 m_pos = sitWorldPosition + adjustmentForSitPose;
             }
 
-            if (PhysicsActor == null)
+            if (addPhys && PhysicsActor == null)
                 AddToPhysicalScene(false);
 
             if (satOnObject)
@@ -3390,7 +3390,7 @@ namespace OpenSim.Region.Framework.Scenes
                 m_requestedSitTargetID = 0;
                 part.RemoveSittingAvatar(this);
                 part.ParentGroup.TriggerScriptChangedEvent(Changed.LINK);
-                
+
                 SendAvatarDataToAllAgents();
                 m_scene.EventManager.TriggerParcelPrimCountTainted(); // update select/ sat on
             }
@@ -3540,6 +3540,8 @@ namespace OpenSim.Region.Framework.Scenes
 
                 StandUp();
             }
+            else if(SitGround)
+                StandUp();
 
             SceneObjectPart part = FindNextAvailableSitTarget(targetID);
 
@@ -3683,7 +3685,7 @@ namespace OpenSim.Region.Framework.Scenes
             if (IsChildAgent)
                 return;
 
-            if(SitGround || IsSatOnObject)
+            if(IsSitting)
                 return;
 
             SceneObjectPart part = m_scene.GetSceneObjectPart(m_requestedSitTargetID);
@@ -6468,8 +6470,6 @@ namespace OpenSim.Region.Framework.Scenes
                         positionChanged = true;
                     }
                 }
-
-                land.SendLandUpdateToClient(ControllingClient);
             }
 
             return true;

@@ -56,6 +56,7 @@ namespace OpenSim.Region.CoreModules.Asset
         {
             public string filename;
             public AssetBase asset;
+            public bool replace;
         }
 
         private static readonly ILog m_log = LogManager.GetLogger( MethodBase.GetCurrentMethod().DeclaringType);
@@ -166,7 +167,6 @@ namespace OpenSim.Region.CoreModules.Asset
 
                         m_negativeCacheEnabled = assetConfig.GetBoolean("NegativeCacheEnabled", m_negativeCacheEnabled);
                         m_negativeExpiration = assetConfig.GetInt("NegativeCacheTimeout", m_negativeExpiration);
-                        
 
                         m_updateFileTimeOnCacheHit = assetConfig.GetBoolean("UpdateFileTimeOnCacheHit", m_updateFileTimeOnCacheHit);
                         m_updateFileTimeOnCacheHit &= m_FileCacheEnabled;
@@ -213,21 +213,9 @@ namespace OpenSim.Region.CoreModules.Asset
                     MainConsole.Instance.Commands.AddCommand("Assets", true, "fcache status", "fcache status", "Display cache status", HandleConsoleCommand);
                     MainConsole.Instance.Commands.AddCommand("Assets", true, "fcache clear", "fcache clear [file] [memory]", "Remove all assets in the cache.  If file or memory is specified then only this cache is cleared.", HandleConsoleCommand);
                     MainConsole.Instance.Commands.AddCommand("Assets", true, "fcache assets", "fcache assets", "Attempt a deep scan and cache of all assets in all scenes", HandleConsoleCommand);
-                    MainConsole.Instance.Commands.AddCommand("Assets", true, "fcache expire", "fcache expire <datetime(mm/dd/YYYY)>", "Purge cached assets older then the specified date/time", HandleConsoleCommand);
+                    MainConsole.Instance.Commands.AddCommand("Assets", true, "fcache expire", "fcache expire <datetime(mm/dd/YYYY)>", "Purge cached assets older than the specified date/time", HandleConsoleCommand);
                     if (!string.IsNullOrWhiteSpace(m_assetLoader))
                     {
-                        IAssetLoader assetLoader = ServerUtils.LoadPlugin<IAssetLoader>(m_assetLoader, new object[] { });
-                        if (assetLoader != null)
-                        {
-                            HashSet<string> ids = new HashSet<string>();
-                            assetLoader.ForEachDefaultXmlAsset(
-                                m_assetLoaderArgs,
-                                delegate (AssetBase a)
-                                {
-                                    ids.Add(a.ID);
-                                });
-                            m_defaultAssets = ids;
-                        }
                         MainConsole.Instance.Commands.AddCommand("Assets", true, "fcache cachedefaultassets", "fcache cachedefaultassets", "loads local default assets to cache. This may override grid ones. use with care", HandleConsoleCommand);
                         MainConsole.Instance.Commands.AddCommand("Assets", true, "fcache deletedefaultassets", "fcache deletedefaultassets", "deletes default local assets from cache so they can be refreshed from grid. use with care", HandleConsoleCommand);
                     }
@@ -317,6 +305,23 @@ namespace OpenSim.Region.CoreModules.Asset
                         m_cancelSource = new CancellationTokenSource();
                         WorkManager.RunInThreadPool(ProcessWrites, null, "FloatsamCacheWriter", false);
                     }
+
+                    if(!string.IsNullOrWhiteSpace(m_assetLoader) && scene.RegionInfo.RegionID == m_Scenes[0].RegionInfo.RegionID)
+                    {
+                        IAssetLoader assetLoader = ServerUtils.LoadPlugin<IAssetLoader>(m_assetLoader, new object[] { });
+                        if (assetLoader != null)
+                        {
+                            HashSet<string> ids = new HashSet<string>();
+                            assetLoader.ForEachDefaultXmlAsset(
+                                m_assetLoaderArgs,
+                                delegate (AssetBase a)
+                                {
+                                    Cache(a, true);
+                                    ids.Add(a.ID);
+                                });
+                            m_defaultAssets = ids;
+                        }
+                    }
                 }
             }
         }
@@ -329,7 +334,7 @@ namespace OpenSim.Region.CoreModules.Asset
                 {
                     if(m_assetFileWriteQueue.TryTake(out WriteAssetInfo wai,-1, m_cancelSource.Token))
                     {
-                        WriteFileCache(wai.filename,wai.asset,false);
+                        WriteFileCache(wai.filename,wai.asset,wai.replace);
                         wai.asset = null;
                         Thread.Sleep(20);
                     }
@@ -386,7 +391,8 @@ namespace OpenSim.Region.CoreModules.Asset
                 WriteAssetInfo wai = new WriteAssetInfo()
                 {
                     filename = filename,
-                    asset = asset
+                    asset = asset,
+                    replace = replace
                 };
 
                 if (m_assetFileWriteQueue != null)
@@ -563,6 +569,11 @@ namespace OpenSim.Region.CoreModules.Asset
             return asset;
         }
 
+        public AssetBase Get(string id, string ForeignAssetService, bool dummy)
+        {
+            return null;
+        }
+
         public bool Get(string id, out AssetBase asset)
         {
             asset = null;
@@ -626,9 +637,51 @@ namespace OpenSim.Region.CoreModules.Asset
             return false;
         }
 
+        // does not check negative cache
         public AssetBase GetCached(string id)
         {
-            Get(id, out AssetBase asset);
+            AssetBase asset = null;
+
+            m_Requests++;
+
+            asset = GetFromWeakReference(id);
+            if (asset != null)
+            {
+                if (m_updateFileTimeOnCacheHit)
+                {
+                    string filename = GetFileName(id);
+                    UpdateFileLastAccessTime(filename);
+                }
+                if (m_MemoryCacheEnabled)
+                    UpdateMemoryCache(id, asset);
+                return asset;
+            }
+
+            if (m_MemoryCacheEnabled)
+            {
+                asset = GetFromMemoryCache(id);
+                if (asset != null)
+                {
+                    UpdateWeakReference(id, asset);
+                    if (m_updateFileTimeOnCacheHit)
+                    {
+                        string filename = GetFileName(id);
+                        UpdateFileLastAccessTime(filename);
+                    }
+                    return asset;
+                }
+            }
+
+            if (m_FileCacheEnabled)
+            {
+                asset = GetFromFileCache(id);
+                if (asset != null)
+                {
+                    UpdateWeakReference(id, asset);
+                    if (m_MemoryCacheEnabled)
+                        UpdateMemoryCache(id, asset);
+                }
+            }
             return asset;
         }
 
@@ -938,8 +991,13 @@ namespace OpenSim.Region.CoreModules.Asset
                         
                     File.Move(tempname, filename);
                 }
-                catch (IOException)
+                catch
                 {
+                    try
+                    {
+                        File.Delete(tempname);
+                    }
+                    catch{ }
                     // If we see an IOException here it's likely that some other competing thread has written the
                     // cache file first, so ignore.  Other IOException errors (e.g. filesystem full) should be
                     // signally by the earlier temporary file writing code.
