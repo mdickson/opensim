@@ -277,6 +277,15 @@ namespace OpenSim.Region.CoreModules.Avatar.Gods
         {
             if (sp.IsDeleted || sp.IsChildAgent)
                 return;
+            if (sp.IsNPC)
+            {
+                INPCModule npcmodule = sp.Scene.RequestModuleInterface<INPCModule>();
+                if (npcmodule != null)
+                {
+                    npcmodule.DeleteNPC(sp.UUID, sp.Scene);
+                    return;
+                }
+            }
             sp.ControllingClient.Kick(reason);
             sp.Scene.CloseAgent(sp.UUID, true);
         }
@@ -312,6 +321,15 @@ namespace OpenSim.Region.CoreModules.Avatar.Gods
                 return;
             }
 
+            if (sp.IsNPC)
+            {
+                INPCModule npcmodule = sp.Scene.RequestModuleInterface<INPCModule>();
+                if (npcmodule != null)
+                {
+                    npcmodule.DeleteNPC(sp.UUID, sp.Scene);
+                    return;
+                }
+            }
             sp.ControllingClient.Kick(reason);
             sp.Scene.CloseAgent(sp.UUID, true);
         }
