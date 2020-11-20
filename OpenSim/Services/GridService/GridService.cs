@@ -25,17 +25,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using log4net;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
 using Nini.Config;
+using log4net;
 using OpenMetaverse;
 using OpenSim.Data;
 using OpenSim.Framework;
 using OpenSim.Framework.Console;
 using OpenSim.Server.Base;
 using OpenSim.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
+
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
 namespace OpenSim.Services.GridService
@@ -172,19 +174,54 @@ namespace OpenSim.Services.GridService
                 m_ExtraFeatures["destination-guide-url"] = configVal;
 
             configVal = Util.GetConfigVarFromSections<string>(
-                    config, "GatekeeperURI", new string[] { "Startup", "Hypergrid" }, String.Empty);
+                    config, "GatekeeperURI", new string[] { "Startup", "Hypergrid" }, string.Empty);
             if (!string.IsNullOrEmpty(configVal))
                 m_ExtraFeatures["GridURL"] = configVal;
 
             configVal = Util.GetConfigVarFromSections<string>(
-                config, "GridName", new string[] { "Const", "Hypergrid" }, String.Empty);
+                config, "GridName", new string[] { "Const", "Hypergrid" }, string.Empty);
             if (string.IsNullOrEmpty(configVal))
                 configVal = Util.GetConfigVarFromSections<string>(
-                    config, "gridname", new string[] { "GridInfo" }, String.Empty);
+                    config, "gridname", new string[] { "GridInfo", "GridInfoService" }, string.Empty);
             if (!string.IsNullOrEmpty(configVal))
                 m_ExtraFeatures["GridName"] = configVal;
 
+            configVal = Util.GetConfigVarFromSections<string>(
+                config, "GridNick", new string[] { "Const", "Hypergrid" }, string.Empty);
+            if (string.IsNullOrEmpty(configVal))
+                configVal = Util.GetConfigVarFromSections<string>(
+                    config, "gridnick", new string[] { "GridInfo", "GridInfoService" }, string.Empty);
+            if (!string.IsNullOrEmpty(configVal))
+                m_ExtraFeatures["GridNick"] = configVal;
+
             m_ExtraFeatures["ExportSupported"] = gridConfig.GetString("ExportSupported", "true");
+
+            string[] sections = new string[] { "Const, Startup", "Hypergrid", "GatekeeperService" };
+            string gatekeeperURIAlias = Util.GetConfigVarFromSections<string>(config, "GatekeeperURIAlias", sections, string.Empty);
+
+            if (!string.IsNullOrWhiteSpace(gatekeeperURIAlias))
+            {
+                string[] alias = gatekeeperURIAlias.Split(',');
+                if(alias.Length > 0)
+                {
+                    StringBuilder sb = osStringBuilderCache.Acquire();
+                    int last = alias.Length -1;
+                    for (int i = 0; i < alias.Length; ++i)
+                    {
+                        OSHHTPHost tmp = new OSHHTPHost(alias[i], false);
+                        if (tmp.IsValidHost)
+                        {
+                            sb.Append(tmp.URI);
+                            if(i < last)
+                                sb.Append(',');
+                        }
+                    }
+                    if(sb.Length > 0)
+                        m_ExtraFeatures["GridURLAlias"] = osStringBuilderCache.GetStringAndRelease(sb);
+                    else
+                        osStringBuilderCache.Release(sb);
+                }
+            }
         }
 
         #region IGridService

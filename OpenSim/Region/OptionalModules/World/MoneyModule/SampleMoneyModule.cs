@@ -182,7 +182,8 @@ namespace OpenSim.Region.OptionalModules.World.MoneyModule
         {
             if (!m_enabled)
                 return;
-
+            if(scene.SceneGridInfo!= null && !string.IsNullOrEmpty(scene.SceneGridInfo.EconomyURL))
+                return;
             ISimulatorFeaturesModule fm = scene.RequestModuleInterface<ISimulatorFeaturesModule>();
             if (fm != null && !string.IsNullOrWhiteSpace(m_localEconomyURL))
             {
@@ -260,8 +261,8 @@ namespace OpenSim.Region.OptionalModules.World.MoneyModule
             IConfig economyConfig = m_gConfig.Configs["Economy"];
 
             // economymodule may be at startup or Economy (legacy)
-            string mmodule = startupConfig.GetString("economymodule", "");
-            if (String.IsNullOrEmpty(mmodule))
+            string mmodule = startupConfig.GetString("economymodule","");
+            if(string.IsNullOrEmpty(mmodule))
             {
                 if(economyConfig != null)
                 {
@@ -271,7 +272,7 @@ namespace OpenSim.Region.OptionalModules.World.MoneyModule
                 }
             }
 
-            if (!String.IsNullOrEmpty(mmodule) && mmodule != Name)
+            if (!string.IsNullOrEmpty(mmodule) && mmodule != Name)
             {
                 // some other money module selected
                 m_enabled = false;
