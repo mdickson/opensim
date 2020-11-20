@@ -82,7 +82,7 @@ namespace OpenSim.Region.ScriptEngine.Yengine
                 }
                 if (tokenBegin == null)
                 {
-                    m_log.Debug("[YEngine]: parsing errors on " + m_ScriptObjCodeKey);
+                    m_log.Debug ("[YEngine]: parsing errors on " + m_ScriptObjCodeKey + " (" + m_CameFrom + ")");
                     return null;
                 }
 
