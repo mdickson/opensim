@@ -660,7 +660,14 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
             return response;
         }
 
-        public void HttpRequestHandler(UUID requestID, OSHttpRequest request)
+        private OSHttpResponse errorResponse(OSHttpRequest request, int error)
+        {
+            OSHttpResponse resp = new OSHttpResponse(request);
+            resp.StatusCode = error;
+            return resp;
+        }
+
+        public OSHttpResponse HttpRequestHandler(UUID requestID, OSHttpRequest request)
         {
             lock (request)
             {
@@ -668,7 +675,7 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
                 if(uri.Length < 45)
                 {
                     request.InputStream.Dispose();
-                    return;
+                    return errorResponse(request, (int)HttpStatusCode.BadRequest);
                 }
 
                 try
@@ -701,7 +708,7 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
                     {
                             //m_log.Warn("[HttpRequestHandler]: http-in request failed; no such url: "+urlkey.ToString());
                             request.InputStream.Dispose();
-                            return;
+                            return errorResponse(request, (int)HttpStatusCode.NotFound);
                     }
 
                     //for llGetHttpHeader support we need to store original URI here
@@ -777,7 +784,7 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
 
                     url.engine.PostScriptEvent(url.itemID, "http_request", new Object[] { requestID.ToString(), request.HttpMethod, requestBody });
 
-                    return;
+                    return null;
 
                 }
                 catch (Exception we)
@@ -787,6 +794,8 @@ namespace OpenSim.Region.CoreModules.Scripting.LSLHttp
                     m_log.Warn(we.Message);
                     m_log.Warn(we.StackTrace);
                 }
+
+                return errorResponse(request, (int)HttpStatusCode.BadRequest);
             }
         }
 
