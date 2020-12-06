@@ -182,8 +182,8 @@ namespace OpenSim.Region.CoreModules.Avatar.Friends
                                 string url = string.Empty, first = string.Empty, last = string.Empty, tmp = string.Empty;
                                 if (Util.ParseUniversalUserIdentifier(finfo.Friend, out id, out url, out first, out last, out tmp))
                                 {
-                                    //                                    m_log.DebugFormat("[HGFRIENDS MODULE]: caching {0}", finfo.Friend);
-                                    uMan.AddUser(id, url + ";" + first + " " + last);
+//                                    m_log.DebugFormat("[HGFRIENDS MODULE]: caching {0}", finfo.Friend);
+                                    uMan.AddUser(id,first,last, url);
                                 }
                             }
                         }

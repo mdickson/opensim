@@ -1338,7 +1338,7 @@ namespace OpenSim.Region.Framework.Scenes
                     {
                         tmp = SceneGridInfo.EconomyURL;
                         if (!string.IsNullOrEmpty(tmp))
-                        fm.AddOpenSimExtraFeature("currency-base-uri", tmp);
+                            fm.AddOpenSimExtraFeature("currency-base-uri", tmp);
                     }
                 }
             }
@@ -3256,11 +3256,12 @@ namespace OpenSim.Region.Framework.Scenes
         {
             if (UserManagementModule != null)
             {
-                string first = aCircuit.firstname, last = aCircuit.lastname;
+                string first = aCircuit.firstname;
+                string last = aCircuit.lastname;
 
                 if (sp != null && sp.PresenceType == PresenceType.Npc)
                 {
-                    UserManagementModule.AddUser(aCircuit.AgentID, first, last, true);
+                    UserManagementModule.AddNPCUser(aCircuit.AgentID, first, last);
                 }
                 else
                 {
@@ -4271,8 +4272,6 @@ namespace OpenSim.Region.Framework.Scenes
                 }
                 else
                 {
-                    // Let the SP know how we got here. This has a lot of interesting
-                    // uses down the line.
                     sp.TeleportFlags = (TPFlags)teleportFlags;
 
                     if (sp.IsChildAgent)
@@ -4301,7 +4300,6 @@ namespace OpenSim.Region.Framework.Scenes
             {
                 CapsModule.ActivateCaps(acd.circuitcode);
             }
-
 
             return true;
         }

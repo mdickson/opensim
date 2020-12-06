@@ -589,9 +589,8 @@ namespace OpenSim.Data.SQLite
                     // Remove prim row
                     row.Delete();
                 }
+                Commit();
             }
-
-            Commit();
         }
 
         /// <summary>
@@ -939,8 +938,8 @@ namespace OpenSim.Data.SQLite
                 {
                     rowsToDelete[iter].Delete();
                 }
+                Commit();
             }
-            Commit();
         }
 
         /// <summary>
@@ -992,9 +991,8 @@ namespace OpenSim.Data.SQLite
                     fillLandAccessRow(newAccessRow, entry, parcel.LandData.GlobalID);
                     landaccesslist.Rows.Add(newAccessRow);
                 }
+                Commit();
             }
-
-            Commit();
         }
 
         /// <summary>
@@ -1032,8 +1030,8 @@ namespace OpenSim.Data.SQLite
         /// </summary>
         public void Commit()
         {
-            //            m_log.Debug("[SQLITE]: Starting commit");
-            lock (ds)
+//            m_log.Debug("[SQLITE]: Starting commit");
+            //lock (ds) caller must lock
             {
                 primDa.Update(ds, "prims");
                 shapeDa.Update(ds, "primshapes");
@@ -1065,7 +1063,8 @@ namespace OpenSim.Data.SQLite
         /// </summary>
         public void Shutdown()
         {
-            Commit();
+            lock(ds)
+                Commit();
         }
 
         /***********************************************************************
@@ -2504,9 +2503,8 @@ namespace OpenSim.Data.SQLite
                     fillItemRow(newItemRow, newItem);
                     dbItems.Rows.Add(newItemRow);
                 }
+                Commit();
             }
-
-            Commit();
         }
 
         /***********************************************************************

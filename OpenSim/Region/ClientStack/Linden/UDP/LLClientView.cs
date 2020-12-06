@@ -10592,7 +10592,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             {
                 string assetServer = aCircuit.ServiceURLs["AssetServerURI"].ToString();
                 if (!string.IsNullOrEmpty(assetServer))
-                    return ((Scene)Scene).AssetService.Get(assetServer + "/" + id);
+                    return ((Scene)Scene).AssetService.Get(id, assetServer, false);
             }
 
             return null;

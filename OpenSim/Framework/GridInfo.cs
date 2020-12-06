@@ -39,6 +39,7 @@ namespace OpenSim.Framework
         None        = 0,
         ValidHost   = 1,
         Resolved    = 1 << 1,
+        Empty       = 1 << 2,
 
         ValidResolved = ValidHost | Resolved
     }
@@ -56,7 +57,7 @@ namespace OpenSim.Framework
 
         public OSHTTPURI(string uri, bool withDNSResolve = false)
         {
-            Flags = OSHTTPURIFlags.None;
+            Flags = OSHTTPURIFlags.Empty;
             Port = -1;
             IP = null;
             Host = string.Empty;
@@ -67,6 +68,7 @@ namespace OpenSim.Framework
             if (string.IsNullOrEmpty(uri))
                 return;
 
+            Flags = OSHTTPURIFlags.None;
             try
             {
                 Uri m_checkuri = new Uri(uri);
@@ -79,11 +81,8 @@ namespace OpenSim.Framework
 
                 Port = m_checkuri.Port;
                 Path = m_checkuri.AbsolutePath;
-                if (Path[Path.Length - 1] == '/')
-                    Path = Path.Substring(0, Path.Length - 1);
-
                 URL = m_checkuri.Scheme + "://" + Host + ":" + Port;
-                URI = URL + Path;
+                URI = m_checkuri.AbsoluteUri;
 
                 if (withDNSResolve)
                 {
@@ -117,12 +116,12 @@ namespace OpenSim.Framework
 
         public bool IsValidHost
         {
-            get { return Flags != OSHTTPURIFlags.None;}
+            get { return (Flags & OSHTTPURIFlags.ValidHost) != 0; }
         }
 
         public bool ValidAndResolved(out string error)
         {
-            if (Flags == OSHTTPURIFlags.None)
+            if ((Flags & OSHTTPURIFlags.ValidHost) == 0)
             {
                 error = "failed to parse uri";
                 return false;
@@ -183,7 +182,7 @@ namespace OpenSim.Framework
 
         public OSHHTPHost(string url, bool withDNSResolve = false)
         {
-            Flags = OSHTTPURIFlags.None;
+            Flags = OSHTTPURIFlags.Empty;
             Port = 80;
             IP = null;
             Host = string.Empty;
@@ -194,8 +193,9 @@ namespace OpenSim.Framework
             if (string.IsNullOrEmpty(url))
                 return;
 
-            url = url.ToLowerInvariant();
+            Flags = OSHTTPURIFlags.None;
 
+            url = url.ToLowerInvariant();
             try
             {
                 int urllen = url.Length;
@@ -288,7 +288,7 @@ namespace OpenSim.Framework
 
         public bool IsValidHost
         {
-            get { return Flags != OSHTTPURIFlags.None; }
+            get { return (Flags & OSHTTPURIFlags.ValidHost) != 0; }
         }
 
         public bool IsResolvedHost
@@ -298,7 +298,7 @@ namespace OpenSim.Framework
 
         public bool ValidAndResolved(out string error)
         {
-            if (Flags == OSHTTPURIFlags.None)
+            if ((Flags & OSHTTPURIFlags.ValidHost) == 0)
             {
                 error = "failed to parse uri";
                 return false;
@@ -315,6 +315,11 @@ namespace OpenSim.Framework
         public string URIwEndSlash
         {
             get { return (Flags == OSHTTPURIFlags.None) ? "" : URI + "/"; }
+        }
+
+        public string HostAndPort
+        {
+            get { return (Flags == OSHTTPURIFlags.None) ? "" : Host + ":" + Port.ToString(); }
         }
 
         public int CompareTo(OSHHTPHost other)
@@ -337,7 +342,7 @@ namespace OpenSim.Framework
 
         public override int GetHashCode()
         {
-            return URI.GetHashCode();
+            return Host.GetHashCode() + Port;
         }
     }
 
@@ -363,7 +368,7 @@ namespace OpenSim.Framework
         {
             string[] sections = new string[] {"Const", "Startup", "Hypergrid"};
 
-            string gatekeeper = Util.GetConfigVarFromSections<string>(config, "GatekeeperURI", sections, String.Empty);
+            string gatekeeper = Util.GetConfigVarFromSections<string>(config, "GatekeeperURI", sections, string.Empty);
             if (string.IsNullOrEmpty(gatekeeper))
             {
                 IConfig serverConfig = config.Configs["GatekeeperService"];
@@ -439,7 +444,7 @@ namespace OpenSim.Framework
                 throw new Exception("HomeURI configuration error");
             }
 
-            string homeAlias = Util.GetConfigVarFromSections<string>(config, "HomeURIAlias", sections, String.Empty);
+            string homeAlias = Util.GetConfigVarFromSections<string>(config, "HomeURIAlias", sections, string.Empty);
             if (!string.IsNullOrWhiteSpace(homeAlias))
             {
                 string[] alias = homeAlias.Split(',');
@@ -475,7 +480,7 @@ namespace OpenSim.Framework
                     m_log.Error(tmpuri.IsValidHost ? "Could not resolve SearchServerURI" : "SearchServerURI is a invalid host");
                     throw new Exception("SearchServerURI configuration error");
                 }
-                m_SearchURL = tmpuri.URIwEndSlash;
+                m_SearchURL = tmpuri.URI;
             }
 
             m_DestinationGuideURL = Util.GetConfigVarFromSections<string>(config, "DestinationGuideURI",namessections, string.Empty);
@@ -491,7 +496,7 @@ namespace OpenSim.Framework
                     m_log.Error(tmpuri.IsValidHost ? "Could not resolve DestinationGuideURL" : "DestinationGuideURL is a invalid host");
                     throw new Exception("DestinationGuideURL configuration error");
                 }
-                m_DestinationGuideURL = tmpuri.URIwEndSlash;
+                m_DestinationGuideURL = tmpuri.URI;
             }
 
             m_economyURL = Util.GetConfigVarFromSections<string>(config, "economy", new string[] { "Economy", "GridInfo" });
@@ -503,7 +508,7 @@ namespace OpenSim.Framework
                     m_log.Error(tmpuri.IsValidHost ? "Could not resolve economyURL" : "economyURL is a invalid host");
                     throw new Exception("economyURL configuration error");
                 }
-                m_economyURL = tmpuri.URIwEndSlash;
+                m_economyURL = tmpuri.URI;
             }
         }
 
@@ -580,7 +585,7 @@ namespace OpenSim.Framework
         {
             OSHHTPHost tmp = new OSHHTPHost(othergatekeeper, false);
             if (!tmp.IsValidHost)
-                return -1;
+                return ((tmp.Flags & OSHTTPURIFlags.Empty) == 0) ? -1 : 1;
             if (tmp.Equals(m_gateKeeperURL))
                 return 1;
             if (m_gateKeeperAlias != null && m_gateKeeperAlias.Contains(tmp))
@@ -592,7 +597,7 @@ namespace OpenSim.Framework
         {
             OSHHTPHost tmp = new OSHHTPHost(othergatekeeper, false);
             if (!tmp.IsValidHost)
-                return -1;
+                return ((tmp.Flags & OSHTTPURIFlags.Empty) == 0) ? -1 : 1;
             if (tmp.Equals(m_gateKeeperURL))
                 return 1;
             if (m_gateKeeperAlias != null && m_gateKeeperAlias.Contains(tmp))
@@ -606,11 +611,23 @@ namespace OpenSim.Framework
             return 0;
         }
 
+        public int IsLocalGrid(OSHHTPHost othergatekeeper)
+        {
+            if (!othergatekeeper.IsValidHost)
+                return ((othergatekeeper.Flags & OSHTTPURIFlags.Empty) == 0) ? -1 : 1;
+
+            if (othergatekeeper.Equals(m_gateKeeperURL))
+                return 1;
+            if (m_gateKeeperAlias != null && m_gateKeeperAlias.Contains(othergatekeeper))
+                return 1;
+            return 0;
+        }
+
         public int IsLocalHome(string otherhome)
         {
             OSHHTPHost tmp = new OSHHTPHost(otherhome, false);
             if (!tmp.IsValidHost)
-                return -1;
+                return ((tmp.Flags & OSHTTPURIFlags.Empty) == 0) ? -1 : 1;
             if (tmp.Equals(m_homeURL))
                 return 1;
             if (m_homeURLAlias != null && m_homeURLAlias.Contains(tmp))
@@ -622,7 +639,7 @@ namespace OpenSim.Framework
         {
             OSHHTPHost tmp = new OSHHTPHost(otherhome, false);
             if (!tmp.IsValidHost)
-                return -1;
+                return ((tmp.Flags & OSHTTPURIFlags.Empty) == 0) ? -1 : 1;
             if (tmp.Equals(m_homeURL))
                 return 1;
             if (m_homeURLAlias != null && m_homeURLAlias.Contains(tmp))
@@ -630,8 +647,6 @@ namespace OpenSim.Framework
 
             if (withResolveCheck)
             {
-                if (tmp.IsResolvedHost)
-                    return 0;
                 return tmp.ResolveDNS() ? 0 : -2;
             }
             return 0;
@@ -705,7 +720,7 @@ namespace OpenSim.Framework
             {
                 OSHTTPURI tmp = new OSHTTPURI(value, true);
                 if (tmp.IsResolvedHost)
-                    m_SearchURL = tmp.URIwEndSlash;
+                    m_SearchURL = tmp.URI;
                 else
                     m_log.Error((tmp.IsValidHost ? "Could not resolve SearchURL" : "SearchURL is a invalid host ") + value??"");
             }
@@ -718,7 +733,7 @@ namespace OpenSim.Framework
             {
                 OSHTTPURI tmp = new OSHTTPURI(value, true);
                 if (tmp.IsResolvedHost)
-                    m_DestinationGuideURL = tmp.URIwEndSlash;
+                    m_DestinationGuideURL = tmp.URI;
                 else
                     m_log.Error((tmp.IsValidHost ? "Could not resolve DestinationGuideURL" : "DestinationGuideURL is a invalid host ") + value ?? "");
             }
@@ -731,7 +746,7 @@ namespace OpenSim.Framework
             {
                 OSHTTPURI tmp = new OSHTTPURI(value, true);
                 if (tmp.IsResolvedHost)
-                    m_economyURL = tmp.URIwEndSlash;
+                    m_economyURL = tmp.URI;
                 else
                     m_log.Error((tmp.IsValidHost ? "Could not resolve EconomyURL" : "EconomyURL is a invalid host ") + value ?? "");
             }
