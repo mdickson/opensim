@@ -4187,14 +4187,9 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
         public LSL_Integer llStringLength(string str)
         {
             m_host.AddScriptLPS(1);
-            if (str.Length > 0)
-            {
-                return str.Length;
-            }
-            else
-            {
+            if(str == null || str.Length <= 0)
                 return 0;
-            }
+            return str.Length;
         }
 
         public void llStartAnimation(string anim)
@@ -4589,56 +4584,50 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             if (linknum < ScriptBaseClass.LINK_THIS)
                 return;
 
-            SceneObjectGroup parentPrim = m_host.ParentGroup;
+            SceneObjectGroup parentSOG = m_host.ParentGroup;
 
-            if (parentPrim.AttachmentPoint != 0)
+            if (parentSOG.AttachmentPoint != 0)
                 return; // Fail silently if attached
             SceneObjectPart childPrim = null;
 
             switch (linknum)
             {
                 case ScriptBaseClass.LINK_ROOT:
-                    break;
                 case ScriptBaseClass.LINK_SET:
                 case ScriptBaseClass.LINK_ALL_OTHERS:
                 case ScriptBaseClass.LINK_ALL_CHILDREN:
-                case ScriptBaseClass.LINK_THIS:
-                    foreach (SceneObjectPart part in parentPrim.Parts)
-                    {
-                        if (part.UUID != m_host.UUID)
-                        {
-                            childPrim = part;
-                            break;
-                        }
-                    }
+                    break;
+                case ScriptBaseClass.LINK_THIS: // not as spec
+                    childPrim = m_host;
                     break;
                 default:
-                    childPrim = parentPrim.GetLinkNumPart(linknum);
-                    if (childPrim.UUID == m_host.UUID)
-                        childPrim = null;
+                    childPrim = parentSOG.GetLinkNumPart(linknum);
                     break;
             }
 
             if (linknum == ScriptBaseClass.LINK_ROOT)
             {
-                // Restructuring Multiple Prims.
-                List<SceneObjectPart> parts = new List<SceneObjectPart>(parentPrim.Parts);
-                parts.Remove(parentPrim.RootPart);
+                List<ScenePresence> avs = parentSOG.GetSittingAvatars();
+                foreach (ScenePresence av in avs)
+                    av.StandUp();
+
+                List<SceneObjectPart> parts = new List<SceneObjectPart>(parentSOG.Parts);
+                parts.Remove(parentSOG.RootPart);
                 if (parts.Count > 0)
                 {
                     try
                     {
                         foreach (SceneObjectPart part in parts)
                         {
-                            parentPrim.DelinkFromGroup(part.LocalId, true);
+                            parentSOG.DelinkFromGroup(part.LocalId, true);
                         }
                     }
                     finally { }
                 }
 
-                parentPrim.HasGroupChanged = true;
-                parentPrim.ScheduleGroupForFullUpdate();
-                parentPrim.TriggerScriptChangedEvent(Changed.LINK);
+                parentSOG.HasGroupChanged = true;
+                parentSOG.ScheduleGroupForFullUpdate();
+                parentSOG.TriggerScriptChangedEvent(Changed.LINK);
 
                 if (parts.Count > 0)
                 {
@@ -4664,10 +4653,11 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                 if (childPrim == null)
                     return;
 
-                parentPrim.DelinkFromGroup(childPrim.LocalId, true);
-                parentPrim.HasGroupChanged = true;
-                parentPrim.ScheduleGroupForFullUpdate();
-                parentPrim.TriggerScriptChangedEvent(Changed.LINK);
+                List<ScenePresence> avs = parentSOG.GetSittingAvatars();
+                foreach (ScenePresence av in avs)
+                    av.StandUp();
+
+                parentSOG.DelinkFromGroup(childPrim.LocalId, true);
             }
         }
 
@@ -4709,12 +4699,13 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             m_host.AddScriptLPS(1);
             if(linknum < 0)
             {
-                if (linknum == ScriptBaseClass.LINK_ROOT)
-                    return m_host.ParentGroup.RootPart.UUID.ToString();
                 if (linknum == ScriptBaseClass.LINK_THIS)
                     return m_host.UUID.ToString();
                 return ScriptBaseClass.NULL_KEY;
             }
+
+            if (linknum < 2)
+                return m_host.ParentGroup.RootPart.UUID.ToString();
 
             SceneObjectPart part = m_host.ParentGroup.GetLinkNumPart(linknum);
             if (part != null)
@@ -4723,12 +4714,9 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             }
             else
             {
-                if (linknum > m_host.ParentGroup.PrimCount || (linknum == 1 && m_host.ParentGroup.PrimCount == 1))
+                if (linknum > m_host.ParentGroup.PrimCount)
                 {
-                    linknum -= (m_host.ParentGroup.PrimCount) + 1;
-
-                    if (linknum < 0)
-                        return ScriptBaseClass.NULL_KEY;
+                    linknum -= m_host.ParentGroup.PrimCount + 1;
 
                     List<ScenePresence> avatars = GetLinkAvatars(ScriptBaseClass.LINK_SET);
                     if (avatars.Count > linknum)
@@ -5026,13 +5014,9 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
                                             }
                                         }
                                     }
+                                    m_PresenceInfoCache.AddOrUpdate(uuid, pinfo, m_llRequestAgentDataCacheTimeout);
                                 }
-
-                                m_PresenceInfoCache.AddOrUpdate(uuid, pinfo, m_llRequestAgentDataCacheTimeout);
-                                if (pinfo != null && pinfo.RegionID != UUID.Zero)
-                                    reply = "1";
-                                else
-                                    reply = "0";
+                                reply = pinfo == null ? "0" : "1";
                             }
                         }
                     }

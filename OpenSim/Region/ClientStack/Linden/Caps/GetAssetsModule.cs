@@ -138,7 +138,7 @@ namespace OpenSim.Region.ClientStack.Linden
 
             lock(m_loadLock)
             {
-                if (m_assetService == null && m_NumberScenes == 0)
+                if (m_assetService == null)
                 {
                     m_assetService = s.RequestModuleInterface<IAssetService>();
                     // We'll reuse the same handler for all requests.
@@ -250,11 +250,11 @@ namespace OpenSim.Region.ClientStack.Linden
 
                             OSHttpResponse resp = response.osresponse;
 
-                            if(Util.GetTimeStamp() - resp.RequestTS > (resp.RawBufferLen > 2000000 ? 200 : 90))
+                            if(Util.GetTimeStamp() - resp.RequestTS > (resp.RawBufferLen > 2000000 ? 10 : 5))
                                 return sp.CapCanSendAsset(2, resp.RawBufferLen);
 
-                            if (resp.Priority > 1)
-                                return sp.CapCanSendAsset(1, resp.RawBufferLen);
+                            if (resp.Priority > 0)
+                                return sp.CapCanSendAsset(resp.Priority, resp.RawBufferLen);
                             return sp.CapCanSendAsset(2, resp.RawBufferLen);
                         }
                         return false;
@@ -300,6 +300,7 @@ namespace OpenSim.Region.ClientStack.Linden
                     reqinfo.request = request;
 
                     m_queue.Add(reqinfo);
+                    return null;
                 };
 
                 // this should never happen except possible on shutdown

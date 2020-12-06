@@ -611,8 +611,16 @@ namespace OpenSim.Framework.Servers.HttpServer
                 {
                     psEvArgs.RequestsReceived++;
                     PollServiceHttpRequest psreq = new PollServiceHttpRequest(psEvArgs, request);
-                    psEvArgs.Request?.Invoke(psreq.RequestID, osRequest);
-                    m_pollServiceManager.Enqueue(psreq);
+                    if(psEvArgs.Request == null)
+                        m_pollServiceManager.Enqueue(psreq);
+                    else
+                    {
+                        OSHttpResponse resp = psEvArgs.Request.Invoke(psreq.RequestID, osRequest);
+                        if(resp == null)
+                            m_pollServiceManager.Enqueue(psreq);
+                        else
+                            resp.Send();
+                    }
                     psreq = null;
                 }
                 else
@@ -622,7 +630,7 @@ namespace OpenSim.Framework.Servers.HttpServer
             }
             catch (Exception e)
             {
-                m_log.Error(String.Format("[BASE HTTP SERVER]: OnRequest() failed: {0} ", e.Message), e);
+                m_log.Error(string.Format("[BASE HTTP SERVER]: OnRequest() failed: {0} ", e.Message), e);
             }
         }
 
@@ -923,10 +931,8 @@ namespace OpenSim.Framework.Servers.HttpServer
                 if (request.InputStream != null && request.InputStream.CanRead)
                     request.InputStream.Close();
 
-                // Every month or so this will wrap and give bad numbers, not really a problem
-                // since its just for reporting
                 int tickdiff = requestEndTick - requestStartTick;
-                if (tickdiff > 3000 && (requestHandler == null || requestHandler.Name == null || requestHandler.Name != "GetTexture"))
+                if (tickdiff > 3000)
                 {
                     m_log.InfoFormat(
                         "[LOGHTTP] Slow handling of {0} {1} {2} {3} {4} from {5} took {6}ms",
@@ -1148,8 +1154,6 @@ namespace OpenSim.Framework.Servers.HttpServer
         /// <param name="response"></param>
         public void HandleXmlRpcRequests(OSHttpRequest request, OSHttpResponse response)
         {
-            String requestBody = null;
-
             Stream requestStream = request.InputStream;
             Stream innerStream = null;
             try
@@ -1157,72 +1161,45 @@ namespace OpenSim.Framework.Servers.HttpServer
                 if ((request.Headers["Content-Encoding"] == "gzip") || (request.Headers["X-Content-Encoding"] == "gzip"))
                 {
                     innerStream = requestStream;
-                    requestStream = new GZipStream(innerStream, System.IO.Compression.CompressionMode.Decompress);
+                    requestStream = new GZipStream(innerStream, CompressionMode.Decompress);
                 }
-
-                using (StreamReader reader = new StreamReader(requestStream, Encoding.UTF8))
-                    requestBody = reader.ReadToEnd();
             }
             catch
             {
-                requestBody = null;
-            }
-            finally
-            {
-                if (innerStream != null && innerStream.CanRead)
-                    innerStream.Dispose();
                 if (requestStream.CanRead)
                     requestStream.Dispose();
-            }
+                if (innerStream != null && innerStream.CanRead)
+                    innerStream.Dispose();
 
-            if (string.IsNullOrWhiteSpace(requestBody))
-            {
-                response.StatusCode = (int)HttpStatusCode.NotFound;
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
                 response.KeepAlive = false;
                 return;
-            }
-
-            //m_log.Debug(requestBody);
-            requestBody = requestBody.Replace("<base64></base64>", "");
-
-            bool gridproxy = false;
-            if (requestBody.Contains("encoding=\"utf-8"))
-            {
-                int channelindx = -1;
-                int optionsindx = requestBody.IndexOf(">options<");
-                if (optionsindx > 0)
-                {
-                    channelindx = requestBody.IndexOf(">channel<");
-                    if (optionsindx < channelindx)
-                        gridproxy = true;
-                }
             }
 
             XmlRpcRequest xmlRprcRequest = null;
             try
             {
-                xmlRprcRequest = (XmlRpcRequest)(new XmlRpcRequestDeserializer()).Deserialize(requestBody);
-            }
-            catch (XmlException e)
-            {
-                if (DebugLevel >= 1)
+                using (StreamReader reader = new StreamReader(requestStream, Encoding.UTF8))
                 {
-                    if (DebugLevel >= 2)
-                        m_log.Warn(
-                            string.Format(
-                                "[BASE HTTP SERVER]: Got XMLRPC request with invalid XML from {0}.  XML was '{1}'.  Sending blank response.  Exception ",
-                                request.RemoteIPEndPoint, requestBody),
-                            e);
-                    else
-                    {
-                        m_log.WarnFormat(
-                            "[BASE HTTP SERVER]: Got XMLRPC request with invalid XML from {0}, length {1}.  Sending blank response.",
-                            request.RemoteIPEndPoint, requestBody.Length);
-                    }
+                    var xmlDes = new XmlRpcRequestDeserializer();
+                    xmlRprcRequest = (XmlRpcRequest)xmlDes.Deserialize(reader);
                 }
             }
+            catch (Exception e)
+            {
+                m_log.WarnFormat(
+                    "[BASE HTTP SERVER]: Fail to decode XMLRPC request {0}: {1}",
+                        request.RemoteIPEndPoint, e.Message);
+            }
+            finally
+            {
+                if (requestStream.CanRead)
+                    requestStream.Dispose();
+                if (innerStream != null && innerStream.CanRead)
+                    innerStream.Dispose();
+            }
 
-            if(xmlRprcRequest == null)
+            if (xmlRprcRequest == null)
             {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
                 response.KeepAlive = false;
@@ -1266,9 +1243,6 @@ namespace OpenSim.Framework.Servers.HttpServer
                 }
                 xmlRprcRequest.Params.Add(request.Headers.Get(xff)); // Param[3]
 
-                if (gridproxy)
-                    xmlRprcRequest.Params.Add("gridproxy");  // Param[4]
-
                 // reserve this for
                 // ... by Fumi.Iseki for DTLNSLMoneyServer
                 // BUT make its presence possible to detect/parse
@@ -1309,30 +1283,26 @@ namespace OpenSim.Framework.Servers.HttpServer
                     String.Format("Requested method [{0}] not found", methodName));
             }
 
-            response.KeepAlive = keepAlive;
-            response.ContentType = "text/xml";
-            string responseString = String.Empty;
-            using (MemoryStream outs = new MemoryStream())
+            using (MemoryStream outs = new MemoryStream(64 * 1024))
             {
                 using (XmlTextWriter writer = new XmlTextWriter(outs, UTF8NoBOM))
                 {
                     writer.Formatting = Formatting.None;
-                    XmlRpcResponseSerializer.Singleton.Serialize(writer, xmlRpcResponse);
+                    var xmlrpcSer = new XmlRpcResponseSerializer();
+                    xmlrpcSer.Serialize(writer, xmlRpcResponse);
                     writer.Flush();
-                    outs.Seek(0, SeekOrigin.Begin);
-                    using (StreamReader sr = new StreamReader(outs))
-                        responseString = sr.ReadToEnd();
+                    response.RawBuffer = outs.GetBuffer();
+                    response.RawBufferLen = (int)outs.Length;
                 }
             }
 
-            response.RawBuffer = Util.UTF8NBGetbytes(responseString);
             response.StatusCode = (int)HttpStatusCode.OK;
+            response.KeepAlive = keepAlive;
+            response.ContentType = "text/xml";
         }
 
         public void HandleXmlRpcRequests(OSHttpRequest request, OSHttpResponse response, Dictionary<string, XmlRpcMethod> rpcHandlers)
         {
-            String requestBody = null;
-
             Stream requestStream = request.InputStream;
             Stream innerStream = null;
             try
@@ -1340,69 +1310,42 @@ namespace OpenSim.Framework.Servers.HttpServer
                 if ((request.Headers["Content-Encoding"] == "gzip") || (request.Headers["X-Content-Encoding"] == "gzip"))
                 {
                     innerStream = requestStream;
-                    requestStream = new GZipStream(innerStream, System.IO.Compression.CompressionMode.Decompress);
+                    requestStream = new GZipStream(innerStream, CompressionMode.Decompress);
                 }
-
-                using (StreamReader reader = new StreamReader(requestStream, Encoding.UTF8))
-                    requestBody = reader.ReadToEnd();
             }
             catch
             {
-                requestBody = null;
-            }
-            finally
-            {
-                if (innerStream != null && innerStream.CanRead)
-                    innerStream.Dispose();
                 if (requestStream.CanRead)
                     requestStream.Dispose();
-            }
+                if (innerStream != null && innerStream.CanRead)
+                    innerStream.Dispose();
 
-            if (string.IsNullOrWhiteSpace(requestBody))
-            {
-                response.StatusCode = (int)HttpStatusCode.NotFound;
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
                 response.KeepAlive = false;
                 return;
-            }
-
-            //m_log.Debug(requestBody);
-            requestBody = requestBody.Replace("<base64></base64>", "");
-
-            bool gridproxy = false;
-            if (requestBody.Contains("encoding=\"utf-8"))
-            {
-                int channelindx = -1;
-                int optionsindx = requestBody.IndexOf(">options<");
-                if (optionsindx > 0)
-                {
-                    channelindx = requestBody.IndexOf(">channel<");
-                    if (optionsindx < channelindx)
-                        gridproxy = true;
-                }
             }
 
             XmlRpcRequest xmlRprcRequest = null;
             try
             {
-                xmlRprcRequest = (XmlRpcRequest)(new XmlRpcRequestDeserializer()).Deserialize(requestBody);
-            }
-            catch (XmlException e)
-            {
-                if (DebugLevel >= 1)
+                using (StreamReader reader = new StreamReader(requestStream, Encoding.UTF8))
                 {
-                    if (DebugLevel >= 2)
-                        m_log.Warn(
-                            string.Format(
-                                "[BASE HTTP SERVER]: Got XMLRPC request with invalid XML from {0}.  XML was '{1}'.  Sending blank response.  Exception ",
-                                request.RemoteIPEndPoint, requestBody),
-                            e);
-                    else
-                    {
-                        m_log.WarnFormat(
-                            "[BASE HTTP SERVER]: Got XMLRPC request with invalid XML from {0}, length {1}.  Sending blank response.",
-                            request.RemoteIPEndPoint, requestBody.Length);
-                    }
+                    var xmlDes = new XmlRpcRequestDeserializer();
+                    xmlRprcRequest = (XmlRpcRequest)xmlDes.Deserialize(reader);
                 }
+            }
+            catch (Exception e)
+            {
+                m_log.WarnFormat(
+                    "[BASE HTTP SERVER]: Fail to decode XMLRPC request {0}: {1}",
+                        request.RemoteIPEndPoint, e.Message);
+            }
+            finally
+            {
+                if (requestStream.CanRead)
+                    requestStream.Dispose();
+                if (innerStream != null && innerStream.CanRead)
+                    innerStream.Dispose();
             }
 
             if (xmlRprcRequest == null)
@@ -1443,9 +1386,6 @@ namespace OpenSim.Framework.Servers.HttpServer
                 }
                 xmlRprcRequest.Params.Add(request.Headers.Get(xff)); // Param[3]
 
-                if (gridproxy)
-                    xmlRprcRequest.Params.Add("gridproxy");  // Param[4]
-
                 // reserve this for
                 // ... by Fumi.Iseki for DTLNSLMoneyServer
                 // BUT make its presence possible to detect/parse
@@ -1462,8 +1402,7 @@ namespace OpenSim.Framework.Servers.HttpServer
                 }
                 catch (Exception e)
                 {
-                    string errorMessage
-                        = String.Format(
+                    string errorMessage = string.Format(
                             "Requested method [{0}] from {1} threw exception: {2} {3}",
                             methodName, request.RemoteIPEndPoint.Address, e.Message, e.StackTrace);
 
@@ -1486,24 +1425,22 @@ namespace OpenSim.Framework.Servers.HttpServer
                     String.Format("Requested method [{0}] not found", methodName));
             }
 
-            string responseString = String.Empty;
-            using (MemoryStream outs = new MemoryStream())
+            using (MemoryStream outs = new MemoryStream(64 * 1024))
             {
                 using (XmlTextWriter writer = new XmlTextWriter(outs, UTF8NoBOM))
                 {
                     writer.Formatting = Formatting.None;
-                    XmlRpcResponseSerializer.Singleton.Serialize(writer, xmlRpcResponse);
+                    var xmlrpcSer = new XmlRpcResponseSerializer();
+                    xmlrpcSer.Serialize(writer, xmlRpcResponse);
                     writer.Flush();
-                    outs.Seek(0, SeekOrigin.Begin);
-                    using (StreamReader sr = new StreamReader(outs))
-                        responseString = sr.ReadToEnd();
+                    response.RawBuffer = outs.GetBuffer();
+                    response.RawBufferLen = (int)outs.Length;
                 }
             }
 
             response.StatusCode = (int)HttpStatusCode.OK;
-            response.ContentType = "text/xml";
             response.KeepAlive = false;
-            response.RawBuffer = Util.UTF8NBGetbytes(responseString);
+            response.ContentType = "text/xml";
         }
 
         // JsonRpc (v2.0 only)
@@ -2187,8 +2124,7 @@ namespace OpenSim.Framework.Servers.HttpServer
                 throw e;
             }
 
-            m_requestsProcessedStat
-                = new Stat(
+            m_requestsProcessedStat = new Stat(
                     "HTTPRequestsServed",
                     "Number of inbound HTTP requests processed",
                     "",
