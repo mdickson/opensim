@@ -55,7 +55,6 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Authorization
         private Scene m_Scene;
         AccessFlags m_accessValue = AccessFlags.None;
 
-
         public AuthorizationService(IConfig config, Scene scene)
         {
             m_Scene = scene;
