@@ -55,7 +55,6 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Authorization
         private Scene m_Scene;
         AccessFlags m_accessValue = AccessFlags.None;
 
-
         public AuthorizationService(IConfig config, Scene scene)
         {
             m_Scene = scene;
@@ -93,28 +92,29 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Authorization
                 return false;
             }
 
-            if (m_accessValue == AccessFlags.None)
-            {
-                message = "Authorized";
-                return true;
-            }
+            bool disallowResidents = m_Scene.RegionInfo.DisallowResidents;
+            bool disallowForeigners = m_Scene.RegionInfo.DisallowForeigners;
 
+            if (m_accessValue == AccessFlags.DisallowResidents)
+                disallowResidents = true;
+            else if (m_accessValue == AccessFlags.DisallowForeigners)
+                disallowForeigners = true;
+            
             UUID userID = new UUID(user);
 
-            if ((m_accessValue & AccessFlags.DisallowForeigners) != 0)
+            if (disallowResidents == true)
             {
-                if (!m_UserManagement.IsLocalGridUser(userID))
+                if (!(m_Scene.Permissions.IsGod(userID) == true || m_Scene.Permissions.IsAdministrator(userID) == true))
                 {
-                    message = "No foreign users allowed in this region";
+                    message = "Only Admins and Managers allowed in this region";
                     return false;
                 }
             }
-
-            if ((m_accessValue & AccessFlags.DisallowResidents) != 0)
+            else if (disallowForeigners == true)
             {
-                if (!(m_Scene.Permissions.IsGod(userID) || m_Scene.Permissions.IsAdministrator(userID)))
+                if (m_UserManagement.IsLocalGridUser(userID) == false)
                 {
-                    message = "Only Admins and Managers allowed in this region";
+                    message = "No foreign users allowed in this region";
                     return false;
                 }
             }
