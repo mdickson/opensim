@@ -419,6 +419,7 @@ namespace OpenSim.Framework.Monitoring
                             RegisteredStats.Remove(stat.Category);
                     }
                 }
+                stat.Dispose();
                 return true;
             }
         }

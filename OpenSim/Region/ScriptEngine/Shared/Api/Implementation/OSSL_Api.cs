@@ -2636,16 +2636,10 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
         {
             CheckThreatLevel(ThreatLevel.Moderate, "osGetGridName");
 
-            string name = String.Empty;
-            IConfigSource config = m_ScriptEngine.ConfigSource;
+            if(World.SceneGridInfo == null)
+                return string.Empty;
 
-            if (config.Configs[GridInfoServiceConfigSectionName] != null)
-                name = config.Configs[GridInfoServiceConfigSectionName].GetString("gridname", name);
-
-            if (String.IsNullOrEmpty(name))
-                name = GridUserInfo(InfoType.Name);
-
-            return name;
+            return World.SceneGridInfo.GridName;
         }
 
         public string osGetGridLoginURI()
@@ -2668,14 +2662,14 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
         {
             CheckThreatLevel(ThreatLevel.Moderate, "osGetGridHomeURI");
 
-            return World.SceneGridInfo.HGHomeURLNoEndSlash;
+            return World.SceneGridInfo.HomeURLNoEndSlash;
         }
 
         public string osGetGridGatekeeperURI()
         {
             CheckThreatLevel(ThreatLevel.Moderate, "osGetGridGatekeeperURI");
 
-            return World.SceneGridInfo.HGGateKeeperURLNoEndSlash;
+            return World.SceneGridInfo.GateKeeperURLNoEndSlash;
         }
 
         public string osGetGridCustom(string key)
@@ -2707,21 +2701,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             }
 
             if (returnValue == "")
-            {
-                IConfigSource config = m_ScriptEngine.ConfigSource;
-                returnValue = Util.GetConfigVarFromSections<string>(config, "HomeURI",
-                    new string[] { "Startup", "Hypergrid" }, String.Empty);
-
-                if (!string.IsNullOrEmpty(returnValue))
-                    return returnValue;
-
-                // Legacy. Remove soon!
-                if (config.Configs["LoginService"] != null)
-                    returnValue = config.Configs["LoginService"].GetString("SRV_HomeURI", returnValue);
-
-                if (String.IsNullOrEmpty(returnValue))
-                    returnValue = GridUserInfo(InfoType.Home);
-            }
+                return World.SceneGridInfo.HomeURLNoEndSlash;
 
             return returnValue;
         }
@@ -5179,11 +5159,15 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             if (m_SoundModule == null)
                 return;
 
-            SceneObjectPart sop = GetSingleLinkPart(linknum);
-            if (sop == null)
+            InitLSL();
+            if(m_LSL_Api == null)
                 return;
 
-            m_SoundModule.StopSound(sop.UUID);
+            List<SceneObjectPart> sops = m_LSL_Api.GetLinkParts(linknum);
+            if(sops == null || sops.Count == 0)
+                return;
+            for(int i = 0; i < sops.Count; ++i)
+                m_SoundModule.StopSound(sops[i].UUID);
         }
 
         public void osPreloadSound(LSL_Integer linknum, LSL_String sound)
@@ -5844,7 +5828,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             {
                 sp.Environment = null;
                 m_envModule.WindlightRefreshForced(sp, transition);
-                return -9;
+                return -5;
             }
             return 1;
         }
