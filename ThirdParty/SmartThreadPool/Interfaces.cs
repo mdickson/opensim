@@ -30,13 +30,13 @@ namespace Amib.Threading
     public delegate void WorkItemsGroupIdleHandler(IWorkItemsGroup workItemsGroup);
 
     /// <summary>
-    /// A delegate to call after a thread is created, but before
+    /// A delegate to call after a thread is created, but before 
     /// it's first use.
     /// </summary>
     public delegate void ThreadInitializationHandler();
 
     /// <summary>
-    /// A delegate to call when a thread is about to exit, after
+    /// A delegate to call when a thread is about to exit, after 
     /// it is no longer belong to the pool.
     /// </summary>
     public delegate void ThreadTerminationHandler();
@@ -61,7 +61,7 @@ namespace Amib.Threading
 
     #endregion
 
-    #region IWorkItemsGroup interface
+    #region IWorkItemsGroup interface 
 
     /// <summary>
     /// IWorkItemsGroup interface
@@ -150,7 +150,7 @@ namespace Amib.Threading
         /// Queue a work item
         /// </summary>
         /// <param name="callback">A callback to execute</param>
-        /// <returns>Returns a work item result</returns>
+        /// <returns>Returns a work item result</returns>        
         IWorkItemResult QueueWorkItem(WorkItemCallback callback);
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace Amib.Threading
         /// </summary>
         /// <param name="callback">A callback to execute</param>
         /// <param name="state">
-        /// The context object of the work item. Used for passing arguments to the work item.
+        /// The context object of the work item. Used for passing arguments to the work item. 
         /// </param>
         /// <returns>Returns a work item result</returns>
         IWorkItemResult QueueWorkItem(WorkItemCallback callback, object state);
@@ -176,7 +176,7 @@ namespace Amib.Threading
         /// </summary>
         /// <param name="callback">A callback to execute</param>
         /// <param name="state">
-        /// The context object of the work item. Used for passing arguments to the work item.
+        /// The context object of the work item. Used for passing arguments to the work item. 
         /// </param>
         /// <param name="workItemPriority">The work item priority</param>
         /// <returns>Returns a work item result</returns>
@@ -187,7 +187,7 @@ namespace Amib.Threading
         /// </summary>
         /// <param name="callback">A callback to execute</param>
         /// <param name="state">
-        /// The context object of the work item. Used for passing arguments to the work item.
+        /// The context object of the work item. Used for passing arguments to the work item. 
         /// </param>
         /// <param name="postExecuteWorkItemCallback">
         /// A delegate to call after the callback completion
@@ -200,7 +200,7 @@ namespace Amib.Threading
         /// </summary>
         /// <param name="callback">A callback to execute</param>
         /// <param name="state">
-        /// The context object of the work item. Used for passing arguments to the work item.
+        /// The context object of the work item. Used for passing arguments to the work item. 
         /// </param>
         /// <param name="postExecuteWorkItemCallback">
         /// A delegate to call after the callback completion
@@ -214,7 +214,7 @@ namespace Amib.Threading
         /// </summary>
         /// <param name="callback">A callback to execute</param>
         /// <param name="state">
-        /// The context object of the work item. Used for passing arguments to the work item.
+        /// The context object of the work item. Used for passing arguments to the work item. 
         /// </param>
         /// <param name="postExecuteWorkItemCallback">
         /// A delegate to call after the callback completion
@@ -228,7 +228,7 @@ namespace Amib.Threading
         /// </summary>
         /// <param name="callback">A callback to execute</param>
         /// <param name="state">
-        /// The context object of the work item. Used for passing arguments to the work item.
+        /// The context object of the work item. Used for passing arguments to the work item. 
         /// </param>
         /// <param name="postExecuteWorkItemCallback">
         /// A delegate to call after the callback completion
@@ -252,7 +252,7 @@ namespace Amib.Threading
         /// <param name="workItemInfo">Work item information</param>
         /// <param name="callback">A callback to execute</param>
         /// <param name="state">
-        /// The context object of the work item. Used for passing arguments to the work item.
+        /// The context object of the work item. Used for passing arguments to the work item. 
         /// </param>
         /// <returns>Returns a work item result</returns>
         IWorkItemResult QueueWorkItem(WorkItemInfo workItemInfo, WorkItemCallback callback, object state);
@@ -328,35 +328,35 @@ namespace Amib.Threading
         /// <summary>
         /// Queue a work item.
         /// </summary>
-        /// <returns>Returns a IWorkItemResult&lt;TResult&gt; object.
+        /// <returns>Returns a IWorkItemResult&lt;TResult&gt; object. 
         /// its GetResult() returns a TResult object</returns>
         IWorkItemResult<TResult> QueueWorkItem<TResult>(Func<TResult> func);
 
         /// <summary>
         /// Queue a work item.
         /// </summary>
-        /// <returns>Returns a IWorkItemResult&lt;TResult&gt; object.
+        /// <returns>Returns a IWorkItemResult&lt;TResult&gt; object. 
         /// its GetResult() returns a TResult object</returns>
         IWorkItemResult<TResult> QueueWorkItem<T, TResult>(Func<T, TResult> func, T arg);
 
         /// <summary>
         /// Queue a work item.
         /// </summary>
-        /// <returns>Returns a IWorkItemResult&lt;TResult&gt; object.
+        /// <returns>Returns a IWorkItemResult&lt;TResult&gt; object. 
         /// its GetResult() returns a TResult object</returns>
         IWorkItemResult<TResult> QueueWorkItem<T1, T2, TResult>(Func<T1, T2, TResult> func, T1 arg1, T2 arg2);
 
         /// <summary>
         /// Queue a work item.
         /// </summary>
-        /// <returns>Returns a IWorkItemResult&lt;TResult&gt; object.
+        /// <returns>Returns a IWorkItemResult&lt;TResult&gt; object. 
         /// its GetResult() returns a TResult object</returns>
         IWorkItemResult<TResult> QueueWorkItem<T1, T2, T3, TResult>(Func<T1, T2, T3, TResult> func, T1 arg1, T2 arg2, T3 arg3);
 
         /// <summary>
         /// Queue a work item.
         /// </summary>
-        /// <returns>Returns a IWorkItemResult&lt;TResult&gt; object.
+        /// <returns>Returns a IWorkItemResult&lt;TResult&gt; object. 
         /// its GetResult() returns a TResult object</returns>
         IWorkItemResult<TResult> QueueWorkItem<T1, T2, T3, T4, TResult>(Func<T1, T2, T3, T4, TResult> func, T1 arg1, T2 arg2, T3 arg3, T4 arg4);
 
@@ -460,7 +460,7 @@ namespace Amib.Threading
         /// </summary>
         /// <param name="millisecondsTimeout">Timeout in milliseconds, or -1 for infinite</param>
         /// <param name="exitContext">
-        /// true to exit the synchronization domain for the context before the wait (if in a synchronized context), and reacquire it; otherwise, false.
+        /// true to exit the synchronization domain for the context before the wait (if in a synchronized context), and reacquire it; otherwise, false. 
         /// </param>
         /// <param name="cancelWaitHandle">A cancel wait handle to interrupt the blocking if needed</param>
         /// <returns>The result of the work item</returns>
@@ -525,7 +525,7 @@ namespace Amib.Threading
         /// </summary>
         /// <param name="millisecondsTimeout">Timeout in milliseconds, or -1 for infinite</param>
         /// <param name="exitContext">
-        /// true to exit the synchronization domain for the context before the wait (if in a synchronized context), and reacquire it; otherwise, false.
+        /// true to exit the synchronization domain for the context before the wait (if in a synchronized context), and reacquire it; otherwise, false. 
         /// </param>
         /// <param name="cancelWaitHandle">A cancel wait handle to interrupt the blocking if needed</param>
         /// <param name="e">Filled with the exception if one was thrown</param>
@@ -566,7 +566,7 @@ namespace Amib.Threading
         bool IsCanceled { get; }
 
         /// <summary>
-        /// Gets the user-defined object that contains context data
+        /// Gets the user-defined object that contains context data 
         /// for the work item method.
         /// </summary>
         object State { get; }
@@ -582,7 +582,7 @@ namespace Amib.Threading
         /// If the work item is completed, it will remain completed
         /// If the work item is in progress then the user can check the SmartThreadPool.IsWorkItemCanceled
         ///   property to check if the work item has been cancelled. If the abortExecution is set to true then
-        ///   the Smart Thread Pool will send an AbortException to the running thread to stop the execution
+        ///   the Smart Thread Pool will send an AbortException to the running thread to stop the execution 
         ///   of the work item. When an in progress work item is canceled its GetResult will throw WorkItemCancelException.
         /// If the work item is already cancelled it will remain cancelled
         /// </summary>
@@ -605,24 +605,6 @@ namespace Amib.Threading
         /// </summary>
         object Exception { get; }
     }
-
-    #endregion
-
-    #region .NET 3.5
-
-    // All these delegate are built-in .NET 3.5
-    // Comment/Remove them when compiling to .NET 3.5 to avoid ambiguity.
-
-    public delegate void Action();
-    public delegate void Action<T1, T2>(T1 arg1, T2 arg2);
-    public delegate void Action<T1, T2, T3>(T1 arg1, T2 arg2, T3 arg3);
-    public delegate void Action<T1, T2, T3, T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-
-    public delegate TResult Func<TResult>();
-    public delegate TResult Func<T, TResult>(T arg1);
-    public delegate TResult Func<T1, T2, TResult>(T1 arg1, T2 arg2);
-    public delegate TResult Func<T1, T2, T3, TResult>(T1 arg1, T2 arg2, T3 arg3);
-    public delegate TResult Func<T1, T2, T3, T4, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
 
     #endregion
 }

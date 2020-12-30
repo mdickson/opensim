@@ -47,7 +47,6 @@
 //        - Added option to start the STP and the WIG as suspended
 //        - Exception behavior changed, the real exception is returned by an 
 //          inner exception
-//        - Added option to keep the Http context of the caller thread. (Thanks to Steven T.)
 //        - Added performance counters
 //        - Added priority to the threads in the pool
 //
@@ -134,11 +133,6 @@ namespace Amib.Threading
         /// Indicate to copy the security context of the caller and then use it in the call. (false)
         /// </summary>
         public const bool DefaultUseCallerCallContext = false;
-
-        /// <summary>
-        /// Indicate to copy the HTTP context of the caller and then use it in the call. (false)
-        /// </summary>
-        public const bool DefaultUseCallerHttpContext = false;
 
         /// <summary>
         /// Indicate to dispose of the state objects if they support the IDispose interface. (false)
@@ -250,14 +244,12 @@ namespace Amib.Threading
         /// Signaled when the thread pool is idle, i.e. no thread is busy
         /// and the work items queue is empty
         /// </summary>
-        //private ManualResetEvent _isIdleWaitHandle = new ManualResetEvent(true);
-        private ManualResetEvent _isIdleWaitHandle = EventWaitHandleFactory.CreateManualResetEvent(true);
+        private ManualResetEvent _isIdleWaitHandle = new ManualResetEvent(true);
 
         /// <summary>
         /// An event to signal all the threads to quit immediately.
         /// </summary>
-        //private ManualResetEvent _shuttingDownEvent = new ManualResetEvent(false);
-        private ManualResetEvent _shuttingDownEvent = EventWaitHandleFactory.CreateManualResetEvent(false);
+        private ManualResetEvent _shuttingDownEvent = new ManualResetEvent(false);
 
         /// <summary>
         /// A flag to indicate if the Smart Thread Pool is now suspended.
