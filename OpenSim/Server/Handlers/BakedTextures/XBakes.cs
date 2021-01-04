@@ -25,27 +25,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.IO;
+using System.Text;
+using System.Reflection;
+
 using log4net;
 using Nini.Config;
+
 using OpenSim.Framework;
 using OpenSim.Services.Base;
 using OpenSim.Services.Interfaces;
-using System;
-using System.IO;
-using System.Reflection;
+
 
 namespace OpenSim.Server.Handlers.BakedTextures
 {
     public class XBakes : ServiceBase, IBakedTextureService
     {
-        private static readonly ILog m_log =
-                LogManager.GetLogger(
-                MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_log = LogManager.GetLogger( MethodBase.GetCurrentMethod().DeclaringType);
 
         protected string m_FSBase;
-
-        private System.Text.UTF8Encoding utf8encoding =
-                new System.Text.UTF8Encoding();
 
         public XBakes(IConfigSource config) : base(config)
         {
@@ -60,8 +59,8 @@ namespace OpenSim.Server.Handlers.BakedTextures
                 throw new Exception("No BakedTextureService configuration");
             }
 
-            m_FSBase = assetConfig.GetString("BaseDirectory", String.Empty);
-            if (m_FSBase == String.Empty)
+            m_FSBase = assetConfig.GetString("BaseDirectory", string.Empty);
+            if (m_FSBase == string.Empty)
             {
                 m_log.ErrorFormat("[BAKES]: BaseDirectory not specified");
                 throw new Exception("Configuration error");
@@ -70,27 +69,23 @@ namespace OpenSim.Server.Handlers.BakedTextures
             m_log.Info("[BAKES]: XBakes service enabled");
         }
 
-        public string Get(string id)
+        public byte[] Get(string id)
         {
             string file = HashToFile(id);
             string diskFile = Path.Combine(m_FSBase, file);
 
-            if (File.Exists(diskFile))
+            try
             {
-                try
-                {
-                    byte[] content = File.ReadAllBytes(diskFile);
-
-                    return utf8encoding.GetString(content);
-                }
-                catch
-                {
-                }
+                byte[] content = File.ReadAllBytes(diskFile);
+                return content;
             }
-            return String.Empty;
+            catch
+            {
+            }
+            return new byte[0];
         }
 
-        public void Store(string id, string sdata)
+        public void Store(string id, byte[] data, int dataLength)
         {
             string file = HashToFile(id);
             string diskFile = Path.Combine(m_FSBase, file);
@@ -98,11 +93,8 @@ namespace OpenSim.Server.Handlers.BakedTextures
             Directory.CreateDirectory(Path.GetDirectoryName(diskFile));
 
             File.Delete(diskFile);
-
-            byte[] data = utf8encoding.GetBytes(sdata);
-
             using (FileStream fs = File.Create(diskFile))
-                fs.Write(data, 0, data.Length);
+                fs.Write(data, 0, dataLength);
         }
 
         private void HandleDeleteBakes(string module, string[] args)

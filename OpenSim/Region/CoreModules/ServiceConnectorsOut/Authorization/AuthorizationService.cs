@@ -114,7 +114,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Authorization
             {
                 if (m_UserManagement.IsLocalGridUser(userID) == false)
                 {
-                    message = "No foreign users allowed in this region";
+                    message = "Only Local grid users allowed in this region";
                     return false;
                 }
             }

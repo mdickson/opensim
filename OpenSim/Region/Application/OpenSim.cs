@@ -169,8 +169,8 @@ namespace OpenSim
 
             MainConsole.Instance = m_console;
 
-            LogEnvironmentInformation();
             RegisterCommonAppenders(Config.Configs["Startup"]);
+            LogEnvironmentInformation();
             RegisterConsoleCommands();
 
             base.StartupSpecific();

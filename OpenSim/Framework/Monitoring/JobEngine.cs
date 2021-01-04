@@ -104,8 +104,8 @@ namespace OpenSim.Framework.Monitoring
                 IsRunning = true;
 
                 m_cancelSource = new CancellationTokenSource();
-                WorkManager.RunInThreadPool(ProcessRequests, null, Name, false);
-                m_threadRunnig = true;
+                //WorkManager.RunInThreadPool(ProcessRequests, null, Name, false);
+                //m_threadRunnig = true;
             }
         }
 

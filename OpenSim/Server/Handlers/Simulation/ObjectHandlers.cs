@@ -58,7 +58,7 @@ namespace OpenSim.Server.Handlers.Simulation
             if (m_SimulationService == null)
             {
                 httpResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                httpResponse.RawBuffer = Util.UTF8.GetBytes("false");
+                httpResponse.RawBuffer = Utils.falseStrBytes;
                 return;
             }
 
@@ -75,11 +75,11 @@ namespace OpenSim.Server.Handlers.Simulation
             {
                 case "POST":
                 {
-                    OSDMap args = Utils.DeserializeOSMap(httpRequest);
+                    OSDMap args = Utils.DeserializeJSONOSMap(httpRequest);
                     if (args == null)
                     {
                         httpResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                        httpResponse.RawBuffer = Util.UTF8.GetBytes("false");
+                        httpResponse.RawBuffer = Utils.falseStrBytes;
                         return;
                     }
                     DoObjectPost(args, httpResponse);
