@@ -25,7 +25,7 @@ namespace Amib.Threading.Internal
         /// <summary>
         /// Work items queue
         /// </summary>
-        private readonly PriorityQueue _workItems = new PriorityQueue();
+        private readonly Queue<WorkItem> _workItems = new Queue<WorkItem>();
 
         /// <summary>
         /// Indicate that work items are allowed to be queued
@@ -165,7 +165,7 @@ namespace Amib.Threading.Internal
                 // If there are waiting work items then take one and return.
                 if (_workItems.Count > 0)
                 {
-                    workItem = _workItems.Dequeue() as WorkItem;
+                    workItem = _workItems.Dequeue();
                     return workItem;
                 }
 
@@ -223,7 +223,7 @@ namespace Amib.Threading.Internal
 
                     if (null == workItem)
                     {
-                        workItem = _workItems.Dequeue() as WorkItem;
+                        workItem = _workItems.Dequeue();
                     }
                 }
             }
