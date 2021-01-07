@@ -25,14 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using log4net;
-using Nini.Config;
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Server.Handlers.Base;
-using System;
-using System.IO;
 using System.Net;
 using System.Reflection;
+using Nini.Config;
+using log4net;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenSim.Server.Handlers.Base;
 
 namespace OpenSim.Server.Handlers.Hypergrid
 {
@@ -41,70 +39,39 @@ namespace OpenSim.Server.Handlers.Hypergrid
         public HeloServiceInConnector(IConfigSource config, IHttpServer server, string configName) :
                 base(config, server, configName)
         {
-#pragma warning disable 0612
-            server.AddStreamHandler(new HeloServerGetHandler("opensim-robust"));
-#pragma warning restore 0612
-            server.AddStreamHandler(new HeloServerHeadHandler("opensim-robust"));
+            server.AddSimpleStreamHandler(new HeloServerGetAndHeadHandler("opensim-robust"));
         }
     }
 
-    [Obsolete]
-    public class HeloServerGetHandler : BaseStreamHandler
+    public class HeloServerGetAndHeadHandler : SimpleStreamHandler
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private string m_HandlersType;
 
-        public HeloServerGetHandler(string handlersType) :
-            base("GET", "/helo")
+        public HeloServerGetAndHeadHandler(string handlersType) : base("/helo")
         {
             m_HandlersType = handlersType;
         }
 
-        public override byte[] Handle(string path, Stream requestData,
-                IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
+        protected override void ProcessRequest(IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
         {
-            return OKResponse(httpResponse);
-        }
-
-        private byte[] OKResponse(IOSHttpResponse httpResponse)
-        {
-            m_log.Debug("[HELO]: hi, GET was called");
+            if (httpRequest.HttpMethod == "GET")
+            {
+                //Obsolete
+                m_log.Debug("[HELO]: hi, GET was called");
+            }
+            else if (httpRequest.HttpMethod == "HEAD")
+            {
+                m_log.Debug("[HELO]: hi, HEAD was called");
+            }
+            else
+            {
+                httpResponse.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
+                return;
+            }
             httpResponse.AddHeader("X-Handlers-Provided", m_HandlersType);
             httpResponse.StatusCode = (int)HttpStatusCode.OK;
-            httpResponse.StatusDescription = "OK";
-            return new byte[0];
         }
-
     }
-
-    public class HeloServerHeadHandler : BaseStreamHandler
-    {
-        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
-        private string m_HandlersType;
-
-        public HeloServerHeadHandler(string handlersType) :
-            base("HEAD", "/helo")
-        {
-            m_HandlersType = handlersType;
-        }
-
-        protected override byte[] ProcessRequest(string path, Stream requestData,
-                IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
-        {
-            return OKResponse(httpResponse);
-        }
-
-        private byte[] OKResponse(IOSHttpResponse httpResponse)
-        {
-            m_log.Debug("[HELO]: hi, HEAD was called");
-            httpResponse.AddHeader("X-Handlers-Provided", m_HandlersType);
-            httpResponse.StatusCode = (int)HttpStatusCode.OK;
-            httpResponse.StatusDescription = "OK";
-            return new byte[0];
-        }
-
-    }
-
 }

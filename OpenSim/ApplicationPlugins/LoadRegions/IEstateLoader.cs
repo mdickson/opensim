@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) Contributors, http://opensimulator.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -25,36 +25,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Framework.ServiceAuth;
-using OpenSim.Services.Interfaces;
-using System.IO;
+using Nini.Config;
 
-namespace OpenSim.Server.Handlers.BakedTextures
+namespace OpenSim.ApplicationPlugins.LoadRegions
 {
-    public class BakesServerGetHandler : BaseStreamHandler
+    public interface IEstateLoader
     {
-        //        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
-        private IBakedTextureService m_BakesService;
-        private System.Text.UTF8Encoding utf8 =
-                new System.Text.UTF8Encoding();
-
-        public BakesServerGetHandler(IBakedTextureService service, IServiceAuth auth) :
-                base("GET", "/bakes", auth)
-        {
-            m_BakesService = service;
-        }
-
-        protected override byte[] ProcessRequest(
-            string path, Stream request, IOSHttpRequest httpRequest, IOSHttpResponse httpResponse)
-        {
-            string[] p = SplitParams(path);
-
-            if (p.Length == 0)
-                return new byte[0];
-
-            return utf8.GetBytes(m_BakesService.Get(p[0]));
-        }
+        void SetIniConfigSource(IConfigSource configSource);
+        void LoadEstates();
     }
 }
