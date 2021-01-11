@@ -42,6 +42,7 @@ using Nini.Config;
 
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
+
 using OpenSim.Framework;
 using OpenSim.Framework.Capabilities;
 using OpenSim.Framework.Servers.HttpServer;
@@ -2476,11 +2477,7 @@ namespace OpenSim.Region.ClientStack.Linden
             NameValueCollection query = httpRequest.QueryString;
             string[] ids = query.GetValues("ids");
 
-            Dictionary<UUID, NameInfo> names = m_DisplayNames.GetDisplayNames(ids);
-
-            bool is_local = m_UserManager.IsLocalGridUser(m_AgentID);
-            string home_uri = m_UserManager.GetUserHomeURL(m_AgentID);
-
+            Dictionary<UUID,string> names = m_UserManager.GetKnownUserNames(ids, m_scopeID);
             osUTF8 lsl = LLSDxmlEncode2.Start(names.Count * 256 + 256);
             LLSDxmlEncode2.AddMap(lsl);
             int ct = 0;
