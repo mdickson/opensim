@@ -326,6 +326,7 @@ namespace OpenSim.Region.Framework.Scenes
 
         protected SceneObjectGroup m_parentGroup;
         protected byte[] m_particleSystem = Utils.EmptyBytes;
+        protected double m_particleSystemExpire = -1;
         protected ulong m_regionHandle;
         protected Quaternion m_rotationOffset = Quaternion.Identity;
         protected PrimitiveBaseShape m_shape;
@@ -738,7 +739,15 @@ namespace OpenSim.Region.Framework.Scenes
 
         public Byte[] ParticleSystem
         {
-            get { return m_particleSystem; }
+            get
+            {
+                if(m_particleSystemExpire > 0 && Util.GetTimeStamp() > m_particleSystemExpire)
+                {
+                    m_particleSystemExpire = -1;
+                    m_particleSystem = new byte[0];
+                }
+                return m_particleSystem;
+            }
             set { m_particleSystem = value; }
         }
 
@@ -1946,8 +1955,12 @@ namespace OpenSim.Region.Framework.Scenes
             // m_log.Debug("Aprev: " + prevflag.ToString() + " curr: " + Flags.ToString());
         }
 
-        public void AddNewParticleSystem(Primitive.ParticleSystem pSystem)
+        public void AddNewParticleSystem(Primitive.ParticleSystem pSystem, bool expire)
         {
+            if(expire && pSystem.MaxAge > 0.0001)
+                m_particleSystemExpire = Util.GetTimeStamp() + pSystem.MaxAge + 0.1;
+            else
+                m_particleSystemExpire = -1;
             m_particleSystem = pSystem.GetBytes();
         }
 

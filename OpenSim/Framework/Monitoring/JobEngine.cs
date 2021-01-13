@@ -51,23 +51,9 @@ namespace OpenSim.Framework.Monitoring
         public bool IsRunning { get; private set; }
 
         /// <summary>
-        /// The current job that the engine is running.
-        /// </summary>
-        /// <remarks>
-        /// Will be null if no job is currently running.
-        /// </remarks>
-        private Job m_currentJob;
-        public Job CurrentJob { get { return m_currentJob; } }
-
-        /// <summary>
         /// Number of jobs waiting to be processed.
         /// </summary>
         public int JobsWaiting { get { return m_jobQueue.Count; } }
-
-        /// <summary>
-        /// The timeout in milliseconds to wait for at least one event to be written when the recorder is stopping.
-        /// </summary>
-        public int RequestProcessTimeoutOnStop { get; set; }
 
         /// <summary>
         /// Controls whether we need to warn in the log about exceeding the max queue size.
@@ -83,15 +69,16 @@ namespace OpenSim.Framework.Monitoring
         private CancellationTokenSource m_cancelSource;
 
         private int m_timeout = -1;
+        private int m_concurrency = 1;
 
-        private bool m_threadRunnig = false;
+        private int m_numberThreads = 0;
 
-        public JobEngine(string name, string loggingName, int timeout = -1)
+        public JobEngine(string name, string loggingName, int timeout = -1, int concurrency = 1)
         {
             Name = name;
             LoggingName = loggingName;
             m_timeout = timeout;
-            RequestProcessTimeoutOnStop = 5000;
+            m_concurrency = concurrency;
         }
 
         public void Start()
@@ -100,12 +87,10 @@ namespace OpenSim.Framework.Monitoring
             {
                 if (IsRunning)
                     return;
-
+                if(m_concurrency < 1)
+                    m_concurrency = 1;
                 IsRunning = true;
-
                 m_cancelSource = new CancellationTokenSource();
-                //WorkManager.RunInThreadPool(ProcessRequests, null, Name, false);
-                //m_threadRunnig = true;
             }
         }
 
@@ -121,10 +106,10 @@ namespace OpenSim.Framework.Monitoring
                     m_log.DebugFormat("[JobEngine] Stopping {0}", Name);
 
                     IsRunning = false;
-                    if (m_threadRunnig)
+                    if(m_numberThreads > 0)
                     {
                         m_cancelSource.Cancel();
-                        m_threadRunnig = false;
+                        Thread.Yield();
                     }
                 }
                 finally
@@ -197,22 +182,21 @@ namespace OpenSim.Framework.Monitoring
         /// </param>
         public bool QueueJob(Job job)
         {
-            lock (JobLock)
-            {
-                if (!IsRunning)
-                    return false;
-
-                if (!m_threadRunnig)
-                {
-                    WorkManager.RunInThreadPool(ProcessRequests, null, Name, false);
-                    m_threadRunnig = true;
-                }
-            }
+            if (!IsRunning)
+                return false;
 
             if (m_jobQueue.Count < m_jobQueue.BoundedCapacity)
             {
                 m_jobQueue.Add(job);
 
+                lock (JobLock)
+                {
+                    if (m_numberThreads < m_concurrency && m_numberThreads < m_jobQueue.Count)
+                    {
+                        Util.FireAndForget(ProcessRequests, null, Name, false);
+                        ++m_numberThreads;
+                    }
+                }
                 if (!m_warnOverMaxQueue)
                     m_warnOverMaxQueue = true;
 
@@ -232,50 +216,42 @@ namespace OpenSim.Framework.Monitoring
             }
         }
 
-        private void ProcessRequests(Object o)
+        private void ProcessRequests(object o)
         {
+            Job currentJob;
             while (IsRunning)
             {
                 try
                 {
-                    if (!m_jobQueue.TryTake(out m_currentJob, m_timeout, m_cancelSource.Token))
-                    {
-                        lock (JobLock)
-                            m_threadRunnig = false;
+                    if(!m_jobQueue.TryTake(out currentJob, m_timeout, m_cancelSource.Token))
                         break;
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    m_log.DebugFormat("[JobEngine] {0} Canceled ignoring {1} jobs in queue",
-                        Name, m_jobQueue.Count);
-                    break;
                 }
                 catch
                 {
                     break;
                 }
 
-                if (LogLevel >= 1)
-                    m_log.DebugFormat("[{0}]: Processing job {1}", LoggingName, m_currentJob.Name);
+                if(LogLevel >= 1)
+                    m_log.DebugFormat("[{0}]: Processing job {1}",LoggingName,currentJob.Name);
 
                 try
                 {
-                    m_currentJob.Action();
+                    currentJob.Action();
                 }
                 catch (Exception e)
                 {
-                    m_log.Error(
-                        string.Format(
-                        "[{0}]: Job {1} failed, continuing.  Exception  ", LoggingName, m_currentJob.Name), e);
+                    m_log.ErrorFormat(
+                        "[{0}]: Job {1} failed, continuing.  Exception {2}",LoggingName, currentJob.Name, e);
                 }
 
-                if (LogLevel >= 1)
-                    m_log.DebugFormat("[{0}]: Processed job {1}", LoggingName, m_currentJob.Name);
+                if(LogLevel >= 1)
+                    m_log.DebugFormat("[{0}]: Processed job {1}",LoggingName,currentJob.Name);
 
-                m_currentJob.Action = null;
-                m_currentJob = null;
+                currentJob.Action = null;
+                currentJob = null;
             }
+            lock (JobLock)
+                --m_numberThreads;
         }
 
         public class Job
