@@ -25,16 +25,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+
 using log4net;
 using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
+
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 
 namespace OpenSim.Region.OptionalModules.World.NPC
 {
@@ -180,38 +182,43 @@ namespace OpenSim.Region.OptionalModules.World.NPC
                 return UUID.Zero;
             }
 
-            npcAvatar.CircuitCode = (uint)Util.RandomClass.Next(0,
-                    int.MaxValue);
+            agentID = npcAvatar.AgentId;
+            uint circuit = (uint)Util.RandomClass.Next(0, int.MaxValue);
+            npcAvatar.CircuitCode = circuit;
 
-            //            m_log.DebugFormat(
-            //                "[NPC MODULE]: Creating NPC {0} {1} {2}, owner={3}, senseAsAgent={4} at {5} in {6}",
-            //                firstname, lastname, npcAvatar.AgentId, owner, senseAsAgent, position, scene.RegionInfo.RegionName);
+            //m_log.DebugFormat(
+            //    "[NPC MODULE]: Creating NPC {0} {1} {2}, owner={3}, senseAsAgent={4} at {5} in {6}",
+            //    firstname, lastname, npcAvatar.AgentId, owner, senseAsAgent, position, scene.RegionInfo.RegionName);
 
-            AgentCircuitData acd = new AgentCircuitData();
-            acd.AgentID = npcAvatar.AgentId;
-            acd.firstname = firstname;
-            acd.lastname = lastname;
-            acd.ServiceURLs = new Dictionary<string, object>();
-
-            AvatarAppearance npcAppearance = new AvatarAppearance(appearance, true);
-            acd.Appearance = npcAppearance;
+            AgentCircuitData acd = new AgentCircuitData()
+            {
+                circuitcode = circuit,
+                AgentID = agentID,
+                firstname = firstname,
+                lastname = lastname,
+                ServiceURLs = new Dictionary<string, object>(),
+                Appearance = new AvatarAppearance(appearance, true)
+            };
 
             lock (m_avatars)
             {
-                scene.AuthenticateHandler.AddNewCircuit(npcAvatar.CircuitCode, acd);
+                scene.AuthenticateHandler.AddNewCircuit(acd);
                 scene.AddNewAgent(npcAvatar, PresenceType.Npc);
 
-                if (scene.TryGetScenePresence(npcAvatar.AgentId, out ScenePresence sp))
+                if (scene.TryGetScenePresence(agentID, out ScenePresence sp))
                 {
                     npcAvatar.Born = born;
                     npcAvatar.ActiveGroupId = groupID;
                     sp.CompleteMovement(npcAvatar, false);
                     sp.Grouptitle = groupTitle;
-                    m_avatars.Add(npcAvatar.AgentId, npcAvatar);
+                    m_avatars.Add(agentID, npcAvatar);
+                    //m_log.DebugFormat("[NPC MODULE]: Created NPC {0} {1}", npcAvatar.AgentId, sp.Name);
                 }
             }
 
-            return npcAvatar.AgentId;
+//            m_log.DebugFormat("[NPC MODULE]: Created NPC with id {0}", npcAvatar.AgentId);
+
+            return agentID;
         }
 
         public bool MoveToTarget(UUID agentID, Scene scene, Vector3 pos,
@@ -227,10 +234,10 @@ namespace OpenSim.Region.OptionalModules.World.NPC
                         if (sp.IsSatOnObject || sp.SitGround)
                             return false;
 
-                        //                        m_log.DebugFormat(
-                        //                                "[NPC MODULE]: Moving {0} to {1} in {2}, noFly {3}, landAtTarget {4}",
-                        //                                sp.Name, pos, scene.RegionInfo.RegionName,
-                        //                                noFly, landAtTarget);
+                    //m_log.DebugFormat(
+                    //        "[NPC MODULE]: Moving {0} to {1} in {2}, noFly {3}, landAtTarget {4}",
+                    //        sp.Name, pos, scene.RegionInfo.RegionName,
+                    //        noFly, landAtTarget);
 
                         sp.MoveToTarget(pos, noFly, landAtTarget, running);
 
