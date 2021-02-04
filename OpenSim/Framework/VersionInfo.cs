@@ -30,7 +30,7 @@ namespace OpenSim
     public class VersionInfo
     {
         public const string VersionNumber = "0.9.2.0";
-        public const string UtopiaSkyeVersion = "usg-022021";
+        public const string UtopiaSkyeVersion = "usg-rel-022021";
         public const string AssemblyVersionNumber = "0.9.2.0";
 
         public const Flavour VERSION_FLAVOUR = Flavour.Release;
@@ -58,7 +58,7 @@ namespace OpenSim
             return versionString.PadRight(VERSIONINFO_VERSION_LENGTH);
         }
 
-        public const int VERSIONINFO_VERSION_LENGTH = 40;
+        public const int VERSIONINFO_VERSION_LENGTH = 44;
 
         /// <value>
         /// This is the external interface version.  It is separate from the OpenSimulator project version.
