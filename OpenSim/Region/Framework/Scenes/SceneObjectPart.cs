@@ -5353,7 +5353,7 @@ namespace OpenSim.Region.Framework.Scenes
                 objectflagupdate |= (uint)PrimFlags.AllowInventoryDrop;
             }
 
-            m_localFlags |= (PrimFlags)objectflagupdate;
+            m_localFlags = (PrimFlags)objectflagupdate;
 
             if (ParentGroup != null && ParentGroup.RootPart == this)
             {
