@@ -96,9 +96,7 @@ namespace OpenSim.Region.ClientStack.Linden
 
         private static FetchInvDescHandler m_webFetchHandler;
 
-        private static Thread[] m_workerThreads = null;
-
-        private static BlockingCollection<APollRequest> m_queue = new BlockingCollection<APollRequest>();
+        private static ObjectJobEngine m_workerpool = null;
 
         private static int m_NumberScenes = 0;
 
@@ -140,12 +138,13 @@ namespace OpenSim.Region.ClientStack.Linden
             if (!m_Enabled)
                 return;
 
+            m_NumberScenes--;
+
             Scene.EventManager.OnRegisterCaps -= RegisterCaps;
 
             StatsManager.DeregisterStat(s_processedRequestsStat);
             StatsManager.DeregisterStat(s_queuedRequestsStat);
 
-            m_NumberScenes--;
             Scene = null;
         }
 
@@ -179,7 +178,7 @@ namespace OpenSim.Region.ClientStack.Linden
                         "httpfetch",
                         StatType.Pull,
                         MeasuresOfInterest.AverageChangeOverTime,
-                        stat => { stat.Value = m_queue.Count; },
+                        stat => { stat.Value = m_workerpool.Count; },
                         StatVerbosity.Debug);
 
             StatsManager.RegisterStat(s_processedRequestsStat);
@@ -198,22 +197,8 @@ namespace OpenSim.Region.ClientStack.Linden
 
             m_NumberScenes++;
 
-            int nworkers = 2; // was 2
-            if (ProcessQueuedRequestsAsync && m_workerThreads == null)
-            {
-                m_workerThreads = new Thread[nworkers];
-
-                for (uint i = 0; i < nworkers; i++)
-                {
-                    m_workerThreads[i] = WorkManager.StartThread(DoInventoryRequests,
-                            String.Format("InventoryWorkerThread{0}", i),
-                            ThreadPriority.Normal,
-                            true,
-                            true,
-                            null,
-                            int.MaxValue);
-                }
-            }
+            if (ProcessQueuedRequestsAsync && m_workerpool == null)
+                m_workerpool = new ObjectJobEngine(DoInventoryRequests, "InventoryWorker",2000,2);
         }
 
         public void PostInitialise()
@@ -227,13 +212,10 @@ namespace OpenSim.Region.ClientStack.Linden
 
             if (ProcessQueuedRequestsAsync)
             {
-                if (m_NumberScenes <= 0 && m_workerThreads != null)
+                if (m_NumberScenes <= 0 && m_workerpool != null)
                 {
-                    m_log.DebugFormat("[WebFetchInvDescModule] Closing");
-                    foreach (Thread t in m_workerThreads)
-                        Watchdog.AbortThread(t.ManagedThreadId);
-
-                    m_workerThreads = null;
+                    m_workerpool.Dispose();
+                    m_workerpool = null;
                     m_badRequests.Dispose();
                     m_badRequests = null;
                 }
@@ -301,7 +283,7 @@ namespace OpenSim.Region.ClientStack.Linden
                     reqinfo.thepoll = this;
                     reqinfo.reqID = requestID;
                     reqinfo.request = request;
-                    m_queue.Add(reqinfo);
+                    m_workerpool.Enqueue(reqinfo);
                     return null;
                 };
 
@@ -397,29 +379,13 @@ namespace OpenSim.Region.ClientStack.Linden
             }
         }
 
-        private static void DoInventoryRequests()
+        private static void DoInventoryRequests(object o)
         {
-            bool running = true;
-            while (running)
-            {
-                try
-                {
-                    APollRequest poolreq;
-                    if (m_queue.TryTake(out poolreq, 4500))
-                    {
-                        Watchdog.UpdateThread();
-                        if (poolreq.thepoll != null)
-                            poolreq.thepoll.Process(poolreq);
-                        poolreq = null;
-                    }
-                    Watchdog.UpdateThread();
-                }
-                catch (ThreadAbortException)
-                {
-                    Thread.ResetAbort();
-                    running = false;
-                }
-            }
+            if(m_NumberScenes <= 0)
+                return;
+            APollRequest poolreq = o as APollRequest;
+            if (poolreq != null && poolreq.thepoll != null)
+                poolreq.thepoll.Process(poolreq);
         }
     }
 }

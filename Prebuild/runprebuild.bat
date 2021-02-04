@@ -19,7 +19,7 @@ rem ## Default Visual Studio edition
 set vstudio=2019
 
 rem ## Default Framework
-set framework=4_7_2
+set framework=4_8
 
 rem ## Default architecture (86 (for 32bit), 64)
 :CheckArch
@@ -37,7 +37,7 @@ rem ## Determine native framework
 set framework=4_5
 for /f "tokens=4-5 delims=. " %%i in ('ver') do set VERSION=%%i.%%j
 if %version% == 10.0 (
-	set framework=4_7_2
+	set framework=4_8
 	echo Windows 10
 )
 if %version% == 6.3 (
