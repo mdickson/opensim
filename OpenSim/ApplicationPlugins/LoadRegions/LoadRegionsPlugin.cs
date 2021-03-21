@@ -26,7 +26,6 @@
  */
 
 using log4net;
-using Mono.Addins;
 using OpenMetaverse;
 using OpenSim.Framework;
 using System;

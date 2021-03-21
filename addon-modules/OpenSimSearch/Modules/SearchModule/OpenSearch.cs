@@ -1,5 +1,4 @@
 using log4net;
-using Mono.Addins;
 using Nini.Config;
 using Nwc.XmlRpc;
 using OpenMetaverse;
@@ -16,15 +15,8 @@ using System.Reflection;
 using System.Xml;
 using DirFindFlags = OpenMetaverse.DirectoryManager.DirFindFlags;
 
-[assembly: Addin("OpenSimSearch", OpenSim.VersionInfo.VersionNumber + "0.4")]
-[assembly: AddinDependency("OpenSim.Region.Framework", OpenSim.VersionInfo.VersionNumber)]
-[assembly: AddinDescription("OpenSimSearch module.")]
-[assembly: AddinAuthor("Unknown")]
-
-
 namespace OpenSimSearch.Modules.OpenSearch
 {
-    [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "OpenSimSearch")]
     public class OpenSearchModule : ISearchModule, ISharedRegionModule
     {
         //

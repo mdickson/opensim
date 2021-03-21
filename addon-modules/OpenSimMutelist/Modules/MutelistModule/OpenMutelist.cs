@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using log4net;
-using Mono.Addins;
 using Nini.Config;
 using Nwc.XmlRpc;
 using OpenMetaverse;
@@ -42,15 +41,8 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Xml;
 
-[assembly: Addin("OpenSimMutelist", OpenSim.VersionInfo.VersionNumber + "0.1")]
-[assembly: AddinDependency("OpenSim.Region.Framework", OpenSim.VersionInfo.VersionNumber)]
-[assembly: AddinDescription("OpenSimMutelist module.")]
-[assembly: AddinAuthor("Kevin Cozens")]
-
-
 namespace OpenSim.Region.CoreModules.Avatar.InstantMessage
 {
-    [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "OpenSimMutelist")]
     public class MuteListModule : ISharedRegionModule
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);

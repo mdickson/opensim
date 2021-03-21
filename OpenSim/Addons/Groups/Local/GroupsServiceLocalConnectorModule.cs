@@ -26,7 +26,6 @@
  */
 
 using log4net;
-using Mono.Addins;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
@@ -39,7 +38,6 @@ using System.Reflection;
 
 namespace OpenSim.Groups
 {
-    [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "GroupsServiceLocalConnectorModule")]
     public class GroupsServiceLocalConnectorModule : ISharedRegionModule, IGroupsServicesConnector
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
