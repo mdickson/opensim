@@ -1536,5 +1536,10 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
         {
             m_OSSL_Functions.osLinkParticleSystem(linknumber, rules);
         }
+
+        public LSL_Integer osNpcLookAt(LSL_Key npckey, LSL_Integer type, LSL_Key objkey, vector offset)
+        {
+            return m_OSSL_Functions.osNpcLookAt(npckey, type, objkey, offset);
+        }
     }
 }
