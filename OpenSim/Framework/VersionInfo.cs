@@ -30,7 +30,7 @@ namespace OpenSim
     public class VersionInfo
     {
         public const string VersionNumber = "0.9.2.0";
-        public const string UtopiaSkyeVersion = "usg-rel-022021";
+        public const string UtopiaSkyeVersion = "usg-rel-032221";
         public const string AssemblyVersionNumber = "0.9.2.0";
 
         public const Flavour VERSION_FLAVOUR = Flavour.Release;
