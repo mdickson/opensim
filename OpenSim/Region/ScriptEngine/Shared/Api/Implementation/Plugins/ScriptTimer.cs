@@ -28,10 +28,11 @@
 using OpenMetaverse;
 using System;
 using System.Collections.Generic;
+using OpenMetaverse;
 
 namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
 {
-    public class Timer
+    public class ScriptTimer
     {
         public class TimerInfo
         {
@@ -59,7 +60,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
             }
         }
 
-        public Timer(AsyncCommandManager CmdManager)
+        public ScriptTimer(AsyncCommandManager CmdManager)
         {
             m_CmdManager = CmdManager;
         }
@@ -122,14 +123,14 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api.Plugins
             if (Timers.Count == 0)
                 return;
 
-            Dictionary<string, TimerInfo> tvals;
+            List<TimerInfo> tvals;
             lock (TimerListLock)
             {
                 // Go through all timers
-                tvals = new Dictionary<string, TimerInfo>(Timers);
+                tvals = new List<TimerInfo>(Timers.Values);
             }
 
-            foreach (TimerInfo ts in tvals.Values)
+            foreach (TimerInfo ts in tvals)
             {
                 // Time has passed?
                 if (ts.next < DateTime.Now.Ticks)

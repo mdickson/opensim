@@ -1425,6 +1425,11 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
             return m_OSSL_Functions.osSlerp(a, b, amount);
         }
 
+        public vector osSlerp(vector a, vector b, LSL_Float amount)
+        {
+            return m_OSSL_Functions.osSlerp(a, b, amount);
+        }
+
         public void osResetAllScripts(LSL_Integer allLinkSet)
         {
             m_OSSL_Functions.osResetAllScripts(allLinkSet);
@@ -1520,6 +1525,21 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
         public LSL_Integer osResetEnvironment(LSL_Integer parcelOrRegion, LSL_Integer transition)
         {
             return m_OSSL_Functions.osResetEnvironment(parcelOrRegion, transition);
+        }
+
+        public void osParticleSystem(LSL_List rules)
+        {
+            m_OSSL_Functions.osParticleSystem(rules);
+        }
+
+        public void osLinkParticleSystem(LSL_Integer linknumber, LSL_List rules)
+        {
+            m_OSSL_Functions.osLinkParticleSystem(linknumber, rules);
+        }
+
+        public LSL_Integer osNpcLookAt(LSL_Key npckey, LSL_Integer type, LSL_Key objkey, vector offset)
+        {
+            return m_OSSL_Functions.osNpcLookAt(npckey, type, objkey, offset);
         }
     }
 }

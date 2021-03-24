@@ -92,7 +92,8 @@ namespace OpenSim.Server.Handlers
 
         public bool ClassifiedUpdate(OSDMap json, ref JsonRpcResponse response)
         {
-            if (!json.ContainsKey("params"))
+            OSD tmpParams;
+            if(!json.TryGetValue("params", out tmpParams) || !(tmpParams is OSDMap))
             {
                 response.Error.Code = ErrorCode.ParseError;
                 response.Error.Message = "Error parsing classified update request";
@@ -102,8 +103,14 @@ namespace OpenSim.Server.Handlers
 
             string result = string.Empty;
             UserClassifiedAdd ad = new UserClassifiedAdd();
-            object Ad = (object)ad;
-            OSD.DeserializeMembers(ref Ad, (OSDMap)json["params"]);
+            object Ad = ad;
+            OSD.DeserializeMembers(ref Ad, (OSDMap)tmpParams);
+            //If no maturity bits are set, set PG maturity bit. This works
+            // around a viewer bug. It simplifies the ability to search ads
+            // based on maturity level. 0x4e is bits 1 (old viewers mature), 2 (pg), 3 (Mature) and 6 (Adult).
+            if ((ad.Flags & 0x4e) == 0)
+                ad.Flags |= 0x04;
+
             if (Service.ClassifiedUpdate(ad, ref result))
             {
                 response.Result = OSD.SerializeMembers(ad);
@@ -137,7 +144,8 @@ namespace OpenSim.Server.Handlers
 
         public bool ClassifiedInfoRequest(OSDMap json, ref JsonRpcResponse response)
         {
-            if (!json.ContainsKey("params"))
+            OSD tmpParams;
+            if (!json.TryGetValue("params", out tmpParams) || !(tmpParams is OSDMap))
             {
                 response.Error.Code = ErrorCode.ParseError;
                 response.Error.Message = "no parameters supplied";
@@ -148,9 +156,14 @@ namespace OpenSim.Server.Handlers
             string result = string.Empty;
             UserClassifiedAdd ad = new UserClassifiedAdd();
             object Ad = (object)ad;
-            OSD.DeserializeMembers(ref Ad, (OSDMap)json["params"]);
-            if (Service.ClassifiedInfoRequest(ref ad, ref result))
+            OSD.DeserializeMembers(ref Ad, (OSDMap)tmpParams);
+            if(Service.ClassifiedInfoRequest(ref ad, ref result))
             {
+                //If no maturity bits are set, set PG maturity bit. This works
+                // around a viewer bug. It simplifies the ability to search ads
+                // based on maturity level. 0x4e is bits 1 (old viewers mature), 2 (pg), 3 (Mature) and 6 (Adult).
+                if ((ad.Flags & 0x4e) == 0)
+                    ad.Flags |= 0x04;
                 response.Result = OSD.SerializeMembers(ad);
                 return true;
             }
@@ -164,18 +177,18 @@ namespace OpenSim.Server.Handlers
         #region Picks
         public bool AvatarPicksRequest(OSDMap json, ref JsonRpcResponse response)
         {
-            if (!json.ContainsKey("params"))
+            OSD tmpParams;
+            if (!json.TryGetValue("params", out tmpParams) || !(tmpParams is OSDMap))
             {
                 response.Error.Code = ErrorCode.ParseError;
                 m_log.DebugFormat("Avatar Picks Request");
                 return false;
             }
 
-            OSDMap request = (OSDMap)json["params"];
+            OSDMap request = (OSDMap)tmpParams;
             UUID creatorId = new UUID(request["creatorId"].AsString());
 
-
-            OSDArray data = (OSDArray)Service.AvatarPicksRequest(creatorId);
+            OSDArray data = (OSDArray) Service.AvatarPicksRequest(creatorId);
             response.Result = data;
 
             return true;
@@ -183,7 +196,8 @@ namespace OpenSim.Server.Handlers
 
         public bool PickInfoRequest(OSDMap json, ref JsonRpcResponse response)
         {
-            if (!json.ContainsKey("params"))
+            OSD tmpParams;
+            if (!json.TryGetValue("params", out tmpParams) || !(tmpParams is OSDMap))
             {
                 response.Error.Code = ErrorCode.ParseError;
                 response.Error.Message = "no parameters supplied";
@@ -194,8 +208,8 @@ namespace OpenSim.Server.Handlers
             string result = string.Empty;
             UserProfilePick pick = new UserProfilePick();
             object Pick = (object)pick;
-            OSD.DeserializeMembers(ref Pick, (OSDMap)json["params"]);
-            if (Service.PickInfoRequest(ref pick, ref result))
+            OSD.DeserializeMembers(ref Pick, (OSDMap)tmpParams);
+            if(Service.PickInfoRequest(ref pick, ref result))
             {
                 response.Result = OSD.SerializeMembers(pick);
                 return true;
@@ -208,7 +222,8 @@ namespace OpenSim.Server.Handlers
 
         public bool PicksUpdate(OSDMap json, ref JsonRpcResponse response)
         {
-            if (!json.ContainsKey("params"))
+            OSD tmpParams;
+            if (!json.TryGetValue("params", out tmpParams) || !(tmpParams is OSDMap))
             {
                 response.Error.Code = ErrorCode.ParseError;
                 response.Error.Message = "no parameters supplied";
@@ -219,8 +234,8 @@ namespace OpenSim.Server.Handlers
             string result = string.Empty;
             UserProfilePick pick = new UserProfilePick();
             object Pick = (object)pick;
-            OSD.DeserializeMembers(ref Pick, (OSDMap)json["params"]);
-            if (Service.PicksUpdate(ref pick, ref result))
+            OSD.DeserializeMembers(ref Pick, (OSDMap)tmpParams);
+            if(Service.PicksUpdate(ref pick, ref result))
             {
                 response.Result = OSD.SerializeMembers(pick);
                 return true;
@@ -234,14 +249,15 @@ namespace OpenSim.Server.Handlers
 
         public bool PicksDelete(OSDMap json, ref JsonRpcResponse response)
         {
-            if (!json.ContainsKey("params"))
+            OSD tmpParams;
+            if (!json.TryGetValue("params", out tmpParams) || !(tmpParams is OSDMap))
             {
                 response.Error.Code = ErrorCode.ParseError;
                 m_log.DebugFormat("Avatar Picks Delete Request");
                 return false;
             }
 
-            OSDMap request = (OSDMap)json["params"];
+            OSDMap request = tmpParams as OSDMap;
             UUID pickId = new UUID(request["pickId"].AsString());
             if (Service.PicksDelete(pickId))
                 return true;
@@ -255,7 +271,8 @@ namespace OpenSim.Server.Handlers
         #region Notes
         public bool AvatarNotesRequest(OSDMap json, ref JsonRpcResponse response)
         {
-            if (!json.ContainsKey("params"))
+            OSD tmpParams;
+            if (!json.TryGetValue("params", out tmpParams) || !(tmpParams is OSDMap))
             {
                 response.Error.Code = ErrorCode.ParseError;
                 response.Error.Message = "Params missing";
@@ -265,8 +282,8 @@ namespace OpenSim.Server.Handlers
 
             UserProfileNotes note = new UserProfileNotes();
             object Note = (object)note;
-            OSD.DeserializeMembers(ref Note, (OSDMap)json["params"]);
-            if (Service.AvatarNotesRequest(ref note))
+            OSD.DeserializeMembers(ref Note, (OSDMap)tmpParams);
+            if(Service.AvatarNotesRequest(ref note))
             {
                 response.Result = OSD.SerializeMembers(note);
                 return true;
@@ -279,7 +296,8 @@ namespace OpenSim.Server.Handlers
 
         public bool NotesUpdate(OSDMap json, ref JsonRpcResponse response)
         {
-            if (!json.ContainsKey("params"))
+            OSD tmpParams;
+            if (!json.TryGetValue("params", out tmpParams) || !(tmpParams is OSDMap))
             {
                 response.Error.Code = ErrorCode.ParseError;
                 response.Error.Message = "No parameters";
@@ -289,9 +307,9 @@ namespace OpenSim.Server.Handlers
 
             string result = string.Empty;
             UserProfileNotes note = new UserProfileNotes();
-            object Notes = (object)note;
-            OSD.DeserializeMembers(ref Notes, (OSDMap)json["params"]);
-            if (Service.NotesUpdate(ref note, ref result))
+            object Notes = (object) note;
+            OSD.DeserializeMembers(ref Notes, (OSDMap)tmpParams);
+            if(Service.NotesUpdate(ref note, ref result))
             {
                 response.Result = OSD.SerializeMembers(note);
                 return true;

@@ -106,6 +106,9 @@ namespace Prebuild.Core.Nodes
 		/// .NET 4.6
 		/// </summary>
 		v4_6,
+		/// <summary>
+		/// .NET 4.6.1
+		/// </summary>
 		v4_6_1,
 		v4_6_2,
 		/// <summary>
