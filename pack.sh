@@ -91,3 +91,4 @@ EXCLUDES="--exclude='./.git' --exclude='./.nant' --exclude='./.vs' --exclude='./
 
 exit 0
 
+tar --exclude='./.git' --exclude='./.nant' --exclude='./.vs' --exclude='./.vscode' --exclude='bin/ScriptEngines'  -czvf ../${releasename}.tar.gz .

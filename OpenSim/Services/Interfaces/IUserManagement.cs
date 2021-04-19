@@ -47,7 +47,8 @@ namespace OpenSim.Framework
         bool GetUserUUI(UUID userID, out string uui);
         string GetUserServerURL(UUID uuid, string serverType);
         string GetUserServerURL(UUID uuid, string serverType, out bool failedWeb);
-        Dictionary<UUID,string> GetUsersNames(string[] ids, UUID scopeID);
+        Dictionary<UUID, string> GetUsersNames(string[] ids, UUID scopeID);
+        Dictionary<UUID, string> GetKnownUserNames(string[] ids, UUID scopeID);
         void UserWebFailed(UUID id);
 
         Dictionary<UUID, UserData> GetUserDatas(string[] ids, UUID scopeID, bool update_name = false);

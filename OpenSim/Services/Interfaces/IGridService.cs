@@ -77,6 +77,7 @@ namespace OpenSim.Services.Interfaces
         /// <param name="regionName"></param>
         /// <returns>Returns the region information if the name matched.  Null otherwise.</returns>
         GridRegion GetRegionByName(UUID scopeID, string regionName);
+        GridRegion GetRegionByURI(UUID scopeID, RegionURI uri);
 
         /// <summary>
         /// Get information about regions starting with the provided name.
@@ -92,6 +93,7 @@ namespace OpenSim.Services.Interfaces
         /// grid-server couldn't be contacted or returned an error, return null.
         /// </returns>
         List<GridRegion> GetRegionsByName(UUID scopeID, string name, int maxNumber);
+        List<GridRegion> GetRegionsByURI(UUID scopeID, RegionURI uri, int maxNumber);
 
         List<GridRegion> GetRegionRange(UUID scopeID, int xmin, int xmax, int ymin, int ymax);
 
