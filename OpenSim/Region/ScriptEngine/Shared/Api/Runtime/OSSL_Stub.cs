@@ -38,6 +38,8 @@ using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
 using vector = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Vector3;
 
+#pragma warning disable IDE1006
+
 namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 {
     public partial class ScriptBaseClass : MarshalByRefObject
@@ -1540,6 +1542,16 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
         public LSL_Integer osNpcLookAt(LSL_Key npckey, LSL_Integer type, LSL_Key objkey, vector offset)
         {
             return m_OSSL_Functions.osNpcLookAt(npckey, type, objkey, offset);
+        }
+
+        public LSL_Integer osAvatarType(LSL_Key avkey)
+        {
+            return m_OSSL_Functions.osAvatarType(avkey);
+        }
+
+        public LSL_Integer osAvatarType(LSL_String sFirstName, LSL_String sLastName)
+        {
+            return m_OSSL_Functions.osAvatarType(sFirstName, sLastName);
         }
     }
 }
